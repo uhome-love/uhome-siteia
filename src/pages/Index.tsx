@@ -19,6 +19,8 @@ const Index = () => {
     }
   }, [navigate]);
 
+  useCanonical("/");
+
   useEffect(() => {
     setJsonLd("jsonld-org", buildOrganizationJsonLd());
     return () => removeJsonLd("jsonld-org");

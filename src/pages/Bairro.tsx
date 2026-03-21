@@ -8,6 +8,7 @@ import { fetchImoveis, formatPreco, type Imovel } from "@/services/imoveis";
 import { motion } from "framer-motion";
 import { MapPin, Home, ArrowRight, Loader2, ChevronRight } from "lucide-react";
 import { setJsonLd, removeJsonLd, buildBairroJsonLd, buildBairroBreadcrumbJsonLd } from "@/lib/jsonld";
+import { useCanonical } from "@/hooks/useCanonical";
 
 function setMeta(attr: string, key: string, content: string) {
   const selector = `meta[${attr}="${key}"]`;

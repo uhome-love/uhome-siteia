@@ -91,7 +91,7 @@ export function HeroSection() {
               Porto Alegre & Região
             </p>
             <h1
-              className="font-body text-[clamp(2rem,5vw,3.25rem)] font-extrabold leading-[1.08] tracking-tight text-white"
+              className="font-body text-[clamp(2rem,5vw,3.25rem)] font-extrabold leading-[1.08] tracking-tight text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.4)]"
               style={{ textWrap: "balance" }}
             >
               Encontre o imóvel{" "}

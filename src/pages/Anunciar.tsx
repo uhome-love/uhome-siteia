@@ -56,6 +56,7 @@ const fadeUp = {
 };
 
 const Anunciar = () => {
+  useCanonical();
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
   const [tipoImovel, setTipoImovel] = useState("");

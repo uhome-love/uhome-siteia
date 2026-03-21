@@ -42,6 +42,7 @@ function describeFilters(filters: Record<string, any>): string {
 }
 
 const Search = () => {
+  useCanonical();
   const [searchParams, setSearchParams] = useSearchParams();
   const modoIA = searchParams.get("modo") === "ia";
   const { filters, setFilter, setFilters } = useSearchStore();

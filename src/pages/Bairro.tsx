@@ -25,6 +25,7 @@ const Bairro = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const bairro = getBairroBySlug(slug || "");
+  useCanonical();
 
   const [imoveis, setImoveis] = useState<Imovel[]>([]);
   const [total, setTotal] = useState(0);

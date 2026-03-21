@@ -20,6 +20,7 @@ function setMeta(attr: string, key: string, content: string) {
 }
 
 const Bairros = () => {
+  useCanonical();
   const [contagens, setContagens] = useState<Record<string, number>>({});
 
   useEffect(() => {

@@ -112,6 +112,7 @@ function buildFaqJsonLd(items: FaqItem[]) {
 }
 
 const FAQ = () => {
+  useCanonical();
   useEffect(() => {
     const title = "Perguntas Frequentes sobre Imóveis em Porto Alegre | Uhome";
     const desc =

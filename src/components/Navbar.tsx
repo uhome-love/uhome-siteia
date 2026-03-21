@@ -1,43 +1,47 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Heart, User } from "lucide-react";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
+import { Menu, X, Heart, User, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { UhomeLogo } from "@/components/UhomeLogo";
-
-const navLinks = [
-  { label: "Comprar", href: "/busca?finalidade=venda", match: "/busca" },
-  { label: "Busca IA", href: "/ia-search", match: "/ia-search" },
-];
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const [searchParams] = useSearchParams();
+
+  const isSearchPage = location.pathname === "/busca";
+  const modoIA = searchParams.get("modo") === "ia";
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border/50">
-      <div className="relative flex h-16 w-full items-center justify-between px-10">
+      <div className="relative flex h-16 w-full items-center justify-between px-5 sm:px-10">
         <Link to="/" className="flex items-center flex-shrink-0">
           <UhomeLogo variant="full" height={32} />
         </Link>
 
-        {/* Desktop — centered nav */}
-        <div className="hidden md:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
-          {navLinks.map((link) => {
-            const isActive = location.pathname.startsWith(link.match);
-            return (
-              <Link
-                key={link.label}
-                to={link.href}
-                className={`rounded-full px-[18px] py-2 text-[15px] transition-colors active:scale-[0.97] ${
-                  isActive
-                    ? "font-bold text-primary bg-primary/5"
-                    : "font-medium text-foreground hover:bg-secondary"
-                }`}
-              >
-                {link.label}
-              </Link>
-            );
-          })}
+        {/* Desktop — centered pill toggle */}
+        <div className="hidden md:flex items-center absolute left-1/2 -translate-x-1/2 rounded-full bg-secondary p-1 gap-0.5">
+          <Link
+            to="/busca?finalidade=venda"
+            className={`rounded-full px-[18px] py-[7px] text-[14px] font-semibold transition-all whitespace-nowrap ${
+              isSearchPage && !modoIA
+                ? "bg-background text-foreground shadow-[0_1px_4px_rgba(0,0,0,0.1)]"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Comprar
+          </Link>
+          <Link
+            to="/busca?modo=ia"
+            className={`rounded-full px-[18px] py-[7px] text-[14px] font-semibold transition-all whitespace-nowrap flex items-center gap-1.5 ${
+              isSearchPage && modoIA
+                ? "bg-background text-primary shadow-[0_1px_4px_rgba(0,0,0,0.1)]"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+            Busca IA
+          </Link>
         </div>
 
         <div className="hidden items-center gap-2 md:flex flex-shrink-0">
@@ -75,16 +79,33 @@ export function Navbar() {
             className="border-t border-border bg-background md:hidden"
           >
             <div className="flex flex-col gap-4 px-8 py-6">
-              {navLinks.map((link) => (
+              {/* Mobile pill toggle */}
+              <div className="flex items-center rounded-full bg-secondary p-1 gap-0.5 self-start">
                 <Link
-                  key={link.label}
-                  to={link.href}
+                  to="/busca?finalidade=venda"
                   onClick={() => setMobileOpen(false)}
-                  className="font-body text-lg text-muted-foreground transition-colors hover:text-foreground"
+                  className={`rounded-full px-4 py-2 text-sm font-semibold transition-all ${
+                    isSearchPage && !modoIA
+                      ? "bg-background text-foreground shadow-[0_1px_4px_rgba(0,0,0,0.1)]"
+                      : "text-muted-foreground"
+                  }`}
                 >
-                  {link.label}
+                  Comprar
                 </Link>
-              ))}
+                <Link
+                  to="/busca?modo=ia"
+                  onClick={() => setMobileOpen(false)}
+                  className={`rounded-full px-4 py-2 text-sm font-semibold transition-all flex items-center gap-1.5 ${
+                    isSearchPage && modoIA
+                      ? "bg-background text-primary shadow-[0_1px_4px_rgba(0,0,0,0.1)]"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  <Sparkles className="h-3.5 w-3.5" />
+                  Busca IA
+                </Link>
+              </div>
+
               <Link
                 to="/anunciar"
                 onClick={() => setMobileOpen(false)}

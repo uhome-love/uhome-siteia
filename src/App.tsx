@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,7 +8,6 @@ import { FloatingCTA } from "@/components/FloatingCTA";
 import Index from "./pages/Index.tsx";
 import Search from "./pages/Search.tsx";
 import PropertyDetail from "./pages/PropertyDetail.tsx";
-import AISearch from "./pages/AISearch.tsx";
 import Anunciar from "./pages/Anunciar.tsx";
 import Onboarding from "./pages/Onboarding.tsx";
 import NotFound from "./pages/NotFound.tsx";
@@ -25,7 +24,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/busca" element={<Search />} />
           <Route path="/imovel/:slug" element={<PropertyDetail />} />
-          <Route path="/ia-search" element={<AISearch />} />
+          <Route path="/ia-search" element={<Navigate to="/busca?modo=ia" replace />} />
           <Route path="/anunciar" element={<Anunciar />} />
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="*" element={<NotFound />} />

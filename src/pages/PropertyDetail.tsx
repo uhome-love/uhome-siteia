@@ -239,7 +239,7 @@ const PropertyDetail = () => {
 
             {/* Description */}
             <div>
-              <h2 className="font-display text-xl font-bold text-foreground">Sobre o imóvel</h2>
+              <h2 className="text-h3 text-foreground">Sobre o imóvel</h2>
               <p className="mt-3 font-body text-sm leading-relaxed text-muted-foreground" style={{ maxWidth: "65ch" }}>
                 {property.description}
               </p>

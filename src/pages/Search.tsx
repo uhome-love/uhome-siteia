@@ -80,36 +80,46 @@ const Search = () => {
     }
   }, [modoIA]);
 
-  // Normal mode: fetch by store filters
+  // Build filter object (shared between list and map)
+  const buildFilters = useCallback(() => ({
+    finalidade: filters.finalidade || undefined,
+    tipo: filters.tipo || undefined,
+    bairro: filters.bairro || undefined,
+    precoMin: filters.precoMin || undefined,
+    precoMax: filters.precoMax || undefined,
+    areaMin: filters.areaMin || undefined,
+    areaMax: filters.areaMax || undefined,
+    quartos: filters.quartos || undefined,
+    banheiros: filters.banheiros || undefined,
+    vagas: filters.vagas || undefined,
+    diferenciais: filters.diferenciais.length ? filters.diferenciais : undefined,
+    q: filters.q || undefined,
+  }), [filters]);
+
+  // Normal mode: fetch list (paginated) + map pins (all)
   const loadImoveis = useCallback(async () => {
-    if (modoIA && !aiResult) return; // In AI mode, wait for AI search
+    if (modoIA && !aiResult) return;
     setLoading(true);
     try {
-      const result = await fetchImoveis({
-        finalidade: filters.finalidade || undefined,
-        tipo: filters.tipo || undefined,
-        bairro: filters.bairro || undefined,
-        precoMin: filters.precoMin || undefined,
-        precoMax: filters.precoMax || undefined,
-        areaMin: filters.areaMin || undefined,
-        areaMax: filters.areaMax || undefined,
-        quartos: filters.quartos || undefined,
-        banheiros: filters.banheiros || undefined,
-        vagas: filters.vagas || undefined,
-        diferenciais: filters.diferenciais.length ? filters.diferenciais : undefined,
-        ordem: filters.ordem as any,
-        q: filters.q || undefined,
-        bounds: filters.bounds || undefined,
-        limit: 40,
-      });
+      const baseFilters = buildFilters();
+      const [result, pins] = await Promise.all([
+        fetchImoveis({
+          ...baseFilters,
+          ordem: filters.ordem as any,
+          bounds: filters.bounds || undefined,
+          limit: 40,
+        }),
+        fetchMapPins(baseFilters),
+      ]);
       setImoveis(result.data);
       setTotal(result.count);
+      setMapPins(pins);
     } catch (err) {
       console.error("Erro ao buscar imóveis:", err);
     } finally {
       setLoading(false);
     }
-  }, [filters, modoIA, aiResult]);
+  }, [filters, modoIA, aiResult, buildFilters]);
 
   useEffect(() => {
     if (!modoIA) loadImoveis();

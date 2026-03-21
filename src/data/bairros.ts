@@ -30,7 +30,7 @@ export const bairrosData: BairroData[] = [
   {
     nome: "Bela Vista",
     slug: "bela-vista",
-    foto: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80",
+    foto: "/images/bela-vista.png",
     descricao:
       "Bela Vista alia localização privilegiada a uma infraestrutura completa. Com o Colégio Farroupilha e a PUCRS nas proximidades, o bairro concentra condomínios modernos, parques e fácil acesso às principais avenidas de Porto Alegre.",
     lat: -30.045,
@@ -39,7 +39,7 @@ export const bairrosData: BairroData[] = [
   {
     nome: "Auxiliadora",
     slug: "auxiliadora",
-    foto: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80",
+    foto: "/images/auxiliadora.png",
     descricao:
       "Auxiliadora é sinônimo de sofisticação e praticidade. A poucos minutos do Shopping Iguatemi, concentra edifícios de alto padrão, clínicas, escolas e o melhor do comércio da Zona Norte. Perfeito para quem busca viver bem sem abrir mão da centralidade.",
     lat: -30.02,
@@ -48,7 +48,7 @@ export const bairrosData: BairroData[] = [
   {
     nome: "Três Figueiras",
     slug: "tres-figueiras",
-    foto: "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=800&q=80",
+    foto: "/images/tres-figueiras.png",
     descricao:
       "Três Figueiras é um dos bairros mais exclusivos de Porto Alegre. Ruas tranquilas, residências luxuosas e a proximidade com o Parque Germânia e o Shopping Iguatemi fazem deste endereço uma referência em qualidade de vida e valorização imobiliária.",
     lat: -30.035,
@@ -57,7 +57,7 @@ export const bairrosData: BairroData[] = [
   {
     nome: "Menino Deus",
     slug: "menino-deus",
-    foto: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80",
+    foto: "/images/menino-deus.png",
     descricao:
       "Menino Deus encanta pela vista para o Guaíba e pela proximidade com o Parque Marinha do Brasil. Com excelente infraestrutura, ciclovias e acesso à Orla, é ideal para quem curte vida ao ar livre sem abrir mão da conveniência urbana.",
     lat: -30.05,

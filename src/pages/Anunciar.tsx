@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { UhomeLogo } from "@/components/UhomeLogo";
 import { useCanonical } from "@/hooks/useCanonical";
+import { whatsappLink } from "@/lib/whatsapp";
 
 const steps = [
   {
@@ -146,7 +147,7 @@ const Anunciar = () => {
               Quero anunciar meu imóvel →
             </button>
             <a
-              href="https://wa.me/5551999999999?text=Olá! Quero anunciar meu imóvel na Uhome."
+              href={whatsappLink("Olá! Quero anunciar meu imóvel na Uhome.")}
               target="_blank"
               rel="noopener noreferrer"
               className="rounded-full border-[1.5px] border-primary px-6 py-4 font-body text-base font-semibold text-primary transition-colors hover:bg-primary/5 active:scale-[0.97]"

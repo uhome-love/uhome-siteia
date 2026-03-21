@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, X } from "lucide-react";
+import { whatsappLink } from "@/lib/whatsapp";
 
 const DISMISSED_KEY = "uhome_float_dismissed";
-const WHATSAPP_NUMBER = "5551999999999";
 
 export function FloatingCTA() {
   const [visible, setVisible] = useState(false);
@@ -30,8 +30,7 @@ export function FloatingCTA() {
   };
 
   const handleClick = () => {
-    const msg = encodeURIComponent("Olá! Vim pelo site da Uhome e gostaria de saber mais sobre os imóveis disponíveis.");
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
+    window.open(whatsappLink("Olá! Vim pelo site da Uhome e gostaria de saber mais sobre os imóveis disponíveis."), "_blank");
   };
 
   if (dismissed) return null;

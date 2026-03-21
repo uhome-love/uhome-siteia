@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { setJsonLd, removeJsonLd } from "@/lib/jsonld";
+import { whatsappLink } from "@/lib/whatsapp";
 import { useCanonical } from "@/hooks/useCanonical";
 import { motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
@@ -230,7 +231,7 @@ const FAQ = () => {
               Buscar imóveis
             </Link>
             <a
-              href="https://wa.me/555199999999"
+              href={whatsappLink("Olá! Tenho uma dúvida sobre imóveis em Porto Alegre.")}
               target="_blank"
               rel="noopener noreferrer"
               className="rounded-full border border-border bg-card px-6 py-2.5 font-body text-sm font-semibold text-foreground transition-colors hover:border-primary/40 hover:text-primary active:scale-[0.97]"

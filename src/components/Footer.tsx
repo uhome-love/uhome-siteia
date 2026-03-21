@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { UhomeLogo } from "@/components/UhomeLogo";
+import { WHATSAPP_NUMBER, WHATSAPP_DISPLAY } from "@/lib/whatsapp";
 
 export function Footer() {
   return (
@@ -40,7 +41,7 @@ export function Footer() {
             <h4 className="font-body text-sm font-semibold text-foreground">Contato</h4>
             <ul className="mt-3 space-y-2 font-body text-sm text-muted-foreground">
               <li>
-                <a href="tel:+555199999999" className="transition-colors hover:text-foreground">(51) 99999-9999</a>
+                <a href={`tel:+${WHATSAPP_NUMBER}`} className="transition-colors hover:text-foreground">{WHATSAPP_DISPLAY}</a>
               </li>
               <li>
                 <a href="mailto:contato@uhome.com.br" className="transition-colors hover:text-foreground">contato@uhome.com.br</a>

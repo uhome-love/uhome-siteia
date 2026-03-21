@@ -3,8 +3,7 @@ import { Send, Loader2, Check, MessageCircle } from "lucide-react";
 import { submitLead } from "@/services/leads";
 import { toast } from "sonner";
 import { formatPreco } from "@/services/imoveis";
-
-const WHATSAPP_NUMBER = "5551999999999";
+import { whatsappLink } from "@/lib/whatsapp";
 
 interface LeadSidebarProps {
   imovelId?: string;
@@ -49,8 +48,7 @@ export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, 
   };
 
   const handleWhatsApp = () => {
-    const msg = encodeURIComponent(`Olá! Tenho interesse no imóvel: ${imovelTitulo || ""}. Vi no site da Uhome.`);
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
+    window.open(whatsappLink(`Olá! Tenho interesse no imóvel: ${imovelTitulo || ""}. Vi no site da Uhome.`), "_blank");
   };
 
   const priceLabel = imovelPreco ? formatPreco(imovelPreco) : null;

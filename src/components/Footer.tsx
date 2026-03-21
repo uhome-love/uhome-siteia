@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { UhomeLogo } from "@/components/UhomeLogo";
 
 export function Footer() {
   return (
@@ -7,8 +8,8 @@ export function Footer() {
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
           <div>
-            <span className="font-display text-2xl font-bold text-gradient-gold">Uhome</span>
-            <p className="mt-3 max-w-xs font-body text-sm text-muted-foreground">
+            <UhomeLogo variant="full" size="md" />
+            <p className="mt-4 max-w-xs font-body text-sm text-muted-foreground">
               Imóveis de alto padrão em Porto Alegre com curadoria especializada e tecnologia de ponta.
             </p>
           </div>
@@ -28,7 +29,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-body text-sm font-semibold text-foreground">Uhome</h4>
+            <h4 className="font-body text-sm font-semibold text-foreground">UHome</h4>
             <ul className="mt-3 space-y-2">
               {["Sobre nós", "Equipe", "Blog", "Carreiras"].map((l) => (
                 <li key={l}>
@@ -52,7 +53,7 @@ export function Footer() {
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 sm:flex-row">
           <p className="font-body text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Uhome Imóveis. Todos os direitos reservados.
+            © {new Date().getFullYear()} UHome Imóveis. Todos os direitos reservados.
           </p>
           <p className="font-body text-xs text-muted-foreground">CRECI-RS 00000-J</p>
         </div>

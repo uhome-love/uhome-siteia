@@ -27,16 +27,20 @@ export function UhomeLogo({
     );
   }
 
+  const aspectRatio = 1424 / 420;
+  const width = Math.round(height * aspectRatio);
+
   return (
     <img
       src="/uhome-logo.svg"
       height={height}
+      width={width}
       alt="Uhome Imóveis"
       className={className}
       style={{
         filter: white ? "brightness(0) invert(1)" : "none",
         objectFit: "contain",
-        maxWidth: height * 4,
+        display: "block",
       }}
     />
   );

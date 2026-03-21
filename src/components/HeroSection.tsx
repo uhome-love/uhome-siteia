@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapPin, Sparkles } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { bairrosData } from "@/data/bairros";
 
 const ease = [0.16, 1, 0.3, 1] as [number, number, number, number];
 
@@ -13,6 +14,8 @@ export function HeroSection() {
 
   // Search state
   const [bairro, setBairro] = useState("");
+  const [bairroOpen, setBairroOpen] = useState(false);
+  const bairroRef = useRef<HTMLDivElement>(null);
   const [tipo, setTipo] = useState("");
   const [preco, setPreco] = useState("");
   const [quartos, setQuartos] = useState("");
@@ -23,6 +26,22 @@ export function HeroSection() {
   const [bairroAnuncio, setBairroAnuncio] = useState("");
   const [enviado, setEnviado] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const bairroSuggestions = useMemo(() => {
+    if (!bairro.trim()) return bairrosData.slice(0, 6);
+    const q = bairro.toLowerCase();
+    return bairrosData.filter((b) => b.nome.toLowerCase().includes(q));
+  }, [bairro]);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (bairroRef.current && !bairroRef.current.contains(e.target as Node)) {
+        setBairroOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   const handleBuscar = () => {
     const params = new URLSearchParams();
@@ -128,25 +147,59 @@ export function HeroSection() {
 
             {modo === "comprar" ? (
               <>
-                {/* Bairro */}
-                <label className="mb-2 block rounded-xl border-[1.5px] border-border p-3 transition-colors focus-within:border-primary sm:mb-2.5 sm:p-3.5">
-                  <div className="flex items-center gap-2.5">
-                    <MapPin className="h-5 w-5 shrink-0 text-muted-foreground" />
-                    <div className="flex-1">
-                      <span className="mb-0.5 block font-body text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                        Bairro ou região
-                      </span>
-                      <input
-                        type="text"
-                        value={bairro}
-                        onChange={(e) => setBairro(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && handleBuscar()}
-                        placeholder="Ex: Moinhos de Vento, Petrópolis..."
-                        className="w-full bg-transparent font-body text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none"
-                      />
+                {/* Bairro with autocomplete */}
+                <div ref={bairroRef} className="relative mb-2 sm:mb-2.5">
+                  <label className="block rounded-xl border-[1.5px] border-border p-3 transition-colors focus-within:border-primary sm:p-3.5">
+                    <div className="flex items-center gap-2.5">
+                      <MapPin className="h-5 w-5 shrink-0 text-muted-foreground" />
+                      <div className="flex-1">
+                        <span className="mb-0.5 block font-body text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                          Bairro ou região
+                        </span>
+                        <input
+                          type="text"
+                          value={bairro}
+                          onChange={(e) => { setBairro(e.target.value); setBairroOpen(true); }}
+                          onFocus={() => setBairroOpen(true)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") { setBairroOpen(false); handleBuscar(); }
+                            if (e.key === "Escape") setBairroOpen(false);
+                          }}
+                          placeholder="Ex: Moinhos de Vento, Petrópolis..."
+                          className="w-full bg-transparent font-body text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none"
+                          autoComplete="off"
+                        />
+                      </div>
                     </div>
-                  </div>
-                </label>
+                  </label>
+
+                  <AnimatePresence>
+                    {bairroOpen && bairroSuggestions.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -4 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute left-0 right-0 top-full z-30 mt-1 max-h-48 overflow-y-auto rounded-xl border border-border bg-card shadow-xl"
+                      >
+                        {bairroSuggestions.map((b) => (
+                          <button
+                            key={b.slug}
+                            type="button"
+                            onClick={() => {
+                              setBairro(b.nome);
+                              setBairroOpen(false);
+                            }}
+                            className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left font-body text-sm text-foreground transition-colors hover:bg-secondary"
+                          >
+                            <MapPin className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                            {b.nome}
+                          </button>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
 
                 {/* Tipo + Preço */}
                 <div className="mb-2 grid grid-cols-2 gap-2 sm:mb-2.5 sm:gap-2.5">

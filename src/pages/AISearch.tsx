@@ -202,7 +202,7 @@ const AISearchPage = () => {
                           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                           transition={{ duration: 0.4, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
                         >
-                          <SearchPropertyCard property={p} />
+                          <SearchPropertyCard property={p} index={i} />
                         </motion.div>
                       ))}
                     </div>

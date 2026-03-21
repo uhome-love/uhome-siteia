@@ -87,7 +87,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch }: 
   const [mapMoved, setMapMoved] = useState(false);
 
   // Keep ref in sync
-  useEffect(() => { imoveisRef.current = imoveis; }, [imoveis]);
+  useEffect(() => { pinsRef.current = pins; }, [pins]);
 
   // Init map once
   useEffect(() => {

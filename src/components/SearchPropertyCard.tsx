@@ -33,9 +33,9 @@ function getBadge(imovel: Imovel): { label: string; style: BadgeStyle } | null {
 }
 
 const badgeClasses: Record<BadgeStyle, string> = {
-  novo: "bg-white/95 text-foreground",
-  exclusivo: "bg-black/80 text-white",
-  visto: "bg-primary/15 text-primary border border-primary/30",
+  novo: "bg-white/95 text-foreground font-semibold shadow-sm",
+  exclusivo: "bg-black/80 text-white font-semibold shadow-sm",
+  visto: "bg-white/90 text-primary font-semibold shadow-sm backdrop-blur-sm",
 };
 
 export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Props) {

@@ -4,7 +4,7 @@ import { Navbar } from "@/components/Navbar";
 import { HeroSection } from "@/components/HeroSection";
 import { FeaturedNeighborhoods } from "@/components/FeaturedNeighborhoods";
 import { FeaturedProperties } from "@/components/FeaturedProperties";
-import { AISearchSection } from "@/components/AISearchSection";
+
 import { Footer } from "@/components/Footer";
 import { setJsonLd, removeJsonLd, buildOrganizationJsonLd } from "@/lib/jsonld";
 import { useCanonical } from "@/hooks/useCanonical";

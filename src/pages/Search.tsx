@@ -72,7 +72,16 @@ const Search = () => {
       const urlQ = searchParams.get("q");
       if (urlFinalidade === "venda") f.finalidade = urlFinalidade;
       if (urlTipo) f.tipo = urlTipo;
-      if (urlQ) f.q = urlQ;
+      if (urlQ) {
+        // Multiple neighborhoods separated by comma → use bairros filter
+        const parts = urlQ.split(",").map(s => s.trim()).filter(Boolean);
+        if (parts.length > 1) {
+          f.q = "";
+          f.bairro = parts.join(",");
+        } else {
+          f.q = urlQ;
+        }
+      }
       if (Object.keys(f).length) setFilters(f as any);
       // Clear AI state
       setResumoIA(null);
@@ -81,21 +90,30 @@ const Search = () => {
   }, [modoIA]);
 
   // Build filter object (shared between list and map)
-  const buildFilters = useCallback(() => ({
-    finalidade: filters.finalidade || undefined,
-    tipo: filters.tipo || undefined,
-    bairro: filters.bairro || undefined,
-    cidade: filters.cidade || undefined,
-    precoMin: filters.precoMin || undefined,
-    precoMax: filters.precoMax || undefined,
-    areaMin: filters.areaMin || undefined,
-    areaMax: filters.areaMax || undefined,
-    quartos: filters.quartos || undefined,
-    banheiros: filters.banheiros || undefined,
-    vagas: filters.vagas || undefined,
-    diferenciais: filters.diferenciais.length ? filters.diferenciais : undefined,
-    q: filters.q || undefined,
-  }), [filters]);
+  const buildFilters = useCallback(() => {
+    // If bairro contains commas, treat as multiple bairros
+    const bairroStr = filters.bairro || "";
+    const bairrosParts = bairroStr.includes(",")
+      ? bairroStr.split(",").map(s => s.trim()).filter(Boolean)
+      : [];
+    
+    return {
+      finalidade: filters.finalidade || undefined,
+      tipo: filters.tipo || undefined,
+      bairro: bairrosParts.length ? undefined : (filters.bairro || undefined),
+      bairros: bairrosParts.length ? bairrosParts : undefined,
+      cidade: filters.cidade || undefined,
+      precoMin: filters.precoMin || undefined,
+      precoMax: filters.precoMax || undefined,
+      areaMin: filters.areaMin || undefined,
+      areaMax: filters.areaMax || undefined,
+      quartos: filters.quartos || undefined,
+      banheiros: filters.banheiros || undefined,
+      vagas: filters.vagas || undefined,
+      diferenciais: filters.diferenciais.length ? filters.diferenciais : undefined,
+      q: filters.q || undefined,
+    };
+  }, [filters]);
 
   // Normal mode: fetch list (paginated) + map pins (all)
   const loadImoveis = useCallback(async () => {

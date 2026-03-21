@@ -23,6 +23,15 @@ const BlogPostPage = lazy(() => import("./pages/BlogPost.tsx"));
 const Favoritos = lazy(() => import("./pages/Favoritos.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
+// Admin
+const AdminLayout = lazy(() => import("./pages/admin/AdminLayout.tsx"));
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard.tsx"));
+const AdminImoveis = lazy(() => import("./pages/admin/AdminImoveis.tsx"));
+const AdminLeads = lazy(() => import("./pages/admin/AdminLeads.tsx"));
+const AdminCaptacoes = lazy(() => import("./pages/admin/AdminCaptacoes.tsx"));
+const AdminSync = lazy(() => import("./pages/admin/AdminSync.tsx"));
+const AdminConfig = lazy(() => import("./pages/admin/AdminConfig.tsx"));
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

@@ -9,6 +9,7 @@ import Index from "./pages/Index.tsx";
 import Search from "./pages/Search.tsx";
 import PropertyDetail from "./pages/PropertyDetail.tsx";
 import AISearch from "./pages/AISearch.tsx";
+import Anunciar from "./pages/Anunciar.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/busca" element={<Search />} />
           <Route path="/imovel/:slug" element={<PropertyDetail />} />
           <Route path="/ia-search" element={<AISearch />} />
+          <Route path="/anunciar" element={<Anunciar />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <ExitIntentModal />

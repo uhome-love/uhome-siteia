@@ -33,6 +33,12 @@ export function Navbar() {
         </div>
 
         <div className="hidden items-center gap-3 md:flex">
+          <Link
+            to="/anunciar"
+            className="rounded-full border-[1.5px] border-primary px-4 py-1.5 font-body text-sm font-semibold text-primary transition-colors hover:bg-primary/5 active:scale-[0.97]"
+          >
+            Anuncie seu imóvel
+          </Link>
           <button className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
             <Heart className="h-5 w-5" />
           </button>
@@ -59,7 +65,7 @@ export function Navbar() {
             exit={{ opacity: 0, height: 0 }}
             className="border-t border-border bg-background md:hidden"
           >
-            <div className="container-uhome flex flex-col gap-4 py-6">
+            <div className="flex flex-col gap-4 px-8 py-6">
               {navLinks.map((link) => (
                 <Link
                   key={link.label}
@@ -70,6 +76,13 @@ export function Navbar() {
                   {link.label}
                 </Link>
               ))}
+              <Link
+                to="/anunciar"
+                onClick={() => setMobileOpen(false)}
+                className="mt-2 inline-block rounded-full border-[1.5px] border-primary px-5 py-2.5 text-center font-body text-base font-semibold text-primary"
+              >
+                Anuncie seu imóvel
+              </Link>
             </div>
           </motion.div>
         )}

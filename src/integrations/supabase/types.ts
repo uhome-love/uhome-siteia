@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      captacao_imoveis: {
+        Row: {
+          atribuido_a: string | null
+          bairro: string | null
+          created_at: string | null
+          id: string
+          mensagem: string | null
+          nome: string
+          status: string | null
+          telefone: string
+          tipo_imovel: string | null
+          utm_campaign: string | null
+          utm_source: string | null
+          valor_pretendido: string | null
+        }
+        Insert: {
+          atribuido_a?: string | null
+          bairro?: string | null
+          created_at?: string | null
+          id?: string
+          mensagem?: string | null
+          nome: string
+          status?: string | null
+          telefone: string
+          tipo_imovel?: string | null
+          utm_campaign?: string | null
+          utm_source?: string | null
+          valor_pretendido?: string | null
+        }
+        Update: {
+          atribuido_a?: string | null
+          bairro?: string | null
+          created_at?: string | null
+          id?: string
+          mensagem?: string | null
+          nome?: string
+          status?: string | null
+          telefone?: string
+          tipo_imovel?: string | null
+          utm_campaign?: string | null
+          utm_source?: string | null
+          valor_pretendido?: string | null
+        }
+        Relationships: []
+      }
       imoveis: {
         Row: {
           andar: number | null

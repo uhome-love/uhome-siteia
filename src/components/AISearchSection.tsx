@@ -25,7 +25,7 @@ export function AISearchSection() {
           <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/10">
             <Sparkles className="h-6 w-6 text-accent" />
           </div>
-          <h2 className="font-display text-3xl font-bold text-foreground sm:text-4xl text-balance">
+          <h2 className="text-h2 text-foreground text-balance">
             Busque com inteligência artificial
           </h2>
           <p className="mt-4 font-body text-muted-foreground">

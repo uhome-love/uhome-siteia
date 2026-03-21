@@ -23,7 +23,7 @@ export function FeaturedNeighborhoods() {
           <p className="font-body text-sm font-medium uppercase tracking-[0.15em] text-primary">
             Explore
           </p>
-          <h2 className="mt-2 font-display text-3xl font-bold text-foreground sm:text-4xl text-balance">
+          <h2 className="mt-2 text-h2 text-foreground text-balance">
             Bairros em destaque
           </h2>
           <p className="mt-3 max-w-md font-body text-muted-foreground">

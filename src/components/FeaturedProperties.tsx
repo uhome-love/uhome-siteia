@@ -145,8 +145,8 @@ export function FeaturedProperties() {
             <p className="font-body text-sm font-medium uppercase tracking-[0.15em] text-primary">
               Seleção
             </p>
-            <h2 className="mt-2 font-display text-3xl font-bold text-foreground sm:text-4xl text-balance">
-              Imóveis em destaque
+             <h2 className="mt-2 text-h2 text-foreground text-balance">
+               Imóveis em destaque
             </h2>
           </div>
           <button className="hidden font-body text-sm font-medium text-primary transition-colors hover:text-primary/80 sm:block">

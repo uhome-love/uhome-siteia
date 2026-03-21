@@ -247,7 +247,7 @@ const PropertyDetail = () => {
 
             {/* Characteristics */}
             <div>
-              <h2 className="font-display text-xl font-bold text-foreground">Características</h2>
+              <h2 className="text-h3 text-foreground">Características</h2>
               <div className="mt-4 grid gap-6 sm:grid-cols-3">
                 {property.characteristics.map(({ category, items }) => (
                   <div key={category}>

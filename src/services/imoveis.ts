@@ -196,7 +196,28 @@ export async function syncFromJetimob(): Promise<{
   erros: number;
   total: number;
 }> {
-  const { data, error } = await supabase.functions.invoke("sync-jetimob");
-  if (error) throw error;
-  return data;
+  let totalInseridos = 0;
+  let totalErros = 0;
+  let totalFetched = 0;
+  let startPage = 1;
+  const PAGES_PER_CHUNK = 15;
+
+  // Call in chunks to avoid edge function timeout
+  for (let chunk = 0; chunk < 10; chunk++) {
+    const { data, error } = await supabase.functions.invoke("sync-jetimob", {
+      body: { start_page: startPage, max_pages: PAGES_PER_CHUNK },
+    });
+    if (error) throw error;
+    totalInseridos += data.inseridos ?? 0;
+    totalErros += data.erros ?? 0;
+    totalFetched += data.total ?? 0;
+
+    // If no next page or we've fetched everything
+    if (!data.next_start_page || (data.total_esperado && totalFetched >= data.total_esperado) || (data.total ?? 0) === 0) {
+      break;
+    }
+    startPage = data.next_start_page;
+  }
+
+  return { inseridos: totalInseridos, atualizados: 0, erros: totalErros, total: totalFetched };
 }

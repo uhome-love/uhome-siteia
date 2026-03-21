@@ -55,6 +55,7 @@ export function SearchPropertyCard({ property, index }: { property: MockProperty
                     {property.title}
                   </h3>
                 </div>
+              </div>
 
               <p className="mt-2 font-display text-lg font-bold text-primary">{property.priceFormatted}</p>
             </div>

@@ -170,7 +170,7 @@ export function HeroSection() {
                     </select>
                   </label>
 
-                  <label className="block rounded-xl border-[1.5px] border-border p-3.5 transition-colors focus-within:border-primary">
+                  <label className="block rounded-xl border-[1.5px] border-border p-3 transition-colors focus-within:border-primary sm:p-3.5">
                     <span className="mb-0.5 block font-body text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                       Valor até
                     </span>

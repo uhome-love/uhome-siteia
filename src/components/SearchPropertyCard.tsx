@@ -82,7 +82,7 @@ export function SearchPropertyCard({ imovel, index }: { imovel: Imovel; index: n
             <div>
               <p className="font-body text-xs uppercase tracking-[0.05em] text-muted-foreground">{imovel.bairro}</p>
               <h3
-                className="mt-0.5 cursor-pointer font-body text-[15px] font-semibold text-foreground line-clamp-1 hover:text-primary transition-colors"
+                className="mt-0.5 cursor-pointer font-body text-sm font-semibold text-foreground truncate hover:text-primary transition-colors"
                 onClick={() => navigate(`/imovel/${imovel.slug}`)}
               >
                 {imovel.titulo}
@@ -110,7 +110,7 @@ export function SearchPropertyCard({ imovel, index }: { imovel: Imovel; index: n
               </div>
               <button
                 onClick={() => setShowLead(!showLead)}
-                className="shrink-0 whitespace-nowrap rounded-full border-[1.5px] border-primary px-4 py-2 font-body text-[13px] font-semibold text-primary transition-all hover:bg-primary/5 active:scale-[0.97]"
+                className="shrink-0 whitespace-nowrap rounded-full border-[1.5px] border-primary px-2.5 py-1 font-body text-xs font-semibold text-primary transition-all hover:bg-primary/5 active:scale-[0.97]"
               >
                 Tenho interesse
               </button>

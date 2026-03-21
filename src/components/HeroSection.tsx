@@ -13,7 +13,8 @@ export function HeroSection() {
   const [modo, setModo] = useState<"comprar" | "anunciar">("comprar");
 
   // Search state
-  const [bairro, setBairro] = useState("");
+  const [bairroInput, setBairroInput] = useState("");
+  const [bairrosSelecionados, setBairrosSelecionados] = useState<string[]>([]);
   const [bairroOpen, setBairroOpen] = useState(false);
   const bairroRef = useRef<HTMLDivElement>(null);
   const [tipo, setTipo] = useState("");

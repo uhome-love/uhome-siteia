@@ -395,17 +395,17 @@ const PropertyDetail = () => {
             transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
             className="w-full lg:w-[35%]"
           >
-            <LeadSidebar
-              imovelId={imovel.id}
-              imovelSlug={imovel.slug}
-              imovelTitulo={imovel.titulo}
-              imovelBairro={imovel.bairro}
-              imovelPreco={imovel.preco}
-              viewCount={viewCount}
-            />
+            <div className="sticky top-24 space-y-4">
+              <LeadSidebar
+                imovelId={imovel.id}
+                imovelSlug={imovel.slug}
+                imovelTitulo={imovel.titulo}
+                imovelBairro={imovel.bairro}
+                imovelPreco={imovel.preco}
+                viewCount={viewCount}
+              />
 
-            {/* Agendamento de visita */}
-            <div className="mt-4">
+              {/* Agendamento de visita */}
               <AgendamentoVisita
                 imovelId={imovel.id}
                 imovelSlug={imovel.slug}

@@ -55,7 +55,7 @@ export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, 
   const viewsText = viewCount === 1 ? "1 pessoa viu hoje" : `${viewCount > 0 ? viewCount : 5} pessoas viram hoje`;
 
   return (
-    <div className="sticky top-24 rounded-2xl border border-border bg-card p-6 shadow-sm">
+    <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
       {/* Price at top */}
       {priceLabel && (
         <p className="font-body text-2xl font-extrabold text-foreground">{priceLabel}</p>

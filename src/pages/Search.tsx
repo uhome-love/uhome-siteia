@@ -5,7 +5,7 @@ import { SearchFiltersBar } from "@/components/SearchFiltersBar";
 import { SearchPropertyCard } from "@/components/SearchPropertyCard";
 import { SearchMap } from "@/components/SearchMap";
 import { useSearchStore, type MapBounds } from "@/stores/searchStore";
-import { fetchImoveis, type Imovel } from "@/services/imoveis";
+import { fetchImoveis, fetchMapPins, type Imovel, type MapPin as MapPinData } from "@/services/imoveis";
 import { interpretarBusca, type AISearchResult } from "@/services/aiSearch";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowUpDown, Bell, Loader2, Map as MapIcon, MapPin, Sparkles, X } from "lucide-react";
@@ -54,6 +54,7 @@ const Search = () => {
   const [alertLoading, setAlertLoading] = useState(false);
 
   const [imoveis, setImoveis] = useState<Imovel[]>([]);
+  const [mapPins, setMapPins] = useState<MapPinData[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -79,36 +80,46 @@ const Search = () => {
     }
   }, [modoIA]);
 
-  // Normal mode: fetch by store filters
+  // Build filter object (shared between list and map)
+  const buildFilters = useCallback(() => ({
+    finalidade: filters.finalidade || undefined,
+    tipo: filters.tipo || undefined,
+    bairro: filters.bairro || undefined,
+    precoMin: filters.precoMin || undefined,
+    precoMax: filters.precoMax || undefined,
+    areaMin: filters.areaMin || undefined,
+    areaMax: filters.areaMax || undefined,
+    quartos: filters.quartos || undefined,
+    banheiros: filters.banheiros || undefined,
+    vagas: filters.vagas || undefined,
+    diferenciais: filters.diferenciais.length ? filters.diferenciais : undefined,
+    q: filters.q || undefined,
+  }), [filters]);
+
+  // Normal mode: fetch list (paginated) + map pins (all)
   const loadImoveis = useCallback(async () => {
-    if (modoIA && !aiResult) return; // In AI mode, wait for AI search
+    if (modoIA && !aiResult) return;
     setLoading(true);
     try {
-      const result = await fetchImoveis({
-        finalidade: filters.finalidade || undefined,
-        tipo: filters.tipo || undefined,
-        bairro: filters.bairro || undefined,
-        precoMin: filters.precoMin || undefined,
-        precoMax: filters.precoMax || undefined,
-        areaMin: filters.areaMin || undefined,
-        areaMax: filters.areaMax || undefined,
-        quartos: filters.quartos || undefined,
-        banheiros: filters.banheiros || undefined,
-        vagas: filters.vagas || undefined,
-        diferenciais: filters.diferenciais.length ? filters.diferenciais : undefined,
-        ordem: filters.ordem as any,
-        q: filters.q || undefined,
-        bounds: filters.bounds || undefined,
-        limit: 40,
-      });
+      const baseFilters = buildFilters();
+      const [result, pins] = await Promise.all([
+        fetchImoveis({
+          ...baseFilters,
+          ordem: filters.ordem as any,
+          bounds: filters.bounds || undefined,
+          limit: 40,
+        }),
+        fetchMapPins(baseFilters),
+      ]);
       setImoveis(result.data);
       setTotal(result.count);
+      setMapPins(pins);
     } catch (err) {
       console.error("Erro ao buscar imóveis:", err);
     } finally {
       setLoading(false);
     }
-  }, [filters, modoIA, aiResult]);
+  }, [filters, modoIA, aiResult, buildFilters]);
 
   useEffect(() => {
     if (!modoIA) loadImoveis();
@@ -126,7 +137,7 @@ const Search = () => {
       setResumoIA(res.resumo);
 
       const f = res.filtros;
-      const { data, count } = await fetchImoveis({
+      const aiFilters = {
         finalidade: f.finalidade || undefined,
         tipo: f.tipo || undefined,
         bairros: f.bairros?.length ? f.bairros : undefined,
@@ -135,10 +146,14 @@ const Search = () => {
         areaMin: f.area_min || undefined,
         quartos: f.quartos || undefined,
         diferenciais: f.diferenciais?.length ? f.diferenciais : undefined,
-        limit: 40,
-      });
+      };
+      const [{ data, count }, pins] = await Promise.all([
+        fetchImoveis({ ...aiFilters, limit: 40 }),
+        fetchMapPins(aiFilters),
+      ]);
       setImoveis(data);
       setTotal(count);
+      setMapPins(pins);
     } catch (e: any) {
       toast.error(e?.message || "Erro ao interpretar busca");
     } finally {
@@ -397,7 +412,7 @@ const Search = () => {
         {/* Map — desktop */}
         <div className="relative hidden w-[45%] shrink-0 border-l border-border lg:block" style={{ overflow: "visible" }}>
           <div className="h-full w-full overflow-hidden rounded-none">
-            <SearchMap imoveis={imoveis} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} />
+            <SearchMap pins={mapPins} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} />
           </div>
         </div>
       </div>
@@ -427,7 +442,7 @@ const Search = () => {
               <X className="h-4 w-4" />
               Voltar à lista
             </button>
-            <SearchMap imoveis={imoveis} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} />
+            <SearchMap pins={mapPins} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} />
           </motion.div>
         )}
       </AnimatePresence>

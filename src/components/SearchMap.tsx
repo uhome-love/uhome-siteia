@@ -4,7 +4,7 @@ import { Search } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { type Imovel } from "@/services/imoveis";
+import { type MapPin as MapPinData } from "@/services/imoveis";
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || "pk.eyJ1IjoibHVjYXN1aG9tZSIsImEiOiJjbW16c2l2dmUwYmxsMnJwdDI2bGxrazBkIn0.B4dp727gJlQQIWTci7GpFQ";
 
@@ -17,10 +17,10 @@ function formatPreco(preco: number): string {
   return `R$${preco}`;
 }
 
-function toGeoJSON(imoveis: Imovel[]): GeoJSON.FeatureCollection {
+function toGeoJSON(pins: MapPinData[]): GeoJSON.FeatureCollection {
   return {
     type: "FeatureCollection",
-    features: imoveis
+    features: pins
       .filter((i) => {
         const lat = Number(i.latitude);
         const lng = Number(i.longitude);
@@ -70,24 +70,24 @@ function createPillImage(fillColor: string, strokeColor: string): ImageData {
 }
 
 interface SearchMapProps {
-  imoveis?: Imovel[];
+  pins?: MapPinData[];
   hoveredId?: string | null;
   onPinHover?: (id: string | null) => void;
   onBoundsSearch?: (bounds: { lat_min: number; lat_max: number; lng_min: number; lng_max: number }) => void;
 }
 
-export function SearchMap({ imoveis = [], hoveredId, onPinHover, onBoundsSearch }: SearchMapProps) {
+export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch }: SearchMapProps) {
   const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const initRef = useRef(false);
   const mapReadyRef = useRef(false);
   const boundsRef = useRef<mapboxgl.LngLatBounds | null>(null);
-  const imoveisRef = useRef(imoveis);
+  const pinsRef = useRef(pins);
   const [mapMoved, setMapMoved] = useState(false);
 
   // Keep ref in sync
-  useEffect(() => { imoveisRef.current = imoveis; }, [imoveis]);
+  useEffect(() => { pinsRef.current = pins; }, [pins]);
 
   // Init map once
   useEffect(() => {
@@ -230,10 +230,10 @@ export function SearchMap({ imoveis = [], hoveredId, onPinHover, onBoundsSearch 
 
       // Set initial data — the imoveis effect may have already fired before map loaded
       const source = map.getSource("imoveis") as mapboxgl.GeoJSONSource | undefined;
-      if (source && imoveisRef.current.length > 0) {
-        const geo = toGeoJSON(imoveisRef.current);
+      if (source && pinsRef.current.length > 0) {
+        const geo = toGeoJSON(pinsRef.current);
         source.setData(geo);
-        const validos = imoveisRef.current.filter((i) => {
+        const validos = pinsRef.current.filter((i) => {
           const lat = Number(i.latitude);
           const lng = Number(i.longitude);
           return lat && lng && lat < -28 && lat > -32 && lng < -49 && lng > -54;
@@ -270,10 +270,10 @@ export function SearchMap({ imoveis = [], hoveredId, onPinHover, onBoundsSearch 
     const source = map.getSource("imoveis") as mapboxgl.GeoJSONSource | undefined;
     if (!source) return;
 
-    source.setData(toGeoJSON(imoveis));
+    source.setData(toGeoJSON(pins));
 
     // Fit bounds
-    const validos = imoveis.filter((i) => {
+    const validos = pins.filter((i) => {
       const lat = Number(i.latitude);
       const lng = Number(i.longitude);
       return lat && lng && lat < -28 && lat > -32 && lng < -49 && lng > -54;
@@ -284,7 +284,7 @@ export function SearchMap({ imoveis = [], hoveredId, onPinHover, onBoundsSearch 
       validos.forEach((i) => bounds.extend([Number(i.longitude), Number(i.latitude)]));
       map.fitBounds(bounds, { padding: 60, maxZoom: 14, duration: 500 });
     }
-  }, [imoveis]);
+  }, [pins]);
 
   // Hover from card → highlight pin
   useEffect(() => {

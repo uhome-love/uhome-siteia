@@ -91,6 +91,9 @@ export function SearchMap({ imoveis, hoveredId, onPinHover, onBoundsSearch }: Se
     if (!mapRef.current || !mapLoaded) return;
     const { map, mapboxgl } = mapRef.current;
 
+    // CRITICAL: wait for style to be fully loaded before adding markers
+    const addMarkers = () => {
+
     const currentIds = new Set(imoveis.filter(p => p.latitude && p.longitude).map(p => p.id));
 
     // Remove markers no longer in results

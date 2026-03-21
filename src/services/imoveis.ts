@@ -85,6 +85,7 @@ export interface BuscaFilters {
   finalidade?: string;
   tipo?: string;
   bairro?: string;
+  bairros?: string[];
   precoMin?: number;
   precoMax?: number;
   areaMin?: number;

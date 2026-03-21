@@ -26,6 +26,14 @@ const areaRanges = [
   { label: "Acima de 400m²", min: 400, max: 0 },
 ];
 
+function formatPrecoLabel(min: number, max: number): string {
+  const fmt = (v: number) => v >= 1000000 ? `${(v / 1000000).toFixed(v % 1000000 === 0 ? 0 : 1)}M` : `${(v / 1000).toFixed(0)}k`;
+  if (min && max) return `R$ ${fmt(min)} – ${fmt(max)}`;
+  if (min) return `A partir de R$ ${fmt(min)}`;
+  if (max) return `Até R$ ${fmt(max)}`;
+  return "";
+}
+
 export function SearchFiltersBar() {
   const { filters, setFilter, resetFilters } = useSearchStore();
   const navigate = useNavigate();

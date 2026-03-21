@@ -140,7 +140,7 @@ const Search = () => {
               {/* Map toggle */}
               <button
                 onClick={() => setShowMap(!showMap)}
-                className="hidden items-center gap-1.5 rounded-lg bg-secondary px-3 py-2 font-body text-xs font-medium text-secondary-foreground transition-colors hover:bg-secondary/80 md:flex"
+                className="hidden items-center gap-1.5 rounded-lg bg-secondary px-3 py-2 font-body text-xs font-medium text-secondary-foreground transition-colors hover:bg-secondary/80 md:flex xl:hidden"
               >
                 {showMap ? <List className="h-3.5 w-3.5" /> : <Map className="h-3.5 w-3.5" />}
                 {showMap ? "Lista" : "Mapa"}

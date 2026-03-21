@@ -117,7 +117,7 @@ const Anunciar = () => {
             custom={0} variants={fadeUp}
             className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-card px-4 py-1.5 font-body text-[13px] font-semibold text-primary"
           >
-            <UhomeLogo variant="icon" size="sm" />
+            <UhomeLogo variant="icon" height={18} />
             Uhome Imóveis · Porto Alegre
           </motion.div>
 

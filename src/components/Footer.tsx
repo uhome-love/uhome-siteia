@@ -8,7 +8,7 @@ export function Footer() {
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
           <div>
-            <UhomeLogo variant="full" size="md" />
+            <UhomeLogo variant="full" height={28} />
             <p className="mt-4 max-w-xs font-body text-sm leading-relaxed text-muted-foreground">
               Imóveis em Porto Alegre com curadoria especializada e tecnologia de ponta.
             </p>

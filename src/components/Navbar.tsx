@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X, Heart, User } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { UhomeLogo } from "@/components/UhomeLogo";
 
 const navLinks = [
   { label: "Comprar", href: "/busca?finalidade=venda" },
@@ -12,11 +13,10 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 glass">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
       <div className="container-uhome flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <span className="font-display text-2xl font-bold text-gradient-gold">Uhome</span>
-          <span className="hidden text-xs font-body text-muted-foreground sm:block">Imóveis</span>
+        <Link to="/" className="flex items-center">
+          <UhomeLogo variant="full" size="sm" />
         </Link>
 
         {/* Desktop */}
@@ -25,7 +25,7 @@ export function Navbar() {
             <Link
               key={link.label}
               to={link.href}
-              className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground"
+              className="font-body text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
               {link.label}
             </Link>
@@ -57,7 +57,7 @@ export function Navbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="glass border-t border-border md:hidden"
+            className="border-t border-border bg-background md:hidden"
           >
             <div className="container-uhome flex flex-col gap-4 py-6">
               {navLinks.map((link) => (

@@ -110,7 +110,8 @@ export interface BuscaFilters {
 export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: Imovel[]; count: number }> {
   let query = supabase
     .from("imoveis")
-    .select("*", { count: "exact" });
+    .select("*", { count: "exact" })
+    .eq("cidade", "Porto Alegre");
 
   if (filters.finalidade) query = query.eq("finalidade", filters.finalidade);
   if (filters.tipo) query = query.eq("tipo", filters.tipo);
@@ -174,7 +175,8 @@ export interface MapPin {
 export async function fetchMapPins(filters: BuscaFilters = {}): Promise<MapPin[]> {
   let query = supabase
     .from("imoveis")
-    .select("id,slug,preco,latitude,longitude,bairro,titulo,tipo,quartos,finalidade");
+    .select("id,slug,preco,latitude,longitude,bairro,titulo,tipo,quartos,finalidade")
+    .eq("cidade", "Porto Alegre");
 
   if (filters.finalidade) query = query.eq("finalidade", filters.finalidade);
   if (filters.tipo) query = query.eq("tipo", filters.tipo);

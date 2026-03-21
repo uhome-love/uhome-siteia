@@ -30,12 +30,30 @@ export function HeroSection() {
   const [enviado, setEnviado] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // Dynamic neighborhood suggestions from DB
+  const [dbBairros, setDbBairros] = useState<string[]>([]);
+
+  useEffect(() => {
+    async function loadBairros() {
+      const { data } = await supabase
+        .from("imoveis")
+        .select("bairro")
+        .eq("status", "disponivel");
+      if (data) {
+        const unique = [...new Set(data.map((d) => d.bairro))].sort();
+        setDbBairros(unique);
+      }
+    }
+    loadBairros();
+  }, []);
+
   const bairroSuggestions = useMemo(() => {
-    const base = bairrosData.filter((b) => !bairrosSelecionados.includes(b.nome));
-    if (!bairroInput.trim()) return base.slice(0, 6);
+    const allBairros = dbBairros.length > 0 ? dbBairros : bairrosData.map((b) => b.nome);
+    const base = allBairros.filter((b) => !bairrosSelecionados.includes(b));
+    if (!bairroInput.trim()) return base.slice(0, 8);
     const q = bairroInput.toLowerCase();
-    return base.filter((b) => b.nome.toLowerCase().includes(q));
-  }, [bairroInput, bairrosSelecionados]);
+    return base.filter((b) => b.toLowerCase().includes(q)).slice(0, 10);
+  }, [bairroInput, bairrosSelecionados, dbBairros]);
 
   const addBairro = (nome: string) => {
     if (!bairrosSelecionados.includes(nome)) {

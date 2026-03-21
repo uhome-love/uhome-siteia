@@ -114,6 +114,33 @@ export function buildBairroJsonLd(
   };
 }
 
+/** BreadcrumbList for bairro pages */
+export function buildBairroBreadcrumbJsonLd(bairroNome: string, bairroSlug: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Uhome", item: "https://uhome.com.br/" },
+      { "@type": "ListItem", position: 2, name: "Bairros", item: "https://uhome.com.br/bairros" },
+      { "@type": "ListItem", position: 3, name: bairroNome, item: `https://uhome.com.br/bairros/${bairroSlug}` },
+    ],
+  };
+}
+
+/** BreadcrumbList for property pages */
+export function buildImovelBreadcrumbJsonLd(imovel: Imovel) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Uhome", item: "https://uhome.com.br/" },
+      { "@type": "ListItem", position: 2, name: "Buscar", item: "https://uhome.com.br/busca" },
+      { "@type": "ListItem", position: 3, name: imovel.bairro, item: `https://uhome.com.br/busca?bairros=${encodeURIComponent(imovel.bairro)}` },
+      { "@type": "ListItem", position: 4, name: imovel.titulo, item: `https://uhome.com.br/imovel/${imovel.slug}` },
+    ],
+  };
+}
+
 /** Organization schema for the site */
 export function buildOrganizationJsonLd() {
   return {

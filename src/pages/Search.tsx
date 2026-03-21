@@ -90,12 +90,20 @@ const Search = () => {
   }, [modoIA]);
 
   // Build filter object (shared between list and map)
-  const buildFilters = useCallback(() => ({
-    finalidade: filters.finalidade || undefined,
-    tipo: filters.tipo || undefined,
-    bairro: filters.bairro || undefined,
-    cidade: filters.cidade || undefined,
-    precoMin: filters.precoMin || undefined,
+  const buildFilters = useCallback(() => {
+    // If bairro contains commas, treat as multiple bairros
+    const bairroStr = filters.bairro || "";
+    const bairrosParts = bairroStr.includes(",")
+      ? bairroStr.split(",").map(s => s.trim()).filter(Boolean)
+      : [];
+    
+    return {
+      finalidade: filters.finalidade || undefined,
+      tipo: filters.tipo || undefined,
+      bairro: bairrosParts.length ? undefined : (filters.bairro || undefined),
+      bairros: bairrosParts.length ? bairrosParts : undefined,
+      cidade: filters.cidade || undefined,
+      precoMin: filters.precoMin || undefined,
     precoMax: filters.precoMax || undefined,
     areaMin: filters.areaMin || undefined,
     areaMax: filters.areaMax || undefined,

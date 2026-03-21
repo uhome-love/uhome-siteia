@@ -35,8 +35,8 @@ export function SearchMap({ imoveis, hoveredId, onPinHover, onBoundsSearch }: Se
   const boundsRef = useRef<any>(null);
   const navigate = useNavigate();
 
-  const [mapMoved, setMapMoved] = __import_useState(false);
-  const [mapError, setMapError] = __import_useState(false);
+  const [mapMoved, setMapMoved] = useState(false);
+  const [mapError, setMapError] = useState(false);
 
   // Init map once
   useEffect(() => {

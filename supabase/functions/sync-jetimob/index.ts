@@ -42,16 +42,14 @@ function capitalize(s: string): string {
 }
 
 function gerarTitulo(j: any, tipo: string, bairro: string): string {
-  // Prefer Jetimob's own title if it's descriptive (not just a code)
-  const raw = j.titulo_anuncio || j.titulo || j.title || j.nome || "";
-  if (raw && raw.length > 20) return raw;
-
+  const finalidade = mapFinalidade(j.finalidade || j.operacao || j.contrato);
+  const label = finalidade === "locacao" ? "para Alugar" : "para Venda";
   const quartos = j.dormitorios ?? j.quartos ?? j.bedrooms;
   if (quartos && Number(quartos) > 0) {
     const q = Number(quartos);
-    return `${capitalize(tipo)} com ${q} quarto${q > 1 ? "s" : ""} — ${bairro}`;
+    return `${capitalize(tipo)} ${q} quarto${q > 1 ? "s" : ""} — ${bairro}`;
   }
-  return `${capitalize(tipo)} em ${bairro}`;
+  return `${capitalize(tipo)} ${label} — ${bairro}`;
 }
 
 function mapStatus(s?: string): string {

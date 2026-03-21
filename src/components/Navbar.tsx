@@ -33,6 +33,12 @@ export function Navbar() {
         </div>
 
         <div className="hidden items-center gap-3 md:flex">
+          <Link
+            to="/anunciar"
+            className="rounded-full border-[1.5px] border-primary px-4 py-1.5 font-body text-sm font-semibold text-primary transition-colors hover:bg-primary/5 active:scale-[0.97]"
+          >
+            Anuncie seu imóvel
+          </Link>
           <button className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
             <Heart className="h-5 w-5" />
           </button>

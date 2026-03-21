@@ -104,15 +104,16 @@ const Search = () => {
       bairros: bairrosParts.length ? bairrosParts : undefined,
       cidade: filters.cidade || undefined,
       precoMin: filters.precoMin || undefined,
-    precoMax: filters.precoMax || undefined,
-    areaMin: filters.areaMin || undefined,
-    areaMax: filters.areaMax || undefined,
-    quartos: filters.quartos || undefined,
-    banheiros: filters.banheiros || undefined,
-    vagas: filters.vagas || undefined,
-    diferenciais: filters.diferenciais.length ? filters.diferenciais : undefined,
-    q: filters.q || undefined,
-  }), [filters]);
+      precoMax: filters.precoMax || undefined,
+      areaMin: filters.areaMin || undefined,
+      areaMax: filters.areaMax || undefined,
+      quartos: filters.quartos || undefined,
+      banheiros: filters.banheiros || undefined,
+      vagas: filters.vagas || undefined,
+      diferenciais: filters.diferenciais.length ? filters.diferenciais : undefined,
+      q: filters.q || undefined,
+    };
+  }, [filters]);
 
   // Normal mode: fetch list (paginated) + map pins (all)
   const loadImoveis = useCallback(async () => {

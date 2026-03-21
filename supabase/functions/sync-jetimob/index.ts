@@ -178,8 +178,11 @@ function extractTotal(data: any): number | null {
   return null;
 }
 
-function hasNextPage(data: any, itemsCount: number, pageSize: number): boolean {
-  // Explicit next page indicators
+function hasNextPage(data: any, itemsCount: number, pageSize: number, currentPage: number): boolean {
+  // Use totalPages from Jetimob API
+  if (data?.totalPages != null && currentPage < Number(data.totalPages)) return true;
+  if (data?.totalPages != null && currentPage >= Number(data.totalPages)) return false;
+  // Other explicit indicators
   if (data?.proxima_pagina != null) return !!data.proxima_pagina;
   if (data?.next_page != null) return !!data.next_page;
   if (data?.has_more != null) return !!data.has_more;

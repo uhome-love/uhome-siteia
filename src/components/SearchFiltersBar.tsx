@@ -53,6 +53,30 @@ export function SearchFiltersBar() {
         />
       </div>
 
+      {/* Cidade */}
+      <FilterPill
+        label="Cidade"
+        value={cidadeLabel}
+        active={filters.cidade !== "Porto Alegre"}
+        onClear={() => setFilter("cidade", "Porto Alegre")}
+      >
+        <PillOption
+          selected={filters.cidade === ""}
+          onClick={() => setFilter("cidade", filters.cidade === "" ? "Porto Alegre" : "")}
+        >
+          Todas
+        </PillOption>
+        {CIDADES_PERMITIDAS.map((c) => (
+          <PillOption
+            key={c}
+            selected={filters.cidade === c}
+            onClick={() => setFilter("cidade", filters.cidade === c ? "" : c)}
+          >
+            {c}
+          </PillOption>
+        ))}
+      </FilterPill>
+
       {/* Tipo */}
       <FilterPill
         label="Tipo"

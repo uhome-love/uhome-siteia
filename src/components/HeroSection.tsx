@@ -206,7 +206,7 @@ export function HeroSection() {
                         <button
                           key={q}
                           onClick={() => setQuartos(val)}
-                          className={`rounded-full border-[1.5px] px-4 py-1.5 font-body text-xs transition-all active:scale-[0.96] ${
+                          className={`rounded-full border-[1.5px] px-3 py-1.5 font-body text-xs transition-all active:scale-[0.96] sm:px-4 ${
                             active
                               ? "border-primary bg-primary/10 font-semibold text-primary"
                               : "border-border text-muted-foreground hover:border-foreground/30"

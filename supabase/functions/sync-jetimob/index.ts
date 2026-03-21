@@ -205,9 +205,9 @@ serve(async (req) => {
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
     const PAGE_SIZE = 200;
-    const MAX_PAGES = 100;
+    const MAX_PAGES = 200;
     const MAX_RETRIES = 3;
-    const RATE_LIMIT_MS = 500;
+    const RATE_LIMIT_MS = 200;
 
     let totalInserted = 0;
     let totalErrors = 0;

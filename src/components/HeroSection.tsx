@@ -64,7 +64,7 @@ export function HeroSection() {
       {/* Background image */}
       <div className="absolute inset-0">
         <img
-          src="/hero-bg.jpg"
+          src="/hero-bg.webp"
           alt=""
           className="h-full w-full object-cover"
           style={{ objectPosition: "center center" }}

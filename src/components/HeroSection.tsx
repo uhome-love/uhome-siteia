@@ -19,6 +19,7 @@ export function HeroSection() {
   const [bairroOpen, setBairroOpen] = useState(false);
   const bairroRef = useRef<HTMLDivElement>(null);
   const [tipo, setTipo] = useState("");
+  const [cidade, setCidade] = useState("Porto Alegre");
   const [preco, setPreco] = useState("");
   const [quartos, setQuartos] = useState("");
 

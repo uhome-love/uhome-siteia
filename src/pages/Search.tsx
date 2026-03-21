@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { SearchFiltersPanel } from "@/components/SearchFiltersPanel";
 import { SearchPropertyCard } from "@/components/SearchPropertyCard";
+import { SearchMap } from "@/components/SearchMap";
 import { useSearchStore } from "@/stores/searchStore";
 import { fetchImoveis, type Imovel } from "@/services/imoveis";
 import { SlidersHorizontal, ArrowUpDown, Loader2 } from "lucide-react";
@@ -18,7 +19,6 @@ const Search = () => {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  // Sync URL params to store on mount
   useEffect(() => {
     const f: Record<string, string | number> = {};
     const urlFinalidade = searchParams.get("finalidade");
@@ -73,17 +73,10 @@ const Search = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      {/* Mobile filter panel (overlay) */}
-      <div className="lg:hidden">
-        <SearchFiltersPanel isOpen={filtersOpen} onClose={() => setFiltersOpen(false)} />
-      </div>
+      {/* Single instance of filters — handles both mobile overlay & desktop static */}
+      <SearchFiltersPanel isOpen={filtersOpen} onClose={() => setFiltersOpen(false)} />
 
       <div className="flex pt-16" style={{ height: "100vh" }}>
-        {/* Filters sidebar — desktop only */}
-        <div className="hidden w-[260px] shrink-0 border-r border-border lg:block overflow-y-auto">
-          <SearchFiltersPanel isOpen={true} onClose={() => {}} />
-        </div>
-
         {/* Main content */}
         <div className="flex flex-1 flex-col overflow-hidden">
           {/* Toolbar */}
@@ -101,7 +94,6 @@ const Search = () => {
               </p>
             </div>
 
-            {/* Sort */}
             <div className="relative">
               <button
                 onClick={() => setSortOpen(!sortOpen)}
@@ -137,27 +129,35 @@ const Search = () => {
             </div>
           </div>
 
-          {/* Cards grid */}
-          <div className="flex-1 overflow-y-auto p-4">
-            {loading ? (
-              <div className="flex flex-col items-center justify-center py-20">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <p className="mt-3 font-body text-sm text-muted-foreground">Carregando imóveis...</p>
-              </div>
-            ) : imoveis.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20">
-                <p className="font-display text-xl font-bold text-foreground">Nenhum imóvel encontrado</p>
-                <p className="mt-2 font-body text-sm text-muted-foreground">
-                  Tente ajustar seus filtros para ver mais resultados.
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                {imoveis.map((imovel, i) => (
-                  <SearchPropertyCard key={imovel.id} imovel={imovel} index={i} />
-                ))}
-              </div>
-            )}
+          {/* Cards + Map split */}
+          <div className="flex flex-1 overflow-hidden">
+            {/* Cards list */}
+            <div className="flex-1 overflow-y-auto p-5" style={{ minWidth: 0 }}>
+              {loading ? (
+                <div className="flex flex-col items-center justify-center py-20">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <p className="mt-3 font-body text-sm text-muted-foreground">Carregando imóveis...</p>
+                </div>
+              ) : imoveis.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-20">
+                  <p className="font-display text-xl font-bold text-foreground">Nenhum imóvel encontrado</p>
+                  <p className="mt-2 font-body text-sm text-muted-foreground">
+                    Tente ajustar seus filtros para ver mais resultados.
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  {imoveis.map((imovel, i) => (
+                    <SearchPropertyCard key={imovel.id} imovel={imovel} index={i} />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Map — hidden below 1100px */}
+            <div className="hidden min-[1100px]:block w-[420px] shrink-0">
+              <SearchMap imoveis={imoveis} />
+            </div>
           </div>
         </div>
       </div>

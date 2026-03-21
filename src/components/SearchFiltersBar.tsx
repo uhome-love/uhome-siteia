@@ -1,4 +1,6 @@
-import { Search, RotateCcw, MapPin } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Search, RotateCcw, MapPin, PenTool, Navigation, Sparkles } from "lucide-react";
 import { useSearchStore } from "@/stores/searchStore";
 import { FilterPill, PillOption } from "@/components/FilterPill";
 import { propertyTypes } from "@/data/properties";
@@ -26,6 +28,56 @@ const areaRanges = [
 
 export function SearchFiltersBar() {
   const { filters, setFilter, resetFilters } = useSearchStore();
+  const navigate = useNavigate();
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [inputFocused, setInputFocused] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
+    }
+    if (showDropdown) document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [showDropdown]);
+
+  const handleSearchIA = () => {
+    setShowDropdown(false);
+    navigate("/busca?modo=ia");
+  };
+
+  const handlePertoDeVoce = () => {
+    setShowDropdown(false);
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          // Center map on user location by setting bounds around them
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          const delta = 0.015; // ~1.5km radius
+          setFilter("bounds", {
+            lat_min: lat - delta,
+            lat_max: lat + delta,
+            lng_min: lng - delta,
+            lng_max: lng + delta,
+          });
+        },
+        () => {
+          import("sonner").then(({ toast }) => toast.error("Não foi possível obter sua localização"));
+        }
+      );
+    }
+  };
+
+  const handleDesenharArea = () => {
+    setShowDropdown(false);
+    // Dispatch custom event for the map to enter draw mode
+    window.dispatchEvent(new CustomEvent("uhome:draw-area"));
+    import("sonner").then(({ toast }) => toast.info("Clique no mapa para desenhar a área de busca"));
+  };
 
   const tipoLabel = propertyTypes.find((t) => t.value === filters.tipo)?.label;
   const precoLabel = precoRanges.find(
@@ -41,16 +93,53 @@ export function SearchFiltersBar() {
 
   return (
     <div className="sticky top-16 z-10 flex items-center gap-2 overflow-x-auto border-b border-border bg-background px-5 py-3 scrollbar-none">
-      {/* Search input */}
-      <div className="flex shrink-0 items-center gap-2 rounded-full border border-border bg-background px-3.5 py-2" style={{ minWidth: 200 }}>
-        <Search className="h-4 w-4 text-muted-foreground" />
-        <input
-          type="text"
-          value={filters.q}
-          onChange={(e) => setFilter("q", e.target.value)}
-          placeholder="Bairro ou tipo..."
-          className="w-full border-none bg-transparent font-body text-[13px] text-foreground outline-none placeholder:text-muted-foreground"
-        />
+      {/* Search input with dropdown */}
+      <div className="relative shrink-0" ref={dropdownRef}>
+        <div className="flex items-center gap-2 rounded-full border border-border bg-background px-3.5 py-2" style={{ minWidth: 220 }}>
+          <Search className="h-4 w-4 text-muted-foreground" />
+          <input
+            type="text"
+            value={filters.q}
+            onChange={(e) => setFilter("q", e.target.value)}
+            onFocus={() => { setInputFocused(true); setShowDropdown(true); }}
+            onBlur={() => setInputFocused(false)}
+            placeholder="Bairro, cidade ou tipo..."
+            className="w-full border-none bg-transparent font-body text-[13px] text-foreground outline-none placeholder:text-muted-foreground"
+          />
+        </div>
+
+        {/* Dropdown with search options */}
+        {showDropdown && !filters.q && (
+          <div className="absolute left-0 top-full z-50 mt-2 w-72 rounded-xl border border-border bg-card p-2 shadow-lg">
+            <p className="px-3 py-2 font-body text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Mais jeitos de buscar
+            </p>
+            <button
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={handleSearchIA}
+              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 font-body text-sm text-foreground transition-colors hover:bg-accent/50 active:scale-[0.98]"
+            >
+              <Sparkles className="h-4 w-4 text-primary" />
+              Busca por IA
+            </button>
+            <button
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={handleDesenharArea}
+              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 font-body text-sm text-foreground transition-colors hover:bg-accent/50 active:scale-[0.98]"
+            >
+              <PenTool className="h-4 w-4 text-muted-foreground" />
+              Desenhe a área no mapa
+            </button>
+            <button
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={handlePertoDeVoce}
+              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 font-body text-sm text-foreground transition-colors hover:bg-accent/50 active:scale-[0.98]"
+            >
+              <Navigation className="h-4 w-4 text-muted-foreground" />
+              Perto de você
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Cidade */}

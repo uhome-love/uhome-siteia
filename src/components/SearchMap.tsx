@@ -284,7 +284,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch }: 
       validos.forEach((i) => bounds.extend([Number(i.longitude), Number(i.latitude)]));
       map.fitBounds(bounds, { padding: 60, maxZoom: 14, duration: 500 });
     }
-  }, [imoveis]);
+  }, [pins]);
 
   // Hover from card → highlight pin
   useEffect(() => {

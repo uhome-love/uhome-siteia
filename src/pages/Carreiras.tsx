@@ -218,7 +218,7 @@ const Carreiras = () => {
               Mande seu currículo. Guardamos para oportunidades futuras.
             </p>
             <a
-              href="mailto:carreiras@uhome.com.br?subject=Candidatura Espontânea"
+              href="mailto:lucas@uhome.imb.br?subject=Candidatura Espontânea"
               className="mt-5 inline-block rounded-full bg-primary px-7 py-3 font-body text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90 active:scale-[0.97]"
             >
               Enviar currículo

@@ -122,21 +122,9 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
           />
         </button>
 
-        {/* Gradient + CTA button on hover */}
-        {hovering && (
-          <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/40 to-transparent pt-12 pb-3 px-3 flex flex-col items-center">
-            <button
-              onClick={(e) => { e.stopPropagation(); }}
-              className="rounded-full bg-white px-5 py-2 font-body text-[13px] font-semibold text-foreground shadow-lg transition-transform hover:scale-105 active:scale-95 animate-fade-in"
-            >
-              Tenho interesse
-            </button>
-          </div>
-        )}
-
-        {/* Dots — above gradient */}
+        {/* Dots */}
         {hovering && fotos.length > 1 && (
-          <div className="absolute bottom-14 left-1/2 z-20 flex -translate-x-1/2 gap-1">
+          <div className="absolute bottom-2.5 left-1/2 z-10 flex -translate-x-1/2 gap-1">
             {fotos.slice(0, 5).map((_, i) => (
               <div
                 key={i}

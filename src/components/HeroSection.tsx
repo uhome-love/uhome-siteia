@@ -194,7 +194,7 @@ export function HeroSection() {
                 </div>
 
                 {/* Quartos */}
-                <div className="mb-5">
+                <div className="mb-4 sm:mb-5">
                   <span className="mb-2 block font-body text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                     Quartos
                   </span>

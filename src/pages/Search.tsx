@@ -73,11 +73,18 @@ const Search = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      <div className="flex pt-16" style={{ height: "100vh" }}>
-        {/* Sidebar filters — static on lg, slide-in overlay on mobile */}
+      {/* Mobile filter overlay — only rendered below lg */}
+      <div className="contents lg:hidden">
         <SearchFiltersPanel isOpen={filtersOpen} onClose={() => setFiltersOpen(false)} />
+      </div>
 
-        {/* Main content (toolbar + cards + map) */}
+      <div className="flex pt-16" style={{ height: "100vh", overflow: "hidden" }}>
+        {/* Desktop sidebar — always open, hidden below lg */}
+        <aside className="hidden lg:flex w-[240px] shrink-0 overflow-y-auto border-r border-border">
+          <SearchFiltersPanel isOpen={true} onClose={() => {}} />
+        </aside>
+
+        {/* Main content */}
         <div className="flex flex-1 flex-col overflow-hidden" style={{ minWidth: 0 }}>
           {/* Toolbar */}
           <div className="flex items-center justify-between border-b border-border px-4 py-3">
@@ -131,8 +138,8 @@ const Search = () => {
 
           {/* Cards + Map */}
           <div className="flex flex-1 overflow-hidden">
-            {/* Cards */}
-            <div className="flex-1 overflow-y-auto p-5" style={{ minWidth: 0 }}>
+            {/* Cards grid */}
+            <div className="flex-1 overflow-y-auto p-4" style={{ minWidth: 0 }}>
               {loading ? (
                 <div className="flex flex-col items-center justify-center py-20">
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -155,7 +162,7 @@ const Search = () => {
             </div>
 
             {/* Map — visible ≥1100px */}
-            <div className="hidden min-[1100px]:block w-[420px] shrink-0 h-full">
+            <div className="hidden min-[1100px]:block w-[380px] shrink-0 h-full">
               <SearchMap imoveis={imoveis} />
             </div>
           </div>

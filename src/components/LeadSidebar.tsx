@@ -3,8 +3,7 @@ import { Send, Loader2, Check, MessageCircle } from "lucide-react";
 import { submitLead } from "@/services/leads";
 import { toast } from "sonner";
 import { formatPreco } from "@/services/imoveis";
-
-const WHATSAPP_NUMBER = "5551999999999";
+import { whatsappLink } from "@/lib/whatsapp";
 
 interface LeadSidebarProps {
   imovelId?: string;

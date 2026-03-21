@@ -4,6 +4,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { LeadSidebar } from "@/components/LeadSidebar";
 import { FinancingSimulator } from "@/components/FinancingSimulator";
+import { AgendamentoVisita } from "@/components/AgendamentoVisita";
 import { PropertyMap } from "@/components/PropertyMap";
 import { Bed, Car, Maximize, Bath, MapPin, Share2, Heart, ChevronLeft, ChevronRight, Loader2, Camera } from "lucide-react";
 import { motion } from "framer-motion";

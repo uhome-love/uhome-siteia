@@ -282,6 +282,36 @@ export function SearchFiltersBar() {
             {r.label}
           </PillOption>
         ))}
+
+        {/* Manual area inputs */}
+        <div className="mt-2 border-t border-border pt-3 px-1">
+          <p className="mb-2 font-body text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Área personalizada
+          </p>
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <input
+                type="number"
+                placeholder="Mín"
+                value={filters.areaMin || ""}
+                onChange={(e) => setFilter("areaMin", Number(e.target.value) || 0)}
+                className="w-full rounded-lg border border-border bg-background py-2 pl-3 pr-8 font-body text-[13px] text-foreground outline-none transition-colors focus:border-primary"
+              />
+              <span className="absolute right-2.5 top-1/2 -translate-y-1/2 font-body text-[11px] text-muted-foreground">m²</span>
+            </div>
+            <span className="font-body text-xs text-muted-foreground">–</span>
+            <div className="relative flex-1">
+              <input
+                type="number"
+                placeholder="Máx"
+                value={filters.areaMax || ""}
+                onChange={(e) => setFilter("areaMax", Number(e.target.value) || 0)}
+                className="w-full rounded-lg border border-border bg-background py-2 pl-3 pr-8 font-body text-[13px] text-foreground outline-none transition-colors focus:border-primary"
+              />
+              <span className="absolute right-2.5 top-1/2 -translate-y-1/2 font-body text-[11px] text-muted-foreground">m²</span>
+            </div>
+          </div>
+        </div>
       </FilterPill>
 
       {/* Vagas */}

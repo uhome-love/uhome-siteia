@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, X } from "lucide-react";
+import { whatsappLink } from "@/lib/whatsapp";
 
 const DISMISSED_KEY = "uhome_float_dismissed";
-const WHATSAPP_NUMBER = "5551999999999";
 
 export function FloatingCTA() {
   const [visible, setVisible] = useState(false);

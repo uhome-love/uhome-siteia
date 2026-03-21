@@ -72,7 +72,16 @@ const Search = () => {
       const urlQ = searchParams.get("q");
       if (urlFinalidade === "venda") f.finalidade = urlFinalidade;
       if (urlTipo) f.tipo = urlTipo;
-      if (urlQ) f.q = urlQ;
+      if (urlQ) {
+        // Multiple neighborhoods separated by comma → use bairros filter
+        const parts = urlQ.split(",").map(s => s.trim()).filter(Boolean);
+        if (parts.length > 1) {
+          f.q = "";
+          f.bairro = parts.join(",");
+        } else {
+          f.q = urlQ;
+        }
+      }
       if (Object.keys(f).length) setFilters(f as any);
       // Clear AI state
       setResumoIA(null);

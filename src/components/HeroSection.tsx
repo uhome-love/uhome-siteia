@@ -60,7 +60,7 @@ export function HeroSection() {
   const quartosOptions = ["Qualquer", "1+", "2+", "3+", "4+"];
 
   return (
-    <section className="relative flex min-h-[92vh] items-center overflow-hidden pt-16">
+    <section className="relative flex min-h-[auto] items-center overflow-hidden pt-16 lg:min-h-[92vh]">
       {/* Background image */}
       <div className="absolute inset-0">
         <img

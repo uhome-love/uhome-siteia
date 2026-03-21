@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Bed, Car, Maximize, Heart } from "lucide-react";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { LeadFormInline } from "@/components/LeadFormInline";
 import { fetchImoveisDestaque, type Imovel, fotoPrincipal, formatPreco } from "@/services/imoveis";
 
@@ -154,9 +154,9 @@ export function FeaturedProperties() {
                Imóveis em destaque
             </h2>
           </div>
-          <button className="hidden font-body text-sm font-medium text-primary transition-colors hover:text-primary/80 sm:block">
+          <Link to="/busca" className="hidden font-body text-sm font-medium text-primary transition-colors hover:text-primary/80 sm:block">
             Ver todos →
-          </button>
+          </Link>
         </motion.div>
 
         <div className="mt-10 flex gap-4 overflow-x-auto pb-4 sm:grid sm:grid-cols-2 sm:overflow-visible lg:grid-cols-3">

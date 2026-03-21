@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
-import { Menu, X, Heart, User, Sparkles } from "lucide-react";
+import { Menu, X, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { UhomeLogo } from "@/components/UhomeLogo";
 
@@ -51,13 +51,12 @@ export function Navbar() {
           >
             Anuncie seu imóvel
           </Link>
-          <button className="rounded-full p-2 text-foreground transition-colors hover:bg-secondary">
-            <Heart className="h-5 w-5" />
-          </button>
-          <button className="rounded-full border-[1.5px] border-border px-3 py-1.5 flex items-center gap-1.5 text-foreground transition-colors hover:border-foreground/40">
-            <Menu className="h-4 w-4" />
-            <User className="h-4 w-4" />
-          </button>
+          <Link
+            to="/faq"
+            className="rounded-full px-4 py-2 font-body text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Ajuda
+          </Link>
         </div>
 
         {/* Mobile toggle */}

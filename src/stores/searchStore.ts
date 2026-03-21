@@ -11,6 +11,7 @@ export interface SearchFilters {
   finalidade: "venda" | "";
   tipo: string;
   bairro: string;
+  cidade: string;
   precoMin: number;
   precoMax: number;
   areaMin: number;
@@ -35,6 +36,7 @@ const defaultFilters: SearchFilters = {
   finalidade: "",
   tipo: "",
   bairro: "",
+  cidade: "Porto Alegre",
   precoMin: 0,
   precoMax: 0,
   areaMin: 0,

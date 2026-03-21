@@ -85,6 +85,7 @@ const Search = () => {
     finalidade: filters.finalidade || undefined,
     tipo: filters.tipo || undefined,
     bairro: filters.bairro || undefined,
+    cidade: filters.cidade || undefined,
     precoMin: filters.precoMin || undefined,
     precoMax: filters.precoMax || undefined,
     areaMin: filters.areaMin || undefined,

@@ -86,6 +86,7 @@ export interface BuscaFilters {
   tipo?: string;
   bairro?: string;
   bairros?: string[];
+  cidade?: string;
   precoMin?: number;
   precoMax?: number;
   areaMin?: number;
@@ -107,13 +108,19 @@ export interface BuscaFilters {
   } | null;
 }
 
-const CIDADES_PERMITIDAS = ["Porto Alegre", "Canoas", "Cachoeirinha", "Gravataí", "Guaíba"];
+export const CIDADES_PERMITIDAS = ["Porto Alegre", "Canoas", "Cachoeirinha", "Gravataí", "Guaíba"];
 
 export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: Imovel[]; count: number }> {
   let query = supabase
     .from("imoveis")
-    .select("*", { count: "exact" })
-    .in("cidade", CIDADES_PERMITIDAS);
+    .select("*", { count: "exact" });
+
+  // City filter: specific city or all allowed
+  if (filters.cidade) {
+    query = query.eq("cidade", filters.cidade);
+  } else {
+    query = query.in("cidade", CIDADES_PERMITIDAS);
+  }
 
   if (filters.finalidade) query = query.eq("finalidade", filters.finalidade);
   if (filters.tipo) query = query.eq("tipo", filters.tipo);
@@ -177,8 +184,13 @@ export interface MapPin {
 export async function fetchMapPins(filters: BuscaFilters = {}): Promise<MapPin[]> {
   let query = supabase
     .from("imoveis")
-    .select("id,slug,preco,latitude,longitude,bairro,titulo,tipo,quartos,finalidade")
-    .in("cidade", CIDADES_PERMITIDAS);
+    .select("id,slug,preco,latitude,longitude,bairro,titulo,tipo,quartos,finalidade");
+
+  if (filters.cidade) {
+    query = query.eq("cidade", filters.cidade);
+  } else {
+    query = query.in("cidade", CIDADES_PERMITIDAS);
+  }
 
   if (filters.finalidade) query = query.eq("finalidade", filters.finalidade);
   if (filters.tipo) query = query.eq("tipo", filters.tipo);

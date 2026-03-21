@@ -44,24 +44,21 @@ export function FloatingCTA() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 60 }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-between gap-3 px-4 py-3 sm:px-6"
-          style={{ backgroundColor: "hsl(39 70% 54%)" }}
+          className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-between gap-3 px-4 py-3 sm:px-6 bg-primary"
         >
-          <p className="flex-1 font-body text-sm font-semibold" style={{ color: "hsl(230 40% 8%)" }}>
+          <p className="flex-1 font-body text-sm font-semibold text-white">
             Corretor disponível agora
           </p>
           <button
             onClick={handleClick}
-            className="flex items-center gap-2 rounded-lg px-4 py-2 font-body text-sm font-bold transition-all hover:brightness-110 active:scale-[0.97]"
-            style={{ backgroundColor: "hsl(230 40% 8%)", color: "hsl(39 70% 66%)" }}
+            className="flex items-center gap-2 rounded-full bg-white px-4 py-2 font-body text-sm font-bold text-primary transition-all hover:brightness-95 active:scale-[0.97]"
           >
-            <MessageCircle className="h-4 w-4" />
+            <MessageCircle className="h-4 w-4" style={{ color: "#25D366" }} />
             Falar no WhatsApp
           </button>
           <button
             onClick={handleDismiss}
-            className="rounded-lg p-1.5 transition-colors hover:bg-black/10"
-            style={{ color: "hsl(230 40% 8%)" }}
+            className="rounded-lg p-1.5 text-white/70 transition-colors hover:text-white"
           >
             <X className="h-4 w-4" />
           </button>

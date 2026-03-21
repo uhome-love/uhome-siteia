@@ -89,9 +89,9 @@ function PropertyCard({ imovel, index }: { imovel: Imovel; index: number }) {
           <p className="mt-2 font-mono text-lg font-bold text-foreground">{priceFormatted}</p>
 
           <div className="mt-3 flex items-center gap-4 border-t border-border pt-3">
-            {imovel.area_total && (
+            {(imovel.area_total ?? imovel.area_util ?? 0) > 0 && (
               <span className="flex items-center gap-1.5 font-body text-xs text-muted-foreground">
-                <Maximize className="h-3.5 w-3.5" /> {imovel.area_total}m²
+                <Maximize className="h-3.5 w-3.5" /> {imovel.area_total ?? imovel.area_util}m²
               </span>
             )}
             {(imovel.quartos ?? 0) > 0 && (

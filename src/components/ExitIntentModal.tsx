@@ -64,7 +64,7 @@ export function ExitIntentModal() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4"
           onClick={() => setShow(false)}
         >
           <motion.div
@@ -73,11 +73,12 @@ export function ExitIntentModal() {
             exit={{ opacity: 0, scale: 0.95, y: 16 }}
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             onClick={(e) => e.stopPropagation()}
-            className="glass relative w-full max-w-md rounded-2xl p-8"
+            className="relative w-full max-w-md rounded-2xl bg-white p-8 shadow-xl"
           >
             <button
               onClick={() => setShow(false)}
-              className="absolute right-4 top-4 rounded-lg p-1 text-muted-foreground transition-colors hover:text-foreground"
+              className="absolute right-4 top-4 rounded-lg p-1 transition-colors hover:text-foreground"
+              style={{ color: "var(--gray-400)" }}
             >
               <X className="h-5 w-5" />
             </button>
@@ -91,10 +92,10 @@ export function ExitIntentModal() {
               </div>
             ) : (
               <>
-                <h3 className="font-display text-2xl font-bold text-foreground">
+                <h3 className="font-display text-2xl font-bold" style={{ color: "var(--gray-900)" }}>
                   Ainda procurando?
                 </h3>
-                <p className="mt-2 font-body text-sm text-muted-foreground">
+                <p className="mt-2 font-body text-sm" style={{ color: "var(--gray-500)" }}>
                   Deixe seu WhatsApp — um corretor responde em até 1h, sem compromisso.
                 </p>
 
@@ -104,14 +105,15 @@ export function ExitIntentModal() {
                     placeholder="Seu WhatsApp"
                     value={telefone}
                     onChange={(e) => setTelefone(e.target.value)}
-                    className="w-full rounded-xl bg-secondary/50 px-4 py-3 font-body text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                    className="w-full rounded-xl border-[1.5px] bg-white px-4 py-3 font-body text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary"
+                    style={{ borderColor: "var(--gray-300)", color: "var(--gray-900)" }}
                     maxLength={20}
                     autoFocus
                   />
                   <button
                     type="submit"
                     disabled={loading}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 font-body text-sm font-semibold text-primary-foreground transition-all hover:brightness-110 active:scale-[0.97] disabled:opacity-50"
+                    className="btn-primary flex w-full items-center justify-center gap-2 py-3 font-body text-sm font-semibold disabled:opacity-50"
                   >
                     {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                     Quero ser contactado
@@ -120,7 +122,8 @@ export function ExitIntentModal() {
 
                 <button
                   onClick={() => setShow(false)}
-                  className="mt-3 w-full text-center font-body text-xs text-muted-foreground transition-colors hover:text-foreground"
+                  className="mt-3 w-full text-center font-body text-xs transition-colors hover:text-foreground cursor-pointer"
+                  style={{ color: "var(--gray-400)" }}
                 >
                   Não, obrigado
                 </button>

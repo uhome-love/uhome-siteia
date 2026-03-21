@@ -94,9 +94,9 @@ export function SearchPropertyCard({ imovel, index }: { imovel: Imovel; index: n
 
             <div className="mt-3 flex items-center justify-between">
               <div className="flex items-center gap-4">
-                {imovel.area_total && (
+                {(imovel.area_total ?? imovel.area_util ?? 0) > 0 && (
                   <span className="flex items-center gap-1 font-body text-xs text-muted-foreground">
-                    <Maximize className="h-3 w-3" /> {imovel.area_total}m²
+                    <Maximize className="h-3 w-3" /> {imovel.area_total ?? imovel.area_util}m²
                   </span>
                 )}
                 {(imovel.quartos ?? 0) > 0 && (

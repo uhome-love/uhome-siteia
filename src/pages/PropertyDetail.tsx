@@ -211,7 +211,7 @@ const PropertyDetail = () => {
             {/* Stats */}
             <div className="flex flex-wrap gap-6 rounded-2xl border border-border bg-card p-5">
               {[
-                imovel.area_total ? { icon: Maximize, value: `${imovel.area_total}m²`, label: "Área" } : null,
+                (imovel.area_total ?? imovel.area_util ?? 0) > 0 ? { icon: Maximize, value: `${imovel.area_total ?? imovel.area_util}m²`, label: "Área" } : null,
                 (imovel.quartos ?? 0) > 0 ? { icon: Bed, value: imovel.quartos, label: "Quartos" } : null,
                 (imovel.banheiros ?? 0) > 0 ? { icon: Bath, value: imovel.banheiros, label: "Banheiros" } : null,
                 (imovel.vagas ?? 0) > 0 ? { icon: Car, value: imovel.vagas, label: "Vagas" } : null,

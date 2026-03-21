@@ -128,8 +128,8 @@ export function SearchMap({ imoveis, hoveredId, onPinHover, onBoundsSearch }: Se
         if (cancelled) return;
 
         // Add pin background images
-        map.addImage("pin-default", createPinImage("#FFFFFF"), { pixelRatio: 2 });
-        map.addImage("pin-active", createPinImage("#222222"), { pixelRatio: 2 });
+        map.addImage("pin-default", createPinImageData("#FFFFFF"), { pixelRatio: 2 });
+        map.addImage("pin-active", createPinImageData("#222222"), { pixelRatio: 2 });
 
         // GeoJSON source
         map.addSource(SOURCE_ID, {

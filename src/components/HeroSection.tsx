@@ -35,19 +35,36 @@ export function HeroSection() {
 
   useEffect(() => {
     async function loadBairros() {
-      const { data } = await supabase
-        .from("imoveis")
-        .select("bairro")
-        .eq("status", "disponivel");
-      if (data) {
-        const unique = [...new Set(data.map((d) => d.bairro))].sort();
-        setDbBairros(unique);
+      // Fetch all bairros in batches to avoid 1000-row limit
+      let allBairros: string[] = [];
+      let from = 0;
+      const pageSize = 1000;
+      let hasMore = true;
+      
+      while (hasMore) {
+        const { data } = await supabase
+          .from("imoveis")
+          .select("bairro")
+          .eq("status", "disponivel")
+          .range(from, from + pageSize - 1);
+        
+        if (data && data.length > 0) {
+          allBairros = allBairros.concat(data.map((d) => d.bairro));
+          from += pageSize;
+          hasMore = data.length === pageSize;
+        } else {
+          hasMore = false;
+        }
       }
+      
+      const unique = [...new Set(allBairros)].sort();
+      setDbBairros(unique);
     }
     loadBairros();
   }, []);
 
   const bairroSuggestions = useMemo(() => {
+    // Use DB bairros if loaded, otherwise fall back to static list
     const allBairros = dbBairros.length > 0 ? dbBairros : bairrosData.map((b) => b.nome);
     const base = allBairros.filter((b) => !bairrosSelecionados.includes(b));
     if (!bairroInput.trim()) return base.slice(0, 8);

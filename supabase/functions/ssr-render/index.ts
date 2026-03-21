@@ -244,6 +244,81 @@ async function renderImovel(slug: string) {
     `<h1>${esc(titulo)}</h1><p>${esc(desc)}</p><img src="${esc(imgUrl)}" alt="${esc(titulo)}" />`);
 }
 
+/* ── blog data (mirror from codebase) ───────────────── */
+
+const BLOG_POSTS: Record<string, { titulo: string; resumo: string; imagem: string; publicadoEm: string; autor: string }> = {
+  "guia-compra-primeiro-imovel-porto-alegre": { titulo: "Guia completo para comprar seu primeiro imóvel em Porto Alegre", resumo: "Tudo que você precisa saber antes de dar o primeiro passo: documentação, financiamento, bairros e dicas práticas.", imagem: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=450&fit=crop", publicadoEm: "2025-03-15", autor: "Equipe Uhome" },
+  "melhores-bairros-para-investir-2025": { titulo: "Os 5 bairros de Porto Alegre com maior valorização em 2025", resumo: "Dados do mercado mostram quais regiões estão se valorizando mais rápido e por quê.", imagem: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=450&fit=crop", publicadoEm: "2025-02-28", autor: "Equipe Uhome" },
+  "financiamento-imobiliario-tudo-que-voce-precisa-saber": { titulo: "Financiamento imobiliário: taxas, prazos e como se preparar", resumo: "Entenda como funciona o financiamento bancário, quais as melhores taxas do mercado.", imagem: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&h=450&fit=crop", publicadoEm: "2025-02-10", autor: "Equipe Uhome" },
+  "checklist-vistoria-imovel-usado": { titulo: "Checklist: 15 itens para verificar na vistoria de um imóvel usado", resumo: "Não feche negócio sem conferir esses pontos. Um guia prático para identificar problemas ocultos.", imagem: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=800&h=450&fit=crop", publicadoEm: "2025-01-22", autor: "Equipe Uhome" },
+  "morar-em-porto-alegre-vale-a-pena": { titulo: "Morar em Porto Alegre em 2025: custo de vida, qualidade e o que esperar", resumo: "Uma análise honesta sobre o custo de vida, mobilidade, segurança e qualidade dos bairros.", imagem: "https://images.unsplash.com/photo-1598971861713-54ad09c93b3e?w=800&h=450&fit=crop", publicadoEm: "2025-01-08", autor: "Equipe Uhome" },
+  "documentos-necessarios-compra-imovel": { titulo: "Lista completa de documentos para comprar um imóvel em 2025", resumo: "Do comprador ao vendedor, do imóvel ao cartório: todos os documentos organizados por etapa.", imagem: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&h=450&fit=crop", publicadoEm: "2024-12-18", autor: "Equipe Uhome" },
+};
+
+async function renderBlog() {
+  const title = "Blog | Mercado Imobiliário em Porto Alegre — Uhome";
+  const desc = "Artigos, guias e análises sobre o mercado imobiliário de Porto Alegre. Dicas para comprar, investir e financiar seu imóvel.";
+  const canonical = `${SITE}/blog`;
+
+  const blogSchema = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    name: "Uhome Blog",
+    description: desc,
+    url: canonical,
+    publisher: { "@type": "Organization", name: "Uhome", url: SITE },
+    blogPost: Object.entries(BLOG_POSTS).map(([slug, p]) => ({
+      "@type": "BlogPosting",
+      headline: p.titulo,
+      description: p.resumo,
+      url: `${SITE}/blog/${slug}`,
+      datePublished: p.publicadoEm,
+      author: { "@type": "Organization", name: p.autor },
+      image: p.imagem,
+    })),
+  });
+
+  const bodyHtml = Object.entries(BLOG_POSTS).map(([slug, p]) =>
+    `<article><h2><a href="${SITE}/blog/${slug}">${esc(p.titulo)}</a></h2><p>${esc(p.resumo)}</p></article>`
+  ).join("");
+
+  return html(title, desc, LOGO, canonical, [blogSchema, orgJsonLd()], `<h1>${esc(title)}</h1>${bodyHtml}`);
+}
+
+function renderBlogPost(slug: string) {
+  const post = BLOG_POSTS[slug];
+  if (!post) return null;
+
+  const title = `${post.titulo} | Blog Uhome`;
+  const canonical = `${SITE}/blog/${slug}`;
+
+  const postSchema = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.titulo,
+    description: post.resumo,
+    image: post.imagem,
+    url: canonical,
+    datePublished: post.publicadoEm,
+    author: { "@type": "Organization", name: post.autor },
+    publisher: { "@type": "Organization", name: "Uhome", url: SITE, logo: LOGO },
+    mainEntityOfPage: canonical,
+  });
+
+  const breadcrumb = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Uhome", item: `${SITE}/` },
+      { "@type": "ListItem", position: 2, name: "Blog", item: `${SITE}/blog` },
+      { "@type": "ListItem", position: 3, name: post.titulo, item: canonical },
+    ],
+  });
+
+  return html(title, post.resumo, post.imagem, canonical, [postSchema, breadcrumb, orgJsonLd()],
+    `<h1>${esc(post.titulo)}</h1><p>${esc(post.resumo)}</p><img src="${esc(post.imagem)}" alt="${esc(post.titulo)}" />`);
+}
+
 async function renderFaq() {
   const faqs = [
     { q: "Quais documentos preciso para comprar um imóvel em Porto Alegre?", a: "RG, CPF, comprovante de renda, certidões negativas de débitos, comprovante de estado civil e extrato do FGTS (se aplicável)." },

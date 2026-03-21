@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { UhomeLogo } from "@/components/UhomeLogo";
 import { useCanonical } from "@/hooks/useCanonical";
+import { whatsappLink } from "@/lib/whatsapp";
 
 const steps = [
   {

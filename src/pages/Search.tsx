@@ -398,11 +398,10 @@ const Search = () => {
         {/* Cards column */}
         <div className="flex-1 overflow-y-auto px-3 py-4 sm:px-6 sm:py-5" style={{ minWidth: 0 }}>
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-20">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              <p className="mt-3 font-body text-sm text-muted-foreground">
-                {modoIA && buscandoIA ? "Interpretando sua busca com IA..." : "Carregando imóveis..."}
-              </p>
+            <div className="grid grid-cols-1 gap-4 pb-16 sm:grid-cols-2 sm:gap-6 sm:pb-4 xl:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <SkeletonCard key={i} />
+              ))}
             </div>
           ) : imoveis.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20">
@@ -423,13 +422,17 @@ const Search = () => {
           ) : (
             <div className="grid grid-cols-1 gap-4 pb-16 sm:grid-cols-2 sm:gap-6 sm:pb-4 xl:grid-cols-3">
               {imoveis.map((imovel, i) => (
-                <SearchPropertyCard
-                  key={imovel.id}
-                  imovel={imovel}
-                  index={i}
-                  highlighted={hoveredId === imovel.id}
-                  onHover={setHoveredId}
-                />
+                <React.Fragment key={imovel.id}>
+                  <SearchPropertyCard
+                    imovel={imovel}
+                    index={i}
+                    highlighted={hoveredId === imovel.id}
+                    onHover={setHoveredId}
+                  />
+                  {i === 5 && (
+                    <SearchCTACard onClickCTA={() => setShowLeadCTA(true)} />
+                  )}
+                </React.Fragment>
               ))}
             </div>
           )}

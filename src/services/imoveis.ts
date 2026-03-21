@@ -107,11 +107,13 @@ export interface BuscaFilters {
   } | null;
 }
 
+const CIDADES_PERMITIDAS = ["Porto Alegre", "Canoas", "Cachoeirinha", "Gravataí", "Guaíba"];
+
 export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: Imovel[]; count: number }> {
   let query = supabase
     .from("imoveis")
     .select("*", { count: "exact" })
-    .eq("cidade", "Porto Alegre");
+    .in("cidade", CIDADES_PERMITIDAS);
 
   if (filters.finalidade) query = query.eq("finalidade", filters.finalidade);
   if (filters.tipo) query = query.eq("tipo", filters.tipo);

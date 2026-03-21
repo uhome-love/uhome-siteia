@@ -83,7 +83,11 @@ export function SearchMap({ imoveis = [], hoveredId, onPinHover, onBoundsSearch 
   const initRef = useRef(false);
   const mapReadyRef = useRef(false);
   const boundsRef = useRef<mapboxgl.LngLatBounds | null>(null);
+  const imoveisRef = useRef(imoveis);
   const [mapMoved, setMapMoved] = useState(false);
+
+  // Keep ref in sync
+  useEffect(() => { imoveisRef.current = imoveis; }, [imoveis]);
 
   // Init map once
   useEffect(() => {

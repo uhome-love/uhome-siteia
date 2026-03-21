@@ -116,27 +116,31 @@ const Search = () => {
     };
   }, [filters]);
 
-  // Normal mode: fetch list (paginated) + map pins (all)
+  // Normal mode: fetch list first (fast), then map pins in background
   const loadImoveis = useCallback(async () => {
     if (modoIA && !aiResult) return;
     setLoading(true);
     try {
       const baseFilters = buildFilters();
-      const [result, pins] = await Promise.all([
-        fetchImoveis({
-          ...baseFilters,
-          ordem: filters.ordem as any,
-          bounds: filters.bounds || undefined,
-          limit: 40,
-        }),
-        fetchMapPins(baseFilters),
-      ]);
+      // Load list immediately — don't wait for map pins
+      const result = await fetchImoveis({
+        ...baseFilters,
+        ordem: filters.ordem as any,
+        bounds: filters.bounds || undefined,
+        limit: 40,
+      });
       setImoveis(result.data);
       setTotal(result.count);
-      setMapPins(pins);
+      setLoading(false);
+
+      // Load map pins in background (13k+ rows, slower)
+      setMapLoading(true);
+      fetchMapPins(baseFilters)
+        .then(setMapPins)
+        .catch((err) => console.error("Erro ao buscar pins:", err))
+        .finally(() => setMapLoading(false));
     } catch (err) {
       console.error("Erro ao buscar imóveis:", err);
-    } finally {
       setLoading(false);
     }
   }, [filters, modoIA, aiResult, buildFilters]);

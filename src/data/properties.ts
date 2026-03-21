@@ -6,7 +6,7 @@ export interface MockProperty {
   city: string;
   price: number;
   priceFormatted: string;
-  finalidade: "venda" | "locacao";
+  finalidade: "venda";
   tipo: string;
   area: number;
   bedrooms: number;

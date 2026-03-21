@@ -64,7 +64,7 @@ export function HeroSection() {
       {/* Background image */}
       <div className="absolute inset-0">
         <img
-          src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1600&q=85"
+          src="/hero-bg.jpg"
           alt=""
           className="h-full w-full object-cover"
           style={{ objectPosition: "center center" }}

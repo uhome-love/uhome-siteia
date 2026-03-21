@@ -110,7 +110,7 @@ export function SearchPropertyCard({ imovel, index }: { imovel: Imovel; index: n
               </div>
               <button
                 onClick={() => setShowLead(!showLead)}
-                className="shrink-0 whitespace-nowrap rounded-full border-[1.5px] border-primary px-4 py-2 font-body text-[13px] font-semibold text-primary transition-all hover:bg-primary/5 active:scale-[0.97]"
+                className="shrink-0 whitespace-nowrap rounded-full border-[1.5px] border-primary px-2.5 py-1 font-body text-xs font-semibold text-primary transition-all hover:bg-primary/5 active:scale-[0.97]"
               >
                 Tenho interesse
               </button>

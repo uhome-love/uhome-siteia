@@ -238,7 +238,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch }: 
           const lng = Number(i.longitude);
           return lat && lng && lat < -28 && lat > -32 && lng < -49 && lng > -54;
         });
-        if (validos.length > 0) {
+        if (validos.length > 0 && validos.length < 2000) {
           const b = new mapboxgl.LngLatBounds();
           validos.forEach((i) => b.extend([Number(i.longitude), Number(i.latitude)]));
           map.fitBounds(b, { padding: 60, maxZoom: 14, duration: 500 });

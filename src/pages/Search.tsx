@@ -75,79 +75,77 @@ const Search = () => {
       <Navbar />
       <SearchFiltersBar />
 
+      {/* Subheader: counter + sort */}
+      <div className="flex items-center justify-between border-b border-border bg-background px-6 py-2.5">
+        <div>
+          <span className="font-body text-sm font-semibold text-foreground">
+            {total.toLocaleString("pt-BR")}
+          </span>
+          <span className="font-body text-sm text-muted-foreground"> imóveis encontrados</span>
+        </div>
+        <div className="relative">
+          <button
+            onClick={() => setSortOpen(!sortOpen)}
+            className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 font-body text-xs font-medium text-foreground transition-colors hover:border-foreground"
+          >
+            <ArrowUpDown className="h-3.5 w-3.5" />
+            {sortLabels[filters.ordem]}
+          </button>
+          {sortOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="absolute right-0 top-full z-30 mt-1 w-44 rounded-xl border border-border bg-card p-1 shadow-xl"
+            >
+              {Object.entries(sortLabels).map(([key, label]) => (
+                <button
+                  key={key}
+                  onClick={() => { setFilter("ordem", key as any); setSortOpen(false); }}
+                  className={`block w-full rounded-lg px-3 py-2 text-left font-body text-[13px] transition-colors ${
+                    filters.ordem === key
+                      ? "bg-primary/10 font-medium text-primary"
+                      : "text-foreground hover:bg-secondary"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </motion.div>
+          )}
+        </div>
+      </div>
+
+      {/* Main area: cards + map */}
       <div className="flex flex-1 overflow-hidden">
         {/* Cards column */}
-        <div className="flex-1 overflow-y-auto" style={{ minWidth: 0 }}>
-          {/* Subheader */}
-          <div className="flex items-center justify-between px-6 py-3">
-            <div>
-              <p className="font-body text-sm font-semibold text-foreground">
-                {total.toLocaleString("pt-BR")} imóveis
-              </p>
-              <p className="font-body text-xs text-muted-foreground">à venda em Porto Alegre</p>
+        <div className="flex-1 overflow-y-auto px-6 py-5" style={{ minWidth: 0 }}>
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <p className="mt-3 font-body text-sm text-muted-foreground">Carregando imóveis...</p>
             </div>
-            <div className="relative">
-              <button
-                onClick={() => setSortOpen(!sortOpen)}
-                className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 font-body text-xs font-medium text-foreground transition-colors hover:border-foreground"
-              >
-                <ArrowUpDown className="h-3.5 w-3.5" />
-                {sortLabels[filters.ordem]}
-              </button>
-              {sortOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="absolute right-0 top-full z-30 mt-1 w-44 rounded-xl border border-border bg-card p-1 shadow-xl"
-                >
-                  {Object.entries(sortLabels).map(([key, label]) => (
-                    <button
-                      key={key}
-                      onClick={() => { setFilter("ordem", key as any); setSortOpen(false); }}
-                      className={`block w-full rounded-lg px-3 py-2 text-left font-body text-[13px] transition-colors ${
-                        filters.ordem === key
-                          ? "bg-primary/10 font-medium text-primary"
-                          : "text-foreground hover:bg-secondary"
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </motion.div>
-              )}
+          ) : imoveis.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <p className="font-body text-lg font-bold text-foreground">Nenhum imóvel encontrado</p>
+              <p className="mt-1 font-body text-sm text-muted-foreground">Tente ajustar seus filtros.</p>
             </div>
-          </div>
-
-          {/* Grid */}
-          <div className="px-6 pb-8">
-            {loading ? (
-              <div className="flex flex-col items-center justify-center py-20">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <p className="mt-3 font-body text-sm text-muted-foreground">Carregando imóveis...</p>
-              </div>
-            ) : imoveis.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20">
-                <p className="font-body text-lg font-bold text-foreground">Nenhum imóvel encontrado</p>
-                <p className="mt-1 font-body text-sm text-muted-foreground">Tente ajustar seus filtros.</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                {imoveis.map((imovel, i) => (
-                  <SearchPropertyCard
-                    key={imovel.id}
-                    imovel={imovel}
-                    index={i}
-                    highlighted={hoveredId === imovel.id}
-                    onHover={setHoveredId}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-6 pb-4 sm:grid-cols-2 xl:grid-cols-3">
+              {imoveis.map((imovel, i) => (
+                <SearchPropertyCard
+                  key={imovel.id}
+                  imovel={imovel}
+                  index={i}
+                  highlighted={hoveredId === imovel.id}
+                  onHover={setHoveredId}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Map — desktop */}
-        <div className="hidden w-[45%] shrink-0 border-l border-border lg:block">
+        <div className="relative hidden w-[45%] shrink-0 border-l border-border lg:block">
           <SearchMap imoveis={imoveis} hoveredId={hoveredId} onPinHover={setHoveredId} />
         </div>
       </div>

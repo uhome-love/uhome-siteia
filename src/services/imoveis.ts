@@ -38,8 +38,23 @@ function parseFotos(fotos: any): Array<{ url: string; ordem: number; principal: 
   return [];
 }
 
+function capitalize(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+/** Generate a clean title regardless of what's stored in the DB */
+export function tituloLimpo(imovel: { tipo: string; finalidade: string; quartos: number | null; bairro: string; titulo?: string }): string {
+  const tipo = capitalize(imovel.tipo);
+  const quartos = imovel.quartos ?? 0;
+  if (quartos > 0) {
+    return `${tipo} ${quartos} quarto${quartos > 1 ? "s" : ""} — ${imovel.bairro}`;
+  }
+  const label = imovel.finalidade === "locacao" ? "para Alugar" : "para Venda";
+  return `${tipo} ${label} — ${imovel.bairro}`;
+}
+
 function mapRow(row: any): Imovel {
-  return {
+  const mapped = {
     ...row,
     fotos: parseFotos(row.fotos),
     diferenciais: row.diferenciais || [],
@@ -47,6 +62,9 @@ function mapRow(row: any): Imovel {
     cidade: row.cidade ?? "Porto Alegre",
     uf: row.uf ?? "RS",
   };
+  // Always override with clean title
+  mapped.titulo = tituloLimpo(mapped);
+  return mapped;
 }
 
 /** Get primary photo URL or a placeholder */

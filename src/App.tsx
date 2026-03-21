@@ -20,6 +20,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/busca" element={<Search />} />
           <Route path="/imovel/:slug" element={<PropertyDetail />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

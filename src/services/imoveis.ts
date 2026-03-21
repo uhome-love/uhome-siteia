@@ -247,6 +247,7 @@ export async function fetchImoveisDestaque(limit = 6): Promise<Imovel[]> {
     .from("imoveis")
     .select("*")
     .eq("destaque", true)
+    .in("cidade", CIDADES_PERMITIDAS)
     .order("publicado_em", { ascending: false })
     .limit(limit);
 
@@ -258,6 +259,7 @@ export async function fetchImoveisDestaque(limit = 6): Promise<Imovel[]> {
     const { data: fallback } = await supabase
       .from("imoveis")
       .select("*")
+      .in("cidade", CIDADES_PERMITIDAS)
       .order("publicado_em", { ascending: false })
       .limit(limit);
     return (fallback || []).map(mapRow);

@@ -127,18 +127,20 @@ const Search = () => {
   const filterDesc = describeFilters(filters);
 
   return (
-    <div className="flex h-screen flex-col bg-background">
+    <div className="flex h-screen flex-col bg-background pt-16">
       <Navbar />
       <SearchFiltersBar />
 
       {/* Subheader: counter + bounds badge + sort + alert */}
-      <div className="flex items-center justify-between border-b border-border bg-background px-6 py-3">
+      <div className="flex items-center justify-between border-b border-border bg-background px-6 py-4">
         <div className="flex items-center gap-3">
           <div>
-            <span className="font-body text-lg font-extrabold text-foreground">
-              {total.toLocaleString("pt-BR")}
-            </span>
-            <span className="ml-1.5 font-body text-sm text-muted-foreground">imóveis encontrados</span>
+            <div className="font-body text-[22px] font-extrabold leading-tight text-foreground">
+              {total.toLocaleString("pt-BR")} imóveis
+            </div>
+            <div className="mt-0.5 font-body text-sm text-muted-foreground">
+              à venda em Porto Alegre{filters.bairro ? `, ${filters.bairro}` : ""}
+            </div>
           </div>
 
           {/* Bounds active badge */}

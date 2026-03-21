@@ -36,7 +36,7 @@ export function PropertyMap({ neighborhood, city, lat = -30.0277, lng = -51.2287
 
       const map = new mapboxgl.default.Map({
         container: mapContainer.current!,
-        style: "mapbox://styles/mapbox/dark-v11",
+        style: "mapbox://styles/mapbox/streets-v12",
         center: [lng, lat],
         zoom: 15,
         attributionControl: false,
@@ -44,7 +44,7 @@ export function PropertyMap({ neighborhood, city, lat = -30.0277, lng = -51.2287
 
       map.addControl(new mapboxgl.default.NavigationControl({ showCompass: false }), "top-right");
 
-      new mapboxgl.default.Marker({ color: "hsl(39, 70%, 66%)" })
+      new mapboxgl.default.Marker({ color: "#5B6CF9" })
         .setLngLat([lng, lat])
         .addTo(map);
 
@@ -64,31 +64,13 @@ export function PropertyMap({ neighborhood, city, lat = -30.0277, lng = -51.2287
   const mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.008}%2C${lat - 0.005}%2C${lng + 0.008}%2C${lat + 0.005}&layer=mapnik&marker=${lat}%2C${lng}`;
 
   return (
-    <div className="rounded-2xl border border-border bg-card overflow-hidden">
-      <div className="flex items-center gap-3 p-5 pb-0">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-          <MapPin className="h-5 w-5 text-primary" />
-        </div>
-        <div>
-          <h3 className="font-display text-xl font-bold text-foreground">Localização</h3>
-          <p className="font-body text-xs text-muted-foreground">{neighborhood}, {city}</p>
-        </div>
-      </div>
-
-      <div className="mt-4 aspect-[16/9] w-full">
+    <div className="overflow-hidden rounded-2xl border border-border">
+      <div className="aspect-[16/9] w-full">
         {fallbackMap ? (
           <iframe title="Mapa do imóvel" src={mapUrl} className="h-full w-full border-0" loading="lazy" referrerPolicy="no-referrer" />
         ) : (
           <div ref={mapContainer} className="h-full w-full" />
         )}
-      </div>
-
-      <div className="flex flex-wrap gap-2 p-5">
-        {["Supermercado", "Escola", "Parque", "Farmácia", "Restaurantes"].map((poi) => (
-          <span key={poi} className="rounded-full border border-border px-3 py-1 font-body text-xs text-muted-foreground">
-            📍 {poi} próximo
-          </span>
-        ))}
       </div>
     </div>
   );

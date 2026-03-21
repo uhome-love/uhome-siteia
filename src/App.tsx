@@ -27,6 +27,7 @@ const App = () => (
           <Route path="/imovel/:slug" element={<PropertyDetail />} />
           <Route path="/ia-search" element={<Navigate to="/busca?modo=ia" replace />} />
           <Route path="/anunciar" element={<Anunciar />} />
+          <Route path="/carreiras" element={<Carreiras />} />
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -39,7 +39,10 @@ const Bairro = () => {
     setMeta("property", "og:description", desc);
     setMeta("property", "og:image", bairro.foto);
     setMeta("property", "og:url", `https://uhome.com.br/bairros/${bairro.slug}`);
-    return () => { document.title = "Uhome Imóveis | Porto Alegre"; };
+    return () => {
+      document.title = "Uhome Imóveis | Porto Alegre";
+      removeJsonLd("jsonld-bairro");
+    };
   }, [bairro]);
 
   useEffect(() => {

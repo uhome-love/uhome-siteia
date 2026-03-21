@@ -132,13 +132,13 @@ const Search = () => {
       <SearchFiltersBar />
 
       {/* Subheader: counter + bounds badge + sort + alert */}
-      <div className="flex items-center justify-between border-b border-border bg-background px-6 py-2.5">
+      <div className="flex items-center justify-between border-b border-border bg-background px-6 py-3">
         <div className="flex items-center gap-3">
           <div>
-            <span className="font-body text-sm font-semibold text-foreground">
+            <span className="font-body text-lg font-extrabold text-foreground">
               {total.toLocaleString("pt-BR")}
             </span>
-            <span className="font-body text-sm text-muted-foreground"> imóveis encontrados</span>
+            <span className="ml-1.5 font-body text-sm text-muted-foreground">imóveis encontrados</span>
           </div>
 
           {/* Bounds active badge */}
@@ -230,8 +230,10 @@ const Search = () => {
         </div>
 
         {/* Map — desktop */}
-        <div className="relative hidden w-[45%] shrink-0 border-l border-border lg:block">
-          <SearchMap imoveis={imoveis} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} />
+        <div className="relative hidden w-[45%] shrink-0 border-l border-border lg:block" style={{ overflow: "visible" }}>
+          <div className="h-full w-full overflow-hidden rounded-none">
+            <SearchMap imoveis={imoveis} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} />
+          </div>
         </div>
       </div>
 

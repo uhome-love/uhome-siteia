@@ -86,9 +86,27 @@ function extractDiferenciais(item: any): string[] {
   return diffs;
 }
 
+function extractPreco(j: any): number {
+  // Try multiple field names; pick the first truthy numeric value
+  const candidates = [
+    j.valor_venda,
+    j.valor_locacao,
+    j.valor_temporada,
+    j.valor,
+    j.preco,
+    j.price,
+    j.valor_total,
+  ];
+  for (const v of candidates) {
+    const n = Number(v);
+    if (n > 0) return n;
+  }
+  return 0;
+}
+
 function mapImovel(j: any) {
   const codigo = String(j.codigo || j.id || j.cod || Date.now());
-  const titulo = j.titulo || j.title || j.nome || `Imóvel ${codigo}`;
+  const titulo = j.titulo_anuncio || j.titulo || j.title || j.nome || `Imóvel ${codigo}`;
 
   return {
     jetimob_id: codigo,
@@ -96,8 +114,8 @@ function mapImovel(j: any) {
     tipo: mapTipo(j.subtipo || j.tipo_imovel || j.tipo || j.type),
     finalidade: mapFinalidade(j.finalidade || j.operacao || j.contrato),
     status: mapStatus(j.status || j.situacao),
-    destaque: j.destaque === true || j.destaque === 1,
-    preco: Number(j.valor_venda || j.valor || j.preco || j.valor_locacao || j.price || 0),
+    destaque: j.destaque === true || j.destaque === 1 || j.destaque === "Destaque",
+    preco: extractPreco(j),
     preco_condominio: j.valor_condominio ? Number(j.valor_condominio) : null,
     preco_iptu: j.valor_iptu || j.iptu ? Number(j.valor_iptu || j.iptu) : null,
     area_total: j.area_total ? Number(j.area_total) : null,
@@ -111,15 +129,15 @@ function mapImovel(j: any) {
     uf: j.endereco_estado || j.uf || j.estado || "RS",
     cep: j.endereco_cep || j.cep || null,
     endereco_completo: j.endereco_logradouro || j.endereco || j.logradouro || null,
-    latitude: j.endereco_latitude || j.latitude || j.lat ? Number(j.endereco_latitude || j.latitude || j.lat) : null,
-    longitude: j.endereco_longitude || j.longitude || j.lng || j.lon ? Number(j.endereco_longitude || j.longitude || j.lng || j.lon) : null,
+    latitude: j.endereco_latitude || j.latitude ? Number(j.endereco_latitude || j.latitude) : null,
+    longitude: j.endereco_longitude || j.longitude ? Number(j.endereco_longitude || j.longitude) : null,
     titulo,
-    descricao: j.descricao || j.description || null,
+    descricao: j.descricao_anuncio || j.descricao || j.description || null,
     diferenciais: extractDiferenciais(j),
     fotos: extractFotos(j),
     video_url: j.video_url || j.video || null,
     origem: "jetimob",
-    jetimob_raw: JSON.stringify(j),
+    jetimob_raw: j,
   };
 }
 

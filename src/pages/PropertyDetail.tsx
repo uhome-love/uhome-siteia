@@ -1,6 +1,5 @@
 import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Helmet } from "react-helmet-async";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { LeadSidebar } from "@/components/LeadSidebar";
@@ -59,6 +58,32 @@ const PropertyDetail = () => {
     return () => window.removeEventListener("keydown", handler);
   }, [images.length]);
 
+  // Dynamic SEO meta tags
+  useEffect(() => {
+    if (!imovel) return;
+    const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+    const price = formatPreco(imovel.preco);
+    document.title = `${imovel.titulo} | Uhome Imóveis`;
+    const setMeta = (attr: string, key: string, content: string) => {
+      let el = document.querySelector(`meta[${attr}="${key}"]`);
+      if (!el) {
+        el = document.createElement("meta");
+        el.setAttribute(attr, key);
+        document.head.appendChild(el);
+      }
+      el.setAttribute("content", content);
+    };
+    const desc = `${cap(imovel.tipo)} ${(imovel.quartos ?? 0) > 0 ? `com ${imovel.quartos} quartos` : ""} em ${imovel.bairro}, Porto Alegre. ${price}.`;
+    setMeta("name", "description", desc);
+    setMeta("property", "og:title", `${imovel.titulo} | Uhome`);
+    setMeta("property", "og:description", `${cap(imovel.tipo)} em ${imovel.bairro} — ${price}`);
+    setMeta("property", "og:image", fotoPrincipal(imovel));
+    setMeta("property", "og:url", `https://uhome.com.br/imovel/${imovel.slug}`);
+    return () => {
+      document.title = "Uhome Imóveis | Apartamentos e Casas à Venda em Porto Alegre";
+    };
+  }, [imovel]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -98,17 +123,6 @@ const PropertyDetail = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Helmet>
-        <title>{imovel.titulo} | Uhome Imóveis</title>
-        <meta name="description" content={`${capitalize(imovel.tipo)} ${(imovel.quartos ?? 0) > 0 ? `com ${imovel.quartos} quartos` : ''} em ${imovel.bairro}, Porto Alegre. ${priceFormatted}. Veja fotos e entre em contato com a Uhome.`} />
-        <meta property="og:title" content={`${imovel.titulo} | Uhome`} />
-        <meta property="og:description" content={`${capitalize(imovel.tipo)} em ${imovel.bairro} — ${priceFormatted}`} />
-        <meta property="og:image" content={fotoPrincipal(imovel)} />
-        <meta property="og:url" content={`https://uhome.com.br/imovel/${imovel.slug}`} />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${imovel.titulo} | Uhome`} />
-        <meta name="twitter:image" content={fotoPrincipal(imovel)} />
-      </Helmet>
       <Navbar />
 
       {/* Gallery */}

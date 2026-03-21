@@ -129,7 +129,7 @@ export function HeroSection() {
             {modo === "comprar" ? (
               <>
                 {/* Bairro */}
-                <label className="mb-2.5 block rounded-xl border-[1.5px] border-border p-3.5 transition-colors focus-within:border-primary">
+                <label className="mb-2 block rounded-xl border-[1.5px] border-border p-3 transition-colors focus-within:border-primary sm:mb-2.5 sm:p-3.5">
                   <div className="flex items-center gap-2.5">
                     <MapPin className="h-5 w-5 shrink-0 text-muted-foreground" />
                     <div className="flex-1">

@@ -14,7 +14,90 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      imovel_views: {
+        Row: {
+          id: string
+          imovel_id: string
+          session_id: string | null
+          viewed_at: string | null
+        }
+        Insert: {
+          id?: string
+          imovel_id: string
+          session_id?: string | null
+          viewed_at?: string | null
+        }
+        Update: {
+          id?: string
+          imovel_id?: string
+          session_id?: string | null
+          viewed_at?: string | null
+        }
+        Relationships: []
+      }
+      public_leads: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          id: string
+          imovel_bairro: string | null
+          imovel_id: string | null
+          imovel_preco: number | null
+          imovel_slug: string | null
+          imovel_titulo: string | null
+          nome: string
+          origem_componente: string | null
+          origem_pagina: string | null
+          session_id: string | null
+          status: string | null
+          telefone: string
+          tipo_interesse: string | null
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          imovel_bairro?: string | null
+          imovel_id?: string | null
+          imovel_preco?: number | null
+          imovel_slug?: string | null
+          imovel_titulo?: string | null
+          nome: string
+          origem_componente?: string | null
+          origem_pagina?: string | null
+          session_id?: string | null
+          status?: string | null
+          telefone: string
+          tipo_interesse?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          imovel_bairro?: string | null
+          imovel_id?: string | null
+          imovel_preco?: number | null
+          imovel_slug?: string | null
+          imovel_titulo?: string | null
+          nome?: string
+          origem_componente?: string | null
+          origem_pagina?: string | null
+          session_id?: string | null
+          status?: string | null
+          telefone?: string
+          tipo_interesse?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

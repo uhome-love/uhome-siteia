@@ -142,9 +142,11 @@ serve(async (req) => {
     const pageSize = 200;
     const maxPages = 50;
 
+    console.log(`JETIMOB_KEY length: ${JETIMOB_KEY.length}, starts with: ${JETIMOB_KEY.substring(0, 4)}...`);
+
     for (let page = 1; page <= maxPages; page++) {
       const url = `${JETIMOB_BASE}/${JETIMOB_KEY}/imoveis/todos?v=6&page=${page}&pageSize=${pageSize}`;
-      console.log(`Fetching page ${page}...`);
+      console.log(`Fetching page ${page}, URL pattern: ${JETIMOB_BASE}/***KEY***/imoveis/todos?v=6&page=${page}&pageSize=${pageSize}`);
 
       const response = await fetch(url, {
         headers: { Accept: "application/json" },

@@ -77,7 +77,8 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
           <img
             src={fotos[fotoAtiva]}
             alt={imovel.titulo}
-            loading="lazy"
+            loading={index < 6 ? "eager" : "lazy"}
+            decoding="async"
             className="h-full w-full object-cover transition-transform duration-500 sm:aspect-[4/3]"
             style={{ transform: hovering ? "scale(1.03)" : "scale(1)" }}
           />

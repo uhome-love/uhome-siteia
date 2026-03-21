@@ -240,6 +240,7 @@ const Search = () => {
   };
 
   const filterDesc = describeFilters(filters);
+  const animatedTotal = useCountUp(total);
 
   return (
     <div className="flex h-screen flex-col bg-background pt-16">

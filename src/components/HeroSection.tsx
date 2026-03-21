@@ -78,8 +78,8 @@ export function HeroSection() {
         />
       </div>
 
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-6 py-16 sm:px-8">
-        <div className="flex flex-col items-start gap-10 lg:flex-row lg:items-center lg:gap-16">
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 sm:py-16 lg:px-8">
+        <div className="flex flex-col items-start gap-6 lg:flex-row lg:items-center lg:gap-16">
           {/* Left — headline */}
           <motion.div
             initial={{ opacity: 0, x: -24 }}

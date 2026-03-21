@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { LeadSidebar } from "@/components/LeadSidebar";
@@ -8,7 +9,7 @@ import { PropertyMap } from "@/components/PropertyMap";
 import { Bed, Car, Maximize, Bath, MapPin, Share2, Heart, ChevronLeft, ChevronRight, Loader2, Camera } from "lucide-react";
 import { motion } from "framer-motion";
 import { trackView, getViewCount } from "@/services/leads";
-import { fetchImovelBySlug, type Imovel, formatPreco } from "@/services/imoveis";
+import { fetchImovelBySlug, type Imovel, formatPreco, fotoPrincipal } from "@/services/imoveis";
 
 const PropertyDetail = () => {
   const { slug } = useParams();

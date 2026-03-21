@@ -187,7 +187,7 @@ export function SearchFiltersBar() {
       {/* Preço */}
       <FilterPill
         label="Preço"
-        value={precoLabel}
+        value={precoLabel || (filters.precoMin || filters.precoMax ? formatPrecoLabel(filters.precoMin, filters.precoMax) : undefined)}
         active={!!(filters.precoMin || filters.precoMax)}
         onClear={() => { setFilter("precoMin", 0); setFilter("precoMax", 0); }}
       >
@@ -204,6 +204,36 @@ export function SearchFiltersBar() {
             {r.label}
           </PillOption>
         ))}
+
+        {/* Manual price inputs */}
+        <div className="mt-2 border-t border-border pt-3 px-1">
+          <p className="mb-2 font-body text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Valor personalizado
+          </p>
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 font-body text-[11px] text-muted-foreground">R$</span>
+              <input
+                type="number"
+                placeholder="Mín"
+                value={filters.precoMin || ""}
+                onChange={(e) => setFilter("precoMin", Number(e.target.value) || 0)}
+                className="w-full rounded-lg border border-border bg-background py-2 pl-8 pr-2 font-body text-[13px] text-foreground outline-none transition-colors focus:border-primary"
+              />
+            </div>
+            <span className="font-body text-xs text-muted-foreground">–</span>
+            <div className="relative flex-1">
+              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 font-body text-[11px] text-muted-foreground">R$</span>
+              <input
+                type="number"
+                placeholder="Máx"
+                value={filters.precoMax || ""}
+                onChange={(e) => setFilter("precoMax", Number(e.target.value) || 0)}
+                className="w-full rounded-lg border border-border bg-background py-2 pl-8 pr-2 font-body text-[13px] text-foreground outline-none transition-colors focus:border-primary"
+              />
+            </div>
+          </div>
+        </div>
       </FilterPill>
 
       {/* Quartos */}

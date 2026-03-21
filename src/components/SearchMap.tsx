@@ -21,7 +21,9 @@ export function SearchMap({ imoveis, hoveredId, onPinHover }: SearchMapProps) {
   const mapRef = useRef<any>(null);
   const markersRef = useRef<Map<string, { el: HTMLElement; marker: any }>>(new Map());
   const popupRef = useRef<any>(null);
+  const mapReadyRef = useRef(false);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [mapError, setMapError] = useState(false);
   const [mapError, setMapError] = useState(false);
   const navigate = useNavigate();
 

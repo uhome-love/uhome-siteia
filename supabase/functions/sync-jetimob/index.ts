@@ -137,62 +137,52 @@ serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Fetch all pages from Jetimob (v=6, paginated)
-    const allItems: any[] = [];
+    // Fetch and upsert page by page (stream to avoid timeout)
     const pageSize = 200;
     const maxPages = 50;
+    let totalFetched = 0;
+    let inseridos = 0;
+    let erros = 0;
 
-    console.log(`JETIMOB_KEY length: ${JETIMOB_KEY.length}, starts with: ${JETIMOB_KEY.substring(0, 4)}...`);
+    console.log(`JETIMOB_KEY length: ${JETIMOB_KEY.length}`);
 
     for (let page = 1; page <= maxPages; page++) {
       const url = `${JETIMOB_BASE}/${JETIMOB_KEY}/imoveis/todos?v=6&page=${page}&pageSize=${pageSize}`;
-      console.log(`Fetching page ${page}, URL pattern: ${JETIMOB_BASE}/***KEY***/imoveis/todos?v=6&page=${page}&pageSize=${pageSize}`);
+      console.log(`Page ${page}...`);
 
-      const response = await fetch(url, {
-        headers: { Accept: "application/json" },
-      });
+      const response = await fetch(url, { headers: { Accept: "application/json" } });
 
       if (!response.ok) {
         const text = await response.text();
-        console.error(`Jetimob page ${page} error: ${response.status}`, text);
+        console.error(`Page ${page} error: ${response.status}`, text.slice(0, 100));
         if (page === 1) throw new Error(`Jetimob API returned ${response.status}: ${text.slice(0, 200)}`);
         break;
       }
 
       const data = await response.json();
-      const items = Array.isArray(data) ? data : data.imoveis || data.data || data.items || [];
+      const rawItems = Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : Array.isArray(data?.result) ? data.result : data.imoveis || data.items || [];
+      const items = Array.isArray(rawItems) ? rawItems : [];
 
       if (items.length === 0) break;
-      allItems.push(...items);
+      totalFetched += items.length;
 
-      if (items.length < pageSize) break;
-    }
-
-    console.log(`Total: ${allItems.length} properties from Jetimob`);
-
-    let inseridos = 0;
-    let erros = 0;
-
-    // Upsert in batches
-    const batchSize = 20;
-    for (let i = 0; i < allItems.length; i += batchSize) {
-      const batch = allItems.slice(i, i + batchSize);
-      const mapped = batch.map(mapImovel);
-
-      const { error } = await supabase.from("imoveis").upsert(mapped, {
-        onConflict: "jetimob_id",
-        ignoreDuplicates: false,
-      });
-
-      if (error) {
-        console.error(`Upsert error batch ${i}:`, error.message);
-        erros += batch.length;
-      } else {
-        inseridos += batch.length;
+      // Upsert this page immediately in batches of 50
+      const batchSize = 50;
+      for (let i = 0; i < items.length; i += batchSize) {
+        const batch = items.slice(i, i + batchSize);
+        const mapped = batch.map(mapImovel);
+        const { error } = await supabase.from("imoveis").upsert(mapped, { onConflict: "jetimob_id", ignoreDuplicates: false });
+        if (error) { console.error(`Upsert err p${page}b${i}:`, error.message); erros += batch.length; }
+        else { inseridos += batch.length; }
       }
+
+      console.log(`Page ${page}: ${items.length} items, total: ${inseridos} ok, ${erros} err`);
+      if (items.length < pageSize) break;
+      const rawTotal = data?.total || data?.totalResults || 0;
+      if (rawTotal > 0 && totalFetched >= rawTotal) break;
     }
 
-    const result = { inseridos, erros, total: allItems.length };
+    const result = { inseridos, erros, total: totalFetched };
     console.log("Sync complete:", result);
 
     return new Response(JSON.stringify(result), {

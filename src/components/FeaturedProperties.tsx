@@ -1,53 +1,17 @@
 import { motion } from "framer-motion";
 import { Bed, Car, Maximize, Heart } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { LeadFormInline } from "@/components/LeadFormInline";
+import { fetchImoveisDestaque, type Imovel, fotoPrincipal, formatPreco } from "@/services/imoveis";
 
-interface Property {
-  id: string;
-  slug?: string;
-  title: string;
-  neighborhood: string;
-  price: string;
-  priceLabel: string;
-  priceNumeric?: number;
-  area: number;
-  bedrooms: number;
-  parking: number;
-  image: string;
-  badge?: string;
-}
-
-const properties: Property[] = [
-  {
-    id: "1", slug: "apartamento-moinhos-de-vento", title: "Apartamento no Moinhos", neighborhood: "Moinhos de Vento",
-    price: "R$ 1.850.000", priceLabel: "Venda", priceNumeric: 1850000, area: 142, bedrooms: 3, parking: 2,
-    image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&h=400&fit=crop",
-    badge: "Destaque",
-  },
-  {
-    id: "2", slug: "cobertura-duplex-petropolis", title: "Cobertura Duplex Petrópolis", neighborhood: "Petrópolis",
-    price: "R$ 2.490.000", priceLabel: "Venda", priceNumeric: 2490000, area: 228, bedrooms: 4, parking: 3,
-    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=400&fit=crop",
-  },
-  {
-    id: "4", slug: "casa-tres-figueiras", title: "Casa com Jardim Três Figueiras", neighborhood: "Três Figueiras",
-    price: "R$ 3.200.000", priceLabel: "Venda", priceNumeric: 3200000, area: 320, bedrooms: 5, parking: 4,
-    image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&h=400&fit=crop",
-  },
-  {
-    id: "6", slug: "loft-montserrat", title: "Loft Mont'Serrat", neighborhood: "Mont'Serrat",
-    price: "R$ 890.000", priceLabel: "Venda", priceNumeric: 890000, area: 68, bedrooms: 1, parking: 1,
-    image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&h=400&fit=crop",
-    badge: "Exclusivo",
-  },
-];
-
-function PropertyCard({ property, index }: { property: Property; index: number }) {
+function PropertyCard({ imovel, index }: { imovel: Imovel; index: number }) {
   const [liked, setLiked] = useState(false);
   const [showLead, setShowLead] = useState(false);
   const navigate = useNavigate();
+
+  const image = fotoPrincipal(imovel);
+  const priceFormatted = formatPreco(imovel.preco);
 
   return (
     <motion.div
@@ -70,11 +34,11 @@ function PropertyCard({ property, index }: { property: Property; index: number }
         <div
           className="relative cursor-pointer overflow-hidden"
           style={{ aspectRatio: '4/3', borderRadius: '12px 12px 0 0' }}
-          onClick={() => navigate(`/imovel/${property.slug || property.id}`)}
+          onClick={() => navigate(`/imovel/${imovel.slug}`)}
         >
           <img
-            src={property.image}
-            alt={property.title}
+            src={image}
+            alt={imovel.titulo}
             loading="lazy"
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
@@ -90,10 +54,10 @@ function PropertyCard({ property, index }: { property: Property; index: number }
               padding: '4px 10px',
             }}
           >
-            {property.priceLabel}
+            {imovel.finalidade === "locacao" ? "Locação" : "Venda"}
           </span>
           {/* Badge destaque */}
-          {property.badge && (
+          {imovel.destaque && (
             <span
               className="absolute left-3 top-10 font-body"
               style={{
@@ -105,7 +69,7 @@ function PropertyCard({ property, index }: { property: Property; index: number }
                 padding: '4px 10px',
               }}
             >
-              {property.badge}
+              Destaque
             </span>
           )}
           <button
@@ -118,22 +82,28 @@ function PropertyCard({ property, index }: { property: Property; index: number }
 
         {/* Info */}
         <div className="p-4">
-          <p className="font-body text-xs text-muted-foreground">{property.neighborhood}</p>
+          <p className="font-body text-xs text-muted-foreground">{imovel.bairro}</p>
           <h3 className="mt-1 font-body text-sm font-semibold text-foreground line-clamp-1">
-            {property.title}
+            {imovel.titulo}
           </h3>
-          <p className="mt-2 font-mono text-lg font-bold text-foreground">{property.price}</p>
+          <p className="mt-2 font-mono text-lg font-bold text-foreground">{priceFormatted}</p>
 
           <div className="mt-3 flex items-center gap-4 border-t border-border pt-3">
-            <span className="flex items-center gap-1.5 font-body text-xs text-muted-foreground">
-              <Maximize className="h-3.5 w-3.5" /> {property.area}m²
-            </span>
-            <span className="flex items-center gap-1.5 font-body text-xs text-muted-foreground">
-              <Bed className="h-3.5 w-3.5" /> {property.bedrooms}
-            </span>
-            <span className="flex items-center gap-1.5 font-body text-xs text-muted-foreground">
-              <Car className="h-3.5 w-3.5" /> {property.parking}
-            </span>
+            {imovel.area_total && (
+              <span className="flex items-center gap-1.5 font-body text-xs text-muted-foreground">
+                <Maximize className="h-3.5 w-3.5" /> {imovel.area_total}m²
+              </span>
+            )}
+            {(imovel.quartos ?? 0) > 0 && (
+              <span className="flex items-center gap-1.5 font-body text-xs text-muted-foreground">
+                <Bed className="h-3.5 w-3.5" /> {imovel.quartos}
+              </span>
+            )}
+            {(imovel.vagas ?? 0) > 0 && (
+              <span className="flex items-center gap-1.5 font-body text-xs text-muted-foreground">
+                <Car className="h-3.5 w-3.5" /> {imovel.vagas}
+              </span>
+            )}
           </div>
 
           <button
@@ -146,10 +116,10 @@ function PropertyCard({ property, index }: { property: Property; index: number }
 
         <LeadFormInline
           isOpen={showLead}
-          imovelId={property.id}
-          imovelTitulo={property.title}
-          imovelBairro={property.neighborhood}
-          imovelPreco={property.priceNumeric}
+          imovelId={imovel.id}
+          imovelTitulo={imovel.titulo}
+          imovelBairro={imovel.bairro}
+          imovelPreco={imovel.preco}
           onClose={() => setShowLead(false)}
         />
       </div>
@@ -158,6 +128,14 @@ function PropertyCard({ property, index }: { property: Property; index: number }
 }
 
 export function FeaturedProperties() {
+  const [imoveis, setImoveis] = useState<Imovel[]>([]);
+
+  useEffect(() => {
+    fetchImoveisDestaque(6).then(setImoveis).catch(console.error);
+  }, []);
+
+  if (imoveis.length === 0) return null;
+
   return (
     <section className="py-24">
       <div className="container-uhome">
@@ -182,8 +160,8 @@ export function FeaturedProperties() {
         </motion.div>
 
         <div className="mt-10 flex gap-4 overflow-x-auto pb-4 sm:grid sm:grid-cols-2 sm:overflow-visible lg:grid-cols-3">
-          {properties.map((p, i) => (
-            <PropertyCard key={p.id} property={p} index={i} />
+          {imoveis.map((imovel, i) => (
+            <PropertyCard key={imovel.id} imovel={imovel} index={i} />
           ))}
         </div>
       </div>

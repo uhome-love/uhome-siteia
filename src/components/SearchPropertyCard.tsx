@@ -3,12 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { Bed, Car, Maximize, Heart } from "lucide-react";
 import { motion } from "framer-motion";
 import { LeadFormInline } from "@/components/LeadFormInline";
-import type { MockProperty } from "@/data/properties";
+import { type Imovel, fotoPrincipal, formatPreco } from "@/services/imoveis";
 
-export function SearchPropertyCard({ property, index }: { property: MockProperty; index: number }) {
+export function SearchPropertyCard({ imovel, index }: { imovel: Imovel; index: number }) {
   const [liked, setLiked] = useState(false);
   const [showLead, setShowLead] = useState(false);
   const navigate = useNavigate();
+
+  const image = fotoPrincipal(imovel);
+  const priceFormatted = formatPreco(imovel.preco);
 
   return (
     <motion.div
@@ -30,11 +33,11 @@ export function SearchPropertyCard({ property, index }: { property: MockProperty
           <div
             className="relative w-full cursor-pointer overflow-hidden sm:h-48 sm:w-56 sm:shrink-0"
             style={{ aspectRatio: '4/3', borderRadius: '12px 12px 0 0' }}
-            onClick={() => navigate(`/imovel/${property.slug}`)}
+            onClick={() => navigate(`/imovel/${imovel.slug}`)}
           >
             <img
-              src={property.image}
-              alt={property.title}
+              src={image}
+              alt={imovel.titulo}
               loading="lazy"
               className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
             />
@@ -50,10 +53,10 @@ export function SearchPropertyCard({ property, index }: { property: MockProperty
                 padding: '3px 8px',
               }}
             >
-              {property.tipo}
+              {imovel.tipo}
             </span>
             {/* Badge destaque */}
-            {property.badge && (
+            {imovel.destaque && (
               <span
                 className="absolute left-2 top-8 font-body"
                 style={{
@@ -65,7 +68,7 @@ export function SearchPropertyCard({ property, index }: { property: MockProperty
                   padding: '3px 8px',
                 }}
               >
-                {property.badge}
+                Destaque
               </span>
             )}
             <button
@@ -79,29 +82,33 @@ export function SearchPropertyCard({ property, index }: { property: MockProperty
           {/* Info */}
           <div className="flex flex-1 flex-col justify-between p-4">
             <div>
-              <p className="font-body text-[11px] text-muted-foreground">{property.neighborhood}</p>
+              <p className="font-body text-[11px] text-muted-foreground">{imovel.bairro}</p>
               <h3
                 className="mt-0.5 cursor-pointer font-body text-sm font-semibold text-foreground line-clamp-1 hover:text-primary transition-colors"
-                onClick={() => navigate(`/imovel/${property.slug}`)}
+                onClick={() => navigate(`/imovel/${imovel.slug}`)}
               >
-                {property.title}
+                {imovel.titulo}
               </h3>
-              <p className="mt-2 font-mono text-lg font-bold text-foreground">{property.priceFormatted}</p>
+              <p className="mt-2 font-mono text-lg font-bold text-foreground">{priceFormatted}</p>
             </div>
 
             <div className="mt-3 flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <span className="flex items-center gap-1 font-body text-xs text-muted-foreground">
-                  <Maximize className="h-3 w-3" /> {property.area}m²
-                </span>
-                {property.bedrooms > 0 && (
+                {imovel.area_total && (
                   <span className="flex items-center gap-1 font-body text-xs text-muted-foreground">
-                    <Bed className="h-3 w-3" /> {property.bedrooms}
+                    <Maximize className="h-3 w-3" /> {imovel.area_total}m²
                   </span>
                 )}
-                <span className="flex items-center gap-1 font-body text-xs text-muted-foreground">
-                  <Car className="h-3 w-3" /> {property.parking}
-                </span>
+                {(imovel.quartos ?? 0) > 0 && (
+                  <span className="flex items-center gap-1 font-body text-xs text-muted-foreground">
+                    <Bed className="h-3 w-3" /> {imovel.quartos}
+                  </span>
+                )}
+                {(imovel.vagas ?? 0) > 0 && (
+                  <span className="flex items-center gap-1 font-body text-xs text-muted-foreground">
+                    <Car className="h-3 w-3" /> {imovel.vagas}
+                  </span>
+                )}
               </div>
               <button
                 onClick={() => setShowLead(!showLead)}
@@ -115,10 +122,10 @@ export function SearchPropertyCard({ property, index }: { property: MockProperty
 
         <LeadFormInline
           isOpen={showLead}
-          imovelId={property.id}
-          imovelTitulo={property.title}
-          imovelBairro={property.neighborhood}
-          imovelPreco={property.price}
+          imovelId={imovel.id}
+          imovelTitulo={imovel.titulo}
+          imovelBairro={imovel.bairro}
+          imovelPreco={imovel.preco}
           onClose={() => setShowLead(false)}
         />
       </div>

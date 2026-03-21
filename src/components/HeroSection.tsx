@@ -107,7 +107,7 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2, ease }}
-            className="w-full max-w-md rounded-2xl bg-card p-7 shadow-2xl lg:ml-auto"
+            className="w-full max-w-md rounded-2xl bg-card p-5 shadow-2xl sm:p-7 lg:ml-auto"
           >
             {/* Toggle */}
             <div className="mb-6 flex gap-2">

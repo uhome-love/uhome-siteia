@@ -1,10 +1,11 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, RotateCcw, MapPin, PenTool, Navigation, Sparkles } from "lucide-react";
+import { Search, RotateCcw, MapPin, PenTool, Navigation, Sparkles, X } from "lucide-react";
 import { useSearchStore } from "@/stores/searchStore";
 import { FilterPill, PillOption } from "@/components/FilterPill";
 import { propertyTypes } from "@/data/properties";
 import { CIDADES_PERMITIDAS } from "@/services/imoveis";
+import { supabase } from "@/integrations/supabase/client";
 
 const quartoOptions = [1, 2, 3, 4];
 const vagaOptions = [1, 2, 3];
@@ -45,8 +46,50 @@ export function SearchFiltersBar() {
   const { filters, setFilter, resetFilters } = useSearchStore();
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
-  const [inputFocused, setInputFocused] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Multi-bairro state
+  const [bairroInput, setBairroInput] = useState("");
+  const [dbBairros, setDbBairros] = useState<string[]>([]);
+
+  // Parse current bairros from filter (comma-separated)
+  const bairrosSelecionados = useMemo(() => {
+    const bairroStr = filters.bairro || "";
+    if (!bairroStr) return [];
+    return bairroStr.split(",").map(s => s.trim()).filter(Boolean);
+  }, [filters.bairro]);
+
+  // Load neighborhoods from DB once
+  useEffect(() => {
+    async function load() {
+      const { data } = await supabase.rpc("get_bairros_disponiveis");
+      if (data) setDbBairros(data.map((d: { bairro: string }) => d.bairro));
+    }
+    load();
+  }, []);
+
+  // Autocomplete suggestions
+  const suggestions = useMemo(() => {
+    const all = dbBairros.length > 0 ? dbBairros : [];
+    const filtered = all.filter(b => !bairrosSelecionados.includes(b));
+    if (!bairroInput.trim()) return filtered.slice(0, 8);
+    const q = bairroInput.toLowerCase();
+    return filtered.filter(b => b.toLowerCase().includes(q)).slice(0, 10);
+  }, [bairroInput, bairrosSelecionados, dbBairros]);
+
+  const addBairro = (nome: string) => {
+    const next = [...bairrosSelecionados, nome];
+    setFilter("bairro", next.join(","));
+    // Also clear the text "q" filter since we're using structured bairro
+    if (filters.q) setFilter("q", "");
+    setBairroInput("");
+  };
+
+  const removeBairro = (nome: string) => {
+    const next = bairrosSelecionados.filter(b => b !== nome);
+    setFilter("bairro", next.join(","));
+  };
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -69,10 +112,9 @@ export function SearchFiltersBar() {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
-          // Center map on user location by setting bounds around them
           const lat = pos.coords.latitude;
           const lng = pos.coords.longitude;
-          const delta = 0.015; // ~1.5km radius
+          const delta = 0.015;
           setFilter("bounds", {
             lat_min: lat - delta,
             lat_max: lat + delta,
@@ -89,9 +131,22 @@ export function SearchFiltersBar() {
 
   const handleDesenharArea = () => {
     setShowDropdown(false);
-    // Dispatch custom event for the map to enter draw mode
     window.dispatchEvent(new CustomEvent("uhome:draw-area"));
-    import("sonner").then(({ toast }) => toast.info("Clique no mapa para desenhar a área de busca"));
+  };
+
+  // Handle keyboard: backspace removes last chip when input is empty
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Backspace" && !bairroInput && bairrosSelecionados.length > 0) {
+      removeBairro(bairrosSelecionados[bairrosSelecionados.length - 1]);
+    }
+    if (e.key === "Enter" && bairroInput && suggestions.length > 0) {
+      e.preventDefault();
+      addBairro(suggestions[0]);
+    }
+    if (e.key === "Escape") {
+      setShowDropdown(false);
+      inputRef.current?.blur();
+    }
   };
 
   const tipoLabel = propertyTypes.find((t) => t.value === filters.tipo)?.label;
@@ -104,27 +159,67 @@ export function SearchFiltersBar() {
   const cidadeLabel = filters.cidade || "Todas";
 
   const hasAny =
-    filters.tipo || filters.precoMin || filters.precoMax || filters.areaMin || filters.areaMax || filters.quartos || filters.vagas || filters.q || (filters.cidade && filters.cidade !== "Porto Alegre");
+    filters.tipo || filters.precoMin || filters.precoMax || filters.areaMin || filters.areaMax || filters.quartos || filters.vagas || filters.q || filters.bairro || (filters.cidade && filters.cidade !== "Porto Alegre");
+
+  const hasInput = bairroInput.trim().length > 0;
+  const hasChips = bairrosSelecionados.length > 0;
 
   return (
     <div className="sticky top-16 z-10 flex items-center gap-2 overflow-x-auto border-b border-border bg-background px-5 py-3 scrollbar-none">
-      {/* Search input with dropdown */}
+      {/* Search input with chips + autocomplete */}
       <div className="relative shrink-0" ref={dropdownRef}>
-        <div className="flex items-center gap-2 rounded-full border border-border bg-background px-3.5 py-2" style={{ minWidth: 220 }}>
-          <Search className="h-4 w-4 text-muted-foreground" />
+        <div
+          className="flex flex-wrap items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1.5 transition-colors focus-within:border-primary"
+          style={{ minWidth: 240, maxWidth: 420 }}
+          onClick={() => { setShowDropdown(true); inputRef.current?.focus(); }}
+        >
+          <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
+          {bairrosSelecionados.map(b => (
+            <span
+              key={b}
+              className="flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 font-body text-[12px] font-medium text-primary"
+            >
+              {b}
+              <X
+                className="h-3 w-3 cursor-pointer opacity-60 hover:opacity-100"
+                onClick={(e) => { e.stopPropagation(); removeBairro(b); }}
+              />
+            </span>
+          ))}
           <input
+            ref={inputRef}
             type="text"
-            value={filters.q}
-            onChange={(e) => setFilter("q", e.target.value)}
-            onFocus={() => { setInputFocused(true); setShowDropdown(true); }}
-            onBlur={() => setInputFocused(false)}
-            placeholder="Bairro, cidade ou tipo..."
-            className="w-full border-none bg-transparent font-body text-[13px] text-foreground outline-none placeholder:text-muted-foreground"
+            value={bairroInput}
+            onChange={(e) => { setBairroInput(e.target.value); setShowDropdown(true); }}
+            onFocus={() => setShowDropdown(true)}
+            onKeyDown={handleKeyDown}
+            placeholder={hasChips ? "Adicionar bairro..." : "Bairro, cidade ou tipo..."}
+            className="min-w-[100px] flex-1 border-none bg-transparent py-1 font-body text-[13px] text-foreground outline-none placeholder:text-muted-foreground"
           />
         </div>
 
-        {/* Dropdown with search options */}
-        {showDropdown && !filters.q && (
+        {/* Dropdown: autocomplete suggestions */}
+        {showDropdown && hasInput && suggestions.length > 0 && (
+          <div className="absolute left-0 top-full z-50 mt-2 max-h-64 w-80 overflow-y-auto rounded-xl border border-border bg-card p-2 shadow-lg">
+            <p className="px-3 py-1.5 font-body text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Bairros
+            </p>
+            {suggestions.map(b => (
+              <button
+                key={b}
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => addBairro(b)}
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-2 font-body text-sm text-foreground transition-colors hover:bg-accent/50 active:scale-[0.98]"
+              >
+                <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+                {b}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Dropdown: "more ways to search" when empty + no chips */}
+        {showDropdown && !hasInput && !hasChips && (
           <div className="absolute left-0 top-full z-50 mt-2 w-72 rounded-xl border border-border bg-card p-2 shadow-lg">
             <p className="px-3 py-2 font-body text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
               Mais jeitos de buscar
@@ -153,6 +248,26 @@ export function SearchFiltersBar() {
               <Navigation className="h-4 w-4 text-muted-foreground" />
               Perto de você
             </button>
+          </div>
+        )}
+
+        {/* Dropdown: suggestions when chips exist but input empty */}
+        {showDropdown && !hasInput && hasChips && (
+          <div className="absolute left-0 top-full z-50 mt-2 max-h-64 w-80 overflow-y-auto rounded-xl border border-border bg-card p-2 shadow-lg">
+            <p className="px-3 py-1.5 font-body text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Adicionar bairro
+            </p>
+            {suggestions.slice(0, 8).map(b => (
+              <button
+                key={b}
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => addBairro(b)}
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-2 font-body text-sm text-foreground transition-colors hover:bg-accent/50 active:scale-[0.98]"
+              >
+                <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+                {b}
+              </button>
+            ))}
           </div>
         )}
       </div>
@@ -219,8 +334,6 @@ export function SearchFiltersBar() {
             {r.label}
           </PillOption>
         ))}
-
-        {/* Manual price inputs */}
         <div className="mt-2 border-t border-border pt-3 px-1">
           <p className="mb-2 font-body text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
             Valor personalizado
@@ -289,8 +402,6 @@ export function SearchFiltersBar() {
             {r.label}
           </PillOption>
         ))}
-
-        {/* Manual area inputs */}
         <div className="mt-2 border-t border-border pt-3 px-1">
           <p className="mb-2 font-body text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
             Área personalizada
@@ -342,7 +453,7 @@ export function SearchFiltersBar() {
       {/* Reset */}
       {hasAny && (
         <button
-          onClick={resetFilters}
+          onClick={() => { resetFilters(); setBairroInput(""); }}
           className="flex shrink-0 items-center gap-1 rounded-full px-3 py-2 font-body text-xs text-muted-foreground transition-colors hover:text-foreground"
         >
           <RotateCcw className="h-3.5 w-3.5" />

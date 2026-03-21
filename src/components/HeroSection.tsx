@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { MapPin, Sparkles } from "lucide-react";
+import { MapPin, Sparkles, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -13,7 +13,8 @@ export function HeroSection() {
   const [modo, setModo] = useState<"comprar" | "anunciar">("comprar");
 
   // Search state
-  const [bairro, setBairro] = useState("");
+  const [bairroInput, setBairroInput] = useState("");
+  const [bairrosSelecionados, setBairrosSelecionados] = useState<string[]>([]);
   const [bairroOpen, setBairroOpen] = useState(false);
   const bairroRef = useRef<HTMLDivElement>(null);
   const [tipo, setTipo] = useState("");
@@ -28,10 +29,23 @@ export function HeroSection() {
   const [loading, setLoading] = useState(false);
 
   const bairroSuggestions = useMemo(() => {
-    if (!bairro.trim()) return bairrosData.slice(0, 6);
-    const q = bairro.toLowerCase();
-    return bairrosData.filter((b) => b.nome.toLowerCase().includes(q));
-  }, [bairro]);
+    const base = bairrosData.filter((b) => !bairrosSelecionados.includes(b.nome));
+    if (!bairroInput.trim()) return base.slice(0, 6);
+    const q = bairroInput.toLowerCase();
+    return base.filter((b) => b.nome.toLowerCase().includes(q));
+  }, [bairroInput, bairrosSelecionados]);
+
+  const addBairro = (nome: string) => {
+    if (!bairrosSelecionados.includes(nome)) {
+      setBairrosSelecionados((prev) => [...prev, nome]);
+    }
+    setBairroInput("");
+    setBairroOpen(false);
+  };
+
+  const removeBairro = (nome: string) => {
+    setBairrosSelecionados((prev) => prev.filter((b) => b !== nome));
+  };
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -46,7 +60,8 @@ export function HeroSection() {
   const handleBuscar = () => {
     const params = new URLSearchParams();
     params.set("finalidade", "venda");
-    if (bairro) params.set("q", bairro);
+    if (bairrosSelecionados.length) params.set("q", bairrosSelecionados.join(","));
+    else if (bairroInput.trim()) params.set("q", bairroInput.trim());
     if (tipo) params.set("tipo", tipo);
     if (preco) params.set("preco_max", preco);
     if (quartos) params.set("quartos", quartos);
@@ -149,29 +164,51 @@ export function HeroSection() {
               <>
                 {/* Bairro with autocomplete */}
                 <div ref={bairroRef} className="relative mb-2 sm:mb-2.5">
-                  <label className="block rounded-xl border-[1.5px] border-border p-3 transition-colors focus-within:border-primary sm:p-3.5">
-                    <div className="flex items-center gap-2.5">
-                      <MapPin className="h-5 w-5 shrink-0 text-muted-foreground" />
+                  <div className="rounded-xl border-[1.5px] border-border p-3 transition-colors focus-within:border-primary sm:p-3.5">
+                    <div className="flex items-start gap-2.5">
+                      <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
                       <div className="flex-1">
-                        <span className="mb-0.5 block font-body text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                          Bairro ou região
+                        <span className="mb-1 block font-body text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                          Bairros ou regiões
                         </span>
+                        {bairrosSelecionados.length > 0 && (
+                          <div className="mb-1.5 flex flex-wrap gap-1">
+                            {bairrosSelecionados.map((nome) => (
+                              <span
+                                key={nome}
+                                className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 font-body text-xs font-semibold text-primary"
+                              >
+                                {nome}
+                                <button
+                                  type="button"
+                                  onClick={() => removeBairro(nome)}
+                                  className="rounded-full p-0.5 transition-colors hover:bg-primary/20"
+                                >
+                                  <X className="h-3 w-3" />
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                        )}
                         <input
                           type="text"
-                          value={bairro}
-                          onChange={(e) => { setBairro(e.target.value); setBairroOpen(true); }}
+                          value={bairroInput}
+                          onChange={(e) => { setBairroInput(e.target.value); setBairroOpen(true); }}
                           onFocus={() => setBairroOpen(true)}
                           onKeyDown={(e) => {
                             if (e.key === "Enter") { setBairroOpen(false); handleBuscar(); }
                             if (e.key === "Escape") setBairroOpen(false);
+                            if (e.key === "Backspace" && !bairroInput && bairrosSelecionados.length) {
+                              removeBairro(bairrosSelecionados[bairrosSelecionados.length - 1]);
+                            }
                           }}
-                          placeholder="Ex: Moinhos de Vento, Petrópolis..."
+                          placeholder={bairrosSelecionados.length ? "Adicionar bairro..." : "Ex: Moinhos de Vento, Petrópolis..."}
                           className="w-full bg-transparent font-body text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none"
                           autoComplete="off"
                         />
                       </div>
                     </div>
-                  </label>
+                  </div>
 
                   <AnimatePresence>
                     {bairroOpen && bairroSuggestions.length > 0 && (
@@ -186,10 +223,7 @@ export function HeroSection() {
                           <button
                             key={b.slug}
                             type="button"
-                            onClick={() => {
-                              setBairro(b.nome);
-                              setBairroOpen(false);
-                            }}
+                            onClick={() => addBairro(b.nome)}
                             className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left font-body text-sm text-foreground transition-colors hover:bg-secondary"
                           >
                             <MapPin className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />

@@ -35,7 +35,8 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="mx-auto max-w-3xl font-display text-4xl leading-[1.1] text-foreground sm:text-5xl lg:text-6xl text-balance"
+          className="mx-auto max-w-3xl text-hero text-foreground sm:text-[56px] text-[36px] text-balance"
+          style={{ lineHeight: 1.1 }}
         >
           Encontre o imóvel{" "}
           <span className="text-primary">perfeito</span> para você

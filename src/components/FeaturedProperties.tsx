@@ -93,7 +93,7 @@ function PropertyCard({ property, index }: { property: Property; index: number }
           <h3 className="mt-1 font-body text-sm font-semibold text-foreground line-clamp-1">
             {property.title}
           </h3>
-          <p className="mt-2 font-display text-lg font-bold text-primary">{property.price}</p>
+          <p className="mt-2 text-price text-primary">{property.price}</p>
 
           <div className="mt-3 flex items-center gap-4 border-t border-border pt-3">
             <span className="flex items-center gap-1.5 font-body text-xs text-muted-foreground">
@@ -145,8 +145,8 @@ export function FeaturedProperties() {
             <p className="font-body text-sm font-medium uppercase tracking-[0.15em] text-primary">
               Seleção
             </p>
-            <h2 className="mt-2 font-display text-3xl font-bold text-foreground sm:text-4xl text-balance">
-              Imóveis em destaque
+             <h2 className="mt-2 text-h2 text-foreground text-balance">
+               Imóveis em destaque
             </h2>
           </div>
           <button className="hidden font-body text-sm font-medium text-primary transition-colors hover:text-primary/80 sm:block">

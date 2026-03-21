@@ -207,14 +207,14 @@ const PropertyDetail = () => {
               <span className="inline-block rounded-full bg-primary/10 px-3 py-1 font-body text-xs font-medium text-primary">
                 {property.priceLabel}
               </span>
-              <h1 className="mt-3 font-display text-3xl font-bold leading-[1.1] text-foreground sm:text-4xl" style={{ textWrap: "balance" }}>
+              <h1 className="mt-3 text-h1 text-foreground" style={{ textWrap: "balance" }}>
                 {property.title}
               </h1>
               <p className="mt-2 flex items-center gap-1.5 font-body text-sm text-muted-foreground">
                 <MapPin className="h-4 w-4" />
                 {property.neighborhood}, {property.city}
               </p>
-              <p className="mt-4 font-display text-3xl font-bold text-primary">{property.priceFormatted}</p>
+              <p className="mt-4 text-price-lg text-primary">{property.priceFormatted}</p>
             </div>
 
             {/* Stats */}
@@ -239,7 +239,7 @@ const PropertyDetail = () => {
 
             {/* Description */}
             <div>
-              <h2 className="font-display text-xl font-bold text-foreground">Sobre o imóvel</h2>
+              <h2 className="text-h3 text-foreground">Sobre o imóvel</h2>
               <p className="mt-3 font-body text-sm leading-relaxed text-muted-foreground" style={{ maxWidth: "65ch" }}>
                 {property.description}
               </p>
@@ -247,7 +247,7 @@ const PropertyDetail = () => {
 
             {/* Characteristics */}
             <div>
-              <h2 className="font-display text-xl font-bold text-foreground">Características</h2>
+              <h2 className="text-h3 text-foreground">Características</h2>
               <div className="mt-4 grid gap-6 sm:grid-cols-3">
                 {property.characteristics.map(({ category, items }) => (
                   <div key={category}>
@@ -267,7 +267,7 @@ const PropertyDetail = () => {
 
             {/* Features tags */}
             <div>
-              <h2 className="font-display text-xl font-bold text-foreground">Diferenciais</h2>
+              <h2 className="text-h3 text-foreground">Diferenciais</h2>
               <div className="mt-4 flex flex-wrap gap-2">
                 {property.features.map((f) => (
                   <span key={f} className="rounded-full border border-border px-3 py-1.5 font-body text-xs text-muted-foreground">

@@ -130,6 +130,62 @@
   .container-uhome {
     @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
   }
+
+  /* ── Button variants ── */
+  .btn-primary {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    border-radius: 9999px;
+    padding: 12px 24px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+  }
+  .btn-primary:hover {
+    background: hsl(233 80% 59%);
+    box-shadow: 0 4px 16px rgba(91, 108, 249, 0.35);
+    transform: translateY(-1px);
+  }
+  .btn-primary:active {
+    transform: scale(0.97);
+  }
+
+  .btn-secondary {
+    border: 1.5px solid hsl(var(--primary));
+    color: hsl(var(--primary));
+    background: transparent;
+    border-radius: 9999px;
+    padding: 12px 24px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .btn-secondary:hover {
+    background: hsl(233 100% 97%);
+  }
+  .btn-secondary:active {
+    transform: scale(0.97);
+  }
+
+  .btn-whatsapp {
+    background: #25D366;
+    color: #fff;
+    border-radius: 9999px;
+    padding: 12px 24px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .btn-whatsapp:hover {
+    background: #20bd5a;
+    transform: translateY(-1px);
+  }
+  .btn-whatsapp:active {
+    transform: scale(0.97);
+  }
 }
 
 @layer utilities {

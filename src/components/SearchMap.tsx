@@ -223,6 +223,23 @@ export function SearchMap({ imoveis = [], hoveredId, onPinHover, onBoundsSearch 
       });
 
       mapReadyRef.current = true;
+
+      // Set initial data — the imoveis effect may have already fired before map loaded
+      const source = map.getSource("imoveis") as mapboxgl.GeoJSONSource | undefined;
+      if (source && imoveisRef.current.length > 0) {
+        const geo = toGeoJSON(imoveisRef.current);
+        source.setData(geo);
+        const validos = imoveisRef.current.filter((i) => {
+          const lat = Number(i.latitude);
+          const lng = Number(i.longitude);
+          return lat && lng && lat < -28 && lat > -32 && lng < -49 && lng > -54;
+        });
+        if (validos.length > 0) {
+          const b = new mapboxgl.LngLatBounds();
+          validos.forEach((i) => b.extend([Number(i.longitude), Number(i.latitude)]));
+          map.fitBounds(b, { padding: 60, maxZoom: 14, duration: 500 });
+        }
+      }
     });
 
     map.on("moveend", () => {

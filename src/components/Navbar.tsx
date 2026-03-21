@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
-import { Menu, X, Heart, User, Sparkles } from "lucide-react";
+import { Menu, X, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { UhomeLogo } from "@/components/UhomeLogo";
 

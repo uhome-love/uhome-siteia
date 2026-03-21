@@ -121,7 +121,8 @@ export function ExitIntentModal() {
 
                 <button
                   onClick={() => setShow(false)}
-                  className="mt-3 w-full text-center font-body text-xs text-muted-foreground transition-colors hover:text-foreground"
+                  className="mt-3 w-full text-center font-body text-xs transition-colors hover:text-foreground cursor-pointer"
+                  style={{ color: "var(--gray-400)" }}
                 >
                   Não, obrigado
                 </button>

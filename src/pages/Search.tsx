@@ -137,7 +137,7 @@ const Search = () => {
       setResumoIA(res.resumo);
 
       const f = res.filtros;
-      const { data, count } = await fetchImoveis({
+      const aiFilters = {
         finalidade: f.finalidade || undefined,
         tipo: f.tipo || undefined,
         bairros: f.bairros?.length ? f.bairros : undefined,
@@ -146,10 +146,14 @@ const Search = () => {
         areaMin: f.area_min || undefined,
         quartos: f.quartos || undefined,
         diferenciais: f.diferenciais?.length ? f.diferenciais : undefined,
-        limit: 40,
-      });
+      };
+      const [{ data, count }, pins] = await Promise.all([
+        fetchImoveis({ ...aiFilters, limit: 40 }),
+        fetchMapPins(aiFilters),
+      ]);
       setImoveis(data);
       setTotal(count);
+      setMapPins(pins);
     } catch (e: any) {
       toast.error(e?.message || "Erro ao interpretar busca");
     } finally {

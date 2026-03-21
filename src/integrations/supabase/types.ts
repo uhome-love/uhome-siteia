@@ -14,6 +14,117 @@ export type Database = {
   }
   public: {
     Tables: {
+      imoveis: {
+        Row: {
+          andar: number | null
+          area_total: number | null
+          area_util: number | null
+          bairro: string
+          banheiros: number | null
+          cep: string | null
+          cidade: string | null
+          corretor_id: string | null
+          created_at: string | null
+          descricao: string | null
+          destaque: boolean | null
+          diferenciais: string[] | null
+          endereco_completo: string | null
+          finalidade: string
+          fotos: Json | null
+          id: string
+          jetimob_id: string | null
+          jetimob_raw: Json | null
+          latitude: number | null
+          longitude: number | null
+          origem: string | null
+          preco: number
+          preco_condominio: number | null
+          preco_iptu: number | null
+          publicado_em: string | null
+          quartos: number | null
+          slug: string
+          status: string | null
+          tipo: string
+          titulo: string
+          uf: string | null
+          updated_at: string | null
+          vagas: number | null
+          video_url: string | null
+        }
+        Insert: {
+          andar?: number | null
+          area_total?: number | null
+          area_util?: number | null
+          bairro: string
+          banheiros?: number | null
+          cep?: string | null
+          cidade?: string | null
+          corretor_id?: string | null
+          created_at?: string | null
+          descricao?: string | null
+          destaque?: boolean | null
+          diferenciais?: string[] | null
+          endereco_completo?: string | null
+          finalidade: string
+          fotos?: Json | null
+          id?: string
+          jetimob_id?: string | null
+          jetimob_raw?: Json | null
+          latitude?: number | null
+          longitude?: number | null
+          origem?: string | null
+          preco: number
+          preco_condominio?: number | null
+          preco_iptu?: number | null
+          publicado_em?: string | null
+          quartos?: number | null
+          slug: string
+          status?: string | null
+          tipo: string
+          titulo: string
+          uf?: string | null
+          updated_at?: string | null
+          vagas?: number | null
+          video_url?: string | null
+        }
+        Update: {
+          andar?: number | null
+          area_total?: number | null
+          area_util?: number | null
+          bairro?: string
+          banheiros?: number | null
+          cep?: string | null
+          cidade?: string | null
+          corretor_id?: string | null
+          created_at?: string | null
+          descricao?: string | null
+          destaque?: boolean | null
+          diferenciais?: string[] | null
+          endereco_completo?: string | null
+          finalidade?: string
+          fotos?: Json | null
+          id?: string
+          jetimob_id?: string | null
+          jetimob_raw?: Json | null
+          latitude?: number | null
+          longitude?: number | null
+          origem?: string | null
+          preco?: number
+          preco_condominio?: number | null
+          preco_iptu?: number | null
+          publicado_em?: string | null
+          quartos?: number | null
+          slug?: string
+          status?: string | null
+          tipo?: string
+          titulo?: string
+          uf?: string | null
+          updated_at?: string | null
+          vagas?: number | null
+          video_url?: string | null
+        }
+        Relationships: []
+      }
       imovel_views: {
         Row: {
           id: string

@@ -37,6 +37,8 @@ const App = () => (
           <Route path="/bairros/:slug" element={<Bairro />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/onboarding" element={<Onboarding />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogPostPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <ExitIntentModal />

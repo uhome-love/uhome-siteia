@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -7,9 +7,14 @@ import { type Imovel, fotoPrincipal, formatPreco } from "@/services/imoveis";
 const MAPBOX_TOKEN = "pk.eyJ1IjoibHVjYXN1aG9tZSIsImEiOiJjbW16c2l2dmUwYmxsMnJwdDI2bGxrazBkIn0.B4dp727gJlQQIWTci7GpFQ";
 
 function formatPinPreco(preco: number): string {
+  if (!preco || preco === 0) return "";
   if (preco >= 1_000_000) return `R$${(preco / 1_000_000).toFixed(1)}M`;
   if (preco >= 1_000) return `R$${Math.round(preco / 1_000)}k`;
   return `R$${preco}`;
+}
+
+function isValidPOACoord(lat: number, lng: number): boolean {
+  return lat > -32 && lat < -28 && lng > -54 && lng < -49;
 }
 
 interface SearchMapProps {
@@ -20,31 +25,29 @@ interface SearchMapProps {
 }
 
 export function SearchMap({ imoveis, hoveredId, onPinHover, onBoundsSearch }: SearchMapProps) {
-  const mapContainer = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
-  const markersRef = useRef<Map<string, { el: HTMLElement; marker: any }>>(new Map());
+  const mapboxRef = useRef<any>(null);
+  const marcadoresRef = useRef<Map<string, { el: HTMLElement; marker: any }>>(new Map());
   const popupRef = useRef<any>(null);
+  const mountedRef = useRef(false);
   const mapReadyRef = useRef(false);
-  const [mapLoaded, setMapLoaded] = useState(false);
-  const [mapError, setMapError] = useState(false);
-  const [mapMoved, setMapMoved] = useState(false);
   const boundsRef = useRef<any>(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    (window as any).__navigateImovel = (slug: string) => navigate(`/imovel/${slug}`);
-    return () => { delete (window as any).__navigateImovel; };
-  }, [navigate]);
+  const [mapMoved, setMapMoved] = __import_useState(false);
+  const [mapError, setMapError] = __import_useState(false);
 
   // Init map once
   useEffect(() => {
-    if (!mapContainer.current || mapRef.current) return;
+    if (mountedRef.current || !containerRef.current) return;
     if (!MAPBOX_TOKEN) { setMapError(true); return; }
+    mountedRef.current = true;
 
     let cancelled = false;
 
     import("mapbox-gl").then((mapboxgl) => {
-      if (cancelled || !mapContainer.current) return;
+      if (cancelled || !containerRef.current) return;
 
       const link = document.createElement("link");
       link.rel = "stylesheet";
@@ -52,23 +55,18 @@ export function SearchMap({ imoveis, hoveredId, onPinHover, onBoundsSearch }: Se
       document.head.appendChild(link);
 
       mapboxgl.default.accessToken = MAPBOX_TOKEN;
+      mapboxRef.current = mapboxgl.default;
 
       const map = new mapboxgl.default.Map({
-        container: mapContainer.current!,
+        container: containerRef.current!,
         style: "mapbox://styles/mapbox/streets-v12",
-        center: [-51.18, -30.04],
-        zoom: 12,
+        center: [-51.2177, -30.0346],
+        zoom: 11,
         attributionControl: false,
+        dragRotate: false,
       });
 
       map.addControl(new mapboxgl.default.NavigationControl({ showCompass: false }), "top-right");
-
-      map.on("load", () => {
-        if (!cancelled) {
-          setMapLoaded(true);
-          setTimeout(() => { mapReadyRef.current = true; }, 800);
-        }
-      });
 
       map.on("moveend", () => {
         if (!mapReadyRef.current) return;
@@ -76,68 +74,81 @@ export function SearchMap({ imoveis, hoveredId, onPinHover, onBoundsSearch }: Se
         setMapMoved(true);
       });
 
-      mapRef.current = { map, mapboxgl: mapboxgl.default };
+      mapRef.current = map;
     }).catch(() => { setMapError(true); });
 
     return () => {
       cancelled = true;
-      mapRef.current?.map?.remove();
+      marcadoresRef.current.forEach(({ marker }) => marker.remove());
+      marcadoresRef.current.clear();
+      mapRef.current?.remove();
       mapRef.current = null;
+      mapboxRef.current = null;
+      mountedRef.current = false;
     };
   }, []);
 
-  // Create/update markers — only when imoveis change
+  // Navigate helper for popups
   useEffect(() => {
-    if (!mapRef.current || !mapLoaded) return;
-    const { map, mapboxgl } = mapRef.current;
+    (window as any).__navigateImovel = (slug: string) => navigate(`/imovel/${slug}`);
+    return () => { delete (window as any).__navigateImovel; };
+  }, [navigate]);
 
-    const addMarkers = () => {
-      const currentIds = new Set(imoveis.filter(p => p.latitude && p.longitude).map(p => p.id));
+  // Render pins when imoveis change
+  useEffect(() => {
+    const map = mapRef.current;
+    const mapboxgl = mapboxRef.current;
+    if (!map || !mapboxgl) return;
 
-      // Remove markers no longer in results
-      markersRef.current.forEach(({ marker }, id) => {
-        if (!currentIds.has(id)) {
+    function renderPins() {
+      const idsNovos = new Set(imoveis.map(i => i.id));
+
+      // Remove pins that left
+      marcadoresRef.current.forEach(({ marker }, id) => {
+        if (!idsNovos.has(id)) {
           marker.remove();
-          markersRef.current.delete(id);
+          marcadoresRef.current.delete(id);
         }
       });
 
-      const withCoords = imoveis.filter((p) => p.latitude && p.longitude);
-      if (withCoords.length === 0) return;
+      // Add new pins
+      const withCoords: Imovel[] = [];
 
-      const bounds = new mapboxgl.LngLatBounds();
-      let hasNewMarkers = false;
+      imoveis.forEach((imovel) => {
+        if (marcadoresRef.current.has(imovel.id)) return;
 
-      withCoords.forEach((p) => {
-        bounds.extend([p.longitude!, p.latitude!]);
+        const lat = Number(imovel.latitude);
+        const lng = Number(imovel.longitude);
+        if (!lat || !lng || !isValidPOACoord(lat, lng)) return;
 
-        if (markersRef.current.has(p.id)) return;
-        hasNewMarkers = true;
+        const label = formatPinPreco(imovel.preco);
+        if (!label) return;
+
+        withCoords.push(imovel);
 
         const el = document.createElement("div");
-        el.textContent = formatPinPreco(p.preco);
-        el.dataset.imovelId = p.id;
-
-        // Airbnb-style pill
-        Object.assign(el.style, {
-          background: "white",
-          color: "#222",
-          border: "1.5px solid rgba(0,0,0,0.18)",
-          borderRadius: "20px",
-          padding: "5px 10px",
-          fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
-          fontSize: "12px",
-          fontWeight: "700",
-          cursor: "pointer",
-          boxShadow: "0 2px 6px rgba(0,0,0,0.14)",
-          whiteSpace: "nowrap",
-          userSelect: "none",
-          transition: "background 0.15s, color 0.15s, transform 0.1s, border-color 0.15s",
-          willChange: "transform",
-        });
+        el.textContent = label;
+        el.dataset.imovelId = imovel.id;
+        el.style.cssText = `
+          background: white;
+          color: #222;
+          border: 1.5px solid rgba(0,0,0,0.2);
+          border-radius: 20px;
+          padding: 5px 10px;
+          font-size: 12px;
+          font-family: 'Plus Jakarta Sans', sans-serif;
+          font-weight: 700;
+          cursor: pointer;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+          white-space: nowrap;
+          user-select: none;
+          will-change: transform;
+          pointer-events: auto;
+          transition: background 0.15s, color 0.15s, transform 0.1s, border-color 0.15s;
+        `;
 
         el.addEventListener("mouseenter", () => {
-          onPinHover?.(p.id);
+          onPinHover?.(imovel.id);
           el.style.background = "#222";
           el.style.color = "white";
           el.style.borderColor = "#222";
@@ -146,78 +157,96 @@ export function SearchMap({ imoveis, hoveredId, onPinHover, onBoundsSearch }: Se
 
           // Show popup
           if (popupRef.current) popupRef.current.remove();
-          const image = fotoPrincipal(p);
-          const formatted = formatPreco(p.preco);
-          const area = p.area_total ?? p.area_util ?? 0;
+          const image = fotoPrincipal(imovel);
+          const formatted = formatPreco(imovel.preco);
+          const area = imovel.area_total ?? imovel.area_util ?? 0;
           const statsLine = [
             area > 0 ? `${area}m²` : null,
-            (p.quartos ?? 0) > 0 ? `${p.quartos} quartos` : null,
+            (imovel.quartos ?? 0) > 0 ? `${imovel.quartos} quartos` : null,
           ].filter(Boolean).join(" · ");
 
-          popupRef.current = new mapboxgl.Popup({
-            closeButton: false,
-            closeOnClick: false,
-            offset: 16,
-            className: "uhome-popup",
-          })
-            .setLngLat([p.longitude!, p.latitude!])
-            .setHTML(`
-              <div style="width:220px;cursor:pointer;font-family:'Plus Jakarta Sans',system-ui,sans-serif;" onclick="window.__navigateImovel('${p.slug}')">
-                <img src="${image}" alt="" style="width:100%;height:110px;object-fit:cover;" />
-                <div style="padding:10px 12px;">
-                  <p style="font-size:11px;color:#888;margin:0 0 2px;">${p.bairro}</p>
-                  <p style="font-size:13px;font-weight:600;margin:0 0 4px;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.titulo}</p>
-                  <p style="font-size:15px;font-weight:700;color:#222;margin:0;">${formatted}</p>
-                  ${statsLine ? `<p style="font-size:11px;color:#717171;margin:4px 0 0;">${statsLine}</p>` : ""}
+          try {
+            popupRef.current = new mapboxgl.Popup({
+              closeButton: false,
+              closeOnClick: false,
+              offset: 16,
+              className: "uhome-popup",
+            })
+              .setLngLat([lng, lat])
+              .setHTML(`
+                <div style="width:220px;cursor:pointer;font-family:'Plus Jakarta Sans',system-ui,sans-serif;" onclick="window.__navigateImovel('${imovel.slug}')">
+                  <img src="${image}" alt="" style="width:100%;height:110px;object-fit:cover;" />
+                  <div style="padding:10px 12px;">
+                    <p style="font-size:11px;color:#717171;margin:0 0 2px;">${imovel.bairro}</p>
+                    <p style="font-size:13px;font-weight:600;margin:0 0 4px;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${imovel.titulo}</p>
+                    <p style="font-size:15px;font-weight:700;color:#222;margin:0;">${formatted}</p>
+                    ${statsLine ? `<p style="font-size:11px;color:#717171;margin:4px 0 0;">${statsLine}</p>` : ""}
+                  </div>
                 </div>
-              </div>
-            `)
-            .addTo(map);
+              `)
+              .addTo(map);
+          } catch (err) {
+            console.warn("Popup error:", err);
+          }
         });
 
         el.addEventListener("mouseleave", () => {
           onPinHover?.(null);
           el.style.background = "white";
           el.style.color = "#222";
-          el.style.borderColor = "rgba(0,0,0,0.18)";
+          el.style.borderColor = "rgba(0,0,0,0.2)";
           el.style.transform = "scale(1)";
           el.style.zIndex = "1";
           if (popupRef.current) { popupRef.current.remove(); popupRef.current = null; }
         });
 
-        el.addEventListener("click", () => {
-          navigate(`/imovel/${p.slug}`);
+        el.addEventListener("click", (e) => {
+          e.stopPropagation();
+          navigate(`/imovel/${imovel.slug}`);
         });
 
-        const marker = new mapboxgl.Marker({ element: el, anchor: "center" })
-          .setLngLat([p.longitude!, p.latitude!])
-          .addTo(map);
-
-        markersRef.current.set(p.id, { el, marker });
+        try {
+          const marker = new mapboxgl.Marker({ element: el, anchor: "center" })
+            .setLngLat([lng, lat])
+            .addTo(map);
+          marcadoresRef.current.set(imovel.id, { el, marker });
+        } catch (err) {
+          console.warn("Marker error:", err);
+        }
       });
 
-      if (hasNewMarkers) {
-        mapReadyRef.current = false;
-        if (withCoords.length > 1) {
-          map.fitBounds(bounds, { padding: 60, maxZoom: 14, duration: 800 });
-        } else if (markersRef.current.size <= 1) {
-          map.flyTo({ center: [withCoords[0].longitude!, withCoords[0].latitude!], zoom: 14, duration: 800 });
-        }
-        setTimeout(() => { mapReadyRef.current = true; }, 1200);
-      }
-    };
+      // Fit bounds
+      const allWithCoords = imoveis.filter(i => {
+        const lat = Number(i.latitude);
+        const lng = Number(i.longitude);
+        return lat && lng && isValidPOACoord(lat, lng);
+      });
 
-    // CRITICAL: wait for style to be fully loaded before adding markers
-    if (map.isStyleLoaded()) {
-      addMarkers();
-    } else {
-      map.once("load", addMarkers);
+      if (allWithCoords.length > 0 && withCoords.length > 0) {
+        mapReadyRef.current = false;
+        const bounds = new mapboxgl.LngLatBounds();
+        allWithCoords.forEach(i => bounds.extend([Number(i.longitude), Number(i.latitude)]));
+
+        if (allWithCoords.length > 1) {
+          map.fitBounds(bounds, { padding: 60, maxZoom: 14, duration: 500 });
+        } else {
+          map.flyTo({ center: [Number(allWithCoords[0].longitude), Number(allWithCoords[0].latitude)], zoom: 14, duration: 500 });
+        }
+        setTimeout(() => { mapReadyRef.current = true; }, 800);
+      }
     }
-  }, [imoveis, mapLoaded, navigate, onPinHover]);
+
+    // CRITICAL: wait for map to be fully loaded
+    if (map.loaded()) {
+      renderPins();
+    } else {
+      map.once("load", renderPins);
+    }
+  }, [imoveis, navigate, onPinHover]);
 
   // Sync hover from card → pin
   useEffect(() => {
-    markersRef.current.forEach(({ el }, id) => {
+    marcadoresRef.current.forEach(({ el }, id) => {
       if (id === hoveredId) {
         el.style.background = "#222";
         el.style.color = "white";
@@ -227,7 +256,7 @@ export function SearchMap({ imoveis, hoveredId, onPinHover, onBoundsSearch }: Se
       } else {
         el.style.background = "white";
         el.style.color = "#222";
-        el.style.borderColor = "rgba(0,0,0,0.18)";
+        el.style.borderColor = "rgba(0,0,0,0.2)";
         el.style.transform = "scale(1)";
         el.style.zIndex = "1";
       }
@@ -265,21 +294,16 @@ export function SearchMap({ imoveis, hoveredId, onPinHover, onBoundsSearch }: Se
           border: none !important;
           overflow: hidden;
         }
-        .uhome-popup .mapboxgl-popup-tip {
-          display: none;
-        }
+        .uhome-popup .mapboxgl-popup-tip { display: none; }
         .mapboxgl-ctrl-group {
           border-radius: 10px !important;
           box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
           border: none !important;
         }
-        .mapboxgl-ctrl-group button {
-          width: 36px !important;
-          height: 36px !important;
-        }
+        .mapboxgl-ctrl-group button { width: 36px !important; height: 36px !important; }
       `}</style>
       <div className="relative h-full w-full">
-        <div ref={mapContainer} className="h-full w-full" />
+        <div ref={containerRef} className="h-full w-full" />
 
         <AnimatePresence>
           {mapMoved && onBoundsSearch && (

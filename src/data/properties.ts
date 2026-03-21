@@ -103,8 +103,8 @@ export const mockProperties: MockProperty[] = [
   },
   {
     id: "10", slug: "studio-cidade-baixa", title: "Studio Descolado Cidade Baixa",
-    neighborhood: "Cidade Baixa", city: "Porto Alegre", price: 1800,
-    priceFormatted: "R$ 1.800/mês", finalidade: "locacao", tipo: "studio",
+    neighborhood: "Cidade Baixa", city: "Porto Alegre", price: 320000,
+    priceFormatted: "R$ 320.000", finalidade: "venda", tipo: "studio",
     area: 32, bedrooms: 1, bathrooms: 1, parking: 0,
     image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&h=400&fit=crop",
     features: ["Mobiliado", "Pet friendly"],

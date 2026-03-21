@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      agendamentos: {
+        Row: {
+          created_at: string | null
+          data_visita: string | null
+          horario: string | null
+          id: string
+          imovel_id: string | null
+          imovel_slug: string | null
+          imovel_titulo: string | null
+          nome: string
+          status: string | null
+          telefone: string
+        }
+        Insert: {
+          created_at?: string | null
+          data_visita?: string | null
+          horario?: string | null
+          id?: string
+          imovel_id?: string | null
+          imovel_slug?: string | null
+          imovel_titulo?: string | null
+          nome: string
+          status?: string | null
+          telefone: string
+        }
+        Update: {
+          created_at?: string | null
+          data_visita?: string | null
+          horario?: string | null
+          id?: string
+          imovel_id?: string | null
+          imovel_slug?: string | null
+          imovel_titulo?: string | null
+          nome?: string
+          status?: string | null
+          telefone?: string
+        }
+        Relationships: []
+      }
       buscas_salvas: {
         Row: {
           ativa: boolean

@@ -4,7 +4,9 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { LeadSidebar } from "@/components/LeadSidebar";
 import { FinancingSimulator } from "@/components/FinancingSimulator";
+import { AgendamentoVisita } from "@/components/AgendamentoVisita";
 import { PropertyMap } from "@/components/PropertyMap";
+import { FotoImovel } from "@/components/FotoImovel";
 import { Bed, Car, Maximize, Bath, MapPin, Share2, Heart, ChevronLeft, ChevronRight, Loader2, Camera } from "lucide-react";
 import { motion } from "framer-motion";
 import { trackView, getViewCount } from "@/services/leads";
@@ -140,7 +142,7 @@ const PropertyDetail = () => {
             onClick={() => { setCurrentImage(0); setGalleryOpen(true); }}
             className="group relative col-span-2 row-span-2 overflow-hidden rounded-l-2xl"
           >
-            <img src={images[0]} alt={imovel.titulo} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
+            <FotoImovel src={images[0]} alt={imovel.titulo} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
           </button>
           {images.slice(1, 5).map((img, i) => (
             <button
@@ -150,7 +152,7 @@ const PropertyDetail = () => {
                 i === 1 ? "rounded-tr-2xl" : i === 3 ? "rounded-br-2xl" : ""
               }`}
             >
-              <img src={img} alt={`Foto ${i + 2}`} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
+              <FotoImovel src={img} alt={`Foto ${i + 2}`} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
               {i === 3 && images.length > 5 && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/40">
                   <span className="font-body text-sm font-semibold text-white">+{images.length - 5} fotos</span>
@@ -401,6 +403,17 @@ const PropertyDetail = () => {
               imovelPreco={imovel.preco}
               viewCount={viewCount}
             />
+
+            {/* Agendamento de visita */}
+            <div className="mt-4">
+              <AgendamentoVisita
+                imovelId={imovel.id}
+                imovelSlug={imovel.slug}
+                imovelTitulo={imovel.titulo}
+                imovelBairro={imovel.bairro}
+                imovelPreco={imovel.preco}
+              />
+            </div>
 
             {/* Secondary actions below sidebar */}
             <div className="mt-4 flex gap-3">

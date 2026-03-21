@@ -1,9 +1,11 @@
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { SearchFiltersBar } from "@/components/SearchFiltersBar";
 import { SearchPropertyCard } from "@/components/SearchPropertyCard";
 import { SearchMap } from "@/components/SearchMap";
+import { SkeletonCard } from "@/components/SkeletonCard";
+import { SearchCTACard } from "@/components/SearchCTACard";
 import { useSearchStore, type MapBounds } from "@/stores/searchStore";
 import { fetchImoveis, fetchMapPins, type Imovel, type MapPin as MapPinData } from "@/services/imoveis";
 import { interpretarBusca, type AISearchResult } from "@/services/aiSearch";
@@ -12,6 +14,7 @@ import { ArrowUpDown, Bell, Loader2, Map as MapIcon, MapPin, Sparkles, X } from 
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { useCanonical } from "@/hooks/useCanonical";
+import { useCountUp } from "@/hooks/useCountUp";
 
 const sortLabels: Record<string, string> = {
   recentes: "Mais recentes",
@@ -51,6 +54,7 @@ const Search = () => {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [alertEmail, setAlertEmail] = useState("");
+  const [showLeadCTA, setShowLeadCTA] = useState(false);
   const [alertLoading, setAlertLoading] = useState(false);
 
   const [imoveis, setImoveis] = useState<Imovel[]>([]);
@@ -117,8 +121,9 @@ const Search = () => {
   }, [filters]);
 
   // Normal mode: fetch list first (fast), then map pins in background
+  // Also loads when in IA mode without a query (shows default results)
   const loadImoveis = useCallback(async () => {
-    if (modoIA && !aiResult) return;
+    if (modoIA && !aiResult && queryIA.trim()) return; // only skip if IA mode WITH a typed query but no result yet
     setLoading(true);
     try {
       const baseFilters = buildFilters();
@@ -146,8 +151,8 @@ const Search = () => {
   }, [filters, modoIA, aiResult, buildFilters]);
 
   useEffect(() => {
-    if (!modoIA) loadImoveis();
-  }, [loadImoveis, modoIA]);
+    loadImoveis();
+  }, [loadImoveis]);
 
   // AI search handler
   const buscarComIA = useCallback(async (query?: string) => {
@@ -235,6 +240,7 @@ const Search = () => {
   };
 
   const filterDesc = describeFilters(filters);
+  const animatedTotal = useCountUp(total);
 
   return (
     <div className="flex h-screen flex-col bg-background pt-16">
@@ -321,7 +327,7 @@ const Search = () => {
         <div className="flex items-center gap-2">
           <div>
             <div className="font-body text-lg font-extrabold leading-tight text-foreground sm:text-[22px]">
-              {total.toLocaleString("pt-BR")} imóveis
+              {animatedTotal.toLocaleString("pt-BR")} imóveis
             </div>
             <div className="mt-0.5 font-body text-xs text-muted-foreground sm:text-sm">
               à venda em Porto Alegre{filters.bairro ? `, ${filters.bairro}` : ""}
@@ -392,13 +398,12 @@ const Search = () => {
       {/* Main area: cards + map */}
       <div className="flex flex-1 overflow-hidden">
         {/* Cards column */}
-        <div className="flex-1 overflow-y-auto px-3 py-4 sm:px-6 sm:py-5" style={{ minWidth: 0 }}>
+        <div className="flex-1 overflow-y-auto px-3 pt-2 pb-4 sm:px-6 sm:pt-3 sm:pb-5" style={{ minWidth: 0 }}>
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-20">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              <p className="mt-3 font-body text-sm text-muted-foreground">
-                {modoIA && buscandoIA ? "Interpretando sua busca com IA..." : "Carregando imóveis..."}
-              </p>
+            <div className="grid grid-cols-1 gap-4 pb-16 sm:grid-cols-2 sm:gap-6 sm:pb-4 xl:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <SkeletonCard key={i} />
+              ))}
             </div>
           ) : imoveis.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20">
@@ -419,13 +424,17 @@ const Search = () => {
           ) : (
             <div className="grid grid-cols-1 gap-4 pb-16 sm:grid-cols-2 sm:gap-6 sm:pb-4 xl:grid-cols-3">
               {imoveis.map((imovel, i) => (
-                <SearchPropertyCard
-                  key={imovel.id}
-                  imovel={imovel}
-                  index={i}
-                  highlighted={hoveredId === imovel.id}
-                  onHover={setHoveredId}
-                />
+                <React.Fragment key={imovel.id}>
+                  <SearchPropertyCard
+                    imovel={imovel}
+                    index={i}
+                    highlighted={hoveredId === imovel.id}
+                    onHover={setHoveredId}
+                  />
+                  {i === 5 && (
+                    <SearchCTACard onClickCTA={() => setShowAlertModal(true)} />
+                  )}
+                </React.Fragment>
               ))}
             </div>
           )}

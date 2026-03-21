@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Heart } from "lucide-react";
 import { motion } from "framer-motion";
 import { type Imovel, fotoPrincipal, formatPreco } from "@/services/imoveis";
+import { FotoImovel } from "@/components/FotoImovel";
 import { useFavoritos } from "@/hooks/useFavoritos";
 
 interface Props {
@@ -74,7 +75,7 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
       <div className="flex gap-3 sm:block">
         {/* Photo */}
         <div className="relative w-[120px] shrink-0 overflow-hidden rounded-lg sm:w-full sm:rounded-xl" style={{ aspectRatio: "1/1" }}>
-          <img
+          <FotoImovel
             src={fotos[fotoAtiva]}
             alt={imovel.titulo}
             loading={index < 6 ? "eager" : "lazy"}

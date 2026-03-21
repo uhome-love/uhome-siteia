@@ -15,13 +15,15 @@ export function FilterPill({ label, value, active, children, onClear }: FilterPi
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 640;
 
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent | TouchEvent) => {
       const target = e.target as Node;
-      if (ref.current && !ref.current.contains(target) && dropdownRef.current && !dropdownRef.current.contains(target)) {
+      if (
+        ref.current && !ref.current.contains(target) &&
+        dropdownRef.current && !dropdownRef.current.contains(target)
+      ) {
         setOpen(false);
       }
     };
@@ -33,41 +35,37 @@ export function FilterPill({ label, value, active, children, onClear }: FilterPi
     };
   }, [open]);
 
-  // Reposition dropdown if it goes off-screen on desktop
+  // On desktop (sm+), position the dropdown below the pill
   const adjustPosition = useCallback(() => {
-    if (!dropdownRef.current || !ref.current || isMobile) return;
+    if (!dropdownRef.current || !ref.current) return;
     const dropdown = dropdownRef.current;
-    const pill = ref.current.getBoundingClientRect();
-    const viewportWidth = window.innerWidth;
+    // Only adjust if sm+ (desktop dropdown style)
+    if (window.matchMedia("(min-width: 640px)").matches) {
+      const pill = ref.current.getBoundingClientRect();
+      dropdown.style.position = "fixed";
+      dropdown.style.bottom = "auto";
+      dropdown.style.left = `${pill.left}px`;
+      dropdown.style.right = "auto";
+      dropdown.style.top = `${pill.bottom + 8}px`;
+      dropdown.style.width = "";
 
-    // Position below the pill
-    dropdown.style.position = "absolute";
-    dropdown.style.top = `${pill.bottom + 8}px`;
-    dropdown.style.left = `${pill.left}px`;
-
-    // Check if overflowing right edge
-    const rect = dropdown.getBoundingClientRect();
-    if (rect.right > viewportWidth - 8) {
-      dropdown.style.left = `${pill.left - (rect.right - viewportWidth + 8)}px`;
+      const rect = dropdown.getBoundingClientRect();
+      const vw = window.innerWidth;
+      if (rect.right > vw - 8) {
+        dropdown.style.left = `${pill.left - (rect.right - vw + 8)}px`;
+      }
     }
-    // Check if overflowing left edge
-    const newRect = dropdown.getBoundingClientRect();
-    if (newRect.left < 8) {
-      dropdown.style.left = "8px";
-    }
-  }, [isMobile]);
+  }, []);
 
   useEffect(() => {
-    if (open && !isMobile) {
-      requestAnimationFrame(adjustPosition);
-    }
-  }, [open, adjustPosition, isMobile]);
+    if (open) requestAnimationFrame(adjustPosition);
+  }, [open, adjustPosition]);
 
   const dropdownContent = (
     <AnimatePresence>
       {open && (
         <>
-          {/* Backdrop for mobile */}
+          {/* Backdrop — only visible on mobile via CSS */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -77,12 +75,12 @@ export function FilterPill({ label, value, active, children, onClear }: FilterPi
           />
           <motion.div
             ref={dropdownRef}
-            initial={{ opacity: 0, y: isMobile ? 20 : -4 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: isMobile ? 20 : -4 }}
-            transition={{ duration: 0.2 }}
-            className="fixed bottom-0 left-0 right-0 z-50 rounded-t-2xl border-t border-border bg-card p-3 pb-8 shadow-xl sm:absolute sm:bottom-auto sm:left-0 sm:right-auto sm:top-full sm:mt-2 sm:min-w-[200px] sm:rounded-xl sm:border sm:p-2 sm:pb-2"
-            style={!isMobile ? { position: "fixed" } : undefined}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed bottom-0 left-0 right-0 z-50 rounded-t-2xl border-t border-border bg-card p-4 pb-8 shadow-xl
+              sm:bottom-auto sm:left-auto sm:right-auto sm:w-auto sm:min-w-[200px] sm:rounded-xl sm:border sm:p-2 sm:pb-2"
           >
             {/* Mobile drag handle */}
             <div className="mb-3 flex justify-center sm:hidden">
@@ -93,7 +91,7 @@ export function FilterPill({ label, value, active, children, onClear }: FilterPi
             </p>
             {children}
             {/* Mobile apply button */}
-            <div className="mt-3 sm:hidden">
+            <div className="mt-4 sm:hidden">
               <button
                 onClick={() => setOpen(false)}
                 className="w-full rounded-full bg-primary py-3 font-body text-sm font-semibold text-primary-foreground transition-all active:scale-[0.97]"
@@ -128,7 +126,6 @@ export function FilterPill({ label, value, active, children, onClear }: FilterPi
         )}
       </button>
 
-      {/* Render dropdown via portal to escape overflow clipping */}
       {createPortal(dropdownContent, document.body)}
     </div>
   );

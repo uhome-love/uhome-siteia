@@ -20,6 +20,7 @@ export function Footer() {
             <ul className="mt-3 space-y-2">
               <li><Link to="/busca?finalidade=venda" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Comprar</Link></li>
               <li><Link to="/busca" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Todos os imóveis</Link></li>
+              <li><Link to="/bairros" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Bairros</Link></li>
               <li><Link to="/anunciar" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Anunciar imóvel</Link></li>
             </ul>
           </div>

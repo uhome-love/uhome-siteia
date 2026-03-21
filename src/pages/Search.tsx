@@ -218,7 +218,7 @@ const Search = () => {
               <p className="mt-1 font-body text-sm text-muted-foreground">Tente ajustar seus filtros.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-6 pb-4 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 pb-16 sm:grid-cols-2 sm:gap-6 sm:pb-4 xl:grid-cols-3">
               {imoveis.map((imovel, i) => (
                 <SearchPropertyCard
                   key={imovel.id}

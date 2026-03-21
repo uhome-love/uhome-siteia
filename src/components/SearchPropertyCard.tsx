@@ -68,91 +68,92 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
       onMouseLeave={handleMouseLeave}
       onClick={() => navigate(`/imovel/${imovel.slug}`)}
     >
-      {/* Photo — 4/3 */}
-      <div className="relative overflow-hidden rounded-xl" style={{ aspectRatio: "4/3" }}>
-        <img
-          src={fotos[fotoAtiva]}
-          alt={imovel.titulo}
-          loading="lazy"
-          className="h-full w-full object-cover transition-transform duration-500"
-          style={{ transform: hovering ? "scale(1.03)" : "scale(1)" }}
-        />
-
-        {/* Badge */}
-        {badge && (
-          <span
-            className={`absolute left-2.5 top-2.5 z-10 rounded-md px-2.5 py-1 font-body text-xs font-semibold backdrop-blur-sm ${badgeClasses[badge.style]}`}
-          >
-            {badge.label}
-          </span>
-        )}
-
-        {/* Nav arrows on hover */}
-        {hovering && fotos.length > 1 && (
-          <>
-            {fotoAtiva > 0 && (
-              <button
-                onClick={(e) => { e.stopPropagation(); setFotoAtiva((i) => i - 1); }}
-                className="absolute left-2 top-1/2 z-10 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-sm shadow transition-transform hover:scale-105 active:scale-95"
-              >
-                ‹
-              </button>
-            )}
-            {fotoAtiva < fotos.length - 1 && (
-              <button
-                onClick={(e) => { e.stopPropagation(); setFotoAtiva((i) => i + 1); }}
-                className="absolute right-2 top-1/2 z-10 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-sm shadow transition-transform hover:scale-105 active:scale-95"
-              >
-                ›
-              </button>
-            )}
-          </>
-        )}
-
-        {/* Heart */}
-        <button
-          onClick={(e) => { e.stopPropagation(); setLiked(!liked); }}
-          className="absolute right-3 top-3 z-10"
-        >
-          <Heart
-            className="h-6 w-6 drop-shadow-md transition-colors"
-            fill={liked ? "#ff385c" : "rgba(255,255,255,0.85)"}
-            stroke={liked ? "#ff385c" : "rgba(0,0,0,0.3)"}
-            strokeWidth={1.5}
+      {/* Mobile: horizontal layout / Desktop: vertical */}
+      <div className="flex gap-3 sm:block">
+        {/* Photo */}
+        <div className="relative w-[120px] shrink-0 overflow-hidden rounded-lg sm:w-full sm:rounded-xl" style={{ aspectRatio: "1/1" }}>
+          <img
+            src={fotos[fotoAtiva]}
+            alt={imovel.titulo}
+            loading="lazy"
+            className="h-full w-full object-cover transition-transform duration-500 sm:aspect-[4/3]"
+            style={{ transform: hovering ? "scale(1.03)" : "scale(1)" }}
           />
-        </button>
 
-        {/* Dots */}
-        {hovering && fotos.length > 1 && (
-          <div className="absolute bottom-2.5 left-1/2 z-10 flex -translate-x-1/2 gap-1">
-            {fotos.slice(0, 5).map((_, i) => (
-              <div
-                key={i}
-                className="rounded-full transition-all duration-200"
-                style={{
-                  width: i === fotoAtiva ? 18 : 5,
-                  height: 5,
-                  background: i === fotoAtiva ? "white" : "rgba(255,255,255,0.55)",
-                }}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+          {/* Badge */}
+          {badge && (
+            <span
+              className={`absolute left-1.5 top-1.5 z-10 rounded-md px-2 py-0.5 font-body text-[10px] font-semibold backdrop-blur-sm sm:left-2.5 sm:top-2.5 sm:px-2.5 sm:py-1 sm:text-xs ${badgeClasses[badge.style]}`}
+            >
+              {badge.label}
+            </span>
+          )}
 
-      {/* Text — no box, fixed height */}
-      <div className="px-0.5 pt-2.5">
-        <div className="flex items-center justify-between gap-2">
+          {/* Nav arrows on hover (desktop only) */}
+          {hovering && fotos.length > 1 && (
+            <>
+              {fotoAtiva > 0 && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); setFotoAtiva((i) => i - 1); }}
+                  className="absolute left-2 top-1/2 z-10 hidden h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-sm shadow transition-transform hover:scale-105 active:scale-95 sm:flex"
+                >
+                  ‹
+                </button>
+              )}
+              {fotoAtiva < fotos.length - 1 && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); setFotoAtiva((i) => i + 1); }}
+                  className="absolute right-2 top-1/2 z-10 hidden h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-sm shadow transition-transform hover:scale-105 active:scale-95 sm:flex"
+                >
+                  ›
+                </button>
+              )}
+            </>
+          )}
+
+          {/* Heart */}
+          <button
+            onClick={(e) => { e.stopPropagation(); setLiked(!liked); }}
+            className="absolute right-1.5 top-1.5 z-10 sm:right-3 sm:top-3"
+          >
+            <Heart
+              className="h-5 w-5 drop-shadow-md transition-colors sm:h-6 sm:w-6"
+              fill={liked ? "#ff385c" : "rgba(255,255,255,0.85)"}
+              stroke={liked ? "#ff385c" : "rgba(0,0,0,0.3)"}
+              strokeWidth={1.5}
+            />
+          </button>
+
+          {/* Dots (desktop only) */}
+          {hovering && fotos.length > 1 && (
+            <div className="absolute bottom-2.5 left-1/2 z-10 hidden -translate-x-1/2 gap-1 sm:flex">
+              {fotos.slice(0, 5).map((_, i) => (
+                <div
+                  key={i}
+                  className="rounded-full transition-all duration-200"
+                  style={{
+                    width: i === fotoAtiva ? 18 : 5,
+                    height: 5,
+                    background: i === fotoAtiva ? "white" : "rgba(255,255,255,0.55)",
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Text */}
+        <div className="flex min-w-0 flex-1 flex-col justify-center sm:px-0.5 sm:pt-2.5">
           <span className="truncate font-body text-[13px] font-semibold text-foreground">
             {imovel.tipo.charAt(0).toUpperCase() + imovel.tipo.slice(1)} · {imovel.bairro}
           </span>
+
+          {stats && (
+            <p className="mt-0.5 truncate font-body text-[11px] text-muted-foreground sm:text-xs">{stats}</p>
+          )}
+
+          <p className="mt-1 font-body text-[15px] font-bold text-foreground sm:text-sm">{price}</p>
         </div>
-
-        {stats && (
-          <p className="mt-0.5 truncate font-body text-xs text-muted-foreground">{stats}</p>
-        )}
-
-        <p className="mt-1 font-body text-sm font-bold text-foreground">{price}</p>
       </div>
     </motion.div>
   );

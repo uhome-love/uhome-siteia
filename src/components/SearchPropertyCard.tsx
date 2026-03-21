@@ -78,20 +78,20 @@ export function SearchPropertyCard({ imovel, index }: { imovel: Imovel; index: n
           </div>
 
           {/* Info */}
-          <div className="flex flex-1 flex-col justify-between p-4">
+          <div className="flex flex-1 flex-col justify-between p-3.5">
             <div>
-              <p className="font-body text-[11px] text-muted-foreground">{imovel.bairro}</p>
+              <p className="font-body text-xs uppercase tracking-[0.05em] text-muted-foreground">{imovel.bairro}</p>
               <h3
-                className="mt-0.5 cursor-pointer font-body text-sm font-semibold text-foreground line-clamp-2 hover:text-primary transition-colors"
+                className="mt-0.5 cursor-pointer font-body text-[15px] font-semibold text-foreground line-clamp-1 hover:text-primary transition-colors"
                 onClick={() => navigate(`/imovel/${imovel.slug}`)}
               >
                 {imovel.titulo}
               </h3>
-              <p className="mt-2 font-mono text-lg font-bold text-foreground whitespace-nowrap">{priceFormatted}</p>
+              <p className="mt-1.5 font-mono text-xl font-bold text-foreground whitespace-nowrap">{priceFormatted}</p>
             </div>
 
-            <div className="mt-3 flex items-center justify-between">
-              <div className="flex items-center gap-4">
+            <div className="mt-2.5 flex items-center justify-between">
+              <div className="flex items-center gap-3">
                 {(imovel.area_total ?? imovel.area_util ?? 0) > 0 && (
                   <span className="flex items-center gap-1 font-body text-xs text-muted-foreground">
                     <Maximize className="h-3 w-3" /> {imovel.area_total ?? imovel.area_util}m²
@@ -110,7 +110,7 @@ export function SearchPropertyCard({ imovel, index }: { imovel: Imovel; index: n
               </div>
               <button
                 onClick={() => setShowLead(!showLead)}
-                className="rounded-full border-[1.5px] border-primary px-3 py-1.5 font-body text-[11px] font-semibold text-primary transition-all hover:bg-[hsl(233_100%_97%)] active:scale-[0.97]"
+                className="rounded-full border-[1.5px] border-primary px-3.5 py-1.5 font-body text-[13px] font-semibold text-primary transition-all hover:bg-primary/5 active:scale-[0.97]"
               >
                 Tenho interesse
               </button>

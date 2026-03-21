@@ -48,7 +48,7 @@ export const bairrosData: BairroData[] = [
   {
     nome: "Três Figueiras",
     slug: "tres-figueiras",
-    foto: "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=800&q=80",
+    foto: "/images/tres-figueiras.png",
     descricao:
       "Três Figueiras é um dos bairros mais exclusivos de Porto Alegre. Ruas tranquilas, residências luxuosas e a proximidade com o Parque Germânia e o Shopping Iguatemi fazem deste endereço uma referência em qualidade de vida e valorização imobiliária.",
     lat: -30.035,

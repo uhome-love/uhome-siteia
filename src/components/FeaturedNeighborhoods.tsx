@@ -7,27 +7,27 @@ import { supabase } from "@/integrations/supabase/client";
 const bairrosConfig = [
   {
     nome: "Moinhos de Vento",
-    foto: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Moinhos_de_Vento_Park%2C_Porto_Alegre.jpg/800px-Moinhos_de_Vento_Park%2C_Porto_Alegre.jpg",
+    foto: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Moinhos_de_Vento_park%2C_18_Nov_2016.jpg/800px-Moinhos_de_Vento_park%2C_18_Nov_2016.jpg",
   },
   {
     nome: "Bela Vista",
-    foto: "https://images.unsplash.com/photo-1516912481808-3406841bd33c?w=600&q=80",
+    foto: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Porto_Alegre04.jpg/800px-Porto_Alegre04.jpg",
   },
   {
     nome: "Petrópolis",
-    foto: "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=600&q=80",
+    foto: "https://upload.wikimedia.org/wikipedia/commons/5/5e/Petr%C3%B3polis_Porto_Alegre.JPG",
   },
   {
     nome: "Mont'Serrat",
-    foto: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&q=80",
+    foto: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/0000_Igreja_de_Nossa_Senhora_do_Mont%27Serrat_em_Porto_Alegre%2C_Rio_Grande_do_Sul%2C_Brasil.JPG/800px-0000_Igreja_de_Nossa_Senhora_do_Mont%27Serrat_em_Porto_Alegre%2C_Rio_Grande_do_Sul%2C_Brasil.JPG",
   },
   {
     nome: "Três Figueiras",
-    foto: "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=600&q=80",
+    foto: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Avenida_Luiz_Manoel_Gonzaga.JPG/800px-Avenida_Luiz_Manoel_Gonzaga.JPG",
   },
   {
     nome: "Boa Vista",
-    foto: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600&q=80",
+    foto: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Rua_Anita_Garibaldi_2_Porto_Alegre.JPG/800px-Rua_Anita_Garibaldi_2_Porto_Alegre.JPG",
   },
 ];
 

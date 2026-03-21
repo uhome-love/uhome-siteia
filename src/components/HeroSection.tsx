@@ -198,7 +198,7 @@ export function HeroSection() {
                   <span className="mb-2 block font-body text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                     Quartos
                   </span>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
                     {quartosOptions.map((q, i) => {
                       const val = i === 0 ? "" : String(i);
                       const active = quartos === val;

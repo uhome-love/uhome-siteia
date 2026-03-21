@@ -194,7 +194,7 @@ const Carreiras = () => {
                 </div>
 
                 <a
-                  href={`mailto:carreiras@uhome.com.br?subject=Candidatura: ${vaga.cargo}`}
+                  href={`mailto:lucas@uhome.imb.br?subject=Candidatura: ${vaga.cargo}`}
                   className="shrink-0 self-start rounded-full bg-primary px-5 py-2.5 font-body text-[13px] font-semibold text-primary-foreground transition-colors hover:bg-primary/90 active:scale-[0.97] sm:ml-6 sm:self-center"
                 >
                   Candidatar →
@@ -218,7 +218,7 @@ const Carreiras = () => {
               Mande seu currículo. Guardamos para oportunidades futuras.
             </p>
             <a
-              href="mailto:carreiras@uhome.com.br?subject=Candidatura Espontânea"
+              href="mailto:lucas@uhome.imb.br?subject=Candidatura Espontânea"
               className="mt-5 inline-block rounded-full bg-primary px-7 py-3 font-body text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90 active:scale-[0.97]"
             >
               Enviar currículo

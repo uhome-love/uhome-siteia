@@ -39,7 +39,8 @@ function PropertyCard({ imovel, index }: { imovel: Imovel; index: number }) {
           <img
             src={image}
             alt={imovel.titulo}
-            loading="lazy"
+            loading={index < 3 ? "eager" : "lazy"}
+            decoding="async"
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
           {/* Badge tipo */}

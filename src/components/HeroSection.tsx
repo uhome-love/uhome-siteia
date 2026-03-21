@@ -118,6 +118,8 @@ export function HeroSection() {
         <img
           src="/hero-bg.webp"
           alt=""
+          fetchPriority="high"
+          decoding="sync"
           className="h-full w-full object-cover"
           style={{ objectPosition: "center center" }}
         />

@@ -13,7 +13,7 @@ const sizes = {
 export function UhomeLogo({ variant = "full", size = "md", className = "" }: UhomeLogoProps) {
   const s = sizes[size];
   const iconColor = variant === "white" ? "#FFFFFF" : "#5B6CF9";
-  const textColor = variant === "white" ? "text-white" : "text-[hsl(231,70%,65%)]";
+  const textColor = variant === "white" ? "text-white" : "text-[#5B6CF9]";
 
   const icon = (
     <svg

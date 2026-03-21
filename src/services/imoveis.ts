@@ -98,6 +98,12 @@ export interface BuscaFilters {
   q?: string;
   limit?: number;
   offset?: number;
+  bounds?: {
+    lat_min: number;
+    lat_max: number;
+    lng_min: number;
+    lng_max: number;
+  } | null;
 }
 
 export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: Imovel[]; count: number }> {
@@ -118,6 +124,13 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
   if (filters.destaque) query = query.eq("destaque", true);
   if (filters.diferenciais?.length) query = query.contains("diferenciais", filters.diferenciais);
   if (filters.q) query = query.or(`titulo.ilike.%${filters.q}%,bairro.ilike.%${filters.q}%,tipo.ilike.%${filters.q}%`);
+  if (filters.bounds) {
+    query = query
+      .gte("latitude", filters.bounds.lat_min)
+      .lte("latitude", filters.bounds.lat_max)
+      .gte("longitude", filters.bounds.lng_min)
+      .lte("longitude", filters.bounds.lng_max);
+  }
 
   const orderMap = {
     recentes: { column: "publicado_em" as const, ascending: false },

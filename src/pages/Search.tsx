@@ -4,10 +4,10 @@ import { Navbar } from "@/components/Navbar";
 import { SearchFiltersBar } from "@/components/SearchFiltersBar";
 import { SearchPropertyCard } from "@/components/SearchPropertyCard";
 import { SearchMap } from "@/components/SearchMap";
-import { useSearchStore } from "@/stores/searchStore";
+import { useSearchStore, type MapBounds } from "@/stores/searchStore";
 import { fetchImoveis, type Imovel } from "@/services/imoveis";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowUpDown, Bell, Loader2, Map as MapIcon, X } from "lucide-react";
+import { ArrowUpDown, Bell, Loader2, Map as MapIcon, MapPin, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 
@@ -75,6 +75,7 @@ const Search = () => {
         diferenciais: filters.diferenciais.length ? filters.diferenciais : undefined,
         ordem: filters.ordem as any,
         q: filters.q || undefined,
+        bounds: filters.bounds || undefined,
         limit: 40,
       });
       setImoveis(result.data);
@@ -89,6 +90,14 @@ const Search = () => {
   useEffect(() => {
     loadImoveis();
   }, [loadImoveis]);
+
+  const handleBoundsSearch = useCallback((bounds: MapBounds) => {
+    setFilter("bounds", bounds);
+  }, [setFilter]);
+
+  const clearBounds = useCallback(() => {
+    setFilter("bounds", null);
+  }, [setFilter]);
 
   const handleCreateAlert = async () => {
     if (!alertEmail || !alertEmail.includes("@")) {
@@ -122,14 +131,31 @@ const Search = () => {
       <Navbar />
       <SearchFiltersBar />
 
-      {/* Subheader: counter + sort + alert */}
+      {/* Subheader: counter + bounds badge + sort + alert */}
       <div className="flex items-center justify-between border-b border-border bg-background px-6 py-2.5">
-        <div>
-          <span className="font-body text-sm font-semibold text-foreground">
-            {total.toLocaleString("pt-BR")}
-          </span>
-          <span className="font-body text-sm text-muted-foreground"> imóveis encontrados</span>
+        <div className="flex items-center gap-3">
+          <div>
+            <span className="font-body text-sm font-semibold text-foreground">
+              {total.toLocaleString("pt-BR")}
+            </span>
+            <span className="font-body text-sm text-muted-foreground"> imóveis encontrados</span>
+          </div>
+
+          {/* Bounds active badge */}
+          {filters.bounds && (
+            <div className="flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 font-body text-xs font-semibold text-primary">
+              <MapPin className="h-3 w-3" />
+              Área do mapa
+              <button
+                onClick={clearBounds}
+                className="ml-0.5 font-bold leading-none hover:opacity-70"
+              >
+                ×
+              </button>
+            </div>
+          )}
         </div>
+
         <div className="flex items-center gap-3">
           {/* Sort */}
           <div className="relative">
@@ -205,7 +231,7 @@ const Search = () => {
 
         {/* Map — desktop */}
         <div className="relative hidden w-[45%] shrink-0 border-l border-border lg:block">
-          <SearchMap imoveis={imoveis} hoveredId={hoveredId} onPinHover={setHoveredId} />
+          <SearchMap imoveis={imoveis} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} />
         </div>
       </div>
 
@@ -234,7 +260,7 @@ const Search = () => {
               <X className="h-4 w-4" />
               Voltar à lista
             </button>
-            <SearchMap imoveis={imoveis} hoveredId={hoveredId} onPinHover={setHoveredId} />
+            <SearchMap imoveis={imoveis} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} />
           </motion.div>
         )}
       </AnimatePresence>

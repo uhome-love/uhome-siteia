@@ -27,7 +27,8 @@ export function Footer() {
           <div>
             <h4 className="font-body text-sm font-semibold text-foreground">Uhome</h4>
             <ul className="mt-3 space-y-2">
-              <li><Link to="/ia-search" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Busca IA</Link></li>
+              <li><Link to="/busca?modo=ia" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Busca IA</Link></li>
+              <li><Link to="/carreiras" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Trabalhe conosco</Link></li>
               <li><Link to="/" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Sobre nós</Link></li>
             </ul>
           </div>

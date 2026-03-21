@@ -9,6 +9,7 @@ import Index from "./pages/Index.tsx";
 import Search from "./pages/Search.tsx";
 import PropertyDetail from "./pages/PropertyDetail.tsx";
 import Anunciar from "./pages/Anunciar.tsx";
+import Carreiras from "./pages/Carreiras.tsx";
 import Onboarding from "./pages/Onboarding.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/imovel/:slug" element={<PropertyDetail />} />
           <Route path="/ia-search" element={<Navigate to="/busca?modo=ia" replace />} />
           <Route path="/anunciar" element={<Anunciar />} />
+          <Route path="/carreiras" element={<Carreiras />} />
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

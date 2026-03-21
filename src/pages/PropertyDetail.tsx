@@ -9,7 +9,7 @@ import { Bed, Car, Maximize, Bath, MapPin, Share2, Heart, ChevronLeft, ChevronRi
 import { motion } from "framer-motion";
 import { trackView, getViewCount } from "@/services/leads";
 import { fetchImovelBySlug, type Imovel, formatPreco, fotoPrincipal } from "@/services/imoveis";
-import { setJsonLd, removeJsonLd, buildImovelJsonLd } from "@/lib/jsonld";
+import { setJsonLd, removeJsonLd, buildImovelJsonLd, buildImovelBreadcrumbJsonLd } from "@/lib/jsonld";
 
 const PropertyDetail = () => {
   const { slug } = useParams();
@@ -81,9 +81,11 @@ const PropertyDetail = () => {
     setMeta("property", "og:image", fotoPrincipal(imovel));
     setMeta("property", "og:url", `https://uhome.com.br/imovel/${imovel.slug}`);
     setJsonLd("jsonld-imovel", buildImovelJsonLd(imovel));
+    setJsonLd("jsonld-breadcrumb", buildImovelBreadcrumbJsonLd(imovel));
     return () => {
       document.title = "Uhome Imóveis | Apartamentos e Casas à Venda em Porto Alegre";
       removeJsonLd("jsonld-imovel");
+      removeJsonLd("jsonld-breadcrumb");
     };
   }, [imovel]);
 

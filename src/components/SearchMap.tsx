@@ -91,121 +91,127 @@ export function SearchMap({ imoveis, hoveredId, onPinHover, onBoundsSearch }: Se
     if (!mapRef.current || !mapLoaded) return;
     const { map, mapboxgl } = mapRef.current;
 
-    // CRITICAL: wait for style to be fully loaded before adding markers
     const addMarkers = () => {
+      const currentIds = new Set(imoveis.filter(p => p.latitude && p.longitude).map(p => p.id));
 
-    const currentIds = new Set(imoveis.filter(p => p.latitude && p.longitude).map(p => p.id));
-
-    // Remove markers no longer in results
-    markersRef.current.forEach(({ marker }, id) => {
-      if (!currentIds.has(id)) {
-        marker.remove();
-        markersRef.current.delete(id);
-      }
-    });
-
-    const withCoords = imoveis.filter((p) => p.latitude && p.longitude);
-    if (withCoords.length === 0) return;
-
-    const bounds = new mapboxgl.LngLatBounds();
-    let hasNewMarkers = false;
-
-    withCoords.forEach((p) => {
-      bounds.extend([p.longitude!, p.latitude!]);
-
-      if (markersRef.current.has(p.id)) return;
-      hasNewMarkers = true;
-
-      const el = document.createElement("div");
-      el.textContent = formatPinPreco(p.preco);
-      el.dataset.imovelId = p.id;
-
-      // Airbnb-style pill
-      Object.assign(el.style, {
-        background: "white",
-        color: "#222",
-        border: "1.5px solid rgba(0,0,0,0.18)",
-        borderRadius: "20px",
-        padding: "5px 10px",
-        fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
-        fontSize: "12px",
-        fontWeight: "700",
-        cursor: "pointer",
-        boxShadow: "0 2px 6px rgba(0,0,0,0.14)",
-        whiteSpace: "nowrap",
-        userSelect: "none",
-        transition: "background 0.15s, color 0.15s, transform 0.1s, border-color 0.15s",
-        willChange: "transform",
+      // Remove markers no longer in results
+      markersRef.current.forEach(({ marker }, id) => {
+        if (!currentIds.has(id)) {
+          marker.remove();
+          markersRef.current.delete(id);
+        }
       });
 
-      el.addEventListener("mouseenter", () => {
-        onPinHover?.(p.id);
-        el.style.background = "#222";
-        el.style.color = "white";
-        el.style.borderColor = "#222";
-        el.style.transform = "scale(1.08)";
-        el.style.zIndex = "10";
+      const withCoords = imoveis.filter((p) => p.latitude && p.longitude);
+      if (withCoords.length === 0) return;
 
-        // Show popup
-        if (popupRef.current) popupRef.current.remove();
-        const image = fotoPrincipal(p);
-        const formatted = formatPreco(p.preco);
-        const area = p.area_total ?? p.area_util ?? 0;
-        const statsLine = [
-          area > 0 ? `${area}m²` : null,
-          (p.quartos ?? 0) > 0 ? `${p.quartos} quartos` : null,
-        ].filter(Boolean).join(" · ");
+      const bounds = new mapboxgl.LngLatBounds();
+      let hasNewMarkers = false;
 
-        popupRef.current = new mapboxgl.Popup({
-          closeButton: false,
-          closeOnClick: false,
-          offset: 16,
-          className: "uhome-popup",
-        })
-          .setLngLat([p.longitude!, p.latitude!])
-          .setHTML(`
-            <div style="width:220px;cursor:pointer;font-family:'Plus Jakarta Sans',system-ui,sans-serif;" onclick="window.__navigateImovel('${p.slug}')">
-              <img src="${image}" alt="" style="width:100%;height:110px;object-fit:cover;" />
-              <div style="padding:10px 12px;">
-                <p style="font-size:11px;color:#888;margin:0 0 2px;">${p.bairro}</p>
-                <p style="font-size:13px;font-weight:600;margin:0 0 4px;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.titulo}</p>
-                <p style="font-size:15px;font-weight:700;color:#222;margin:0;">${formatted}</p>
-                ${statsLine ? `<p style="font-size:11px;color:#717171;margin:4px 0 0;">${statsLine}</p>` : ""}
+      withCoords.forEach((p) => {
+        bounds.extend([p.longitude!, p.latitude!]);
+
+        if (markersRef.current.has(p.id)) return;
+        hasNewMarkers = true;
+
+        const el = document.createElement("div");
+        el.textContent = formatPinPreco(p.preco);
+        el.dataset.imovelId = p.id;
+
+        // Airbnb-style pill
+        Object.assign(el.style, {
+          background: "white",
+          color: "#222",
+          border: "1.5px solid rgba(0,0,0,0.18)",
+          borderRadius: "20px",
+          padding: "5px 10px",
+          fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+          fontSize: "12px",
+          fontWeight: "700",
+          cursor: "pointer",
+          boxShadow: "0 2px 6px rgba(0,0,0,0.14)",
+          whiteSpace: "nowrap",
+          userSelect: "none",
+          transition: "background 0.15s, color 0.15s, transform 0.1s, border-color 0.15s",
+          willChange: "transform",
+        });
+
+        el.addEventListener("mouseenter", () => {
+          onPinHover?.(p.id);
+          el.style.background = "#222";
+          el.style.color = "white";
+          el.style.borderColor = "#222";
+          el.style.transform = "scale(1.08)";
+          el.style.zIndex = "10";
+
+          // Show popup
+          if (popupRef.current) popupRef.current.remove();
+          const image = fotoPrincipal(p);
+          const formatted = formatPreco(p.preco);
+          const area = p.area_total ?? p.area_util ?? 0;
+          const statsLine = [
+            area > 0 ? `${area}m²` : null,
+            (p.quartos ?? 0) > 0 ? `${p.quartos} quartos` : null,
+          ].filter(Boolean).join(" · ");
+
+          popupRef.current = new mapboxgl.Popup({
+            closeButton: false,
+            closeOnClick: false,
+            offset: 16,
+            className: "uhome-popup",
+          })
+            .setLngLat([p.longitude!, p.latitude!])
+            .setHTML(`
+              <div style="width:220px;cursor:pointer;font-family:'Plus Jakarta Sans',system-ui,sans-serif;" onclick="window.__navigateImovel('${p.slug}')">
+                <img src="${image}" alt="" style="width:100%;height:110px;object-fit:cover;" />
+                <div style="padding:10px 12px;">
+                  <p style="font-size:11px;color:#888;margin:0 0 2px;">${p.bairro}</p>
+                  <p style="font-size:13px;font-weight:600;margin:0 0 4px;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.titulo}</p>
+                  <p style="font-size:15px;font-weight:700;color:#222;margin:0;">${formatted}</p>
+                  ${statsLine ? `<p style="font-size:11px;color:#717171;margin:4px 0 0;">${statsLine}</p>` : ""}
+                </div>
               </div>
-            </div>
-          `)
+            `)
+            .addTo(map);
+        });
+
+        el.addEventListener("mouseleave", () => {
+          onPinHover?.(null);
+          el.style.background = "white";
+          el.style.color = "#222";
+          el.style.borderColor = "rgba(0,0,0,0.18)";
+          el.style.transform = "scale(1)";
+          el.style.zIndex = "1";
+          if (popupRef.current) { popupRef.current.remove(); popupRef.current = null; }
+        });
+
+        el.addEventListener("click", () => {
+          navigate(`/imovel/${p.slug}`);
+        });
+
+        const marker = new mapboxgl.Marker({ element: el, anchor: "center" })
+          .setLngLat([p.longitude!, p.latitude!])
           .addTo(map);
+
+        markersRef.current.set(p.id, { el, marker });
       });
 
-      el.addEventListener("mouseleave", () => {
-        onPinHover?.(null);
-        el.style.background = "white";
-        el.style.color = "#222";
-        el.style.borderColor = "rgba(0,0,0,0.18)";
-        el.style.transform = "scale(1)";
-        el.style.zIndex = "1";
-        if (popupRef.current) { popupRef.current.remove(); popupRef.current = null; }
-      });
-
-      el.addEventListener("click", () => {
-        navigate(`/imovel/${p.slug}`);
-      });
-
-      const marker = new mapboxgl.Marker({ element: el, anchor: "center" })
-        .setLngLat([p.longitude!, p.latitude!])
-        .addTo(map);
-
-      markersRef.current.set(p.id, { el, marker });
-    });
-
-    if (hasNewMarkers) {
-      mapReadyRef.current = false;
-      if (withCoords.length > 1) {
-        map.fitBounds(bounds, { padding: 60, maxZoom: 14, duration: 800 });
-      } else if (markersRef.current.size <= 1) {
-        map.flyTo({ center: [withCoords[0].longitude!, withCoords[0].latitude!], zoom: 14, duration: 800 });
+      if (hasNewMarkers) {
+        mapReadyRef.current = false;
+        if (withCoords.length > 1) {
+          map.fitBounds(bounds, { padding: 60, maxZoom: 14, duration: 800 });
+        } else if (markersRef.current.size <= 1) {
+          map.flyTo({ center: [withCoords[0].longitude!, withCoords[0].latitude!], zoom: 14, duration: 800 });
+        }
+        setTimeout(() => { mapReadyRef.current = true; }, 1200);
       }
-      setTimeout(() => { mapReadyRef.current = true; }, 1200);
+    };
+
+    // CRITICAL: wait for style to be fully loaded before adding markers
+    if (map.isStyleLoaded()) {
+      addMarkers();
+    } else {
+      map.once("load", addMarkers);
     }
   }, [imoveis, mapLoaded, navigate, onPinHover]);
 

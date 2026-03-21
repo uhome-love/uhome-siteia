@@ -1,19 +1,19 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { type Imovel, fotoPrincipal, formatPreco } from "@/services/imoveis";
 
 const MAPBOX_TOKEN = "pk.eyJ1IjoibHVjYXN1aG9tZSIsImEiOiJjbW16c2l2dmUwYmxsMnJwdDI2bGxrazBkIn0.B4dp727gJlQQIWTci7GpFQ";
 
 interface SearchMapProps {
   imoveis: Imovel[];
-  onMarkerClick?: (id: string) => void;
 }
 
-export function SearchMap({ imoveis, onMarkerClick }: SearchMapProps) {
+export function SearchMap({ imoveis }: SearchMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
-  const markersRef = useRef<any[]>([]);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [mapError, setMapError] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!mapContainer.current || mapRef.current) return;
@@ -29,7 +29,7 @@ export function SearchMap({ imoveis, onMarkerClick }: SearchMapProps) {
       link.href = "https://api.mapbox.com/mapbox-gl-js/v3.12.0/mapbox-gl.css";
       document.head.appendChild(link);
 
-      mapboxgl.default.accessToken = MAPBOX_TOKEN!;
+      mapboxgl.default.accessToken = MAPBOX_TOKEN;
 
       const map = new mapboxgl.default.Map({
         container: mapContainer.current!,
@@ -40,74 +40,163 @@ export function SearchMap({ imoveis, onMarkerClick }: SearchMapProps) {
       });
 
       map.addControl(new mapboxgl.default.NavigationControl({ showCompass: false }), "top-right");
-      map.on("load", () => { if (!cancelled) setMapLoaded(true); });
+
+      map.on("load", () => {
+        if (cancelled) return;
+        setMapLoaded(true);
+      });
 
       mapRef.current = { map, mapboxgl: mapboxgl.default };
     }).catch(() => { setMapError(true); });
 
-    return () => { cancelled = true; mapRef.current?.map?.remove(); mapRef.current = null; };
+    return () => {
+      cancelled = true;
+      mapRef.current?.map?.remove();
+      mapRef.current = null;
+    };
   }, []);
 
+  // Update source data when imoveis change
   useEffect(() => {
     if (!mapRef.current || !mapLoaded) return;
     const { map, mapboxgl } = mapRef.current;
 
-    markersRef.current.forEach((m: any) => m.remove());
-    markersRef.current = [];
-
     const withCoords = imoveis.filter((p) => p.latitude && p.longitude);
-    if (withCoords.length === 0) return;
 
-    const bounds = new mapboxgl.LngLatBounds();
+    const geojson: GeoJSON.FeatureCollection = {
+      type: "FeatureCollection",
+      features: withCoords.map((p) => ({
+        type: "Feature",
+        geometry: { type: "Point", coordinates: [p.longitude!, p.latitude!] },
+        properties: {
+          id: p.id,
+          slug: p.slug,
+          titulo: p.titulo,
+          bairro: p.bairro,
+          preco: p.preco,
+          precoLabel:
+            p.preco >= 1000000
+              ? `R$${(p.preco / 1000000).toFixed(1)}M`
+              : `R$${(p.preco / 1000).toFixed(0)}k`,
+          image: fotoPrincipal(p),
+          precoFormatted: formatPreco(p.preco),
+        },
+      })),
+    };
 
-    withCoords.forEach((p) => {
-      const priceLabel =
-        p.preco >= 1000000
-          ? `R$${(p.preco / 1000000).toFixed(1)}M`
-          : `R$${(p.preco / 1000).toFixed(0)}k`;
+    const source = map.getSource("imoveis");
+    if (source) {
+      source.setData(geojson);
+    } else {
+      map.addSource("imoveis", {
+        type: "geojson",
+        data: geojson,
+        cluster: true,
+        clusterMaxZoom: 13,
+        clusterRadius: 50,
+      });
 
-      const el = document.createElement("button");
-      el.className = "mapbox-price-pin";
-      el.innerHTML = `<div class="pin-body"><span>${priceLabel}</span></div><div class="pin-arrow"></div>`;
-      el.addEventListener("click", () => onMarkerClick?.(p.id));
+      // Cluster circles
+      map.addLayer({
+        id: "clusters",
+        type: "circle",
+        source: "imoveis",
+        filter: ["has", "point_count"],
+        paint: {
+          "circle-color": "hsl(235, 93%, 67%)",
+          "circle-radius": ["step", ["get", "point_count"], 22, 10, 28, 50, 36],
+          "circle-stroke-width": 3,
+          "circle-stroke-color": "hsl(235, 93%, 80%)",
+        },
+      });
 
-      const image = fotoPrincipal(p);
-      const formatted = formatPreco(p.preco);
+      // Cluster count text
+      map.addLayer({
+        id: "cluster-count",
+        type: "symbol",
+        source: "imoveis",
+        filter: ["has", "point_count"],
+        layout: {
+          "text-field": "{point_count_abbreviated}",
+          "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
+          "text-size": 13,
+        },
+        paint: { "text-color": "#ffffff" },
+      });
 
-      const marker = new mapboxgl.Marker({ element: el, anchor: "bottom" })
-        .setLngLat([p.longitude!, p.latitude!])
-        .setPopup(
-          new mapboxgl.Popup({ offset: 12, closeButton: false, maxWidth: "240px" }).setHTML(`
-            <div style="font-family:'Plus Jakarta Sans',sans-serif;">
-              <img src="${image}" alt="" style="width:100%;height:100px;object-fit:cover;border-radius:8px 8px 0 0;" />
+      // Individual points (unclustered)
+      map.addLayer({
+        id: "unclustered-point",
+        type: "circle",
+        source: "imoveis",
+        filter: ["!", ["has", "point_count"]],
+        paint: {
+          "circle-color": "hsl(235, 93%, 67%)",
+          "circle-radius": 8,
+          "circle-stroke-width": 2,
+          "circle-stroke-color": "#ffffff",
+        },
+      });
+
+      // Click on cluster → zoom in
+      map.on("click", "clusters", (e: any) => {
+        const features = map.queryRenderedFeatures(e.point, { layers: ["clusters"] });
+        const clusterId = features[0].properties.cluster_id;
+        map.getSource("imoveis").getClusterExpansionZoom(clusterId, (err: any, zoom: number) => {
+          if (err) return;
+          map.easeTo({ center: features[0].geometry.coordinates, zoom });
+        });
+      });
+
+      // Click on individual point → popup
+      map.on("click", "unclustered-point", (e: any) => {
+        const props = e.features[0].properties;
+        const coords = e.features[0].geometry.coordinates.slice();
+
+        const popup = new mapboxgl.Popup({ offset: 12, closeButton: false, maxWidth: "220px" })
+          .setLngLat(coords)
+          .setHTML(`
+            <div style="font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;" onclick="window.__navigateImovel('${props.slug}')">
+              <img src="${props.image}" alt="" style="width:100%;height:90px;object-fit:cover;border-radius:8px 8px 0 0;" />
               <div style="padding:8px 10px;">
-                <p style="font-size:11px;font-weight:700;color:#1a1a1a;margin:0;">${p.titulo}</p>
-                <p style="font-size:10px;color:#666;margin:4px 0 0;">${p.bairro}</p>
-                <p style="font-size:13px;font-weight:700;color:hsl(235,93%,67%);margin:6px 0 0;">${formatted}</p>
+                <p style="font-size:11px;font-weight:600;color:#333;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${props.titulo}</p>
+                <p style="font-size:10px;color:#888;margin:3px 0 0;">${props.bairro}</p>
+                <p style="font-size:14px;font-weight:700;color:hsl(235,93%,67%);margin:5px 0 0;">${props.precoFormatted}</p>
               </div>
             </div>
           `)
-        )
-        .addTo(map);
+          .addTo(map);
+      });
 
-      markersRef.current.push(marker);
-      bounds.extend([p.longitude!, p.latitude!]);
-    });
-
-    if (withCoords.length > 1) {
-      map.fitBounds(bounds, { padding: 60, maxZoom: 14, duration: 600 });
-    } else {
-      map.flyTo({ center: [withCoords[0].longitude!, withCoords[0].latitude!], zoom: 14, duration: 600 });
+      // Cursor pointers
+      map.on("mouseenter", "clusters", () => { map.getCanvas().style.cursor = "pointer"; });
+      map.on("mouseleave", "clusters", () => { map.getCanvas().style.cursor = ""; });
+      map.on("mouseenter", "unclustered-point", () => { map.getCanvas().style.cursor = "pointer"; });
+      map.on("mouseleave", "unclustered-point", () => { map.getCanvas().style.cursor = ""; });
     }
-  }, [imoveis, onMarkerClick, mapLoaded]);
+
+    // Fit bounds
+    if (withCoords.length > 0) {
+      const bounds = new mapboxgl.LngLatBounds();
+      withCoords.forEach((p) => bounds.extend([p.longitude!, p.latitude!]));
+      if (withCoords.length > 1) {
+        map.fitBounds(bounds, { padding: 60, maxZoom: 14, duration: 600 });
+      } else {
+        map.flyTo({ center: [withCoords[0].longitude!, withCoords[0].latitude!], zoom: 14, duration: 600 });
+      }
+    }
+  }, [imoveis, mapLoaded, navigate]);
+
+  // Expose navigation helper for popup clicks
+  useEffect(() => {
+    (window as any).__navigateImovel = (slug: string) => navigate(`/imovel/${slug}`);
+    return () => { delete (window as any).__navigateImovel; };
+  }, [navigate]);
 
   if (mapError) {
     return (
-      <div className="relative flex h-full w-full items-center justify-center rounded-xl bg-secondary/30">
-        <div className="glass rounded-2xl px-6 py-4 text-center">
-          <p className="font-body text-sm font-semibold text-foreground">Mapa Interativo</p>
-          <p className="mt-1 font-body text-xs text-muted-foreground">Configure VITE_MAPBOX_TOKEN para ativar</p>
-        </div>
+      <div className="flex h-full w-full items-center justify-center bg-secondary/30">
+        <p className="font-body text-sm text-muted-foreground">Mapa indisponível</p>
       </div>
     );
   }
@@ -115,15 +204,10 @@ export function SearchMap({ imoveis, onMarkerClick }: SearchMapProps) {
   return (
     <>
       <style>{`
-        .mapbox-price-pin { cursor:pointer;background:none;border:none;padding:0;transition:transform .15s ease-out; }
-        .mapbox-price-pin:hover { transform:scale(1.12);z-index:10!important; }
-        .mapbox-price-pin:active { transform:scale(0.96); }
-        .pin-body { background:hsl(235 93% 67%);color:#fff;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;padding:4px 8px;border-radius:999px;white-space:nowrap;box-shadow:0 4px 12px hsl(0 0% 0%/.4); }
-        .pin-arrow { width:0;height:0;margin:0 auto;border-left:5px solid transparent;border-right:5px solid transparent;border-top:5px solid hsl(235 93% 67%); }
-        .mapboxgl-popup-content { background:#fff!important;border:1px solid hsl(0 0% 90%)!important;border-radius:12px!important;padding:0!important;overflow:hidden;box-shadow:0 8px 32px hsl(0 0% 0%/.12)!important; }
+        .mapboxgl-popup-content { background:#fff!important;border:1px solid hsl(0 0% 90%)!important;border-radius:10px!important;padding:0!important;overflow:hidden;box-shadow:0 6px 24px hsl(0 0% 0%/.1)!important; }
         .mapboxgl-popup-tip { border-top-color:#fff!important; }
       `}</style>
-      <div ref={mapContainer} className="h-full w-full rounded-xl" />
+      <div ref={mapContainer} className="h-full w-full" />
     </>
   );
 }

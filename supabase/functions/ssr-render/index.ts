@@ -362,6 +362,11 @@ Deno.serve(async (req) => {
       rendered = await renderHome();
     } else if (path === "/faq") {
       rendered = await renderFaq();
+    } else if (path === "/blog") {
+      rendered = await renderBlog();
+    } else if (path.startsWith("/blog/")) {
+      const slug = path.replace("/blog/", "").replace(/\/$/, "");
+      rendered = renderBlogPost(slug);
     } else if (path.startsWith("/bairros/")) {
       const slug = path.replace("/bairros/", "").replace(/\/$/, "");
       rendered = await renderBairro(slug);

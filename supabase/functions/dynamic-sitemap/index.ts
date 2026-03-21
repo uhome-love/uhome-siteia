@@ -61,6 +61,12 @@ Deno.serve(async (req) => {
       entries.push(urlEntry(`${SITE}/bairros/${slug}`, today, "weekly", "0.7"));
     }
 
+    // Blog pages
+    entries.push(urlEntry(`${SITE}/blog`, today, "weekly", "0.7"));
+    for (const slug of BLOG_SLUGS) {
+      entries.push(urlEntry(`${SITE}/blog/${slug}`, today, "monthly", "0.6"));
+    }
+
     // All available properties
     let offset = 0;
     const PAGE_SIZE = 1000;

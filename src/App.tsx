@@ -23,6 +23,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/busca" element={<Search />} />
           <Route path="/imovel/:slug" element={<PropertyDetail />} />
+          <Route path="/ia-search" element={<AISearch />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <ExitIntentModal />

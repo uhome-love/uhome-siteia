@@ -46,7 +46,6 @@ export function Footer() {
               <li>
                 <a href="mailto:lucas@uhome.imb.br" className="transition-colors hover:text-foreground">lucas@uhome.imb.br</a>
               </li>
-              </li>
               <li>Porto Alegre, RS</li>
             </ul>
           </div>

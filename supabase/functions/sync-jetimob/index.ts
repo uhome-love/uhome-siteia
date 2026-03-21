@@ -37,6 +37,23 @@ function mapTipo(t?: string): string {
   return "apartamento";
 }
 
+function capitalize(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function gerarTitulo(j: any, tipo: string, bairro: string): string {
+  // Prefer Jetimob's own title if it's descriptive (not just a code)
+  const raw = j.titulo_anuncio || j.titulo || j.title || j.nome || "";
+  if (raw && raw.length > 20) return raw;
+
+  const quartos = j.dormitorios ?? j.quartos ?? j.bedrooms;
+  if (quartos && Number(quartos) > 0) {
+    const q = Number(quartos);
+    return `${capitalize(tipo)} com ${q} quarto${q > 1 ? "s" : ""} — ${bairro}`;
+  }
+  return `${capitalize(tipo)} em ${bairro}`;
+}
+
 function mapStatus(s?: string): string {
   if (!s) return "disponivel";
   const lower = s.toLowerCase();

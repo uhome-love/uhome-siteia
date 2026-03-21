@@ -267,7 +267,7 @@ const PropertyDetail = () => {
 
             {/* Features tags */}
             <div>
-              <h2 className="font-display text-xl font-bold text-foreground">Diferenciais</h2>
+              <h2 className="text-h3 text-foreground">Diferenciais</h2>
               <div className="mt-4 flex flex-wrap gap-2">
                 {property.features.map((f) => (
                   <span key={f} className="rounded-full border border-border px-3 py-1.5 font-body text-xs text-muted-foreground">

@@ -28,10 +28,10 @@ export function SearchPropertyCard({ imovel, index }: { imovel: Imovel; index: n
         onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = '0 8px 24px rgba(91,108,249,0.15)'; }}
         onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 8px rgba(91,108,249,0.08), 0 0 0 1px rgba(0,0,0,0.04)'; }}
       >
-        <div className="flex flex-col sm:flex-row">
+        <div className="flex flex-col">
           {/* Image */}
           <div
-            className="relative w-full cursor-pointer overflow-hidden sm:h-48 sm:w-56 sm:shrink-0"
+            className="relative w-full cursor-pointer overflow-hidden"
             style={{ aspectRatio: '4/3', borderRadius: '12px 12px 0 0' }}
             onClick={() => navigate(`/imovel/${imovel.slug}`)}
           >
@@ -41,7 +41,6 @@ export function SearchPropertyCard({ imovel, index }: { imovel: Imovel; index: n
               loading="lazy"
               className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
             />
-            {/* Badge tipo */}
             <span
               className="absolute left-2 top-2 font-body"
               style={{
@@ -55,7 +54,6 @@ export function SearchPropertyCard({ imovel, index }: { imovel: Imovel; index: n
             >
               {imovel.tipo}
             </span>
-            {/* Badge destaque */}
             {imovel.destaque && (
               <span
                 className="absolute left-2 top-8 font-body"
@@ -84,12 +82,12 @@ export function SearchPropertyCard({ imovel, index }: { imovel: Imovel; index: n
             <div>
               <p className="font-body text-[11px] text-muted-foreground">{imovel.bairro}</p>
               <h3
-                className="mt-0.5 cursor-pointer font-body text-sm font-semibold text-foreground line-clamp-1 hover:text-primary transition-colors"
+                className="mt-0.5 cursor-pointer font-body text-sm font-semibold text-foreground line-clamp-2 hover:text-primary transition-colors"
                 onClick={() => navigate(`/imovel/${imovel.slug}`)}
               >
                 {imovel.titulo}
               </h3>
-              <p className="mt-2 font-mono text-lg font-bold text-foreground">{priceFormatted}</p>
+              <p className="mt-2 font-mono text-lg font-bold text-foreground whitespace-nowrap">{priceFormatted}</p>
             </div>
 
             <div className="mt-3 flex items-center justify-between">

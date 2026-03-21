@@ -33,7 +33,7 @@ export function SearchMap({ imoveis, onMarkerClick }: SearchMapProps) {
 
       const map = new mapboxgl.default.Map({
         container: mapContainer.current!,
-        style: "mapbox://styles/mapbox/dark-v11",
+        style: "mapbox://styles/mapbox/streets-v12",
         center: [-51.18, -30.04],
         zoom: 12,
         attributionControl: false,
@@ -81,8 +81,8 @@ export function SearchMap({ imoveis, onMarkerClick }: SearchMapProps) {
             <div style="font-family:'Plus Jakarta Sans',sans-serif;">
               <img src="${image}" alt="" style="width:100%;height:100px;object-fit:cover;border-radius:8px 8px 0 0;" />
               <div style="padding:8px 10px;">
-                <p style="font-size:11px;font-weight:700;color:#fff;margin:0;">${p.titulo}</p>
-                <p style="font-size:10px;color:#999;margin:4px 0 0;">${p.bairro}</p>
+                <p style="font-size:11px;font-weight:700;color:#1a1a1a;margin:0;">${p.titulo}</p>
+                <p style="font-size:10px;color:#666;margin:4px 0 0;">${p.bairro}</p>
                 <p style="font-size:13px;font-weight:700;color:hsl(235,93%,67%);margin:6px 0 0;">${formatted}</p>
               </div>
             </div>
@@ -120,8 +120,8 @@ export function SearchMap({ imoveis, onMarkerClick }: SearchMapProps) {
         .mapbox-price-pin:active { transform:scale(0.96); }
         .pin-body { background:hsl(235 93% 67%);color:#fff;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;padding:4px 8px;border-radius:999px;white-space:nowrap;box-shadow:0 4px 12px hsl(0 0% 0%/.4); }
         .pin-arrow { width:0;height:0;margin:0 auto;border-left:5px solid transparent;border-right:5px solid transparent;border-top:5px solid hsl(235 93% 67%); }
-        .mapboxgl-popup-content { background:hsl(230 30% 12%)!important;border:1px solid hsl(230 20% 18%)!important;border-radius:12px!important;padding:0!important;overflow:hidden;box-shadow:0 8px 32px hsl(0 0% 0%/.5)!important; }
-        .mapboxgl-popup-tip { border-top-color:hsl(230 30% 12%)!important; }
+        .mapboxgl-popup-content { background:#fff!important;border:1px solid hsl(0 0% 90%)!important;border-radius:12px!important;padding:0!important;overflow:hidden;box-shadow:0 8px 32px hsl(0 0% 0%/.12)!important; }
+        .mapboxgl-popup-tip { border-top-color:#fff!important; }
       `}</style>
       <div ref={mapContainer} className="h-full w-full rounded-xl" />
     </>

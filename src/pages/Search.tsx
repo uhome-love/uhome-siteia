@@ -151,7 +151,7 @@ const Search = () => {
           {/* Split view */}
           <div className="flex flex-1 overflow-hidden">
             {/* Property list */}
-            <div className={`flex-1 overflow-y-auto p-4 space-y-3 ${showMap ? "md:w-1/2" : "w-full"}`}>
+            <div className={`flex-1 overflow-y-auto p-4 ${showMap ? "md:min-w-[560px]" : "w-full"}`}>
               {loading ? (
                 <div className="flex flex-col items-center justify-center py-20">
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -165,15 +165,17 @@ const Search = () => {
                   </p>
                 </div>
               ) : (
-                imoveis.map((imovel, i) => (
-                  <SearchPropertyCard key={imovel.id} imovel={imovel} index={i} />
-                ))
+                <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}>
+                  {imoveis.map((imovel, i) => (
+                    <SearchPropertyCard key={imovel.id} imovel={imovel} index={i} />
+                  ))}
+                </div>
               )}
             </div>
 
             {/* Map */}
             {showMap && (
-              <div className="hidden w-1/2 p-4 md:block">
+              <div className="hidden w-[320px] shrink-0 p-4 md:block">
                 <SearchMap imoveis={imoveis} />
               </div>
             )}

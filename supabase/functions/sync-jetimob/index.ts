@@ -124,7 +124,7 @@ function mapImovel(j: any) {
     banheiros: j.banheiros ? Number(j.banheiros) : null,
     vagas: j.garagens || j.vagas ? Number(j.garagens || j.vagas) : null,
     andar: j.andar ? Number(j.andar) : null,
-    bairro: j.endereco_bairro || j.bairro || j.endereco?.bairro || "Sem bairro",
+    bairro: j.endereco_bairro || j.bairro || j.neighborhood || j.bairro_nome || j.endereco?.bairro || j.localizacao?.bairro || "Porto Alegre",
     cidade: j.endereco_cidade || j.cidade || j.endereco?.cidade || "Porto Alegre",
     uf: j.endereco_estado || j.uf || j.estado || "RS",
     cep: j.endereco_cep || j.cep || null,

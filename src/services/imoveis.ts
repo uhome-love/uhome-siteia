@@ -59,6 +59,7 @@ export function fotoPrincipal(imovel: Imovel): string {
 
 /** Format price as BRL */
 export function formatPreco(preco: number): string {
+  if (!preco || preco <= 0) return "Consulte";
   return preco.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
 }
 

@@ -403,6 +403,17 @@ const PropertyDetail = () => {
               viewCount={viewCount}
             />
 
+            {/* Agendamento de visita */}
+            <div className="mt-4">
+              <AgendamentoVisita
+                imovelId={imovel.id}
+                imovelSlug={imovel.slug}
+                imovelTitulo={imovel.titulo}
+                imovelBairro={imovel.bairro}
+                imovelPreco={imovel.preco}
+              />
+            </div>
+
             {/* Secondary actions below sidebar */}
             <div className="mt-4 flex gap-3">
               <button

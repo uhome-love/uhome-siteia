@@ -56,7 +56,7 @@ export function Footer() {
           <p className="font-body text-xs text-muted-foreground">
             © {new Date().getFullYear()} Uhome Imóveis. Todos os direitos reservados.
           </p>
-          <p className="font-body text-xs text-muted-foreground">CRECI-RS</p>
+          <p className="font-body text-xs text-muted-foreground">CRECI-RS 25682J</p>
         </div>
       </div>
     </footer>

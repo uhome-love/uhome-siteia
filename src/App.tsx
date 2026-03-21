@@ -23,6 +23,15 @@ const BlogPostPage = lazy(() => import("./pages/BlogPost.tsx"));
 const Favoritos = lazy(() => import("./pages/Favoritos.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
+// Admin
+const AdminLayout = lazy(() => import("./pages/admin/AdminLayout.tsx"));
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard.tsx"));
+const AdminImoveis = lazy(() => import("./pages/admin/AdminImoveis.tsx"));
+const AdminLeads = lazy(() => import("./pages/admin/AdminLeads.tsx"));
+const AdminCaptacoes = lazy(() => import("./pages/admin/AdminCaptacoes.tsx"));
+const AdminSync = lazy(() => import("./pages/admin/AdminSync.tsx"));
+const AdminConfig = lazy(() => import("./pages/admin/AdminConfig.tsx"));
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -62,6 +71,14 @@ const App = () => (
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPostPage />} />
               <Route path="/favoritos" element={<Favoritos />} />
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<AdminDashboard />} />
+                <Route path="imoveis" element={<AdminImoveis />} />
+                <Route path="leads" element={<AdminLeads />} />
+                <Route path="captacoes" element={<AdminCaptacoes />} />
+                <Route path="sync" element={<AdminSync />} />
+                <Route path="config" element={<AdminConfig />} />
+              </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>

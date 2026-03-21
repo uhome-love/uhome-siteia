@@ -77,7 +77,7 @@ const Search = () => {
 
       <div className="flex pt-16" style={{ height: "100vh" }}>
         {/* Filters sidebar — desktop */}
-        <div className="hidden w-80 shrink-0 border-r border-border lg:block">
+        <div className="hidden w-[260px] shrink-0 border-r border-border lg:block">
           <SearchFiltersPanel isOpen={true} onClose={() => {}} />
         </div>
 

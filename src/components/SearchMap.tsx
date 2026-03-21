@@ -120,8 +120,8 @@ export function SearchMap({ imoveis, onMarkerClick }: SearchMapProps) {
         .mapbox-price-pin:active { transform:scale(0.96); }
         .pin-body { background:hsl(235 93% 67%);color:#fff;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;padding:4px 8px;border-radius:999px;white-space:nowrap;box-shadow:0 4px 12px hsl(0 0% 0%/.4); }
         .pin-arrow { width:0;height:0;margin:0 auto;border-left:5px solid transparent;border-right:5px solid transparent;border-top:5px solid hsl(235 93% 67%); }
-        .mapboxgl-popup-content { background:hsl(230 30% 12%)!important;border:1px solid hsl(230 20% 18%)!important;border-radius:12px!important;padding:0!important;overflow:hidden;box-shadow:0 8px 32px hsl(0 0% 0%/.5)!important; }
-        .mapboxgl-popup-tip { border-top-color:hsl(230 30% 12%)!important; }
+        .mapboxgl-popup-content { background:#fff!important;border:1px solid hsl(0 0% 90%)!important;border-radius:12px!important;padding:0!important;overflow:hidden;box-shadow:0 8px 32px hsl(0 0% 0%/.12)!important; }
+        .mapboxgl-popup-tip { border-top-color:#fff!important; }
       `}</style>
       <div ref={mapContainer} className="h-full w-full rounded-xl" />
     </>

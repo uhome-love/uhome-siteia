@@ -21,6 +21,7 @@ export function SearchMap({ imoveis, hoveredId, onPinHover }: SearchMapProps) {
   const mapRef = useRef<any>(null);
   const markersRef = useRef<Map<string, { el: HTMLElement; marker: any }>>(new Map());
   const popupRef = useRef<any>(null);
+  const mapReadyRef = useRef(false);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [mapError, setMapError] = useState(false);
   const navigate = useNavigate();
@@ -64,7 +65,12 @@ export function SearchMap({ imoveis, hoveredId, onPinHover }: SearchMapProps) {
         "top-right"
       );
 
-      map.on("load", () => { if (!cancelled) setMapLoaded(true); });
+      map.on("load", () => {
+        if (!cancelled) {
+          setMapLoaded(true);
+          setTimeout(() => { mapReadyRef.current = true; }, 500);
+        }
+      });
 
       mapRef.current = { map, mapboxgl: mapboxgl.default };
     }).catch(() => { setMapError(true); });

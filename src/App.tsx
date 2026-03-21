@@ -14,6 +14,8 @@ import Bairro from "./pages/Bairro.tsx";
 import Bairros from "./pages/Bairros.tsx";
 import FAQ from "./pages/FAQ.tsx";
 import Onboarding from "./pages/Onboarding.tsx";
+import Blog from "./pages/Blog.tsx";
+import BlogPostPage from "./pages/BlogPost.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -35,6 +37,8 @@ const App = () => (
           <Route path="/bairros/:slug" element={<Bairro />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/onboarding" element={<Onboarding />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogPostPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <ExitIntentModal />

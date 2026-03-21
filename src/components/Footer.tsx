@@ -31,6 +31,7 @@ export function Footer() {
               <li><Link to="/busca?modo=ia" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Busca IA</Link></li>
               <li><Link to="/faq" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Perguntas frequentes</Link></li>
               <li><Link to="/carreiras" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Trabalhe conosco</Link></li>
+              <li><Link to="/blog" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Blog</Link></li>
               <li><Link to="/" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Sobre nós</Link></li>
             </ul>
           </div>

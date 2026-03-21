@@ -20,6 +20,15 @@ const BAIRRO_SLUGS = [
   "menino-deus", "centro-historico", "jardim-botanico",
 ];
 
+const BLOG_SLUGS = [
+  "guia-compra-primeiro-imovel-porto-alegre",
+  "melhores-bairros-para-investir-2025",
+  "financiamento-imobiliario-tudo-que-voce-precisa-saber",
+  "checklist-vistoria-imovel-usado",
+  "morar-em-porto-alegre-vale-a-pena",
+  "documentos-necessarios-compra-imovel",
+];
+
 function urlEntry(loc: string, lastmod: string, changefreq: string, priority: string) {
   return `  <url>
     <loc>${loc}</loc>
@@ -50,6 +59,12 @@ Deno.serve(async (req) => {
     // Bairro pages
     for (const slug of BAIRRO_SLUGS) {
       entries.push(urlEntry(`${SITE}/bairros/${slug}`, today, "weekly", "0.7"));
+    }
+
+    // Blog pages
+    entries.push(urlEntry(`${SITE}/blog`, today, "weekly", "0.7"));
+    for (const slug of BLOG_SLUGS) {
+      entries.push(urlEntry(`${SITE}/blog/${slug}`, today, "monthly", "0.6"));
     }
 
     // All available properties

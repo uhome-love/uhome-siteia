@@ -57,7 +57,7 @@ export const bairrosData: BairroData[] = [
   {
     nome: "Menino Deus",
     slug: "menino-deus",
-    foto: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80",
+    foto: "/images/menino-deus.png",
     descricao:
       "Menino Deus encanta pela vista para o Guaíba e pela proximidade com o Parque Marinha do Brasil. Com excelente infraestrutura, ciclovias e acesso à Orla, é ideal para quem curte vida ao ar livre sem abrir mão da conveniência urbana.",
     lat: -30.05,

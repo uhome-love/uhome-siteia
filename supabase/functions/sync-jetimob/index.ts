@@ -228,31 +228,28 @@ serve(async (req) => {
 
     console.log(`🔄 Sync started | startPage=${startPage} maxPages=${maxPagesToProcess} key=${JETIMOB_KEY.length}`);
 
-    for (let page = 1; page <= MAX_PAGES; page++) {
+    const endPage = startPage + maxPagesToProcess - 1;
+
+    for (let page = startPage; page <= endPage; page++) {
       const url = `${JETIMOB_BASE}/${JETIMOB_KEY}/imoveis/todos?v=6&page=${page}&pageSize=${PAGE_SIZE}`;
 
       let response: Response | null = null;
       let retries = 0;
 
-      // Retry loop for this page
       while (retries < MAX_RETRIES) {
         try {
           console.log(`📄 Page ${page} (attempt ${retries + 1})...`);
           response = await fetch(url, { headers: { Accept: "application/json" } });
           if (response.ok) break;
-
           const text = await response.text();
           console.error(`❌ Page ${page} HTTP ${response.status}: ${text.slice(0, 200)}`);
-
-          // If first page fails, abort entirely
-          if (page === 1) throw new Error(`Jetimob API returned ${response.status}: ${text.slice(0, 200)}`);
-
+          if (page === startPage && retries === 0) throw new Error(`Jetimob API returned ${response.status}`);
           retries++;
           if (retries < MAX_RETRIES) await sleep(2000 * retries);
         } catch (fetchErr) {
           retries++;
           console.error(`❌ Page ${page} fetch error (attempt ${retries}):`, fetchErr);
-          if (page === 1 && retries >= MAX_RETRIES) throw fetchErr;
+          if (page === startPage && retries >= MAX_RETRIES) throw fetchErr;
           if (retries < MAX_RETRIES) await sleep(2000 * retries);
         }
       }
@@ -264,14 +261,13 @@ serve(async (req) => {
 
       const data = await response.json();
 
-      // Log structure on first page for debugging
-      if (page === 1) {
+      if (page === startPage) {
         const topKeys = Object.keys(data);
         console.log(`📊 Response structure: ${JSON.stringify(topKeys)}`);
         const total = extractTotal(data);
         if (total) {
           expectedTotal = total;
-          console.log(`📊 Expected total: ${expectedTotal}`);
+          console.log(`📊 Expected total: ${expectedTotal}, totalPages: ${data?.totalPages ?? '?'}`);
         }
       }
 
@@ -283,7 +279,6 @@ serve(async (req) => {
 
       totalFetched += items.length;
 
-      // Upsert in batches of 50
       for (let i = 0; i < items.length; i += 50) {
         const batch = items.slice(i, i + 50);
         const mapped = batch.map(mapImovel);
@@ -298,20 +293,14 @@ serve(async (req) => {
         }
       }
 
-      console.log(`✅ Page ${page}: ${items.length} items | Running: ${totalInserted} ok, ${totalErrors} err, ${totalFetched} fetched`);
+      lastPage = page;
+      console.log(`✅ Page ${page}: ${items.length} items | Running: ${totalInserted} ok, ${totalErrors} err`);
 
-      // Check if we should stop
       if (!hasNextPage(data, items.length, PAGE_SIZE, page)) {
-        console.log(`🏁 No next page indicator — stopping.`);
+        console.log(`🏁 No next page — stopping.`);
         break;
       }
 
-      if (expectedTotal && totalFetched >= expectedTotal) {
-        console.log(`🏁 Reached expected total ${expectedTotal} — stopping.`);
-        break;
-      }
-
-      // Rate limit between pages
       await sleep(RATE_LIMIT_MS);
     }
 
@@ -320,8 +309,10 @@ serve(async (req) => {
       erros: totalErrors,
       total: totalFetched,
       total_esperado: expectedTotal,
+      last_page: lastPage,
+      next_start_page: lastPage + 1,
     };
-    console.log(`✅ Sync complete:`, JSON.stringify(result));
+    console.log(`✅ Sync chunk complete:`, JSON.stringify(result));
 
     return new Response(JSON.stringify(result), {
       status: 200,

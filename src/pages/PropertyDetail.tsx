@@ -188,31 +188,84 @@ const PropertyDetail = () => {
         </div>
       </div>
 
-      {/* Fullscreen gallery */}
+      {/* Fullscreen lightbox */}
       {galleryOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95">
-          <button
+        <div
+          className="fixed inset-0 z-50 flex flex-col bg-black/95"
+          onClick={() => setGalleryOpen(false)}
+        >
+          {/* Header */}
+          <div className="flex shrink-0 items-center justify-between px-5 py-4 sm:px-8">
+            <div>
+              <p className="font-body text-sm font-semibold text-white/90 line-clamp-1">
+                {imovel.titulo}
+              </p>
+              <p className="font-body text-xs text-white/50">
+                {currentImage + 1} de {images.length} fotos
+              </p>
+            </div>
+            <button
+              onClick={(e) => { e.stopPropagation(); setGalleryOpen(false); }}
+              className="rounded-full bg-white/10 px-4 py-2 font-body text-sm font-medium text-white/80 backdrop-blur-sm transition-colors hover:bg-white/20 active:scale-95"
+            >
+              ✕ Fechar
+            </button>
+          </div>
+
+          {/* Main photo area */}
+          <div
+            className="relative flex flex-1 items-center justify-center overflow-hidden px-4 sm:px-16"
             onClick={() => setGalleryOpen(false)}
-            className="absolute right-6 top-6 rounded-full bg-white/10 px-4 py-2 font-body text-sm text-white hover:bg-white/20 active:scale-95"
           >
-            ✕ Fechar
-          </button>
-          <button onClick={prevImage} className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-3 active:scale-95">
-            <ChevronLeft className="h-6 w-6 text-white" />
-          </button>
-          <img src={images[currentImage]} alt={`Foto ${currentImage + 1}`} className="max-h-[85vh] max-w-[90vw] rounded-xl object-contain" />
-          <button onClick={nextImage} className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-3 active:scale-95">
-            <ChevronRight className="h-6 w-6 text-white" />
-          </button>
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5">
-            {images.map((_, i) => (
+            <img
+              key={currentImage}
+              src={images[currentImage]}
+              alt={`Foto ${currentImage + 1}`}
+              onClick={(e) => e.stopPropagation()}
+              className="max-h-full max-w-full object-contain select-none animate-lightbox-appear"
+            />
+
+            {/* Left arrow */}
+            {currentImage > 0 && (
+              <button
+                onClick={(e) => { e.stopPropagation(); prevImage(); }}
+                className="absolute left-3 top-1/2 flex h-[52px] w-[52px] -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-white/[0.12] text-2xl font-light text-white backdrop-blur-xl transition-colors hover:bg-white/25 active:scale-95 sm:left-6"
+              >
+                ‹
+              </button>
+            )}
+
+            {/* Right arrow */}
+            {currentImage < images.length - 1 && (
+              <button
+                onClick={(e) => { e.stopPropagation(); nextImage(); }}
+                className="absolute right-3 top-1/2 flex h-[52px] w-[52px] -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-white/[0.12] text-2xl font-light text-white backdrop-blur-xl transition-colors hover:bg-white/25 active:scale-95 sm:right-6"
+              >
+                ›
+              </button>
+            )}
+          </div>
+
+          {/* Thumbnails */}
+          <div
+            className="flex shrink-0 items-center justify-center gap-2 overflow-x-auto px-4 py-4 scrollbar-hide"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {images.map((img, i) => (
               <button
                 key={i}
                 onClick={() => setCurrentImage(i)}
-                className={`h-2 rounded-full transition-all ${
-                  i === currentImage ? "w-6 bg-white" : "w-2 bg-white/30 hover:bg-white/50"
-                }`}
-              />
+                className="shrink-0 overflow-hidden rounded-md transition-all duration-150"
+                style={{
+                  width: 64,
+                  height: 48,
+                  border: i === currentImage ? "2px solid hsl(var(--primary))" : "2px solid transparent",
+                  opacity: i === currentImage ? 1 : 0.45,
+                  transform: i === currentImage ? "scale(1.05)" : "scale(1)",
+                }}
+              >
+                <img src={img} alt={`Thumb ${i + 1}`} className="h-full w-full object-cover" />
+              </button>
             ))}
           </div>
         </div>

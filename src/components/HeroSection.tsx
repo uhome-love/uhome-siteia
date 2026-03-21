@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { bairrosData } from "@/data/bairros";
+import { CIDADES_PERMITIDAS } from "@/services/imoveis";
 
 const ease = [0.16, 1, 0.3, 1] as [number, number, number, number];
 
@@ -18,6 +19,7 @@ export function HeroSection() {
   const [bairroOpen, setBairroOpen] = useState(false);
   const bairroRef = useRef<HTMLDivElement>(null);
   const [tipo, setTipo] = useState("");
+  const [cidade, setCidade] = useState("Porto Alegre");
   const [preco, setPreco] = useState("");
   const [quartos, setQuartos] = useState("");
 
@@ -65,6 +67,7 @@ export function HeroSection() {
     if (tipo) params.set("tipo", tipo);
     if (preco) params.set("preco_max", preco);
     if (quartos) params.set("quartos", quartos);
+    if (cidade && cidade !== "Porto Alegre") params.set("cidade", cidade);
     navigate(`/busca?${params.toString()}`);
   };
 
@@ -236,7 +239,22 @@ export function HeroSection() {
                 </div>
 
                 {/* Tipo + Preço */}
-                <div className="mb-2 grid grid-cols-2 gap-2 sm:mb-2.5 sm:gap-2.5">
+                <div className="mb-2 grid grid-cols-3 gap-2 sm:mb-2.5 sm:gap-2.5">
+                  {/* Cidade */}
+                  <label className="block rounded-xl border-[1.5px] border-border p-3 transition-colors focus-within:border-primary sm:p-3.5">
+                    <span className="mb-0.5 block font-body text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                      Cidade
+                    </span>
+                    <select
+                      value={cidade}
+                      onChange={(e) => setCidade(e.target.value)}
+                      className="w-full appearance-none bg-transparent font-body text-sm text-foreground focus:outline-none"
+                    >
+                      {CIDADES_PERMITIDAS.map((c) => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
+                  </label>
                   <label className="block rounded-xl border-[1.5px] border-border p-3 transition-colors focus-within:border-primary sm:p-3.5">
                     <span className="mb-0.5 block font-body text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                       Tipo de imóvel

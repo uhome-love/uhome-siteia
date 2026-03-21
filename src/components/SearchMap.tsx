@@ -111,8 +111,8 @@ export function SearchMap({ imoveis = [], hoveredId, onPinHover, onBoundsSearch 
         type: "geojson",
         data: { type: "FeatureCollection", features: [] },
         cluster: true,
-        clusterMaxZoom: 13,
-        clusterRadius: 50,
+        clusterMaxZoom: 15,
+        clusterRadius: 60,
       });
 
       // Layer 1: cluster circles
@@ -161,11 +161,11 @@ export function SearchMap({ imoveis = [], hoveredId, onPinHover, onBoundsSearch 
           "icon-image": "pin-bg",
           "icon-text-fit": "both",
           "icon-text-fit-padding": [5, 10, 5, 10],
-          "icon-allow-overlap": false,
+          "icon-allow-overlap": true,
           "text-field": ["get", "preco_label"],
           "text-font": ["DIN Pro Bold", "Arial Unicode MS Bold"],
           "text-size": 12,
-          "text-allow-overlap": false,
+          "text-allow-overlap": true,
           "text-anchor": "center",
         },
         paint: {

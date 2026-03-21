@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ExitIntentModal } from "@/components/ExitIntentModal";
 import { FloatingCTA } from "@/components/FloatingCTA";
 import Index from "./pages/Index.tsx";
+import Search from "./pages/Search.tsx";
 import PropertyDetail from "./pages/PropertyDetail.tsx";
 import NotFound from "./pages/NotFound.tsx";
 

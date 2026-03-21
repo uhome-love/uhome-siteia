@@ -270,7 +270,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch }: 
     const source = map.getSource("imoveis") as mapboxgl.GeoJSONSource | undefined;
     if (!source) return;
 
-    source.setData(toGeoJSON(imoveis));
+    source.setData(toGeoJSON(pins));
 
     // Fit bounds
     const validos = imoveis.filter((i) => {

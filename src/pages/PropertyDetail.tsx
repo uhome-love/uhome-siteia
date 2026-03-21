@@ -207,7 +207,7 @@ const PropertyDetail = () => {
               <span className="inline-block rounded-full bg-primary/10 px-3 py-1 font-body text-xs font-medium text-primary">
                 {property.priceLabel}
               </span>
-              <h1 className="mt-3 font-display text-3xl font-bold leading-[1.1] text-foreground sm:text-4xl" style={{ textWrap: "balance" }}>
+              <h1 className="mt-3 text-h1 text-foreground" style={{ textWrap: "balance" }}>
                 {property.title}
               </h1>
               <p className="mt-2 flex items-center gap-1.5 font-body text-sm text-muted-foreground">

@@ -432,7 +432,7 @@ const Search = () => {
                     onHover={setHoveredId}
                   />
                   {i === 5 && (
-                    <SearchCTACard onClickCTA={() => setShowLeadCTA(true)} />
+                    <SearchCTACard onClickCTA={() => setShowAlertModal(true)} />
                   )}
                 </React.Fragment>
               ))}

@@ -72,7 +72,8 @@ export function HeroSection() {
         <div
           className="absolute inset-0"
           style={{
-            background: "linear-gradient(to right, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.0) 100%)",
+            background:
+              "linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.25) 40%, rgba(0,0,0,0.1) 100%), linear-gradient(to right, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.15) 60%, rgba(0,0,0,0.0) 100%)",
           }}
         />
       </div>
@@ -90,7 +91,7 @@ export function HeroSection() {
               Porto Alegre & Região
             </p>
             <h1
-              className="font-body text-[clamp(2rem,5vw,3.25rem)] font-extrabold leading-[1.08] tracking-tight text-white"
+              className="font-body text-[clamp(2rem,5vw,3.25rem)] font-extrabold leading-[1.08] tracking-tight text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.4)]"
               style={{ textWrap: "balance" }}
             >
               Encontre o imóvel{" "}

@@ -11,6 +11,7 @@ export interface SearchFilters {
   finalidade: "venda" | "";
   tipo: string;
   bairro: string;
+  cidade: string;
   precoMin: number;
   precoMax: number;
   areaMin: number;

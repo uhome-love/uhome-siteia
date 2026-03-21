@@ -1,12 +1,12 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { SearchFiltersPanel } from "@/components/SearchFiltersPanel";
 import { SearchPropertyCard } from "@/components/SearchPropertyCard";
 import { SearchMap } from "@/components/SearchMap";
 import { useSearchStore } from "@/stores/searchStore";
-import { mockProperties } from "@/data/properties";
-import { SlidersHorizontal, Map, List, ArrowUpDown } from "lucide-react";
+import { fetchImoveis, type Imovel } from "@/services/imoveis";
+import { SlidersHorizontal, Map, List, ArrowUpDown, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 
 const Search = () => {
@@ -15,6 +15,10 @@ const Search = () => {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [showMap, setShowMap] = useState(true);
   const [sortOpen, setSortOpen] = useState(false);
+
+  const [imoveis, setImoveis] = useState<Imovel[]>([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   // Sync URL params to store on mount
   useEffect(() => {
@@ -28,45 +32,37 @@ const Search = () => {
     if (Object.keys(f).length) setFilters(f as any);
   }, []);
 
-  // Filter properties
-  const filtered = useMemo(() => {
-    let result = [...mockProperties];
-
-    if (filters.finalidade) result = result.filter((p) => p.finalidade === filters.finalidade);
-    if (filters.tipo) result = result.filter((p) => p.tipo === filters.tipo);
-    if (filters.bairro) result = result.filter((p) => p.neighborhood === filters.bairro);
-    if (filters.precoMin) result = result.filter((p) => p.price >= filters.precoMin);
-    if (filters.precoMax) result = result.filter((p) => p.price <= filters.precoMax);
-    if (filters.areaMin) result = result.filter((p) => p.area >= filters.areaMin);
-    if (filters.areaMax) result = result.filter((p) => p.area <= filters.areaMax);
-    if (filters.quartos) result = result.filter((p) => p.bedrooms >= filters.quartos);
-    if (filters.banheiros) result = result.filter((p) => p.bathrooms >= filters.banheiros);
-    if (filters.vagas) result = result.filter((p) => p.parking >= filters.vagas);
-    if (filters.diferenciais.length > 0) {
-      result = result.filter((p) =>
-        filters.diferenciais.every((d) => p.features.includes(d))
-      );
+  const loadImoveis = useCallback(async () => {
+    setLoading(true);
+    try {
+      const result = await fetchImoveis({
+        finalidade: filters.finalidade || undefined,
+        tipo: filters.tipo || undefined,
+        bairro: filters.bairro || undefined,
+        precoMin: filters.precoMin || undefined,
+        precoMax: filters.precoMax || undefined,
+        areaMin: filters.areaMin || undefined,
+        areaMax: filters.areaMax || undefined,
+        quartos: filters.quartos || undefined,
+        banheiros: filters.banheiros || undefined,
+        vagas: filters.vagas || undefined,
+        diferenciais: filters.diferenciais.length ? filters.diferenciais : undefined,
+        ordem: filters.ordem as any,
+        q: filters.q || undefined,
+        limit: 40,
+      });
+      setImoveis(result.data);
+      setTotal(result.count);
+    } catch (err) {
+      console.error("Erro ao buscar imóveis:", err);
+    } finally {
+      setLoading(false);
     }
-    if (filters.q) {
-      const q = filters.q.toLowerCase();
-      result = result.filter(
-        (p) =>
-          p.title.toLowerCase().includes(q) ||
-          p.neighborhood.toLowerCase().includes(q) ||
-          p.tipo.toLowerCase().includes(q)
-      );
-    }
-
-    // Sort
-    switch (filters.ordem) {
-      case "preco_asc": result.sort((a, b) => a.price - b.price); break;
-      case "preco_desc": result.sort((a, b) => b.price - a.price); break;
-      case "area_desc": result.sort((a, b) => b.area - a.area); break;
-      default: break;
-    }
-
-    return result;
   }, [filters]);
+
+  useEffect(() => {
+    loadImoveis();
+  }, [loadImoveis]);
 
   const sortLabels: Record<string, string> = {
     recentes: "Mais recentes",
@@ -80,7 +76,7 @@ const Search = () => {
       <Navbar />
 
       <div className="flex pt-16" style={{ height: "100vh" }}>
-        {/* Filters sidebar — desktop always visible */}
+        {/* Filters sidebar — desktop */}
         <div className="hidden w-80 shrink-0 border-r border-border lg:block">
           <SearchFiltersPanel isOpen={true} onClose={() => {}} />
         </div>
@@ -101,7 +97,7 @@ const Search = () => {
                 Filtros
               </button>
               <p className="font-body text-sm text-muted-foreground">
-                <span className="font-semibold text-foreground">{filtered.length}</span> imóveis encontrados
+                <span className="font-semibold text-foreground">{total}</span> imóveis encontrados
               </p>
             </div>
 
@@ -156,7 +152,12 @@ const Search = () => {
           <div className="flex flex-1 overflow-hidden">
             {/* Property list */}
             <div className={`flex-1 overflow-y-auto p-4 space-y-3 ${showMap ? "md:w-1/2" : "w-full"}`}>
-              {filtered.length === 0 ? (
+              {loading ? (
+                <div className="flex flex-col items-center justify-center py-20">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <p className="mt-3 font-body text-sm text-muted-foreground">Carregando imóveis...</p>
+                </div>
+              ) : imoveis.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20">
                   <p className="font-display text-xl font-bold text-foreground">Nenhum imóvel encontrado</p>
                   <p className="mt-2 font-body text-sm text-muted-foreground">
@@ -164,8 +165,8 @@ const Search = () => {
                   </p>
                 </div>
               ) : (
-                filtered.map((p, i) => (
-                  <SearchPropertyCard key={p.id} property={p} index={i} />
+                imoveis.map((imovel, i) => (
+                  <SearchPropertyCard key={imovel.id} imovel={imovel} index={i} />
                 ))
               )}
             </div>
@@ -173,7 +174,7 @@ const Search = () => {
             {/* Map */}
             {showMap && (
               <div className="hidden w-1/2 p-4 md:block">
-                <SearchMap properties={filtered} />
+                <SearchMap imoveis={imoveis} />
               </div>
             )}
           </div>

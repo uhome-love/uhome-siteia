@@ -43,36 +43,75 @@ function mapRow(row: any): Imovel {
     ...row,
     fotos: parseFotos(row.fotos),
     diferenciais: row.diferenciais || [],
+    destaque: row.destaque ?? false,
+    cidade: row.cidade ?? "Porto Alegre",
+    uf: row.uf ?? "RS",
   };
 }
 
-export async function fetchImoveis(filters?: {
+/** Get primary photo URL or a placeholder */
+export function fotoPrincipal(imovel: Imovel): string {
+  const fotos = imovel.fotos;
+  if (fotos.length === 0) return "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&h=400&fit=crop";
+  const principal = fotos.find((f) => f.principal);
+  return (principal ?? fotos[0]).url;
+}
+
+/** Format price as BRL */
+export function formatPreco(preco: number): string {
+  return preco.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+}
+
+export interface BuscaFilters {
   finalidade?: string;
   tipo?: string;
   bairro?: string;
   precoMin?: number;
   precoMax?: number;
+  areaMin?: number;
+  areaMax?: number;
   quartos?: number;
+  banheiros?: number;
+  vagas?: number;
+  diferenciais?: string[];
   destaque?: boolean;
+  ordem?: "recentes" | "preco_asc" | "preco_desc" | "area_desc";
+  q?: string;
   limit?: number;
   offset?: number;
-}): Promise<{ data: Imovel[]; count: number }> {
+}
+
+export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: Imovel[]; count: number }> {
   let query = supabase
     .from("imoveis")
     .select("*", { count: "exact" });
 
-  if (filters?.finalidade) query = query.eq("finalidade", filters.finalidade);
-  if (filters?.tipo) query = query.eq("tipo", filters.tipo);
-  if (filters?.bairro) query = query.ilike("bairro", `%${filters.bairro}%`);
-  if (filters?.precoMin) query = query.gte("preco", filters.precoMin);
-  if (filters?.precoMax) query = query.lte("preco", filters.precoMax);
-  if (filters?.quartos) query = query.gte("quartos", filters.quartos);
-  if (filters?.destaque) query = query.eq("destaque", true);
+  if (filters.finalidade) query = query.eq("finalidade", filters.finalidade);
+  if (filters.tipo) query = query.eq("tipo", filters.tipo);
+  if (filters.bairro) query = query.ilike("bairro", `%${filters.bairro}%`);
+  if (filters.precoMin) query = query.gte("preco", filters.precoMin);
+  if (filters.precoMax) query = query.lte("preco", filters.precoMax);
+  if (filters.areaMin) query = query.gte("area_total", filters.areaMin);
+  if (filters.areaMax) query = query.lte("area_total", filters.areaMax);
+  if (filters.quartos) query = query.gte("quartos", filters.quartos);
+  if (filters.banheiros) query = query.gte("banheiros", filters.banheiros);
+  if (filters.vagas) query = query.gte("vagas", filters.vagas);
+  if (filters.destaque) query = query.eq("destaque", true);
+  if (filters.diferenciais?.length) query = query.contains("diferenciais", filters.diferenciais);
+  if (filters.q) query = query.or(`titulo.ilike.%${filters.q}%,bairro.ilike.%${filters.q}%,tipo.ilike.%${filters.q}%`);
 
-  query = query.order("publicado_em", { ascending: false });
+  const orderMap = {
+    recentes: { column: "publicado_em" as const, ascending: false },
+    preco_asc: { column: "preco" as const, ascending: true },
+    preco_desc: { column: "preco" as const, ascending: false },
+    area_desc: { column: "area_total" as const, ascending: false },
+  };
+  const ordem = orderMap[filters.ordem ?? "recentes"];
+  query = query.order(ordem.column, { ascending: ordem.ascending });
 
-  if (filters?.limit) query = query.limit(filters.limit);
-  if (filters?.offset) query = query.range(filters.offset, filters.offset + (filters?.limit || 20) - 1);
+  const limit = filters.limit ?? 20;
+  const offset = filters.offset ?? 0;
+  query = query.range(offset, offset + limit - 1);
 
   const { data, error, count } = await query;
   if (error) throw error;
@@ -104,7 +143,19 @@ export async function fetchImoveisDestaque(limit = 6): Promise<Imovel[]> {
     .limit(limit);
 
   if (error) throw error;
-  return (data || []).map(mapRow);
+  const result = (data || []).map(mapRow);
+
+  // If no featured, return latest
+  if (result.length === 0) {
+    const { data: fallback } = await supabase
+      .from("imoveis")
+      .select("*")
+      .order("publicado_em", { ascending: false })
+      .limit(limit);
+    return (fallback || []).map(mapRow);
+  }
+
+  return result;
 }
 
 export async function syncFromJetimob(): Promise<{

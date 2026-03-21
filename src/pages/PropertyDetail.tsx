@@ -87,7 +87,7 @@ const PropertyDetail = () => {
       {/* Gallery */}
       <div className="relative mt-16">
         <div className="container-uhome py-4">
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-4 sm:grid-rows-2 sm:h-[480px]">
+          <div className="hidden gap-2 sm:grid sm:grid-cols-4 sm:grid-rows-2 sm:h-[480px]">
             <button
               onClick={() => { setCurrentImage(0); setGalleryOpen(true); }}
               className="relative col-span-1 overflow-hidden rounded-l-2xl sm:col-span-2 sm:row-span-2 group"

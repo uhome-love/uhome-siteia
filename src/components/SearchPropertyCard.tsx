@@ -4,85 +4,132 @@ import { Heart } from "lucide-react";
 import { motion } from "framer-motion";
 import { type Imovel, fotoPrincipal, formatPreco } from "@/services/imoveis";
 
-export function SearchPropertyCard({ imovel, index }: { imovel: Imovel; index: number }) {
+interface Props {
+  imovel: Imovel;
+  index: number;
+  highlighted?: boolean;
+  onHover?: (id: string | null) => void;
+}
+
+export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Props) {
   const [liked, setLiked] = useState(false);
+  const [hovering, setHovering] = useState(false);
+  const [fotoAtiva, setFotoAtiva] = useState(0);
   const navigate = useNavigate();
 
-  const image = fotoPrincipal(imovel);
+  const fotos = imovel.fotos.length > 0 ? imovel.fotos.map((f) => f.url) : [fotoPrincipal(imovel)];
   const price = formatPreco(imovel.preco);
   const area = imovel.area_total ?? imovel.area_util ?? 0;
 
   const stats = [
     area > 0 ? `${area}m²` : null,
-    (imovel.quartos ?? 0) > 0 ? `${imovel.quartos} quarto${imovel.quartos! > 1 ? "s" : ""}` : null,
+    (imovel.quartos ?? 0) > 0 ? `${imovel.quartos} quartos` : null,
     (imovel.vagas ?? 0) > 0 ? `${imovel.vagas} vaga${imovel.vagas! > 1 ? "s" : ""}` : null,
-  ].filter(Boolean);
+  ].filter(Boolean).join(" · ");
+
+  const handleMouseEnter = () => { setHovering(true); onHover?.(imovel.id); };
+  const handleMouseLeave = () => { setHovering(false); onHover?.(null); };
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: Math.min(index * 0.03, 0.2) }}
-      className="group cursor-pointer overflow-hidden rounded-xl bg-card transition-all duration-200 hover:-translate-y-0.5"
-      style={{
-        boxShadow: "0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.03)",
-      }}
-      onMouseEnter={(e) => {
-        (e.currentTarget as HTMLDivElement).style.boxShadow =
-          "0 6px 20px rgba(0,0,0,0.1)";
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLDivElement).style.boxShadow =
-          "0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.03)";
-      }}
+      transition={{ duration: 0.3, delay: Math.min(index * 0.03, 0.15) }}
+      className="cursor-pointer"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       onClick={() => navigate(`/imovel/${imovel.slug}`)}
     >
-      {/* Photo */}
-      <div className="relative overflow-hidden" style={{ aspectRatio: "4/3" }}>
+      {/* Photo — square */}
+      <div
+        className="relative overflow-hidden rounded-xl"
+        style={{ aspectRatio: "1/1" }}
+      >
         <img
-          src={image}
+          src={fotos[fotoAtiva]}
           alt={imovel.titulo}
           loading="lazy"
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className="h-full w-full object-cover transition-transform duration-500"
+          style={{ transform: hovering ? "scale(1.03)" : "scale(1)" }}
         />
-        {/* Badge */}
-        {imovel.destaque && (
-          <span className="absolute left-2 top-2 rounded bg-card px-2 py-0.5 font-body text-[11px] font-semibold text-foreground shadow-sm">
-            Destaque
-          </span>
+
+        {/* Nav arrows on hover */}
+        {hovering && fotos.length > 1 && (
+          <>
+            {fotoAtiva > 0 && (
+              <button
+                onClick={(e) => { e.stopPropagation(); setFotoAtiva((i) => i - 1); }}
+                className="absolute left-2 top-1/2 z-10 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-sm shadow transition-transform hover:scale-105 active:scale-95"
+              >
+                ‹
+              </button>
+            )}
+            {fotoAtiva < fotos.length - 1 && (
+              <button
+                onClick={(e) => { e.stopPropagation(); setFotoAtiva((i) => i + 1); }}
+                className="absolute right-2 top-1/2 z-10 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-sm shadow transition-transform hover:scale-105 active:scale-95"
+              >
+                ›
+              </button>
+            )}
+          </>
         )}
-        <span className="absolute left-2 top-2 rounded bg-card/90 px-2 py-0.5 font-body text-[11px] font-semibold text-foreground shadow-sm" style={{ top: imovel.destaque ? 32 : 8 }}>
-          {imovel.tipo}
-        </span>
+
         {/* Heart */}
         <button
-          onClick={(e) => {
-            e.stopPropagation();
-            setLiked(!liked);
-          }}
-          className="absolute right-2 top-2 rounded-full bg-black/25 p-1.5 backdrop-blur-sm transition-colors hover:bg-black/40 active:scale-95"
+          onClick={(e) => { e.stopPropagation(); setLiked(!liked); }}
+          className="absolute right-3 top-3 z-10"
         >
           <Heart
-            className={`h-4 w-4 ${liked ? "fill-red-500 text-red-500" : "text-white"}`}
+            className="h-6 w-6 drop-shadow-md transition-colors"
+            fill={liked ? "#ff385c" : "rgba(255,255,255,0.85)"}
+            stroke={liked ? "#ff385c" : "rgba(0,0,0,0.3)"}
+            strokeWidth={1.5}
           />
         </button>
+
+        {/* Dots */}
+        {hovering && fotos.length > 1 && (
+          <div className="absolute bottom-2 left-1/2 z-10 flex -translate-x-1/2 gap-[3px]">
+            {fotos.slice(0, 5).map((_, i) => (
+              <div
+                key={i}
+                className="rounded-full"
+                style={{
+                  width: 5, height: 5,
+                  background: i === fotoAtiva ? "white" : "rgba(255,255,255,0.5)",
+                }}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Content */}
-      <div className="p-3">
-        <p className="truncate font-body text-[13px] text-muted-foreground">
-          {imovel.titulo}
-        </p>
-        <p className="mt-1 font-mono text-lg font-bold text-foreground">{price}</p>
-        {stats.length > 0 && (
-          <p className="mt-1 font-body text-[13px] text-muted-foreground">
-            {stats.join(" · ")}
-          </p>
+      {/* Text — no box */}
+      <div className="px-0.5 pt-2.5">
+        {/* Line 1: type · neighborhood */}
+        <div className="flex items-center justify-between gap-2">
+          <span className="truncate font-body text-sm font-semibold text-foreground">
+            {imovel.tipo} · {imovel.bairro}
+          </span>
+          {imovel.destaque && (
+            <span className="shrink-0 font-body text-xs text-foreground">★ Destaque</span>
+          )}
+        </div>
+
+        {/* Line 2: stats */}
+        {stats && (
+          <p className="mt-0.5 truncate font-body text-[13px] text-muted-foreground">{stats}</p>
         )}
-        <p className="mt-1 truncate font-body text-xs text-muted-foreground/70">
-          {imovel.bairro} · {imovel.cidade}
-        </p>
+
+        {/* Line 3: price */}
+        <p className="mt-1 font-body text-sm font-bold text-foreground">{price}</p>
       </div>
+
+      {/* Highlighted border from map hover */}
+      {highlighted && (
+        <div className="pointer-events-none absolute inset-0 rounded-xl ring-2 ring-primary" />
+      )}
     </motion.div>
   );
 }

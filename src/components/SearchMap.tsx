@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { type Imovel, fotoPrincipal, formatPreco } from "@/services/imoveis";
 
@@ -12,17 +12,19 @@ function formatPinPreco(preco: number): string {
 
 interface SearchMapProps {
   imoveis: Imovel[];
+  hoveredId?: string | null;
+  onPinHover?: (id: string | null) => void;
 }
 
-export function SearchMap({ imoveis }: SearchMapProps) {
+export function SearchMap({ imoveis, hoveredId, onPinHover }: SearchMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
+  const markersRef = useRef<Map<string, { el: HTMLElement; marker: any }>>(new Map());
   const popupRef = useRef<any>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [mapError, setMapError] = useState(false);
   const navigate = useNavigate();
 
-  // Expose navigation helper for popup clicks
   useEffect(() => {
     (window as any).__navigateImovel = (slug: string) => navigate(`/imovel/${slug}`);
     return () => { delete (window as any).__navigateImovel; };
@@ -50,13 +52,9 @@ export function SearchMap({ imoveis }: SearchMapProps) {
         center: [-51.18, -30.04],
         zoom: 12,
         attributionControl: false,
-        locale: { "NavigationControl.ZoomIn": "+", "NavigationControl.ZoomOut": "−" },
       });
 
-      map.addControl(
-        new mapboxgl.default.NavigationControl({ showCompass: false }),
-        "top-right"
-      );
+      map.addControl(new mapboxgl.default.NavigationControl({ showCompass: false }), "top-right");
       map.addControl(
         new mapboxgl.default.GeolocateControl({
           positionOptions: { enableHighAccuracy: true },
@@ -66,10 +64,7 @@ export function SearchMap({ imoveis }: SearchMapProps) {
         "top-right"
       );
 
-      map.on("load", () => {
-        if (cancelled) return;
-        setMapLoaded(true);
-      });
+      map.on("load", () => { if (!cancelled) setMapLoaded(true); });
 
       mapRef.current = { map, mapboxgl: mapboxgl.default };
     }).catch(() => { setMapError(true); });
@@ -81,175 +76,93 @@ export function SearchMap({ imoveis }: SearchMapProps) {
     };
   }, []);
 
-  // Update data
+  // Create / update markers
   useEffect(() => {
     if (!mapRef.current || !mapLoaded) return;
     const { map, mapboxgl } = mapRef.current;
 
+    // Remove old markers
+    markersRef.current.forEach(({ marker }) => marker.remove());
+    markersRef.current.clear();
+
     const withCoords = imoveis.filter((p) => p.latitude && p.longitude);
+    if (withCoords.length === 0) return;
 
-    const geojson: GeoJSON.FeatureCollection = {
-      type: "FeatureCollection",
-      features: withCoords.map((p) => ({
-        type: "Feature",
-        geometry: { type: "Point", coordinates: [p.longitude!, p.latitude!] },
-        properties: {
-          id: p.id,
-          slug: p.slug,
-          titulo: p.titulo,
-          bairro: p.bairro,
-          preco: p.preco,
-          preco_label: formatPinPreco(p.preco),
-          preco_formatted: formatPreco(p.preco),
-          foto_url: fotoPrincipal(p),
-          quartos: p.quartos ?? 0,
-          area: p.area_total ?? p.area_util ?? 0,
-        },
-      })),
-    };
+    const bounds = new mapboxgl.LngLatBounds();
 
-    const source = map.getSource("imoveis");
-    if (source) {
-      source.setData(geojson);
-    } else {
-      map.addSource("imoveis", {
-        type: "geojson",
-        data: geojson,
-        cluster: true,
-        clusterMaxZoom: 14,
-        clusterRadius: 40,
-      });
+    withCoords.forEach((p) => {
+      const priceLabel = formatPinPreco(p.preco);
 
-      // Cluster circles
-      map.addLayer({
-        id: "clusters",
-        type: "circle",
-        source: "imoveis",
-        filter: ["has", "point_count"],
-        paint: {
-          "circle-color": "hsl(235, 93%, 67%)",
-          "circle-radius": ["step", ["get", "point_count"], 22, 10, 28, 50, 36, 200, 44],
-          "circle-opacity": 0.92,
-          "circle-stroke-width": 2.5,
-          "circle-stroke-color": "#ffffff",
-        },
-      });
+      const el = document.createElement("div");
+      el.className = "uhome-pin";
+      el.textContent = priceLabel;
+      el.dataset.imovelId = p.id;
 
-      // Cluster count
-      map.addLayer({
-        id: "cluster-count",
-        type: "symbol",
-        source: "imoveis",
-        filter: ["has", "point_count"],
-        layout: {
-          "text-field": "{point_count_abbreviated}",
-          "text-font": ["DIN Pro Medium", "Arial Unicode MS Bold"],
-          "text-size": 13,
-          "text-allow-overlap": true,
-        },
-        paint: { "text-color": "#ffffff" },
-      });
-
-      // Individual price pins
-      map.addLayer({
-        id: "imovel-pin-bg",
-        type: "circle",
-        source: "imoveis",
-        filter: ["!", ["has", "point_count"]],
-        paint: {
-          "circle-color": "hsl(235, 93%, 67%)",
-          "circle-radius": 18,
-          "circle-stroke-width": 2,
-          "circle-stroke-color": "#ffffff",
-        },
-      });
-
-      map.addLayer({
-        id: "imovel-pin-label",
-        type: "symbol",
-        source: "imoveis",
-        filter: ["!", ["has", "point_count"]],
-        layout: {
-          "text-field": ["get", "preco_label"],
-          "text-font": ["DIN Pro Bold", "Arial Unicode MS Bold"],
-          "text-size": 10,
-          "text-allow-overlap": false,
-          "icon-allow-overlap": true,
-        },
-        paint: { "text-color": "#ffffff" },
-      });
-
-      // Click cluster → zoom
-      map.on("click", "clusters", (e: any) => {
-        const features = map.queryRenderedFeatures(e.point, { layers: ["clusters"] });
-        const clusterId = features[0].properties.cluster_id;
-        map.getSource("imoveis").getClusterExpansionZoom(clusterId, (err: any, zoom: number) => {
-          if (err) return;
-          map.easeTo({ center: features[0].geometry.coordinates, zoom });
-        });
-      });
-
-      // Click individual pin → navigate
-      map.on("click", "imovel-pin-bg", (e: any) => {
-        const slug = e.features[0].properties.slug;
-        if (slug) navigate(`/imovel/${slug}`);
-      });
-
-      // Hover individual pin → popup
-      map.on("mouseenter", "imovel-pin-bg", (e: any) => {
-        map.getCanvas().style.cursor = "pointer";
-        const props = e.features[0].properties;
-        const coords = e.features[0].geometry.coordinates.slice();
-
+      // Hover on pin
+      el.addEventListener("mouseenter", () => {
+        onPinHover?.(p.id);
         if (popupRef.current) popupRef.current.remove();
 
+        const image = fotoPrincipal(p);
+        const formatted = formatPreco(p.preco);
+        const area = p.area_total ?? p.area_util ?? 0;
         const statsLine = [
-          props.area > 0 ? `${props.area}m²` : null,
-          props.quartos > 0 ? `${props.quartos} quartos` : null,
+          area > 0 ? `${area}m²` : null,
+          (p.quartos ?? 0) > 0 ? `${p.quartos} quartos` : null,
         ].filter(Boolean).join(" · ");
 
         popupRef.current = new mapboxgl.Popup({
           closeButton: false,
           closeOnClick: false,
-          offset: 20,
+          offset: 16,
           className: "uhome-popup",
         })
-          .setLngLat(coords)
+          .setLngLat([p.longitude!, p.latitude!])
           .setHTML(`
-            <div style="width:220px;cursor:pointer;" onclick="window.__navigateImovel('${props.slug}')">
-              <img src="${props.foto_url}" alt="" style="width:100%;height:110px;object-fit:cover;" />
+            <div style="width:220px;cursor:pointer;font-family:'Plus Jakarta Sans',system-ui,sans-serif;" onclick="window.__navigateImovel('${p.slug}')">
+              <img src="${image}" alt="" style="width:100%;height:110px;object-fit:cover;" />
               <div style="padding:10px 12px;">
-                <p style="font-size:11px;color:#888;margin:0 0 2px;">${props.bairro}</p>
-                <p style="font-size:13px;font-weight:600;margin:0 0 4px;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${props.titulo}</p>
-                <p style="font-size:15px;font-weight:700;color:hsl(235,93%,67%);margin:0;">${props.preco_formatted}</p>
-                ${statsLine ? `<p style="font-size:11px;color:#666;margin:4px 0 0;">${statsLine}</p>` : ""}
+                <p style="font-size:11px;color:#888;margin:0 0 2px;">${p.bairro}</p>
+                <p style="font-size:13px;font-weight:600;margin:0 0 4px;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.titulo}</p>
+                <p style="font-size:15px;font-weight:700;color:#222;margin:0;">${formatted}</p>
+                ${statsLine ? `<p style="font-size:11px;color:#717171;margin:4px 0 0;">${statsLine}</p>` : ""}
               </div>
             </div>
           `)
           .addTo(map);
       });
 
-      map.on("mouseleave", "imovel-pin-bg", () => {
-        map.getCanvas().style.cursor = "";
+      el.addEventListener("mouseleave", () => {
+        onPinHover?.(null);
         if (popupRef.current) { popupRef.current.remove(); popupRef.current = null; }
       });
 
-      // Cluster cursors
-      map.on("mouseenter", "clusters", () => { map.getCanvas().style.cursor = "pointer"; });
-      map.on("mouseleave", "clusters", () => { map.getCanvas().style.cursor = ""; });
-    }
+      el.addEventListener("click", () => {
+        navigate(`/imovel/${p.slug}`);
+      });
 
-    // Fit bounds
-    if (withCoords.length > 0) {
-      const bounds = new mapboxgl.LngLatBounds();
-      withCoords.forEach((p) => bounds.extend([p.longitude!, p.latitude!]));
-      if (withCoords.length > 1) {
-        map.fitBounds(bounds, { padding: { top: 60, bottom: 60, left: 60, right: 60 }, maxZoom: 14, duration: 800 });
-      } else {
-        map.flyTo({ center: [withCoords[0].longitude!, withCoords[0].latitude!], zoom: 14, duration: 800 });
-      }
+      const marker = new mapboxgl.Marker({ element: el, anchor: "center" })
+        .setLngLat([p.longitude!, p.latitude!])
+        .addTo(map);
+
+      markersRef.current.set(p.id, { el, marker });
+      bounds.extend([p.longitude!, p.latitude!]);
+    });
+
+    if (withCoords.length > 1) {
+      map.fitBounds(bounds, { padding: { top: 60, bottom: 60, left: 60, right: 60 }, maxZoom: 14, duration: 800 });
+    } else {
+      map.flyTo({ center: [withCoords[0].longitude!, withCoords[0].latitude!], zoom: 14, duration: 800 });
     }
-  }, [imoveis, mapLoaded, navigate]);
+  }, [imoveis, mapLoaded, navigate, onPinHover]);
+
+  // Sync hover highlight from card → pin
+  useEffect(() => {
+    markersRef.current.forEach(({ el }, id) => {
+      const selected = id === hoveredId;
+      el.classList.toggle("uhome-pin--active", selected);
+    });
+  }, [hoveredId]);
 
   if (mapError) {
     return (
@@ -262,6 +175,30 @@ export function SearchMap({ imoveis }: SearchMapProps) {
   return (
     <>
       <style>{`
+        .uhome-pin {
+          background: white;
+          color: #222;
+          border: 1.5px solid rgba(0,0,0,0.12);
+          border-radius: 20px;
+          padding: 5px 10px;
+          font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+          font-size: 12px;
+          font-weight: 700;
+          cursor: pointer;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+          transition: all 0.15s ease-out;
+          white-space: nowrap;
+          user-select: none;
+        }
+        .uhome-pin:hover,
+        .uhome-pin--active {
+          background: #222;
+          color: white;
+          border-color: #222;
+          transform: scale(1.08);
+          z-index: 10 !important;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        }
         .uhome-popup .mapboxgl-popup-content {
           padding: 0 !important;
           border-radius: 12px !important;

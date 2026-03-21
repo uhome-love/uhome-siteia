@@ -178,7 +178,7 @@ export async function fetchMapPins(filters: BuscaFilters = {}): Promise<MapPin[]
   let query = supabase
     .from("imoveis")
     .select("id,slug,preco,latitude,longitude,bairro,titulo,tipo,quartos,finalidade")
-    .eq("cidade", "Porto Alegre");
+    .in("cidade", CIDADES_PERMITIDAS);
 
   if (filters.finalidade) query = query.eq("finalidade", filters.finalidade);
   if (filters.tipo) query = query.eq("tipo", filters.tipo);

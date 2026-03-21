@@ -5,7 +5,7 @@ import { SearchFiltersBar } from "@/components/SearchFiltersBar";
 import { SearchPropertyCard } from "@/components/SearchPropertyCard";
 import { SearchMap } from "@/components/SearchMap";
 import { useSearchStore, type MapBounds } from "@/stores/searchStore";
-import { fetchImoveis, type Imovel } from "@/services/imoveis";
+import { fetchImoveis, fetchMapPins, type Imovel, type MapPin } from "@/services/imoveis";
 import { interpretarBusca, type AISearchResult } from "@/services/aiSearch";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowUpDown, Bell, Loader2, Map as MapIcon, MapPin, Sparkles, X } from "lucide-react";

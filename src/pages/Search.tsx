@@ -325,7 +325,7 @@ const Search = () => {
         <div className="flex items-center gap-2">
           <div>
             <div className="font-body text-lg font-extrabold leading-tight text-foreground sm:text-[22px]">
-              {total.toLocaleString("pt-BR")} imóveis
+              <AnimatedCount value={total} /> imóveis
             </div>
             <div className="mt-0.5 font-body text-xs text-muted-foreground sm:text-sm">
               à venda em Porto Alegre{filters.bairro ? `, ${filters.bairro}` : ""}

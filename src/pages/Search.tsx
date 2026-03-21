@@ -73,12 +73,12 @@ const Search = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      {/* Single instance of filters — handles both mobile overlay & desktop static */}
-      <SearchFiltersPanel isOpen={filtersOpen} onClose={() => setFiltersOpen(false)} />
-
       <div className="flex pt-16" style={{ height: "100vh" }}>
-        {/* Main content */}
-        <div className="flex flex-1 flex-col overflow-hidden">
+        {/* Sidebar filters — static on lg, slide-in overlay on mobile */}
+        <SearchFiltersPanel isOpen={filtersOpen} onClose={() => setFiltersOpen(false)} />
+
+        {/* Main content (toolbar + cards + map) */}
+        <div className="flex flex-1 flex-col overflow-hidden" style={{ minWidth: 0 }}>
           {/* Toolbar */}
           <div className="flex items-center justify-between border-b border-border px-4 py-3">
             <div className="flex items-center gap-3">
@@ -129,9 +129,9 @@ const Search = () => {
             </div>
           </div>
 
-          {/* Cards + Map split */}
+          {/* Cards + Map */}
           <div className="flex flex-1 overflow-hidden">
-            {/* Cards list */}
+            {/* Cards */}
             <div className="flex-1 overflow-y-auto p-5" style={{ minWidth: 0 }}>
               {loading ? (
                 <div className="flex flex-col items-center justify-center py-20">
@@ -154,8 +154,8 @@ const Search = () => {
               )}
             </div>
 
-            {/* Map — hidden below 1100px */}
-            <div className="hidden min-[1100px]:block w-[420px] shrink-0">
+            {/* Map — visible ≥1100px */}
+            <div className="hidden min-[1100px]:block w-[420px] shrink-0 h-full">
               <SearchMap imoveis={imoveis} />
             </div>
           </div>

@@ -12,7 +12,7 @@ export const bairrosData: BairroData[] = [
   {
     nome: "Moinhos de Vento",
     slug: "moinhos-de-vento",
-    foto: "/images/moinhos-de-vento.png",
+    foto: "/images/moinhos-de-vento.png?v=2",
     descricao:
       "Moinhos de Vento é o bairro mais nobre de Porto Alegre. Com ruas arborizadas, gastronomia sofisticada na Rua Padre Chagas e o icônico Parcão, reúne edifícios de alto padrão, boutiques e vida noturna refinada. Um endereço de prestígio para quem valoriza conveniência e qualidade de vida.",
     lat: -30.025,
@@ -21,7 +21,7 @@ export const bairrosData: BairroData[] = [
   {
     nome: "Petrópolis",
     slug: "petropolis",
-    foto: "/images/petropolis.png",
+    foto: "/images/petropolis.png?v=2",
     descricao:
       "Petrópolis é um bairro residencial de alto padrão, próximo ao Parque Germânia e ao Colégio Rosário. Combina tranquilidade com acesso fácil ao comércio da Avenida Protásio Alves e às principais vias da cidade. Ideal para famílias que buscam segurança e espaço.",
     lat: -30.04,

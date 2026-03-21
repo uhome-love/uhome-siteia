@@ -65,7 +65,12 @@ export function SearchMap({ imoveis, hoveredId, onPinHover }: SearchMapProps) {
         "top-right"
       );
 
-      map.on("load", () => { if (!cancelled) setMapLoaded(true); });
+      map.on("load", () => {
+        if (!cancelled) {
+          setMapLoaded(true);
+          setTimeout(() => { mapReadyRef.current = true; }, 500);
+        }
+      });
 
       mapRef.current = { map, mapboxgl: mapboxgl.default };
     }).catch(() => { setMapError(true); });

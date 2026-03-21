@@ -6,8 +6,9 @@ import { SearchPropertyCard } from "@/components/SearchPropertyCard";
 import { SearchMap } from "@/components/SearchMap";
 import { useSearchStore, type MapBounds } from "@/stores/searchStore";
 import { fetchImoveis, type Imovel } from "@/services/imoveis";
+import { interpretarBusca, type AISearchResult } from "@/services/aiSearch";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowUpDown, Bell, Loader2, Map as MapIcon, MapPin, X } from "lucide-react";
+import { ArrowUpDown, Bell, Loader2, Map as MapIcon, MapPin, Sparkles, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 
@@ -17,6 +18,12 @@ const sortLabels: Record<string, string> = {
   preco_desc: "Maior preço",
   area_desc: "Maior área",
 };
+
+const aiSuggestions = [
+  "Apartamento 2 quartos perto do Parcão até 800 mil",
+  "Cobertura com terraço no Moinhos",
+  "Casa com jardim em Três Figueiras",
+];
 
 function describeFilters(filters: Record<string, any>): string {
   const parts: string[] = [];
@@ -34,7 +41,8 @@ function describeFilters(filters: Record<string, any>): string {
 }
 
 const Search = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const modoIA = searchParams.get("modo") === "ia";
   const { filters, setFilter, setFilters } = useSearchStore();
   const [sortOpen, setSortOpen] = useState(false);
   const [mobileMap, setMobileMap] = useState(false);
@@ -47,18 +55,31 @@ const Search = () => {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const f: Record<string, string | number> = {};
-    const urlFinalidade = searchParams.get("finalidade");
-    const urlTipo = searchParams.get("tipo");
-    const urlQ = searchParams.get("q");
-    if (urlFinalidade === "venda") f.finalidade = urlFinalidade;
-    if (urlTipo) f.tipo = urlTipo;
-    if (urlQ) f.q = urlQ;
-    if (Object.keys(f).length) setFilters(f as any);
-  }, []);
+  // AI mode state
+  const [queryIA, setQueryIA] = useState(searchParams.get("q") || "");
+  const [buscandoIA, setBuscandoIA] = useState(false);
+  const [resumoIA, setResumoIA] = useState<string | null>(null);
+  const [aiResult, setAiResult] = useState<AISearchResult | null>(null);
 
+  useEffect(() => {
+    if (!modoIA) {
+      const f: Record<string, string | number> = {};
+      const urlFinalidade = searchParams.get("finalidade");
+      const urlTipo = searchParams.get("tipo");
+      const urlQ = searchParams.get("q");
+      if (urlFinalidade === "venda") f.finalidade = urlFinalidade;
+      if (urlTipo) f.tipo = urlTipo;
+      if (urlQ) f.q = urlQ;
+      if (Object.keys(f).length) setFilters(f as any);
+      // Clear AI state
+      setResumoIA(null);
+      setAiResult(null);
+    }
+  }, [modoIA]);
+
+  // Normal mode: fetch by store filters
   const loadImoveis = useCallback(async () => {
+    if (modoIA && !aiResult) return; // In AI mode, wait for AI search
     setLoading(true);
     try {
       const result = await fetchImoveis({
@@ -85,11 +106,61 @@ const Search = () => {
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [filters, modoIA, aiResult]);
 
   useEffect(() => {
-    loadImoveis();
-  }, [loadImoveis]);
+    if (!modoIA) loadImoveis();
+  }, [loadImoveis, modoIA]);
+
+  // AI search handler
+  const buscarComIA = useCallback(async (query?: string) => {
+    const q = query || queryIA;
+    if (!q.trim()) return;
+    setBuscandoIA(true);
+    setLoading(true);
+    try {
+      const res = await interpretarBusca(q.trim());
+      setAiResult(res);
+      setResumoIA(res.resumo);
+
+      const f = res.filtros;
+      const { data, count } = await fetchImoveis({
+        finalidade: f.finalidade || undefined,
+        tipo: f.tipo || undefined,
+        bairro: f.bairros?.[0] || undefined,
+        precoMin: f.preco_min || undefined,
+        precoMax: f.preco_max || undefined,
+        areaMin: f.area_min || undefined,
+        quartos: f.quartos || undefined,
+        diferenciais: f.diferenciais?.length ? f.diferenciais : undefined,
+        limit: 40,
+      });
+      setImoveis(data);
+      setTotal(count);
+    } catch (e: any) {
+      toast.error(e?.message || "Erro ao interpretar busca");
+    } finally {
+      setBuscandoIA(false);
+      setLoading(false);
+    }
+  }, [queryIA]);
+
+  // Auto-search if arriving with ?modo=ia&q=...
+  useEffect(() => {
+    if (modoIA && searchParams.get("q")) {
+      const q = searchParams.get("q")!;
+      setQueryIA(q);
+      buscarComIA(q);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const limparIA = () => {
+    setResumoIA(null);
+    setAiResult(null);
+    setQueryIA("");
+    setImoveis([]);
+    setTotal(0);
+  };
 
   const handleBoundsSearch = useCallback((bounds: MapBounds) => {
     setFilter("bounds", bounds);
@@ -129,7 +200,82 @@ const Search = () => {
   return (
     <div className="flex h-screen flex-col bg-background pt-16">
       <Navbar />
-      <SearchFiltersBar />
+
+      {/* Filter bar — switches between normal and AI */}
+      {modoIA ? (
+        <div className="sticky top-16 z-10 border-b border-border bg-background px-4 py-3 sm:px-6">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div
+              className="flex flex-1 items-center gap-2.5 rounded-xl border-[1.5px] border-primary bg-primary/[0.03] px-3 py-2.5 sm:px-4 sm:py-3"
+              style={{ boxShadow: "0 0 0 3px hsl(var(--primary) / 0.08)" }}
+            >
+              <Sparkles className="h-4 w-4 shrink-0 text-primary" />
+              <input
+                value={queryIA}
+                onChange={(e) => setQueryIA(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && buscarComIA()}
+                placeholder="Ex: apartamento 2 quartos perto do Iguatemi até 800 mil..."
+                autoFocus
+                className="w-full border-none bg-transparent font-body text-[13px] text-foreground outline-none placeholder:text-muted-foreground sm:text-sm"
+              />
+              {queryIA && (
+                <button
+                  onClick={() => setQueryIA("")}
+                  className="shrink-0 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+            <button
+              onClick={() => buscarComIA()}
+              disabled={!queryIA.trim() || buscandoIA}
+              className="shrink-0 rounded-full bg-primary px-4 py-2.5 font-body text-xs font-bold text-primary-foreground transition-colors hover:bg-primary/90 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed sm:px-6 sm:text-sm"
+            >
+              {buscandoIA ? "Buscando..." : "Buscar"}
+            </button>
+          </div>
+          {/* Suggestions */}
+          {!resumoIA && !buscandoIA && (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {aiSuggestions.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => { setQueryIA(s); buscarComIA(s); }}
+                  className="rounded-full border border-border px-2.5 py-1 font-body text-[11px] text-muted-foreground transition-colors hover:border-primary/30 hover:text-foreground"
+                >
+                  "{s}"
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        <SearchFiltersBar />
+      )}
+
+      {/* AI resumo badge */}
+      <AnimatePresence>
+        {modoIA && resumoIA && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="flex items-center justify-between border-b border-primary/20 bg-primary/[0.05] px-4 py-2 sm:px-6"
+          >
+            <span className="font-body text-xs font-medium text-primary sm:text-[13px]">
+              <Sparkles className="mr-1.5 inline h-3 w-3" />
+              {resumoIA}
+            </span>
+            <button
+              onClick={limparIA}
+              className="font-body text-xs font-semibold text-primary hover:text-primary/70"
+            >
+              Limpar ×
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Subheader: counter + bounds badge + sort + alert */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-background px-4 py-3 sm:px-6 sm:py-4">
@@ -143,7 +289,6 @@ const Search = () => {
             </div>
           </div>
 
-          {/* Bounds active badge */}
           {filters.bounds && (
             <div className="flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 font-body text-[11px] font-semibold text-primary sm:gap-1.5 sm:px-3 sm:py-1 sm:text-xs">
               <MapPin className="h-3 w-3" />
@@ -160,37 +305,39 @@ const Search = () => {
 
         <div className="flex items-center gap-2">
           {/* Sort */}
-          <div className="relative">
-            <button
-              onClick={() => setSortOpen(!sortOpen)}
-              className="flex items-center gap-1 rounded-full border border-border px-2.5 py-1.5 font-body text-[11px] font-medium text-foreground transition-colors hover:border-foreground sm:gap-1.5 sm:px-3 sm:text-xs"
-            >
-              <ArrowUpDown className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-              <span className="hidden sm:inline">{sortLabels[filters.ordem]}</span>
-              <span className="sm:hidden">Ordenar</span>
-            </button>
-            {sortOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: -4 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="absolute right-0 top-full z-30 mt-1 w-44 rounded-xl border border-border bg-card p-1 shadow-xl"
+          {!modoIA && (
+            <div className="relative">
+              <button
+                onClick={() => setSortOpen(!sortOpen)}
+                className="flex items-center gap-1 rounded-full border border-border px-2.5 py-1.5 font-body text-[11px] font-medium text-foreground transition-colors hover:border-foreground sm:gap-1.5 sm:px-3 sm:text-xs"
               >
-                {Object.entries(sortLabels).map(([key, label]) => (
-                  <button
-                    key={key}
-                    onClick={() => { setFilter("ordem", key as any); setSortOpen(false); }}
-                    className={`block w-full rounded-lg px-3 py-2 text-left font-body text-[13px] transition-colors ${
-                      filters.ordem === key
-                        ? "bg-primary/10 font-medium text-primary"
-                        : "text-foreground hover:bg-secondary"
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </motion.div>
-            )}
-          </div>
+                <ArrowUpDown className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                <span className="hidden sm:inline">{sortLabels[filters.ordem]}</span>
+                <span className="sm:hidden">Ordenar</span>
+              </button>
+              {sortOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="absolute right-0 top-full z-30 mt-1 w-44 rounded-xl border border-border bg-card p-1 shadow-xl"
+                >
+                  {Object.entries(sortLabels).map(([key, label]) => (
+                    <button
+                      key={key}
+                      onClick={() => { setFilter("ordem", key as any); setSortOpen(false); }}
+                      className={`block w-full rounded-lg px-3 py-2 text-left font-body text-[13px] transition-colors ${
+                        filters.ordem === key
+                          ? "bg-primary/10 font-medium text-primary"
+                          : "text-foreground hover:bg-secondary"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </div>
+          )}
 
           {/* Alert button */}
           <button
@@ -210,12 +357,25 @@ const Search = () => {
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              <p className="mt-3 font-body text-sm text-muted-foreground">Carregando imóveis...</p>
+              <p className="mt-3 font-body text-sm text-muted-foreground">
+                {modoIA && buscandoIA ? "Interpretando sua busca com IA..." : "Carregando imóveis..."}
+              </p>
             </div>
           ) : imoveis.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20">
-              <p className="font-body text-lg font-bold text-foreground">Nenhum imóvel encontrado</p>
-              <p className="mt-1 font-body text-sm text-muted-foreground">Tente ajustar seus filtros.</p>
+              {modoIA && !aiResult ? (
+                <>
+                  <Sparkles className="h-10 w-10 text-muted-foreground/30" />
+                  <p className="mt-4 font-body text-sm text-muted-foreground">
+                    Digite o que você procura acima ou clique em uma sugestão.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="font-body text-lg font-bold text-foreground">Nenhum imóvel encontrado</p>
+                  <p className="mt-1 font-body text-sm text-muted-foreground">Tente ajustar seus filtros.</p>
+                </>
+              )}
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-4 pb-16 sm:grid-cols-2 sm:gap-6 sm:pb-4 xl:grid-cols-3">

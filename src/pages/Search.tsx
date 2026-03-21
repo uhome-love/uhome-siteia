@@ -150,8 +150,8 @@ const Search = () => {
   }, [filters, modoIA, aiResult, buildFilters]);
 
   useEffect(() => {
-    if (!modoIA) loadImoveis();
-  }, [loadImoveis, modoIA]);
+    loadImoveis();
+  }, [loadImoveis]);
 
   // AI search handler
   const buscarComIA = useCallback(async (query?: string) => {

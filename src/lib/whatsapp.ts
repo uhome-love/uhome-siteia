@@ -1,6 +1,6 @@
 /** Número do WhatsApp da Uhome — lido de env var ou fallback padrão */
 export const WHATSAPP_NUMBER =
-  import.meta.env.VITE_WHATSAPP_NUMBER || "5551999999999";
+  import.meta.env.VITE_WHATSAPP_NUMBER || "5551992597097";
 
 /** Número formatado para exibição */
 export const WHATSAPP_DISPLAY = WHATSAPP_NUMBER.replace(

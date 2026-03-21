@@ -82,7 +82,7 @@ export function SearchPropertyCard({ imovel, index }: { imovel: Imovel; index: n
             <div>
               <p className="font-body text-xs uppercase tracking-[0.05em] text-muted-foreground">{imovel.bairro}</p>
               <h3
-                className="mt-0.5 cursor-pointer font-body text-[15px] font-semibold text-foreground line-clamp-1 hover:text-primary transition-colors"
+                className="mt-0.5 cursor-pointer font-body text-sm font-semibold text-foreground truncate hover:text-primary transition-colors"
                 onClick={() => navigate(`/imovel/${imovel.slug}`)}
               >
                 {imovel.titulo}

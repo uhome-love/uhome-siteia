@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { bairrosData } from "@/data/bairros";
+import { CIDADES_PERMITIDAS } from "@/services/imoveis";
 
 const ease = [0.16, 1, 0.3, 1] as [number, number, number, number];
 

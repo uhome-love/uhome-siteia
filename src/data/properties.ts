@@ -58,8 +58,8 @@ export const mockProperties: MockProperty[] = [
   },
   {
     id: "5", slug: "apto-reformado-boa-vista", title: "Apartamento Reformado 2D",
-    neighborhood: "Boa Vista", city: "Porto Alegre", price: 3800,
-    priceFormatted: "R$ 3.800/mês", finalidade: "locacao", tipo: "apartamento",
+    neighborhood: "Boa Vista", city: "Porto Alegre", price: 520000,
+    priceFormatted: "R$ 520.000", finalidade: "venda", tipo: "apartamento",
     area: 95, bedrooms: 2, bathrooms: 1, parking: 1,
     image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&h=400&fit=crop",
     features: ["Portaria 24h", "Reformado"],

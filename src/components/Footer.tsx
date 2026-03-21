@@ -44,7 +44,7 @@ export function Footer() {
                 <a href={`tel:+${WHATSAPP_NUMBER}`} className="transition-colors hover:text-foreground">{WHATSAPP_DISPLAY}</a>
               </li>
               <li>
-                <a href="mailto:contato@uhome.com.br" className="transition-colors hover:text-foreground">contato@uhome.com.br</a>
+                <a href="mailto:lucas@uhome.imb.br" className="transition-colors hover:text-foreground">lucas@uhome.imb.br</a>
               </li>
               <li>Porto Alegre, RS</li>
             </ul>
@@ -55,7 +55,7 @@ export function Footer() {
           <p className="font-body text-xs text-muted-foreground">
             © {new Date().getFullYear()} Uhome Imóveis. Todos os direitos reservados.
           </p>
-          <p className="font-body text-xs text-muted-foreground">CRECI-RS</p>
+          <p className="font-body text-xs text-muted-foreground">CRECI-RS 25682J</p>
         </div>
       </div>
     </footer>

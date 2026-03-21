@@ -57,6 +57,7 @@ const Search = () => {
   const [mapPins, setMapPins] = useState<MapPinData[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [mapLoading, setMapLoading] = useState(true);
 
   // AI mode state
   const [queryIA, setQueryIA] = useState(searchParams.get("q") || "");

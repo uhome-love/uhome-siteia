@@ -83,7 +83,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch }: 
   const initRef = useRef(false);
   const mapReadyRef = useRef(false);
   const boundsRef = useRef<mapboxgl.LngLatBounds | null>(null);
-  const imoveisRef = useRef(imoveis);
+  const pinsRef = useRef(pins);
   const [mapMoved, setMapMoved] = useState(false);
 
   // Keep ref in sync

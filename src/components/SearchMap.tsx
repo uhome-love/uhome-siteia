@@ -76,11 +76,9 @@ export function SearchMap({ properties, onMarkerClick }: SearchMapProps) {
 
     properties.forEach((p) => {
       const priceLabel =
-        p.finalidade === "locacao"
-          ? `R$${(p.price / 1000).toFixed(1)}k`
-          : p.price >= 1000000
-            ? `R$${(p.price / 1000000).toFixed(1)}M`
-            : `R$${(p.price / 1000).toFixed(0)}k`;
+        p.price >= 1000000
+          ? `R$${(p.price / 1000000).toFixed(1)}M`
+          : `R$${(p.price / 1000).toFixed(0)}k`;
 
       const el = document.createElement("button");
       el.className = "mapbox-price-pin";

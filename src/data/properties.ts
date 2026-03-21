@@ -112,8 +112,8 @@ export const mockProperties: MockProperty[] = [
   },
   {
     id: "11", slug: "sala-comercial-moinhos", title: "Sala Comercial Premium",
-    neighborhood: "Moinhos de Vento", city: "Porto Alegre", price: 4500,
-    priceFormatted: "R$ 4.500/mês", finalidade: "locacao", tipo: "comercial",
+    neighborhood: "Moinhos de Vento", city: "Porto Alegre", price: 650000,
+    priceFormatted: "R$ 650.000", finalidade: "venda", tipo: "comercial",
     area: 60, bedrooms: 0, bathrooms: 1, parking: 1,
     image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&h=400&fit=crop",
     features: ["Ar condicionado", "Portaria 24h"],

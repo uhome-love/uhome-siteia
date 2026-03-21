@@ -271,6 +271,7 @@ serve(async (req) => {
     }
 
     const filtros = JSON.parse(toolCall.function.arguments);
+    console.log("AI filtros extraídos:", JSON.stringify(filtros));
 
     return new Response(JSON.stringify({ filtros }), {
       status: 200,

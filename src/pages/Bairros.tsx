@@ -33,18 +33,21 @@ const Bairros = () => {
 
   useEffect(() => {
     async function load() {
-      const results = await Promise.all(
-        bairrosData.map((b) =>
-          supabase
-            .from("imoveis")
-            .select("*", { count: "exact", head: true })
-            .eq("status", "disponivel")
-            .ilike("bairro", `%${b.nome}%`)
-        )
-      );
-      const map: Record<string, number> = {};
-      bairrosData.forEach((b, i) => { map[b.slug] = results[i].count ?? 0; });
-      setContagens(map);
+      // Single efficient query instead of 15 separate count queries
+      const { data } = await supabase.rpc("get_bairros_disponiveis");
+      if (data) {
+        const dbMap = new Map(data.map((d: { bairro: string; count: number }) => [d.bairro, Number(d.count)]));
+        const map: Record<string, number> = {};
+        bairrosData.forEach((b) => {
+          const exact = dbMap.get(b.nome);
+          if (exact !== undefined) { map[b.slug] = exact; return; }
+          for (const [key, val] of dbMap) {
+            if (key.toLowerCase().includes(b.nome.toLowerCase())) { map[b.slug] = (map[b.slug] ?? 0) + val; }
+          }
+          if (!(b.slug in map)) map[b.slug] = 0;
+        });
+        setContagens(map);
+      }
     }
     load();
   }, []);

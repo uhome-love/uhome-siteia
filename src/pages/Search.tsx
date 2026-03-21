@@ -206,7 +206,7 @@ const Search = () => {
       {/* Main area: cards + map */}
       <div className="flex flex-1 overflow-hidden">
         {/* Cards column */}
-        <div className="flex-1 overflow-y-auto px-6 py-5" style={{ minWidth: 0 }}>
+        <div className="flex-1 overflow-y-auto px-3 py-4 sm:px-6 sm:py-5" style={{ minWidth: 0 }}>
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />

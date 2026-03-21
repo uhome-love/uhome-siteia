@@ -54,6 +54,7 @@ const Search = () => {
   const [alertLoading, setAlertLoading] = useState(false);
 
   const [imoveis, setImoveis] = useState<Imovel[]>([]);
+  const [mapPins, setMapPins] = useState<MapPin[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
 

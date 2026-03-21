@@ -11,6 +11,32 @@ interface Props {
   onHover?: (id: string | null) => void;
 }
 
+type BadgeStyle = "novo" | "exclusivo" | "visto";
+
+function getBadge(imovel: Imovel): { label: string; style: BadgeStyle } | null {
+  const vistos: string[] = JSON.parse(localStorage.getItem("imoveis_vistos") || "[]");
+  if (vistos.includes(imovel.id)) {
+    return { label: "Visualizado", style: "visto" };
+  }
+
+  if (imovel.publicado_em) {
+    const dias = Math.floor(
+      (Date.now() - new Date(imovel.publicado_em).getTime()) / 86400000
+    );
+    if (dias <= 7) return { label: "Novo", style: "novo" };
+  }
+
+  if (imovel.destaque) return { label: "Exclusivo", style: "exclusivo" };
+
+  return null;
+}
+
+const badgeClasses: Record<BadgeStyle, string> = {
+  novo: "bg-white/95 text-foreground",
+  exclusivo: "bg-black/80 text-white",
+  visto: "bg-primary/15 text-primary border border-primary/30",
+};
+
 export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Props) {
   const [liked, setLiked] = useState(false);
   const [hovering, setHovering] = useState(false);
@@ -27,6 +53,8 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
     (imovel.vagas ?? 0) > 0 ? `${imovel.vagas} vaga${imovel.vagas! > 1 ? "s" : ""}` : null,
   ].filter(Boolean).join(" · ");
 
+  const badge = getBadge(imovel);
+
   const handleMouseEnter = () => { setHovering(true); onHover?.(imovel.id); };
   const handleMouseLeave = () => { setHovering(false); onHover?.(null); };
 
@@ -35,16 +63,13 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: Math.min(index * 0.03, 0.15) }}
-      className="cursor-pointer"
+      className={`relative cursor-pointer ${highlighted ? "ring-2 ring-primary rounded-xl" : ""}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={() => navigate(`/imovel/${imovel.slug}`)}
     >
-      {/* Photo — square */}
-      <div
-        className="relative overflow-hidden rounded-xl"
-        style={{ aspectRatio: "1/1" }}
-      >
+      {/* Photo — 4/3 */}
+      <div className="relative overflow-hidden rounded-xl" style={{ aspectRatio: "4/3" }}>
         <img
           src={fotos[fotoAtiva]}
           alt={imovel.titulo}
@@ -52,6 +77,15 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
           className="h-full w-full object-cover transition-transform duration-500"
           style={{ transform: hovering ? "scale(1.03)" : "scale(1)" }}
         />
+
+        {/* Badge */}
+        {badge && (
+          <span
+            className={`absolute left-2.5 top-2.5 z-10 rounded-md px-2.5 py-1 font-body text-xs font-semibold backdrop-blur-sm ${badgeClasses[badge.style]}`}
+          >
+            {badge.label}
+          </span>
+        )}
 
         {/* Nav arrows on hover */}
         {hovering && fotos.length > 1 && (
@@ -90,14 +124,15 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
 
         {/* Dots */}
         {hovering && fotos.length > 1 && (
-          <div className="absolute bottom-2 left-1/2 z-10 flex -translate-x-1/2 gap-[3px]">
+          <div className="absolute bottom-2 left-1/2 z-10 flex -translate-x-1/2 gap-1">
             {fotos.slice(0, 5).map((_, i) => (
               <div
                 key={i}
-                className="rounded-full"
+                className="rounded-full transition-all duration-200"
                 style={{
-                  width: 5, height: 5,
-                  background: i === fotoAtiva ? "white" : "rgba(255,255,255,0.5)",
+                  width: i === fotoAtiva ? 18 : 5,
+                  height: 5,
+                  background: i === fotoAtiva ? "white" : "rgba(255,255,255,0.55)",
                 }}
               />
             ))}
@@ -107,29 +142,28 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
 
       {/* Text — no box */}
       <div className="px-0.5 pt-2.5">
-        {/* Line 1: type · neighborhood */}
         <div className="flex items-center justify-between gap-2">
-          <span className="truncate font-body text-sm font-semibold text-foreground">
+          <span className="truncate font-body text-[13px] font-semibold text-foreground">
             {imovel.tipo} · {imovel.bairro}
           </span>
-          {imovel.destaque && (
-            <span className="shrink-0 font-body text-xs text-foreground">★ Destaque</span>
-          )}
         </div>
 
-        {/* Line 2: stats */}
         {stats && (
-          <p className="mt-0.5 truncate font-body text-[13px] text-muted-foreground">{stats}</p>
+          <p className="mt-0.5 truncate font-body text-xs text-muted-foreground">{stats}</p>
         )}
 
-        {/* Line 3: price */}
         <p className="mt-1 font-body text-sm font-bold text-foreground">{price}</p>
-      </div>
 
-      {/* Highlighted border from map hover */}
-      {highlighted && (
-        <div className="pointer-events-none absolute inset-0 rounded-xl ring-2 ring-primary" />
-      )}
+        {/* Interest button — hover only */}
+        {hovering && (
+          <button
+            onClick={(e) => { e.stopPropagation(); }}
+            className="mt-2.5 w-full rounded-lg border border-foreground bg-transparent px-3 py-2 font-body text-[13px] font-medium text-foreground transition-colors hover:bg-secondary active:scale-[0.98]"
+          >
+            Tenho interesse
+          </button>
+        )}
+      </div>
     </motion.div>
   );
 }

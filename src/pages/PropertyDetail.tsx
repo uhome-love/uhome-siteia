@@ -28,6 +28,13 @@ const PropertyDetail = () => {
         if (data) {
           trackView(data.id);
           getViewCount(data.id).then(setViewCount);
+          // Register in localStorage for "Visualizado" badge
+          const vistos: string[] = JSON.parse(localStorage.getItem("imoveis_vistos") || "[]");
+          if (!vistos.includes(data.id)) {
+            vistos.push(data.id);
+            if (vistos.length > 100) vistos.shift();
+            localStorage.setItem("imoveis_vistos", JSON.stringify(vistos));
+          }
         }
       })
       .catch(console.error)

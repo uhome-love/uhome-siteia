@@ -123,12 +123,14 @@ function extractPreco(j: any): number {
 
 function mapImovel(j: any) {
   const codigo = String(j.codigo || j.id || j.cod || Date.now());
-  const titulo = j.titulo_anuncio || j.titulo || j.title || j.nome || `Imóvel ${codigo}`;
+  const tipo = mapTipo(j.subtipo || j.tipo_imovel || j.tipo || j.type);
+  const bairro = j.endereco_bairro || j.bairro || j.neighborhood || j.bairro_nome || j.endereco?.bairro || j.localizacao?.bairro || "Porto Alegre";
+  const titulo = gerarTitulo(j, tipo, bairro);
 
   return {
     jetimob_id: codigo,
     slug: slugify(titulo, codigo),
-    tipo: mapTipo(j.subtipo || j.tipo_imovel || j.tipo || j.type),
+    tipo,
     finalidade: mapFinalidade(j.finalidade || j.operacao || j.contrato),
     status: mapStatus(j.status || j.situacao),
     destaque: j.destaque === true || j.destaque === 1 || j.destaque === "Destaque",
@@ -141,7 +143,7 @@ function mapImovel(j: any) {
     banheiros: j.banheiros ? Number(j.banheiros) : null,
     vagas: j.garagens || j.vagas ? Number(j.garagens || j.vagas) : null,
     andar: j.andar ? Number(j.andar) : null,
-    bairro: j.endereco_bairro || j.bairro || j.neighborhood || j.bairro_nome || j.endereco?.bairro || j.localizacao?.bairro || "Porto Alegre",
+    bairro,
     cidade: j.endereco_cidade || j.cidade || j.endereco?.cidade || "Porto Alegre",
     uf: j.endereco_estado || j.uf || j.estado || "RS",
     cep: j.endereco_cep || j.cep || null,

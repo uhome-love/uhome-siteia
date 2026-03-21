@@ -74,7 +74,9 @@ const Search = () => {
       <Navbar />
 
       {/* Mobile filter panel (overlay) */}
-      <SearchFiltersPanel isOpen={filtersOpen} onClose={() => setFiltersOpen(false)} mobile />
+      <div className="lg:hidden">
+        <SearchFiltersPanel isOpen={filtersOpen} onClose={() => setFiltersOpen(false)} />
+      </div>
 
       <div className="flex pt-16" style={{ height: "100vh" }}>
         {/* Filters sidebar — desktop only */}

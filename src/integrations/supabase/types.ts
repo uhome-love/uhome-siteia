@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      buscas_salvas: {
+        Row: {
+          ativa: boolean
+          created_at: string
+          descricao_humana: string | null
+          email: string
+          filters: Json
+          id: string
+        }
+        Insert: {
+          ativa?: boolean
+          created_at?: string
+          descricao_humana?: string | null
+          email: string
+          filters?: Json
+          id?: string
+        }
+        Update: {
+          ativa?: boolean
+          created_at?: string
+          descricao_humana?: string | null
+          email?: string
+          filters?: Json
+          id?: string
+        }
+        Relationships: []
+      }
       captacao_imoveis: {
         Row: {
           atribuido_a: string | null

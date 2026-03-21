@@ -10,6 +10,7 @@ import Search from "./pages/Search.tsx";
 import PropertyDetail from "./pages/PropertyDetail.tsx";
 import AISearch from "./pages/AISearch.tsx";
 import Anunciar from "./pages/Anunciar.tsx";
+import Onboarding from "./pages/Onboarding.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/imovel/:slug" element={<PropertyDetail />} />
           <Route path="/ia-search" element={<AISearch />} />
           <Route path="/anunciar" element={<Anunciar />} />
+          <Route path="/onboarding" element={<Onboarding />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <ExitIntentModal />

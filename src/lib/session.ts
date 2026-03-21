@@ -1,5 +1,3 @@
-import { v4 as uuidv4 } from 'crypto';
-
 const SESSION_KEY = 'uhome_session_id';
 
 export function getSessionId(): string {

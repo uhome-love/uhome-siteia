@@ -40,8 +40,8 @@ export const mockProperties: MockProperty[] = [
   },
   {
     id: "3", slug: "studio-moderno-bela-vista", title: "Studio Moderno e Compacto",
-    neighborhood: "Bela Vista", city: "Porto Alegre", price: 2200,
-    priceFormatted: "R$ 2.200/mês", finalidade: "locacao", tipo: "studio",
+    neighborhood: "Bela Vista", city: "Porto Alegre", price: 385000,
+    priceFormatted: "R$ 385.000", finalidade: "venda", tipo: "studio",
     area: 38, bedrooms: 1, bathrooms: 1, parking: 1,
     image: "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=600&h=400&fit=crop",
     badge: "Novo", features: ["Mobiliado", "Pet friendly"],

@@ -114,7 +114,12 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
 
   if (filters.finalidade) query = query.eq("finalidade", filters.finalidade);
   if (filters.tipo) query = query.eq("tipo", filters.tipo);
-  if (filters.bairro) query = query.ilike("bairro", `%${filters.bairro}%`);
+  if (filters.bairros?.length) {
+    const bairroFilter = filters.bairros.map(b => `bairro.ilike.%${b}%`).join(",");
+    query = query.or(bairroFilter);
+  } else if (filters.bairro) {
+    query = query.ilike("bairro", `%${filters.bairro}%`);
+  }
   if (filters.precoMin) query = query.gte("preco", filters.precoMin);
   if (filters.precoMax) query = query.lte("preco", filters.precoMax);
   if (filters.areaMin) query = query.gte("area_total", filters.areaMin);

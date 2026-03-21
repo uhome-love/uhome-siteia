@@ -80,8 +80,10 @@ const PropertyDetail = () => {
     setMeta("property", "og:description", `${cap(imovel.tipo)} em ${imovel.bairro} — ${price}`);
     setMeta("property", "og:image", fotoPrincipal(imovel));
     setMeta("property", "og:url", `https://uhome.com.br/imovel/${imovel.slug}`);
+    setJsonLd("jsonld-imovel", buildImovelJsonLd(imovel));
     return () => {
       document.title = "Uhome Imóveis | Apartamentos e Casas à Venda em Porto Alegre";
+      removeJsonLd("jsonld-imovel");
     };
   }, [imovel]);
 

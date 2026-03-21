@@ -49,7 +49,15 @@ const Bairro = () => {
     if (!bairro) return;
     setLoading(true);
     fetchImoveis({ bairro: bairro.nome, limit: 40 })
-      .then((r) => { setImoveis(r.data); setTotal(r.count); })
+      .then((r) => {
+        setImoveis(r.data);
+        setTotal(r.count);
+        if (bairro) {
+          const precos = r.data.map((i) => i.preco).filter(Boolean);
+          const avg = precos.length ? precos.reduce((a, b) => a + b, 0) / precos.length : undefined;
+          setJsonLd("jsonld-bairro", buildBairroJsonLd(bairro, r.count, avg));
+        }
+      })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [bairro]);

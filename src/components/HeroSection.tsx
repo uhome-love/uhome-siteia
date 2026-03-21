@@ -29,10 +29,23 @@ export function HeroSection() {
   const [loading, setLoading] = useState(false);
 
   const bairroSuggestions = useMemo(() => {
-    if (!bairro.trim()) return bairrosData.slice(0, 6);
-    const q = bairro.toLowerCase();
-    return bairrosData.filter((b) => b.nome.toLowerCase().includes(q));
-  }, [bairro]);
+    const base = bairrosData.filter((b) => !bairrosSelecionados.includes(b.nome));
+    if (!bairroInput.trim()) return base.slice(0, 6);
+    const q = bairroInput.toLowerCase();
+    return base.filter((b) => b.nome.toLowerCase().includes(q));
+  }, [bairroInput, bairrosSelecionados]);
+
+  const addBairro = (nome: string) => {
+    if (!bairrosSelecionados.includes(nome)) {
+      setBairrosSelecionados((prev) => [...prev, nome]);
+    }
+    setBairroInput("");
+    setBairroOpen(false);
+  };
+
+  const removeBairro = (nome: string) => {
+    setBairrosSelecionados((prev) => prev.filter((b) => b !== nome));
+  };
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {

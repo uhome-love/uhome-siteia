@@ -17,12 +17,12 @@ export function useAdmin() {
 
     supabase
       .rpc("has_role" as any, { _user_id: user.id, _role: "admin" })
-      .then(({ data }) => {
-        setIsAdmin(data === true);
-        setLoading(false);
-      })
-      .catch(() => {
-        setIsAdmin(false);
+      .then(({ data, error }) => {
+        if (error) {
+          setIsAdmin(false);
+        } else {
+          setIsAdmin(data === true);
+        }
         setLoading(false);
       });
   }, [user, authLoading]);

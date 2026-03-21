@@ -230,10 +230,10 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch }: 
 
       // Set initial data — the imoveis effect may have already fired before map loaded
       const source = map.getSource("imoveis") as mapboxgl.GeoJSONSource | undefined;
-      if (source && imoveisRef.current.length > 0) {
-        const geo = toGeoJSON(imoveisRef.current);
+      if (source && pinsRef.current.length > 0) {
+        const geo = toGeoJSON(pinsRef.current);
         source.setData(geo);
-        const validos = imoveisRef.current.filter((i) => {
+        const validos = pinsRef.current.filter((i) => {
           const lat = Number(i.latitude);
           const lng = Number(i.longitude);
           return lat && lng && lat < -28 && lat > -32 && lng < -49 && lng > -54;

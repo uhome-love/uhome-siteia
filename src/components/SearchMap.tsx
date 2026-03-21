@@ -93,20 +93,34 @@ export function SearchMap({ imoveis, hoveredId, onPinHover, onBoundsSearch }: Se
     };
   }, []);
 
-  // Create / update markers
+  // Create / update markers — only when imoveis change, not on map move
   useEffect(() => {
     if (!mapRef.current || !mapLoaded) return;
     const { map, mapboxgl } = mapRef.current;
 
-    markersRef.current.forEach(({ marker }) => marker.remove());
-    markersRef.current.clear();
+    const currentIds = new Set(imoveis.filter(p => p.latitude && p.longitude).map(p => p.id));
+
+    // Remove markers no longer in results
+    markersRef.current.forEach(({ marker }, id) => {
+      if (!currentIds.has(id)) {
+        marker.remove();
+        markersRef.current.delete(id);
+      }
+    });
 
     const withCoords = imoveis.filter((p) => p.latitude && p.longitude);
     if (withCoords.length === 0) return;
 
     const bounds = new mapboxgl.LngLatBounds();
+    let hasNewMarkers = false;
 
     withCoords.forEach((p) => {
+      bounds.extend([p.longitude!, p.latitude!]);
+
+      // Skip if marker already exists
+      if (markersRef.current.has(p.id)) return;
+
+      hasNewMarkers = true;
       const priceLabel = formatPinPreco(p.preco);
 
       const el = document.createElement("div");
@@ -161,17 +175,18 @@ export function SearchMap({ imoveis, hoveredId, onPinHover, onBoundsSearch }: Se
         .addTo(map);
 
       markersRef.current.set(p.id, { el, marker });
-      bounds.extend([p.longitude!, p.latitude!]);
     });
 
-    // Fit bounds but suppress the moveend from triggering "search this area"
-    mapReadyRef.current = false;
-    if (withCoords.length > 1) {
-      map.fitBounds(bounds, { padding: { top: 60, bottom: 60, left: 60, right: 60 }, maxZoom: 14, duration: 800 });
-    } else {
-      map.flyTo({ center: [withCoords[0].longitude!, withCoords[0].latitude!], zoom: 14, duration: 800 });
+    // Fit bounds only when markers actually changed
+    if (hasNewMarkers) {
+      mapReadyRef.current = false;
+      if (withCoords.length > 1) {
+        map.fitBounds(bounds, { padding: { top: 60, bottom: 60, left: 60, right: 60 }, maxZoom: 14, duration: 800 });
+      } else if (markersRef.current.size <= 1) {
+        map.flyTo({ center: [withCoords[0].longitude!, withCoords[0].latitude!], zoom: 14, duration: 800 });
+      }
+      setTimeout(() => { mapReadyRef.current = true; }, 1200);
     }
-    setTimeout(() => { mapReadyRef.current = true; }, 1200);
   }, [imoveis, mapLoaded, navigate, onPinHover]);
 
   // Sync hover highlight from card → pin

@@ -1,16 +1,17 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Heart, User } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { UhomeLogo } from "@/components/UhomeLogo";
 
 const navLinks = [
-  { label: "Comprar", href: "/busca?finalidade=venda" },
-  { label: "Busca IA", href: "/ia-search" },
+  { label: "Comprar", href: "/busca?finalidade=venda", match: "/busca" },
+  { label: "Busca IA", href: "/ia-search", match: "/ia-search" },
 ];
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const location = useLocation();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
@@ -20,16 +21,23 @@ export function Navbar() {
         </Link>
 
         {/* Desktop */}
-        <div className="hidden items-center gap-8 md:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.label}
-              to={link.href}
-              className="font-body text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-            >
-              {link.label}
-            </Link>
-          ))}
+        <div className="hidden items-center gap-1 md:flex">
+          {navLinks.map((link) => {
+            const isActive = location.pathname.startsWith(link.match);
+            return (
+              <Link
+                key={link.label}
+                to={link.href}
+                className={`rounded-full px-4 py-2 font-body text-sm transition-colors active:scale-[0.97] ${
+                  isActive
+                    ? "font-bold text-primary bg-primary/5"
+                    : "font-medium text-muted-foreground hover:bg-secondary hover:text-foreground"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </div>
 
         <div className="hidden items-center gap-3 md:flex">

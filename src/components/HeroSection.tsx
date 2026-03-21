@@ -3,17 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { Search, SlidersHorizontal } from "lucide-react";
 import { motion } from "framer-motion";
 
-const quickFilters = ["Comprar", "Alugar"] as const;
 const propertyTypes = ["Apartamento", "Casa", "Cobertura", "Studio", "Comercial"];
 
 export function HeroSection() {
   const navigate = useNavigate();
-  const [activeFilter, setActiveFilter] = useState<"Comprar" | "Alugar">("Comprar");
   const [query, setQuery] = useState("");
 
   const handleSearch = () => {
-    const finalidade = activeFilter === "Comprar" ? "venda" : "locacao";
-    navigate(`/busca?finalidade=${finalidade}&q=${encodeURIComponent(query)}`);
+    navigate(`/busca?finalidade=venda&q=${encodeURIComponent(query)}`);
   };
 
   return (

@@ -55,10 +55,6 @@ export function SearchPropertyCard({ property, index }: { property: MockProperty
                     {property.title}
                   </h3>
                 </div>
-                <span className="shrink-0 rounded-md bg-secondary px-2 py-0.5 font-body text-[10px] text-muted-foreground">
-                  {property.finalidade === "venda" ? "Venda" : "Aluguel"}
-                </span>
-              </div>
 
               <p className="mt-2 font-display text-lg font-bold text-primary">{property.priceFormatted}</p>
             </div>

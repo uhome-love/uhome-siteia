@@ -36,6 +36,7 @@ const defaultFilters: SearchFilters = {
   finalidade: "",
   tipo: "",
   bairro: "",
+  cidade: "Porto Alegre",
   precoMin: 0,
   precoMax: 0,
   areaMin: 0,

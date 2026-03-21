@@ -160,6 +160,72 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
   };
 }
 
+export interface MapPin {
+  id: string;
+  slug: string;
+  preco: number;
+  latitude: number;
+  longitude: number;
+  bairro: string;
+  titulo: string;
+}
+
+/** Fetch lightweight pin data for the map — all matching properties, no limit */
+export async function fetchMapPins(filters: BuscaFilters = {}): Promise<MapPin[]> {
+  let query = supabase
+    .from("imoveis")
+    .select("id,slug,preco,latitude,longitude,bairro,titulo,tipo,quartos,finalidade");
+
+  if (filters.finalidade) query = query.eq("finalidade", filters.finalidade);
+  if (filters.tipo) query = query.eq("tipo", filters.tipo);
+  if (filters.bairros?.length) {
+    const bairroFilter = filters.bairros.map(b => `bairro.ilike.%${b}%`).join(",");
+    query = query.or(bairroFilter);
+  } else if (filters.bairro) {
+    query = query.ilike("bairro", `%${filters.bairro}%`);
+  }
+  if (filters.precoMin) query = query.gte("preco", filters.precoMin);
+  if (filters.precoMax) query = query.lte("preco", filters.precoMax);
+  if (filters.areaMin) query = query.gte("area_total", filters.areaMin);
+  if (filters.areaMax) query = query.lte("area_total", filters.areaMax);
+  if (filters.quartos) query = query.gte("quartos", filters.quartos);
+  if (filters.banheiros) query = query.gte("banheiros", filters.banheiros);
+  if (filters.vagas) query = query.gte("vagas", filters.vagas);
+  if (filters.diferenciais?.length) query = query.contains("diferenciais", filters.diferenciais);
+  if (filters.q) query = query.or(`titulo.ilike.%${filters.q}%,bairro.ilike.%${filters.q}%,tipo.ilike.%${filters.q}%`);
+
+  // Only properties with coordinates
+  query = query.not("latitude", "is", null).not("longitude", "is", null);
+
+  // Supabase default limit is 1000, we need all — fetch in pages
+  const allPins: MapPin[] = [];
+  let offset = 0;
+  const PAGE = 1000;
+
+  while (true) {
+    const { data, error } = await query.range(offset, offset + PAGE - 1);
+    if (error) throw error;
+    if (!data || data.length === 0) break;
+
+    for (const row of data) {
+      allPins.push({
+        id: row.id,
+        slug: row.slug,
+        preco: row.preco,
+        latitude: row.latitude!,
+        longitude: row.longitude!,
+        bairro: row.bairro,
+        titulo: tituloLimpo(row),
+      });
+    }
+
+    if (data.length < PAGE) break;
+    offset += PAGE;
+  }
+
+  return allPins;
+}
+
 export async function fetchImovelBySlug(slug: string): Promise<Imovel | null> {
   const { data, error } = await supabase
     .from("imoveis")

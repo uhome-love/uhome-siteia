@@ -21,6 +21,7 @@ const Search = () => {
   const { filters, setFilter, setFilters } = useSearchStore();
   const [sortOpen, setSortOpen] = useState(false);
   const [mobileMap, setMobileMap] = useState(false);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   const [imoveis, setImoveis] = useState<Imovel[]>([]);
   const [total, setTotal] = useState(0);
@@ -72,28 +73,23 @@ const Search = () => {
   return (
     <div className="flex h-screen flex-col bg-background">
       <Navbar />
-
-      {/* Filter pills bar */}
       <SearchFiltersBar />
 
-      {/* Main area */}
       <div className="flex flex-1 overflow-hidden">
         {/* Cards column */}
         <div className="flex-1 overflow-y-auto" style={{ minWidth: 0 }}>
-          {/* Subheader: count + sort */}
-          <div className="flex items-center justify-between px-5 py-3">
+          {/* Subheader */}
+          <div className="flex items-center justify-between px-6 py-3">
             <div>
               <p className="font-body text-sm font-semibold text-foreground">
                 {total.toLocaleString("pt-BR")} imóveis
               </p>
-              <p className="font-body text-xs text-muted-foreground">
-                à venda em Porto Alegre
-              </p>
+              <p className="font-body text-xs text-muted-foreground">à venda em Porto Alegre</p>
             </div>
             <div className="relative">
               <button
                 onClick={() => setSortOpen(!sortOpen)}
-                className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 font-body text-xs font-medium text-foreground transition-colors hover:border-primary"
+                className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 font-body text-xs font-medium text-foreground transition-colors hover:border-foreground"
               >
                 <ArrowUpDown className="h-3.5 w-3.5" />
                 {sortLabels[filters.ordem]}
@@ -122,8 +118,8 @@ const Search = () => {
             </div>
           </div>
 
-          {/* Cards grid */}
-          <div className="px-5 pb-6">
+          {/* Grid */}
+          <div className="px-6 pb-8">
             {loading ? (
               <div className="flex flex-col items-center justify-center py-20">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -132,30 +128,34 @@ const Search = () => {
             ) : imoveis.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20">
                 <p className="font-body text-lg font-bold text-foreground">Nenhum imóvel encontrado</p>
-                <p className="mt-1 font-body text-sm text-muted-foreground">
-                  Tente ajustar seus filtros.
-                </p>
+                <p className="mt-1 font-body text-sm text-muted-foreground">Tente ajustar seus filtros.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
                 {imoveis.map((imovel, i) => (
-                  <SearchPropertyCard key={imovel.id} imovel={imovel} index={i} />
+                  <SearchPropertyCard
+                    key={imovel.id}
+                    imovel={imovel}
+                    index={i}
+                    highlighted={hoveredId === imovel.id}
+                    onHover={setHoveredId}
+                  />
                 ))}
               </div>
             )}
           </div>
         </div>
 
-        {/* Map — desktop (≥1024px) */}
-        <div className="hidden w-[45%] shrink-0 lg:block">
-          <SearchMap imoveis={imoveis} />
+        {/* Map — desktop */}
+        <div className="hidden w-[45%] shrink-0 border-l border-border lg:block">
+          <SearchMap imoveis={imoveis} hoveredId={hoveredId} onPinHover={setHoveredId} />
         </div>
       </div>
 
       {/* Mobile: floating map button */}
       <button
         onClick={() => setMobileMap(true)}
-        className="fixed bottom-6 left-1/2 z-30 flex -translate-x-1/2 items-center gap-2 rounded-full bg-primary px-5 py-3 font-body text-sm font-semibold text-primary-foreground shadow-xl transition-transform active:scale-95 lg:hidden"
+        className="fixed bottom-6 left-1/2 z-30 flex -translate-x-1/2 items-center gap-2 rounded-full bg-foreground px-5 py-3 font-body text-sm font-semibold text-background shadow-xl transition-transform active:scale-95 lg:hidden"
       >
         <MapIcon className="h-4 w-4" />
         Ver no mapa
@@ -177,7 +177,7 @@ const Search = () => {
               <X className="h-4 w-4" />
               Voltar à lista
             </button>
-            <SearchMap imoveis={imoveis} />
+            <SearchMap imoveis={imoveis} hoveredId={hoveredId} onPinHover={setHoveredId} />
           </motion.div>
         )}
       </AnimatePresence>

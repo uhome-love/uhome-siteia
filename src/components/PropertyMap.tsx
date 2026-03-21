@@ -1,9 +1,7 @@
-import { useEffect, useRef } from "react";
-import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
+import { useEffect, useRef, useState } from "react";
 import { MapPin } from "lucide-react";
 
-const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN as string;
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN as string | undefined;
 
 interface PropertyMapProps {
   neighborhood: string;
@@ -14,32 +12,56 @@ interface PropertyMapProps {
 
 export function PropertyMap({ neighborhood, city, lat = -30.0277, lng = -51.2287 }: PropertyMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
+  const mapRef = useRef<any>(null);
+  const [mapError, setMapError] = useState(false);
 
   useEffect(() => {
-    if (!mapContainer.current || map.current) return;
+    if (!mapContainer.current || mapRef.current) return;
+    if (!MAPBOX_TOKEN) {
+      setMapError(true);
+      return;
+    }
 
-    mapboxgl.accessToken = MAPBOX_TOKEN;
+    let cancelled = false;
 
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: "mapbox://styles/mapbox/dark-v11",
-      center: [lng, lat],
-      zoom: 15,
-      attributionControl: false,
+    import("mapbox-gl").then((mapboxgl) => {
+      if (cancelled || !mapContainer.current) return;
+
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = "https://api.mapbox.com/mapbox-gl-js/v3.12.0/mapbox-gl.css";
+      document.head.appendChild(link);
+
+      mapboxgl.default.accessToken = MAPBOX_TOKEN!;
+
+      const map = new mapboxgl.default.Map({
+        container: mapContainer.current!,
+        style: "mapbox://styles/mapbox/dark-v11",
+        center: [lng, lat],
+        zoom: 15,
+        attributionControl: false,
+      });
+
+      map.addControl(new mapboxgl.default.NavigationControl({ showCompass: false }), "top-right");
+
+      new mapboxgl.default.Marker({ color: "hsl(39, 70%, 66%)" })
+        .setLngLat([lng, lat])
+        .addTo(map);
+
+      mapRef.current = map;
+    }).catch(() => {
+      setMapError(true);
     });
 
-    map.current.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "top-right");
-
-    new mapboxgl.Marker({ color: "hsl(39, 70%, 66%)" })
-      .setLngLat([lng, lat])
-      .addTo(map.current);
-
     return () => {
-      map.current?.remove();
-      map.current = null;
+      cancelled = true;
+      mapRef.current?.remove?.();
+      mapRef.current = null;
     };
   }, [lat, lng]);
+
+  const fallbackMap = mapError || !MAPBOX_TOKEN;
+  const mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.008}%2C${lat - 0.005}%2C${lng + 0.008}%2C${lat + 0.005}&layer=mapnik&marker=${lat}%2C${lng}`;
 
   return (
     <div className="rounded-2xl border border-border bg-card overflow-hidden">
@@ -49,22 +71,21 @@ export function PropertyMap({ neighborhood, city, lat = -30.0277, lng = -51.2287
         </div>
         <div>
           <h3 className="font-display text-xl font-bold text-foreground">Localização</h3>
-          <p className="font-body text-xs text-muted-foreground">
-            {neighborhood}, {city}
-          </p>
+          <p className="font-body text-xs text-muted-foreground">{neighborhood}, {city}</p>
         </div>
       </div>
 
       <div className="mt-4 aspect-[16/9] w-full">
-        <div ref={mapContainer} className="h-full w-full" />
+        {fallbackMap ? (
+          <iframe title="Mapa do imóvel" src={mapUrl} className="h-full w-full border-0" loading="lazy" referrerPolicy="no-referrer" />
+        ) : (
+          <div ref={mapContainer} className="h-full w-full" />
+        )}
       </div>
 
       <div className="flex flex-wrap gap-2 p-5">
         {["Supermercado", "Escola", "Parque", "Farmácia", "Restaurantes"].map((poi) => (
-          <span
-            key={poi}
-            className="rounded-full border border-border px-3 py-1 font-body text-xs text-muted-foreground"
-          >
+          <span key={poi} className="rounded-full border border-border px-3 py-1 font-body text-xs text-muted-foreground">
             📍 {poi} próximo
           </span>
         ))}

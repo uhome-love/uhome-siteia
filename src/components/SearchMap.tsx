@@ -111,8 +111,8 @@ export function SearchMap({ imoveis = [], hoveredId, onPinHover, onBoundsSearch 
         type: "geojson",
         data: { type: "FeatureCollection", features: [] },
         cluster: true,
-        clusterMaxZoom: 13,
-        clusterRadius: 50,
+        clusterMaxZoom: 15,
+        clusterRadius: 60,
       });
 
       // Layer 1: cluster circles

@@ -34,6 +34,13 @@ function formatPrecoLabel(min: number, max: number): string {
   return "";
 }
 
+function formatAreaLabel(min: number, max: number): string {
+  if (min && max) return `${min} – ${max}m²`;
+  if (min) return `A partir de ${min}m²`;
+  if (max) return `Até ${max}m²`;
+  return "";
+}
+
 export function SearchFiltersBar() {
   const { filters, setFilter, resetFilters } = useSearchStore();
   const navigate = useNavigate();

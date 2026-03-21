@@ -152,7 +152,7 @@ const PropertyDetail = () => {
                 i === 1 ? "rounded-tr-2xl" : i === 3 ? "rounded-br-2xl" : ""
               }`}
             >
-              <img src={img} alt={`Foto ${i + 2}`} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
+              <FotoImovel src={img} alt={`Foto ${i + 2}`} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
               {i === 3 && images.length > 5 && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/40">
                   <span className="font-body text-sm font-semibold text-white">+{images.length - 5} fotos</span>

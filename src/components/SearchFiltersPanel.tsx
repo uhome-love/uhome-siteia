@@ -175,6 +175,16 @@ export function SearchFiltersPanel({ isOpen, onClose }: { isOpen: boolean; onClo
             </div>
           </FilterSection>
         </div>
+
+        {/* Mobile apply button */}
+        <div className="border-t border-border px-5 py-4 lg:hidden">
+          <button
+            onClick={onClose}
+            className="w-full rounded-full bg-primary py-3 font-body text-sm font-semibold text-primary-foreground transition-all hover:shadow-[0_4px_16px_rgba(91,108,249,0.35)] active:scale-[0.97]"
+          >
+            Aplicar filtros{activeCount > 0 ? ` (${activeCount})` : ""}
+          </button>
+        </div>
       </motion.aside>
     </>
   );

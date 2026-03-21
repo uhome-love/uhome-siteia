@@ -39,7 +39,7 @@ export const bairrosData: BairroData[] = [
   {
     nome: "Auxiliadora",
     slug: "auxiliadora",
-    foto: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80",
+    foto: "/images/auxiliadora.png",
     descricao:
       "Auxiliadora é sinônimo de sofisticação e praticidade. A poucos minutos do Shopping Iguatemi, concentra edifícios de alto padrão, clínicas, escolas e o melhor do comércio da Zona Norte. Perfeito para quem busca viver bem sem abrir mão da centralidade.",
     lat: -30.02,

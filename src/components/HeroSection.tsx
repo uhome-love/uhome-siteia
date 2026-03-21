@@ -60,7 +60,7 @@ export function HeroSection() {
   const quartosOptions = ["Qualquer", "1+", "2+", "3+", "4+"];
 
   return (
-    <section className="relative flex min-h-[92vh] items-center overflow-hidden pt-16">
+    <section className="relative flex min-h-[auto] items-center overflow-hidden pt-16 lg:min-h-[92vh]">
       {/* Background image */}
       <div className="absolute inset-0">
         <img
@@ -78,8 +78,8 @@ export function HeroSection() {
         />
       </div>
 
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-6 py-16 sm:px-8">
-        <div className="flex flex-col items-start gap-10 lg:flex-row lg:items-center lg:gap-16">
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 sm:py-16 lg:px-8">
+        <div className="flex flex-col items-start gap-6 lg:flex-row lg:items-center lg:gap-16">
           {/* Left — headline */}
           <motion.div
             initial={{ opacity: 0, x: -24 }}
@@ -107,10 +107,10 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2, ease }}
-            className="w-full max-w-md rounded-2xl bg-card p-7 shadow-2xl lg:ml-auto"
+            className="w-full max-w-md rounded-2xl bg-card p-5 shadow-2xl sm:p-7 lg:ml-auto"
           >
             {/* Toggle */}
-            <div className="mb-6 flex gap-2">
+            <div className="mb-4 flex gap-2 sm:mb-6">
               {(["comprar", "anunciar"] as const).map((m) => (
                 <button
                   key={m}
@@ -129,7 +129,7 @@ export function HeroSection() {
             {modo === "comprar" ? (
               <>
                 {/* Bairro */}
-                <label className="mb-2.5 block rounded-xl border-[1.5px] border-border p-3.5 transition-colors focus-within:border-primary">
+                <label className="mb-2 block rounded-xl border-[1.5px] border-border p-3 transition-colors focus-within:border-primary sm:mb-2.5 sm:p-3.5">
                   <div className="flex items-center gap-2.5">
                     <MapPin className="h-5 w-5 shrink-0 text-muted-foreground" />
                     <div className="flex-1">
@@ -149,8 +149,8 @@ export function HeroSection() {
                 </label>
 
                 {/* Tipo + Preço */}
-                <div className="mb-2.5 grid grid-cols-2 gap-2.5">
-                  <label className="block rounded-xl border-[1.5px] border-border p-3.5 transition-colors focus-within:border-primary">
+                <div className="mb-2 grid grid-cols-2 gap-2 sm:mb-2.5 sm:gap-2.5">
+                  <label className="block rounded-xl border-[1.5px] border-border p-3 transition-colors focus-within:border-primary sm:p-3.5">
                     <span className="mb-0.5 block font-body text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                       Tipo de imóvel
                     </span>
@@ -170,7 +170,7 @@ export function HeroSection() {
                     </select>
                   </label>
 
-                  <label className="block rounded-xl border-[1.5px] border-border p-3.5 transition-colors focus-within:border-primary">
+                  <label className="block rounded-xl border-[1.5px] border-border p-3 transition-colors focus-within:border-primary sm:p-3.5">
                     <span className="mb-0.5 block font-body text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                       Valor até
                     </span>
@@ -194,11 +194,11 @@ export function HeroSection() {
                 </div>
 
                 {/* Quartos */}
-                <div className="mb-5">
+                <div className="mb-4 sm:mb-5">
                   <span className="mb-2 block font-body text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                     Quartos
                   </span>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
                     {quartosOptions.map((q, i) => {
                       const val = i === 0 ? "" : String(i);
                       const active = quartos === val;
@@ -206,7 +206,7 @@ export function HeroSection() {
                         <button
                           key={q}
                           onClick={() => setQuartos(val)}
-                          className={`rounded-full border-[1.5px] px-4 py-1.5 font-body text-xs transition-all active:scale-[0.96] ${
+                          className={`rounded-full border-[1.5px] px-3 py-1.5 font-body text-xs transition-all active:scale-[0.96] sm:px-4 ${
                             active
                               ? "border-primary bg-primary/10 font-semibold text-primary"
                               : "border-border text-muted-foreground hover:border-foreground/30"

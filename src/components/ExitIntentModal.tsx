@@ -91,10 +91,10 @@ export function ExitIntentModal() {
               </div>
             ) : (
               <>
-                <h3 className="font-display text-2xl font-bold text-foreground">
+                <h3 className="font-display text-2xl font-bold" style={{ color: "var(--gray-900)" }}>
                   Ainda procurando?
                 </h3>
-                <p className="mt-2 font-body text-sm text-muted-foreground">
+                <p className="mt-2 font-body text-sm" style={{ color: "var(--gray-500)" }}>
                   Deixe seu WhatsApp — um corretor responde em até 1h, sem compromisso.
                 </p>
 
@@ -104,7 +104,8 @@ export function ExitIntentModal() {
                     placeholder="Seu WhatsApp"
                     value={telefone}
                     onChange={(e) => setTelefone(e.target.value)}
-                    className="w-full rounded-xl bg-secondary/50 px-4 py-3 font-body text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                    className="w-full rounded-xl border-[1.5px] bg-white px-4 py-3 font-body text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary"
+                    style={{ borderColor: "var(--gray-300)", color: "var(--gray-900)" }}
                     maxLength={20}
                     autoFocus
                   />

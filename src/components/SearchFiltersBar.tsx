@@ -93,7 +93,7 @@ export function SearchFiltersBar() {
   )?.label;
   const areaLabel = areaRanges.find(
     (r) => r.min === filters.areaMin && r.max === filters.areaMax
-  )?.label;
+  )?.label || (filters.areaMin || filters.areaMax ? formatAreaLabel(filters.areaMin, filters.areaMax) : undefined);
   const cidadeLabel = filters.cidade || "Todas";
 
   const hasAny =

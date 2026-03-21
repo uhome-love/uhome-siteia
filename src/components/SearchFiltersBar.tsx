@@ -1,7 +1,8 @@
-import { Search, RotateCcw } from "lucide-react";
+import { Search, RotateCcw, MapPin } from "lucide-react";
 import { useSearchStore } from "@/stores/searchStore";
 import { FilterPill, PillOption } from "@/components/FilterPill";
 import { propertyTypes } from "@/data/properties";
+import { CIDADES_PERMITIDAS } from "@/services/imoveis";
 
 const quartoOptions = [1, 2, 3, 4];
 const vagaOptions = [1, 2, 3];
@@ -33,9 +34,10 @@ export function SearchFiltersBar() {
   const areaLabel = areaRanges.find(
     (r) => r.min === filters.areaMin && r.max === filters.areaMax
   )?.label;
+  const cidadeLabel = filters.cidade || "Todas";
 
   const hasAny =
-    filters.tipo || filters.precoMin || filters.precoMax || filters.areaMin || filters.areaMax || filters.quartos || filters.vagas || filters.q;
+    filters.tipo || filters.precoMin || filters.precoMax || filters.areaMin || filters.areaMax || filters.quartos || filters.vagas || filters.q || (filters.cidade && filters.cidade !== "Porto Alegre");
 
   return (
     <div className="sticky top-16 z-10 flex items-center gap-2 overflow-x-auto border-b border-border bg-background px-5 py-3 scrollbar-none">

@@ -184,8 +184,13 @@ export interface MapPin {
 export async function fetchMapPins(filters: BuscaFilters = {}): Promise<MapPin[]> {
   let query = supabase
     .from("imoveis")
-    .select("id,slug,preco,latitude,longitude,bairro,titulo,tipo,quartos,finalidade")
-    .in("cidade", CIDADES_PERMITIDAS);
+    .select("id,slug,preco,latitude,longitude,bairro,titulo,tipo,quartos,finalidade");
+
+  if (filters.cidade) {
+    query = query.eq("cidade", filters.cidade);
+  } else {
+    query = query.in("cidade", CIDADES_PERMITIDAS);
+  }
 
   if (filters.finalidade) query = query.eq("finalidade", filters.finalidade);
   if (filters.tipo) query = query.eq("tipo", filters.tipo);

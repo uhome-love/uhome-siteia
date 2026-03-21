@@ -54,7 +54,7 @@ const Search = () => {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [alertEmail, setAlertEmail] = useState("");
-  const [alertLoading, setAlertLoading] = useState(false);
+  const [showLeadCTA, setShowLeadCTA] = useState(false);
 
   const [imoveis, setImoveis] = useState<Imovel[]>([]);
   const [mapPins, setMapPins] = useState<MapPinData[]>([]);

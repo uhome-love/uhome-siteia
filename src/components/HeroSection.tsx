@@ -51,14 +51,6 @@ export function HeroSection() {
     return base.filter((b) => b.toLowerCase().includes(q)).slice(0, 10);
   }, [bairroInput, bairrosSelecionados, dbBairros]);
 
-  const bairroSuggestions = useMemo(() => {
-    // Use DB bairros if loaded, otherwise fall back to static list
-    const allBairros = dbBairros.length > 0 ? dbBairros : bairrosData.map((b) => b.nome);
-    const base = allBairros.filter((b) => !bairrosSelecionados.includes(b));
-    if (!bairroInput.trim()) return base.slice(0, 8);
-    const q = bairroInput.toLowerCase();
-    return base.filter((b) => b.toLowerCase().includes(q)).slice(0, 10);
-  }, [bairroInput, bairrosSelecionados, dbBairros]);
 
   const addBairro = (nome: string) => {
     if (!bairrosSelecionados.includes(nome)) {

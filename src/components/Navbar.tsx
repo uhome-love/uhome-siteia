@@ -65,7 +65,7 @@ export function Navbar() {
             exit={{ opacity: 0, height: 0 }}
             className="border-t border-border bg-background md:hidden"
           >
-            <div className="container-uhome flex flex-col gap-4 py-6">
+            <div className="flex flex-col gap-4 px-8 py-6">
               {navLinks.map((link) => (
                 <Link
                   key={link.label}

@@ -76,8 +76,8 @@ export const mockProperties: MockProperty[] = [
   },
   {
     id: "7", slug: "apto-rio-branco", title: "Apartamento Clássico Centro",
-    neighborhood: "Centro Histórico", city: "Porto Alegre", price: 1500,
-    priceFormatted: "R$ 1.500/mês", finalidade: "locacao", tipo: "apartamento",
+    neighborhood: "Centro Histórico", city: "Porto Alegre", price: 295000,
+    priceFormatted: "R$ 295.000", finalidade: "venda", tipo: "apartamento",
     area: 55, bedrooms: 1, bathrooms: 1, parking: 0,
     image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&h=400&fit=crop",
     features: ["Portaria 24h"],

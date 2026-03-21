@@ -42,7 +42,7 @@ function toGeoJSON(imoveis: Imovel[]) {
 }
 
 /** Create a rounded-pill SDF-like image for the pin background */
-function createPinImage(color: string, w = 80, h = 28): HTMLCanvasElement {
+function createPinImageData(color: string, w = 80, h = 28): { width: number; height: number; data: Uint8Array } {
   const canvas = document.createElement("canvas");
   const dpr = 2;
   canvas.width = w * dpr;
@@ -57,17 +57,17 @@ function createPinImage(color: string, w = 80, h = 28): HTMLCanvasElement {
   ctx.lineTo(r, h);
   ctx.arc(r, r, r, Math.PI / 2, -Math.PI / 2);
   ctx.closePath();
-  ctx.fillStyle = color;
-  ctx.fill();
-  ctx.strokeStyle = "rgba(0,0,0,0.12)";
-  ctx.lineWidth = 1;
-  ctx.stroke();
-  // small shadow
   ctx.shadowColor = "rgba(0,0,0,0.15)";
   ctx.shadowBlur = 6;
   ctx.shadowOffsetY = 2;
+  ctx.fillStyle = color;
   ctx.fill();
-  return canvas;
+  ctx.shadowColor = "transparent";
+  ctx.strokeStyle = "rgba(0,0,0,0.12)";
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  return { width: canvas.width, height: canvas.height, data: new Uint8Array(imgData.data.buffer) };
 }
 
 interface SearchMapProps {

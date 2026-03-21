@@ -214,7 +214,7 @@ const PropertyDetail = () => {
                 <MapPin className="h-4 w-4" />
                 {property.neighborhood}, {property.city}
               </p>
-              <p className="mt-4 font-display text-3xl font-bold text-primary">{property.priceFormatted}</p>
+              <p className="mt-4 text-price-lg text-primary">{property.priceFormatted}</p>
             </div>
 
             {/* Stats */}

@@ -14,6 +14,8 @@ import Bairro from "./pages/Bairro.tsx";
 import Bairros from "./pages/Bairros.tsx";
 import FAQ from "./pages/FAQ.tsx";
 import Onboarding from "./pages/Onboarding.tsx";
+import Blog from "./pages/Blog.tsx";
+import BlogPostPage from "./pages/BlogPost.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();

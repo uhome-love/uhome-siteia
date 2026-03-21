@@ -242,13 +242,13 @@ export function HeroSection() {
                       >
                         {bairroSuggestions.map((b) => (
                           <button
-                            key={b.slug}
+                            key={b}
                             type="button"
-                            onClick={() => addBairro(b.nome)}
+                            onClick={() => addBairro(b)}
                             className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left font-body text-sm text-foreground transition-colors hover:bg-secondary"
                           >
                             <MapPin className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                            {b.nome}
+                            {b}
                           </button>
                         ))}
                       </motion.div>

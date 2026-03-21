@@ -14,6 +14,7 @@ import { useCanonical } from "@/hooks/useCanonical";
 
 const PropertyDetail = () => {
   const { slug } = useParams();
+  useCanonical(slug ? `/imovel/${slug}` : undefined);
   const [currentImage, setCurrentImage] = useState(0);
   const [viewCount, setViewCount] = useState(0);
   const [liked, setLiked] = useState(false);

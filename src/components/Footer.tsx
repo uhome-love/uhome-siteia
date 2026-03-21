@@ -44,7 +44,8 @@ export function Footer() {
                 <a href={`tel:+${WHATSAPP_NUMBER}`} className="transition-colors hover:text-foreground">{WHATSAPP_DISPLAY}</a>
               </li>
               <li>
-                <a href="mailto:contato@uhome.com.br" className="transition-colors hover:text-foreground">contato@uhome.com.br</a>
+                <a href="mailto:lucas@uhome.imb.br" className="transition-colors hover:text-foreground">lucas@uhome.imb.br</a>
+              </li>
               </li>
               <li>Porto Alegre, RS</li>
             </ul>

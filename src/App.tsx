@@ -12,6 +12,7 @@ import Anunciar from "./pages/Anunciar.tsx";
 import Carreiras from "./pages/Carreiras.tsx";
 import Bairro from "./pages/Bairro.tsx";
 import Bairros from "./pages/Bairros.tsx";
+import FAQ from "./pages/FAQ.tsx";
 import Onboarding from "./pages/Onboarding.tsx";
 import NotFound from "./pages/NotFound.tsx";
 

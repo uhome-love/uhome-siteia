@@ -14,19 +14,33 @@ export function ExitIntentModal() {
     const shown = sessionStorage.getItem("uhome_exit_shown");
     if (shown) return;
 
+    const pageLoadTime = Date.now();
+
+    const canShow = () => {
+      // Don't show if a dropdown/popover/select is open
+      const openEl = document.querySelector(
+        '[data-state="open"], [aria-expanded="true"]'
+      );
+      if (openEl) return false;
+      // Require at least 60s on page
+      if (Date.now() - pageLoadTime < 60000) return false;
+      if (sessionStorage.getItem("uhome_exit_shown")) return false;
+      return true;
+    };
+
     const handleMouseLeave = (e: MouseEvent) => {
-      if (e.clientY <= 0) {
+      if (e.clientY <= 0 && canShow()) {
         sessionStorage.setItem("uhome_exit_shown", "1");
         setShow(true);
       }
     };
 
     const timer = setTimeout(() => {
-      if (!sessionStorage.getItem("uhome_exit_shown")) {
+      if (canShow()) {
         sessionStorage.setItem("uhome_exit_shown", "1");
         setShow(true);
       }
-    }, 60000);
+    }, 90000);
 
     document.addEventListener("mouseleave", handleMouseLeave);
     return () => {

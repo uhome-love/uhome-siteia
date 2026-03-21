@@ -71,6 +71,14 @@ const App = () => (
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPostPage />} />
               <Route path="/favoritos" element={<Favoritos />} />
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<AdminDashboard />} />
+                <Route path="imoveis" element={<AdminImoveis />} />
+                <Route path="leads" element={<AdminLeads />} />
+                <Route path="captacoes" element={<AdminCaptacoes />} />
+                <Route path="sync" element={<AdminSync />} />
+                <Route path="config" element={<AdminConfig />} />
+              </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>

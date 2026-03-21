@@ -30,8 +30,7 @@ export function FloatingCTA() {
   };
 
   const handleClick = () => {
-    const msg = encodeURIComponent("Olá! Vim pelo site da Uhome e gostaria de saber mais sobre os imóveis disponíveis.");
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
+    window.open(whatsappLink("Olá! Vim pelo site da Uhome e gostaria de saber mais sobre os imóveis disponíveis."), "_blank");
   };
 
   if (dismissed) return null;

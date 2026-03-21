@@ -61,7 +61,7 @@ export function FilterPill({ label, value, active, children, onClear }: FilterPi
   return (
     <div ref={ref} className="relative shrink-0">
       <button
-        onClick={() => setOpen(!open)}
+        onClick={(e) => { e.stopPropagation(); setOpen(!open); }}
         className={`flex items-center gap-1.5 rounded-full border px-3.5 py-2 font-body text-[13px] font-medium transition-all active:scale-[0.97] ${
           active
             ? "border-primary bg-primary text-primary-foreground"

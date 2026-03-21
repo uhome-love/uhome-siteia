@@ -14,7 +14,6 @@ export function ExitIntentModal() {
     const shown = sessionStorage.getItem("uhome_exit_shown");
     if (shown) return;
 
-    // Desktop: mouse leaves top
     const handleMouseLeave = (e: MouseEvent) => {
       if (e.clientY <= 0) {
         sessionStorage.setItem("uhome_exit_shown", "1");
@@ -22,7 +21,6 @@ export function ExitIntentModal() {
       }
     };
 
-    // Mobile: 60s timeout
     const timer = setTimeout(() => {
       if (!sessionStorage.getItem("uhome_exit_shown")) {
         sessionStorage.setItem("uhome_exit_shown", "1");
@@ -73,12 +71,11 @@ export function ExitIntentModal() {
             exit={{ opacity: 0, scale: 0.95, y: 16 }}
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-md rounded-2xl bg-white p-8 shadow-xl"
+            className="relative w-full max-w-md rounded-2xl bg-card p-8 shadow-xl"
           >
             <button
               onClick={() => setShow(false)}
-              className="absolute right-4 top-4 rounded-lg p-1 transition-colors hover:text-foreground"
-              style={{ color: "var(--gray-400)" }}
+              className="absolute right-4 top-4 rounded-lg p-1 text-muted-foreground transition-colors hover:text-foreground"
             >
               <X className="h-5 w-5" />
             </button>
@@ -86,16 +83,16 @@ export function ExitIntentModal() {
             {success ? (
               <div className="flex flex-col items-center gap-3 py-6">
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-500/10">
-                  <Check className="h-6 w-6 text-green-400" />
+                  <Check className="h-6 w-6 text-green-500" />
                 </div>
                 <p className="font-body text-sm text-foreground">Entraremos em contato em breve!</p>
               </div>
             ) : (
               <>
-                <h3 className="font-display text-2xl font-bold" style={{ color: "var(--gray-900)" }}>
+                <h3 className="font-body text-2xl font-bold text-foreground">
                   Ainda procurando?
                 </h3>
-                <p className="mt-2 font-body text-sm" style={{ color: "var(--gray-500)" }}>
+                <p className="mt-2 font-body text-sm text-muted-foreground">
                   Deixe seu WhatsApp — um corretor responde em até 1h, sem compromisso.
                 </p>
 
@@ -105,8 +102,7 @@ export function ExitIntentModal() {
                     placeholder="Seu WhatsApp"
                     value={telefone}
                     onChange={(e) => setTelefone(e.target.value)}
-                    className="w-full rounded-xl border-[1.5px] bg-white px-4 py-3 font-body text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary"
-                    style={{ borderColor: "var(--gray-300)", color: "var(--gray-900)" }}
+                    className="w-full rounded-xl border-[1.5px] border-border bg-card px-4 py-3 font-body text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
                     maxLength={20}
                     autoFocus
                   />
@@ -122,8 +118,7 @@ export function ExitIntentModal() {
 
                 <button
                   onClick={() => setShow(false)}
-                  className="mt-3 w-full text-center font-body text-xs transition-colors hover:text-foreground cursor-pointer"
-                  style={{ color: "var(--gray-400)" }}
+                  className="mt-3 w-full text-center font-body text-xs text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
                 >
                   Não, obrigado
                 </button>

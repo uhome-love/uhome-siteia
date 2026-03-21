@@ -171,13 +171,11 @@ const Search = () => {
         quartos: f.quartos || undefined,
         diferenciais: f.diferenciais?.length ? f.diferenciais : undefined,
       };
-      const [{ data, count }, pins] = await Promise.all([
-        fetchImoveis({ ...aiFilters, limit: 40 }),
-        fetchMapPins(aiFilters),
-      ]);
+      const { data, count } = await fetchImoveis({ ...aiFilters, limit: 40 });
       setImoveis(data);
       setTotal(count);
-      setMapPins(pins);
+      // Load pins in background
+      fetchMapPins(aiFilters).then(setMapPins).catch(console.error);
     } catch (e: any) {
       toast.error(e?.message || "Erro ao interpretar busca");
     } finally {

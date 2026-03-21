@@ -9,6 +9,7 @@ import Index from "./pages/Index.tsx";
 import Search from "./pages/Search.tsx";
 import PropertyDetail from "./pages/PropertyDetail.tsx";
 import Anunciar from "./pages/Anunciar.tsx";
+import Carreiras from "./pages/Carreiras.tsx";
 import Onboarding from "./pages/Onboarding.tsx";
 import NotFound from "./pages/NotFound.tsx";
 

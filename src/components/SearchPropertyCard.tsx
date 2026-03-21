@@ -32,7 +32,7 @@ export function SearchPropertyCard({ imovel, index }: { imovel: Imovel; index: n
           {/* Image */}
           <div
             className="relative w-full cursor-pointer overflow-hidden"
-            style={{ aspectRatio: '4/3', borderRadius: '12px 12px 0 0' }}
+            style={{ aspectRatio: '16/9', borderRadius: '12px 12px 0 0' }}
             onClick={() => navigate(`/imovel/${imovel.slug}`)}
           >
             <img

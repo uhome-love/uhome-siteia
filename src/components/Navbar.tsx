@@ -14,7 +14,7 @@ export function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
-      <div className="container-uhome flex h-16 items-center justify-between">
+      <div className="flex h-16 w-full items-center justify-between px-8">
         <Link to="/" className="flex items-center">
           <UhomeLogo variant="full" size="sm" />
         </Link>

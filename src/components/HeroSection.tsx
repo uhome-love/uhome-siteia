@@ -60,7 +60,8 @@ export function HeroSection() {
   const handleBuscar = () => {
     const params = new URLSearchParams();
     params.set("finalidade", "venda");
-    if (bairro) params.set("q", bairro);
+    if (bairrosSelecionados.length) params.set("q", bairrosSelecionados.join(","));
+    else if (bairroInput.trim()) params.set("q", bairroInput.trim());
     if (tipo) params.set("tipo", tipo);
     if (preco) params.set("preco_max", preco);
     if (quartos) params.set("quartos", quartos);

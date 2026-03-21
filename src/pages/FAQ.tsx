@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { setJsonLd, removeJsonLd } from "@/lib/jsonld";
+import { useCanonical } from "@/hooks/useCanonical";
 import { motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
 import {
@@ -111,6 +112,7 @@ function buildFaqJsonLd(items: FaqItem[]) {
 }
 
 const FAQ = () => {
+  useCanonical();
   useEffect(() => {
     const title = "Perguntas Frequentes sobre Imóveis em Porto Alegre | Uhome";
     const desc =

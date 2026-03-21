@@ -7,6 +7,7 @@ import { FeaturedProperties } from "@/components/FeaturedProperties";
 import { AISearchSection } from "@/components/AISearchSection";
 import { Footer } from "@/components/Footer";
 import { setJsonLd, removeJsonLd, buildOrganizationJsonLd } from "@/lib/jsonld";
+import { useCanonical } from "@/hooks/useCanonical";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -17,6 +18,8 @@ const Index = () => {
       navigate("/onboarding", { replace: true });
     }
   }, [navigate]);
+
+  useCanonical("/");
 
   useEffect(() => {
     setJsonLd("jsonld-org", buildOrganizationJsonLd());

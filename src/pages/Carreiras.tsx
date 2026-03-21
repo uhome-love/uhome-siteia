@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { useCanonical } from "@/hooks/useCanonical";
 
 const benefits = [
   {
@@ -74,6 +75,7 @@ const vagas = [
 const ease = [0.16, 1, 0.3, 1] as const;
 
 const Carreiras = () => {
+  useCanonical();
   const vagasRef = useRef<HTMLElement>(null);
 
   useEffect(() => {

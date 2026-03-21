@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ArrowUpDown, Bell, Loader2, Map as MapIcon, MapPin, Sparkles, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { useCanonical } from "@/hooks/useCanonical";
 
 const sortLabels: Record<string, string> = {
   recentes: "Mais recentes",
@@ -41,6 +42,7 @@ function describeFilters(filters: Record<string, any>): string {
 }
 
 const Search = () => {
+  useCanonical();
   const [searchParams, setSearchParams] = useSearchParams();
   const modoIA = searchParams.get("modo") === "ia";
   const { filters, setFilter, setFilters } = useSearchStore();

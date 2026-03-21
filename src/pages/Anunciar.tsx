@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { UhomeLogo } from "@/components/UhomeLogo";
+import { useCanonical } from "@/hooks/useCanonical";
 
 const steps = [
   {
@@ -55,6 +56,7 @@ const fadeUp = {
 };
 
 const Anunciar = () => {
+  useCanonical();
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
   const [tipoImovel, setTipoImovel] = useState("");

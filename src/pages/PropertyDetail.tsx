@@ -10,9 +10,11 @@ import { motion } from "framer-motion";
 import { trackView, getViewCount } from "@/services/leads";
 import { fetchImovelBySlug, type Imovel, formatPreco, fotoPrincipal } from "@/services/imoveis";
 import { setJsonLd, removeJsonLd, buildImovelJsonLd, buildImovelBreadcrumbJsonLd } from "@/lib/jsonld";
+import { useCanonical } from "@/hooks/useCanonical";
 
 const PropertyDetail = () => {
   const { slug } = useParams();
+  useCanonical(slug ? `/imovel/${slug}` : undefined);
   const [currentImage, setCurrentImage] = useState(0);
   const [viewCount, setViewCount] = useState(0);
   const [liked, setLiked] = useState(false);

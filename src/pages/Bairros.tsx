@@ -6,6 +6,7 @@ import { bairrosData } from "@/data/bairros";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 import { MapPin } from "lucide-react";
+import { useCanonical } from "@/hooks/useCanonical";
 
 function setMeta(attr: string, key: string, content: string) {
   const selector = `meta[${attr}="${key}"]`;
@@ -19,6 +20,7 @@ function setMeta(attr: string, key: string, content: string) {
 }
 
 const Bairros = () => {
+  useCanonical();
   const [contagens, setContagens] = useState<Record<string, number>>({});
 
   useEffect(() => {

@@ -76,6 +76,13 @@ export function Navbar() {
                   {link.label}
                 </Link>
               ))}
+              <Link
+                to="/anunciar"
+                onClick={() => setMobileOpen(false)}
+                className="mt-2 inline-block rounded-full border-[1.5px] border-primary px-5 py-2.5 text-center font-body text-base font-semibold text-primary"
+              >
+                Anuncie seu imóvel
+              </Link>
             </div>
           </motion.div>
         )}

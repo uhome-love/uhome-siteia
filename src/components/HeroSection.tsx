@@ -67,6 +67,7 @@ export function HeroSection() {
     if (tipo) params.set("tipo", tipo);
     if (preco) params.set("preco_max", preco);
     if (quartos) params.set("quartos", quartos);
+    if (cidade && cidade !== "Porto Alegre") params.set("cidade", cidade);
     navigate(`/busca?${params.toString()}`);
   };
 

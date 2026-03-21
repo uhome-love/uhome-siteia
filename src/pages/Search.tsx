@@ -132,22 +132,22 @@ const Search = () => {
       <SearchFiltersBar />
 
       {/* Subheader: counter + bounds badge + sort + alert */}
-      <div className="flex items-center justify-between border-b border-border bg-background px-6 py-4">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-background px-4 py-3 sm:px-6 sm:py-4">
+        <div className="flex items-center gap-2">
           <div>
-            <div className="font-body text-[22px] font-extrabold leading-tight text-foreground">
+            <div className="font-body text-lg font-extrabold leading-tight text-foreground sm:text-[22px]">
               {total.toLocaleString("pt-BR")} imóveis
             </div>
-            <div className="mt-0.5 font-body text-sm text-muted-foreground">
+            <div className="mt-0.5 font-body text-xs text-muted-foreground sm:text-sm">
               à venda em Porto Alegre{filters.bairro ? `, ${filters.bairro}` : ""}
             </div>
           </div>
 
           {/* Bounds active badge */}
           {filters.bounds && (
-            <div className="flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 font-body text-xs font-semibold text-primary">
+            <div className="flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 font-body text-[11px] font-semibold text-primary sm:gap-1.5 sm:px-3 sm:py-1 sm:text-xs">
               <MapPin className="h-3 w-3" />
-              Área do mapa
+              Mapa
               <button
                 onClick={clearBounds}
                 className="ml-0.5 font-bold leading-none hover:opacity-70"
@@ -158,15 +158,16 @@ const Search = () => {
           )}
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {/* Sort */}
           <div className="relative">
             <button
               onClick={() => setSortOpen(!sortOpen)}
-              className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 font-body text-xs font-medium text-foreground transition-colors hover:border-foreground"
+              className="flex items-center gap-1 rounded-full border border-border px-2.5 py-1.5 font-body text-[11px] font-medium text-foreground transition-colors hover:border-foreground sm:gap-1.5 sm:px-3 sm:text-xs"
             >
-              <ArrowUpDown className="h-3.5 w-3.5" />
-              {sortLabels[filters.ordem]}
+              <ArrowUpDown className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+              <span className="hidden sm:inline">{sortLabels[filters.ordem]}</span>
+              <span className="sm:hidden">Ordenar</span>
             </button>
             {sortOpen && (
               <motion.div
@@ -194,10 +195,10 @@ const Search = () => {
           {/* Alert button */}
           <button
             onClick={() => setShowAlertModal(true)}
-            className="flex items-center gap-1.5 rounded-full border-[1.5px] border-primary px-3.5 py-1.5 font-body text-xs font-semibold text-primary transition-colors hover:bg-primary/5 active:scale-[0.97]"
+            className="flex items-center gap-1 rounded-full border-[1.5px] border-primary px-2.5 py-1.5 font-body text-[11px] font-semibold text-primary transition-colors hover:bg-primary/5 active:scale-[0.97] sm:gap-1.5 sm:px-3.5 sm:text-xs"
           >
-            <Bell className="h-3.5 w-3.5" />
-            Criar alerta
+            <Bell className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+            Alerta
           </button>
         </div>
       </div>

@@ -1,10 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { AISearchBar } from "@/components/AISearchBar";
 import { SearchPropertyCard } from "@/components/SearchPropertyCard";
-import { mockProperties } from "@/data/properties";
+import { fetchImoveis, type Imovel } from "@/services/imoveis";
 import { interpretarBusca, type AISearchResult } from "@/services/aiSearch";
 import { Sparkles, SlidersHorizontal, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -17,6 +17,7 @@ const AISearchPage = () => {
 
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AISearchResult | null>(null);
+  const [imoveis, setImoveis] = useState<Imovel[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [searchedQuery, setSearchedQuery] = useState("");
 
@@ -28,6 +29,21 @@ const AISearchPage = () => {
     try {
       const res = await interpretarBusca(query);
       setResult(res);
+
+      // Use AI-extracted filters to query Supabase
+      const f = res.filtros;
+      const { data } = await fetchImoveis({
+        finalidade: f.finalidade || undefined,
+        tipo: f.tipo || undefined,
+        bairro: f.bairros?.[0] || undefined,
+        precoMin: f.preco_min || undefined,
+        precoMax: f.preco_max || undefined,
+        areaMin: f.area_min || undefined,
+        quartos: f.quartos || undefined,
+        diferenciais: f.diferenciais?.length ? f.diferenciais : undefined,
+        limit: 20,
+      });
+      setImoveis(data);
     } catch (e: any) {
       const msg = e?.message || "Erro ao interpretar busca";
       setError(msg);
@@ -37,36 +53,11 @@ const AISearchPage = () => {
     }
   };
 
-  // Auto-search if query param exists
   useEffect(() => {
     if (initialQuery) {
       handleSearch(initialQuery);
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Filter properties based on AI result
-  const filtered = useMemo(() => {
-    if (!result) return [];
-    const f = result.filtros;
-
-    return mockProperties.filter((p) => {
-      if (f.finalidade && p.finalidade !== f.finalidade) return false;
-      if (f.tipo && p.tipo !== f.tipo) return false;
-      if (f.bairros?.length) {
-        const normalizedBairros = f.bairros.map((b) => b.toLowerCase());
-        if (!normalizedBairros.some((b) => p.neighborhood.toLowerCase().includes(b))) return false;
-      }
-      if (f.preco_max && p.price > f.preco_max) return false;
-      if (f.preco_min && p.price < f.preco_min) return false;
-      if (f.quartos && p.bedrooms < f.quartos) return false;
-      if (f.area_min && p.area < f.area_min) return false;
-      if (f.diferenciais?.length) {
-        const pFeatures = p.features.map((feat) => feat.toLowerCase());
-        if (!f.diferenciais.some((d) => pFeatures.some((pf) => pf.includes(d.toLowerCase())))) return false;
-      }
-      return true;
-    });
-  }, [result]);
 
   const confidenceColor = {
     alta: "text-green-400 bg-green-400/10",
@@ -79,7 +70,6 @@ const AISearchPage = () => {
       <Navbar />
 
       <div className="container-uhome pt-24 pb-16">
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 16, filter: "blur(4px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -100,7 +90,6 @@ const AISearchPage = () => {
           </p>
         </motion.div>
 
-        {/* Search bar */}
         <motion.div
           initial={{ opacity: 0, y: 16, filter: "blur(4px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -110,10 +99,8 @@ const AISearchPage = () => {
           <AISearchBar onSearch={handleSearch} loading={loading} />
         </motion.div>
 
-        {/* Results */}
         <div className="mt-12">
           <AnimatePresence mode="wait">
-            {/* Error state */}
             {error && !loading && (
               <motion.div
                 key="error"
@@ -128,7 +115,6 @@ const AISearchPage = () => {
               </motion.div>
             )}
 
-            {/* Result summary + filters */}
             {result && !loading && (
               <motion.div
                 key="results"
@@ -137,7 +123,6 @@ const AISearchPage = () => {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.5 }}
               >
-                {/* Summary card */}
                 <div className="mx-auto mb-8 max-w-3xl">
                   <div className="glass rounded-2xl p-5">
                     <div className="flex flex-wrap items-center justify-between gap-3">
@@ -156,7 +141,6 @@ const AISearchPage = () => {
                       </span>
                     </div>
 
-                    {/* Active filters */}
                     {Object.entries(result.filtros).some(([, v]) =>
                       Array.isArray(v) ? v.length > 0 : v !== undefined
                     ) && (
@@ -181,13 +165,12 @@ const AISearchPage = () => {
                   </div>
                 </div>
 
-                {/* Property results */}
                 <div className="mx-auto max-w-4xl">
                   <p className="mb-4 font-body text-sm text-muted-foreground">
-                    {filtered.length} {filtered.length === 1 ? "imóvel encontrado" : "imóveis encontrados"}
+                    {imoveis.length} {imoveis.length === 1 ? "imóvel encontrado" : "imóveis encontrados"}
                   </p>
 
-                  {filtered.length === 0 ? (
+                  {imoveis.length === 0 ? (
                     <div className="rounded-2xl border border-border bg-card p-12 text-center">
                       <p className="font-body text-sm text-muted-foreground">
                         Nenhum imóvel corresponde aos filtros. Tente uma busca mais ampla.
@@ -195,14 +178,14 @@ const AISearchPage = () => {
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      {filtered.map((p, i) => (
+                      {imoveis.map((imovel, i) => (
                         <motion.div
-                          key={p.id}
+                          key={imovel.id}
                           initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
                           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                           transition={{ duration: 0.4, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
                         >
-                          <SearchPropertyCard property={p} index={i} />
+                          <SearchPropertyCard imovel={imovel} index={i} />
                         </motion.div>
                       ))}
                     </div>
@@ -211,7 +194,6 @@ const AISearchPage = () => {
               </motion.div>
             )}
 
-            {/* Empty state */}
             {!result && !loading && !error && (
               <motion.div
                 key="empty"

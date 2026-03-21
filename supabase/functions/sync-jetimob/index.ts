@@ -49,20 +49,26 @@ function mapStatus(s?: string): string {
 function extractFotos(item: any): string {
   const fotos: Array<{ url: string; ordem: number; principal: boolean }> = [];
 
-  // Jetimob returns fotos in various formats
-  const rawFotos = item.fotos || item.imagens || item.photos || [];
+  const rawFotos = item.imagens || item.fotos || item.galeria || item.photos || [];
   if (Array.isArray(rawFotos)) {
     rawFotos.forEach((f: any, i: number) => {
-      const url = typeof f === "string" ? f : f.url || f.link || f.src || "";
+      let url = "";
+      if (typeof f === "string") {
+        url = f;
+      } else {
+        url = f.link_large || f.link || f.link_medio || f.link_thumb || f.url || f.arquivo || f.src || "";
+      }
       if (url) {
-        fotos.push({ url, ordem: f.ordem ?? i, principal: f.principal ?? i === 0 });
+        fotos.push({ url, ordem: f?.ordem ?? i, principal: f?.principal ?? i === 0 });
       }
     });
   }
 
-  // Also check for foto_principal
   if (item.foto_principal && !fotos.some((f) => f.url === item.foto_principal)) {
     fotos.unshift({ url: item.foto_principal, ordem: 0, principal: true });
+  }
+  if (item.foto_destaque && !fotos.some((f) => f.url === item.foto_destaque)) {
+    fotos.unshift({ url: item.foto_destaque, ordem: 0, principal: true });
   }
 
   return JSON.stringify(fotos);

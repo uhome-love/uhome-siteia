@@ -57,6 +57,7 @@ const Search = () => {
   const [mapPins, setMapPins] = useState<MapPinData[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [mapLoading, setMapLoading] = useState(true);
 
   // AI mode state
   const [queryIA, setQueryIA] = useState(searchParams.get("q") || "");
@@ -115,27 +116,31 @@ const Search = () => {
     };
   }, [filters]);
 
-  // Normal mode: fetch list (paginated) + map pins (all)
+  // Normal mode: fetch list first (fast), then map pins in background
   const loadImoveis = useCallback(async () => {
     if (modoIA && !aiResult) return;
     setLoading(true);
     try {
       const baseFilters = buildFilters();
-      const [result, pins] = await Promise.all([
-        fetchImoveis({
-          ...baseFilters,
-          ordem: filters.ordem as any,
-          bounds: filters.bounds || undefined,
-          limit: 40,
-        }),
-        fetchMapPins(baseFilters),
-      ]);
+      // Load list immediately — don't wait for map pins
+      const result = await fetchImoveis({
+        ...baseFilters,
+        ordem: filters.ordem as any,
+        bounds: filters.bounds || undefined,
+        limit: 40,
+      });
       setImoveis(result.data);
       setTotal(result.count);
-      setMapPins(pins);
+      setLoading(false);
+
+      // Load map pins in background (13k+ rows, slower)
+      setMapLoading(true);
+      fetchMapPins(baseFilters)
+        .then(setMapPins)
+        .catch((err) => console.error("Erro ao buscar pins:", err))
+        .finally(() => setMapLoading(false));
     } catch (err) {
       console.error("Erro ao buscar imóveis:", err);
-    } finally {
       setLoading(false);
     }
   }, [filters, modoIA, aiResult, buildFilters]);
@@ -166,13 +171,11 @@ const Search = () => {
         quartos: f.quartos || undefined,
         diferenciais: f.diferenciais?.length ? f.diferenciais : undefined,
       };
-      const [{ data, count }, pins] = await Promise.all([
-        fetchImoveis({ ...aiFilters, limit: 40 }),
-        fetchMapPins(aiFilters),
-      ]);
+      const { data, count } = await fetchImoveis({ ...aiFilters, limit: 40 });
       setImoveis(data);
       setTotal(count);
-      setMapPins(pins);
+      // Load pins in background
+      fetchMapPins(aiFilters).then(setMapPins).catch(console.error);
     } catch (e: any) {
       toast.error(e?.message || "Erro ao interpretar busca");
     } finally {

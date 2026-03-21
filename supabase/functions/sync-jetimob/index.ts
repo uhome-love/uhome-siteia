@@ -8,6 +8,10 @@ const corsHeaders = {
 
 const JETIMOB_BASE = "https://api.jetimob.com/webservice";
 
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 function slugify(text: string, codigo: string): string {
   const base = text
     .toLowerCase()
@@ -63,7 +67,6 @@ function mapStatus(s?: string): string {
 
 function extractFotos(item: any): string {
   const fotos: Array<{ url: string; ordem: number; principal: boolean }> = [];
-
   const rawFotos = item.imagens || item.fotos || item.galeria || item.photos || [];
   if (Array.isArray(rawFotos)) {
     rawFotos.forEach((f: any, i: number) => {
@@ -78,14 +81,12 @@ function extractFotos(item: any): string {
       }
     });
   }
-
   if (item.foto_principal && !fotos.some((f) => f.url === item.foto_principal)) {
     fotos.unshift({ url: item.foto_principal, ordem: 0, principal: true });
   }
   if (item.foto_destaque && !fotos.some((f) => f.url === item.foto_destaque)) {
     fotos.unshift({ url: item.foto_destaque, ordem: 0, principal: true });
   }
-
   return JSON.stringify(fotos);
 }
 
@@ -102,16 +103,7 @@ function extractDiferenciais(item: any): string[] {
 }
 
 function extractPreco(j: any): number {
-  // Try multiple field names; pick the first truthy numeric value
-  const candidates = [
-    j.valor_venda,
-    j.valor_locacao,
-    j.valor_temporada,
-    j.valor,
-    j.preco,
-    j.price,
-    j.valor_total,
-  ];
+  const candidates = [j.valor_venda, j.valor_locacao, j.valor_temporada, j.valor, j.preco, j.price, j.valor_total];
   for (const v of candidates) {
     const n = Number(v);
     if (n > 0) return n;
@@ -158,73 +150,166 @@ function mapImovel(j: any) {
   };
 }
 
+function extractItems(data: any): any[] {
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.data)) return data.data;
+  if (Array.isArray(data?.result)) return data.result;
+  if (Array.isArray(data?.imoveis)) return data.imoveis;
+  if (Array.isArray(data?.items)) return data.items;
+  if (Array.isArray(data?.results)) return data.results;
+  return [];
+}
+
+function extractTotal(data: any): number | null {
+  const candidates = [
+    data?.total,
+    data?.count,
+    data?.totalResults,
+    data?.totalItems,
+    data?.total_items,
+    data?.meta?.total,
+    data?.pagination?.total,
+    data?.paginacao?.total,
+  ];
+  for (const v of candidates) {
+    const n = Number(v);
+    if (n > 0) return n;
+  }
+  return null;
+}
+
+function hasNextPage(data: any, itemsCount: number, pageSize: number): boolean {
+  // Explicit next page indicators
+  if (data?.proxima_pagina != null) return !!data.proxima_pagina;
+  if (data?.next_page != null) return !!data.next_page;
+  if (data?.has_more != null) return !!data.has_more;
+  if (data?.meta?.has_next_page != null) return !!data.meta.has_next_page;
+  if (data?.pagination?.has_next != null) return !!data.pagination.has_next;
+  // Fallback: if the page came full, there's probably more
+  return itemsCount >= pageSize;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // Support both secret names
     const JETIMOB_KEY = Deno.env.get("JETIMOB_API_KEY") || Deno.env.get("JETIMOB_API_TOKEN");
-    if (!JETIMOB_KEY) {
-      throw new Error("JETIMOB_API_KEY is not configured");
-    }
+    if (!JETIMOB_KEY) throw new Error("JETIMOB_API_KEY is not configured");
 
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-      throw new Error("Supabase credentials not configured");
-    }
+    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) throw new Error("Supabase credentials not configured");
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Fetch and upsert page by page (stream to avoid timeout)
-    const pageSize = 200;
-    const maxPages = 50;
+    const PAGE_SIZE = 200;
+    const MAX_PAGES = 100;
+    const MAX_RETRIES = 3;
+    const RATE_LIMIT_MS = 500;
+
+    let totalInserted = 0;
+    let totalErrors = 0;
     let totalFetched = 0;
-    let inseridos = 0;
-    let erros = 0;
+    let expectedTotal: number | null = null;
 
-    console.log(`JETIMOB_KEY length: ${JETIMOB_KEY.length}`);
+    console.log(`🔄 Sync started | key length: ${JETIMOB_KEY.length}`);
 
-    for (let page = 1; page <= maxPages; page++) {
-      const url = `${JETIMOB_BASE}/${JETIMOB_KEY}/imoveis/todos?v=6&page=${page}&pageSize=${pageSize}`;
-      console.log(`Page ${page}...`);
+    for (let page = 1; page <= MAX_PAGES; page++) {
+      const url = `${JETIMOB_BASE}/${JETIMOB_KEY}/imoveis/todos?v=6&page=${page}&pageSize=${PAGE_SIZE}`;
 
-      const response = await fetch(url, { headers: { Accept: "application/json" } });
+      let response: Response | null = null;
+      let retries = 0;
 
-      if (!response.ok) {
-        const text = await response.text();
-        console.error(`Page ${page} error: ${response.status}`, text.slice(0, 100));
-        if (page === 1) throw new Error(`Jetimob API returned ${response.status}: ${text.slice(0, 200)}`);
+      // Retry loop for this page
+      while (retries < MAX_RETRIES) {
+        try {
+          console.log(`📄 Page ${page} (attempt ${retries + 1})...`);
+          response = await fetch(url, { headers: { Accept: "application/json" } });
+          if (response.ok) break;
+
+          const text = await response.text();
+          console.error(`❌ Page ${page} HTTP ${response.status}: ${text.slice(0, 200)}`);
+
+          // If first page fails, abort entirely
+          if (page === 1) throw new Error(`Jetimob API returned ${response.status}: ${text.slice(0, 200)}`);
+
+          retries++;
+          if (retries < MAX_RETRIES) await sleep(2000 * retries);
+        } catch (fetchErr) {
+          retries++;
+          console.error(`❌ Page ${page} fetch error (attempt ${retries}):`, fetchErr);
+          if (page === 1 && retries >= MAX_RETRIES) throw fetchErr;
+          if (retries < MAX_RETRIES) await sleep(2000 * retries);
+        }
+      }
+
+      if (!response || !response.ok) {
+        console.warn(`⚠️ Skipping page ${page} after ${MAX_RETRIES} retries`);
         break;
       }
 
       const data = await response.json();
-      const rawItems = Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : Array.isArray(data?.result) ? data.result : data.imoveis || data.items || [];
-      const items = Array.isArray(rawItems) ? rawItems : [];
 
-      if (items.length === 0) break;
-      totalFetched += items.length;
-
-      // Upsert this page immediately in batches of 50
-      const batchSize = 50;
-      for (let i = 0; i < items.length; i += batchSize) {
-        const batch = items.slice(i, i + batchSize);
-        const mapped = batch.map(mapImovel);
-        const { error } = await supabase.from("imoveis").upsert(mapped, { onConflict: "jetimob_id", ignoreDuplicates: false });
-        if (error) { console.error(`Upsert err p${page}b${i}:`, error.message); erros += batch.length; }
-        else { inseridos += batch.length; }
+      // Log structure on first page for debugging
+      if (page === 1) {
+        const topKeys = Object.keys(data);
+        console.log(`📊 Response structure: ${JSON.stringify(topKeys)}`);
+        const total = extractTotal(data);
+        if (total) {
+          expectedTotal = total;
+          console.log(`📊 Expected total: ${expectedTotal}`);
+        }
       }
 
-      console.log(`Page ${page}: ${items.length} items, total: ${inseridos} ok, ${erros} err`);
-      if (items.length < pageSize) break;
-      const rawTotal = data?.total || data?.totalResults || 0;
-      if (rawTotal > 0 && totalFetched >= rawTotal) break;
+      const items = extractItems(data);
+      if (items.length === 0) {
+        console.log(`🏁 Page ${page}: empty — stopping.`);
+        break;
+      }
+
+      totalFetched += items.length;
+
+      // Upsert in batches of 50
+      for (let i = 0; i < items.length; i += 50) {
+        const batch = items.slice(i, i + 50);
+        const mapped = batch.map(mapImovel);
+        const { error } = await supabase
+          .from("imoveis")
+          .upsert(mapped, { onConflict: "jetimob_id", ignoreDuplicates: false });
+        if (error) {
+          console.error(`❌ Upsert p${page}b${i}: ${error.message}`);
+          totalErrors += batch.length;
+        } else {
+          totalInserted += batch.length;
+        }
+      }
+
+      console.log(`✅ Page ${page}: ${items.length} items | Running: ${totalInserted} ok, ${totalErrors} err, ${totalFetched} fetched`);
+
+      // Check if we should stop
+      if (!hasNextPage(data, items.length, PAGE_SIZE)) {
+        console.log(`🏁 No next page indicator — stopping.`);
+        break;
+      }
+
+      if (expectedTotal && totalFetched >= expectedTotal) {
+        console.log(`🏁 Reached expected total ${expectedTotal} — stopping.`);
+        break;
+      }
+
+      // Rate limit between pages
+      await sleep(RATE_LIMIT_MS);
     }
 
-    const result = { inseridos, erros, total: totalFetched };
-    console.log("Sync complete:", result);
+    const result = {
+      inseridos: totalInserted,
+      erros: totalErrors,
+      total: totalFetched,
+      total_esperado: expectedTotal,
+    };
+    console.log(`✅ Sync complete:`, JSON.stringify(result));
 
     return new Response(JSON.stringify(result), {
       status: 200,

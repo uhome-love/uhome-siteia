@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { UhomeLogo } from "@/components/UhomeLogo";
+import { WHATSAPP_NUMBER, WHATSAPP_DISPLAY } from "@/lib/whatsapp";
 
 export function Footer() {
   return (

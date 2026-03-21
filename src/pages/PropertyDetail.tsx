@@ -9,6 +9,7 @@ import { Bed, Car, Maximize, Bath, MapPin, Share2, Heart, ChevronLeft, ChevronRi
 import { motion } from "framer-motion";
 import { trackView, getViewCount } from "@/services/leads";
 import { fetchImovelBySlug, type Imovel, formatPreco, fotoPrincipal } from "@/services/imoveis";
+import { setJsonLd, removeJsonLd, buildImovelJsonLd } from "@/lib/jsonld";
 
 const PropertyDetail = () => {
   const { slug } = useParams();

@@ -122,9 +122,21 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
           />
         </button>
 
-        {/* Dots */}
+        {/* Gradient + CTA button on hover */}
+        {hovering && (
+          <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/40 to-transparent pt-12 pb-3 px-3 flex flex-col items-center">
+            <button
+              onClick={(e) => { e.stopPropagation(); }}
+              className="rounded-full bg-white px-5 py-2 font-body text-[13px] font-semibold text-foreground shadow-lg transition-transform hover:scale-105 active:scale-95 animate-fade-in"
+            >
+              Tenho interesse
+            </button>
+          </div>
+        )}
+
+        {/* Dots — above gradient */}
         {hovering && fotos.length > 1 && (
-          <div className="absolute bottom-2 left-1/2 z-10 flex -translate-x-1/2 gap-1">
+          <div className="absolute bottom-14 left-1/2 z-20 flex -translate-x-1/2 gap-1">
             {fotos.slice(0, 5).map((_, i) => (
               <div
                 key={i}
@@ -140,7 +152,7 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
         )}
       </div>
 
-      {/* Text — no box */}
+      {/* Text — no box, fixed height */}
       <div className="px-0.5 pt-2.5">
         <div className="flex items-center justify-between gap-2">
           <span className="truncate font-body text-[13px] font-semibold text-foreground">
@@ -153,16 +165,6 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
         )}
 
         <p className="mt-1 font-body text-sm font-bold text-foreground">{price}</p>
-
-        {/* Interest button — hover only */}
-        {hovering && (
-          <button
-            onClick={(e) => { e.stopPropagation(); }}
-            className="mt-2.5 w-full rounded-lg border border-foreground bg-transparent px-3 py-2 font-body text-[13px] font-medium text-foreground transition-colors hover:bg-secondary active:scale-[0.98]"
-          >
-            Tenho interesse
-          </button>
-        )}
       </div>
     </motion.div>
   );

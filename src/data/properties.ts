@@ -6,7 +6,7 @@ export interface MockProperty {
   city: string;
   price: number;
   priceFormatted: string;
-  finalidade: "venda" | "locacao";
+  finalidade: "venda";
   tipo: string;
   area: number;
   bedrooms: number;
@@ -40,8 +40,8 @@ export const mockProperties: MockProperty[] = [
   },
   {
     id: "3", slug: "studio-moderno-bela-vista", title: "Studio Moderno e Compacto",
-    neighborhood: "Bela Vista", city: "Porto Alegre", price: 2200,
-    priceFormatted: "R$ 2.200/mês", finalidade: "locacao", tipo: "studio",
+    neighborhood: "Bela Vista", city: "Porto Alegre", price: 385000,
+    priceFormatted: "R$ 385.000", finalidade: "venda", tipo: "studio",
     area: 38, bedrooms: 1, bathrooms: 1, parking: 1,
     image: "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=600&h=400&fit=crop",
     badge: "Novo", features: ["Mobiliado", "Pet friendly"],
@@ -58,8 +58,8 @@ export const mockProperties: MockProperty[] = [
   },
   {
     id: "5", slug: "apto-reformado-boa-vista", title: "Apartamento Reformado 2D",
-    neighborhood: "Boa Vista", city: "Porto Alegre", price: 3800,
-    priceFormatted: "R$ 3.800/mês", finalidade: "locacao", tipo: "apartamento",
+    neighborhood: "Boa Vista", city: "Porto Alegre", price: 520000,
+    priceFormatted: "R$ 520.000", finalidade: "venda", tipo: "apartamento",
     area: 95, bedrooms: 2, bathrooms: 1, parking: 1,
     image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&h=400&fit=crop",
     features: ["Portaria 24h", "Reformado"],
@@ -76,8 +76,8 @@ export const mockProperties: MockProperty[] = [
   },
   {
     id: "7", slug: "apto-rio-branco", title: "Apartamento Clássico Centro",
-    neighborhood: "Centro Histórico", city: "Porto Alegre", price: 1500,
-    priceFormatted: "R$ 1.500/mês", finalidade: "locacao", tipo: "apartamento",
+    neighborhood: "Centro Histórico", city: "Porto Alegre", price: 295000,
+    priceFormatted: "R$ 295.000", finalidade: "venda", tipo: "apartamento",
     area: 55, bedrooms: 1, bathrooms: 1, parking: 0,
     image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&h=400&fit=crop",
     features: ["Portaria 24h"],
@@ -103,8 +103,8 @@ export const mockProperties: MockProperty[] = [
   },
   {
     id: "10", slug: "studio-cidade-baixa", title: "Studio Descolado Cidade Baixa",
-    neighborhood: "Cidade Baixa", city: "Porto Alegre", price: 1800,
-    priceFormatted: "R$ 1.800/mês", finalidade: "locacao", tipo: "studio",
+    neighborhood: "Cidade Baixa", city: "Porto Alegre", price: 320000,
+    priceFormatted: "R$ 320.000", finalidade: "venda", tipo: "studio",
     area: 32, bedrooms: 1, bathrooms: 1, parking: 0,
     image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&h=400&fit=crop",
     features: ["Mobiliado", "Pet friendly"],
@@ -112,8 +112,8 @@ export const mockProperties: MockProperty[] = [
   },
   {
     id: "11", slug: "sala-comercial-moinhos", title: "Sala Comercial Premium",
-    neighborhood: "Moinhos de Vento", city: "Porto Alegre", price: 4500,
-    priceFormatted: "R$ 4.500/mês", finalidade: "locacao", tipo: "comercial",
+    neighborhood: "Moinhos de Vento", city: "Porto Alegre", price: 650000,
+    priceFormatted: "R$ 650.000", finalidade: "venda", tipo: "comercial",
     area: 60, bedrooms: 0, bathrooms: 1, parking: 1,
     image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&h=400&fit=crop",
     features: ["Ar condicionado", "Portaria 24h"],

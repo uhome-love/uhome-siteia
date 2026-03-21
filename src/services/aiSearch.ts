@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export interface AISearchFilters {
-  finalidade?: "venda" | "locacao";
+  finalidade?: "venda";
   tipo?: string;
   bairros?: string[];
   preco_max?: number;

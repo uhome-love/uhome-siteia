@@ -3,17 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { Search, SlidersHorizontal } from "lucide-react";
 import { motion } from "framer-motion";
 
-const quickFilters = ["Comprar", "Alugar"] as const;
 const propertyTypes = ["Apartamento", "Casa", "Cobertura", "Studio", "Comercial"];
 
 export function HeroSection() {
   const navigate = useNavigate();
-  const [activeFilter, setActiveFilter] = useState<"Comprar" | "Alugar">("Comprar");
   const [query, setQuery] = useState("");
 
   const handleSearch = () => {
-    const finalidade = activeFilter === "Comprar" ? "venda" : "locacao";
-    navigate(`/busca?finalidade=${finalidade}&q=${encodeURIComponent(query)}`);
+    navigate(`/busca?finalidade=venda&q=${encodeURIComponent(query)}`);
   };
 
   return (
@@ -60,22 +57,6 @@ export function HeroSection() {
           transition={{ duration: 0.6, delay: 0.5 }}
           className="mx-auto mt-10 max-w-2xl"
         >
-          {/* Tabs */}
-          <div className="mb-4 flex items-center justify-center gap-2">
-            {quickFilters.map((f) => (
-              <button
-                key={f}
-                onClick={() => setActiveFilter(f)}
-                className={`rounded-full px-5 py-2 font-body text-sm font-medium transition-all duration-200 ${
-                  activeFilter === f
-                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
-                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-                }`}
-              >
-                {f}
-              </button>
-            ))}
-          </div>
 
           {/* Input */}
           <div className="glass flex items-center gap-3 rounded-2xl p-2 shadow-2xl shadow-black/20">

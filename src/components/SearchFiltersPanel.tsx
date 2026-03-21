@@ -61,23 +61,6 @@ export function SearchFiltersPanel({ isOpen, onClose }: { isOpen: boolean; onClo
 
         {/* Scrollable filters */}
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-1">
-          {/* Finalidade */}
-          <div className="flex gap-2 pb-4">
-            {(["venda", "locacao"] as const).map((f) => (
-              <button
-                key={f}
-                onClick={() => setFilter("finalidade", filters.finalidade === f ? "" : f)}
-                className={`flex-1 rounded-lg py-2.5 font-body text-sm font-medium transition-all ${
-                  filters.finalidade === f
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-                }`}
-              >
-                {f === "venda" ? "Comprar" : "Alugar"}
-              </button>
-            ))}
-          </div>
-
           {/* Tipo */}
           <FilterSection title="Tipo de imóvel" id="tipo" expanded={expandedSection} onToggle={toggle}>
             <div className="flex flex-wrap gap-2">

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 export interface SearchFilters {
-  finalidade: "venda" | "locacao" | "";
+  finalidade: "venda" | "";
   tipo: string;
   bairro: string;
   precoMin: number;

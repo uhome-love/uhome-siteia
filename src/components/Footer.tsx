@@ -17,7 +17,7 @@ export function Footer() {
           <div>
             <h4 className="font-body text-sm font-semibold text-foreground">Imóveis</h4>
             <ul className="mt-3 space-y-2">
-              {["Comprar", "Alugar", "Lançamentos", "Comercial"].map((l) => (
+              {["Comprar", "Lançamentos", "Comercial"].map((l) => (
                 <li key={l}>
                   <Link to="/busca" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">
                     {l}

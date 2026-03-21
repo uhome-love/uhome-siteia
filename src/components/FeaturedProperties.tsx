@@ -32,20 +32,9 @@ const properties: Property[] = [
     image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=400&fit=crop",
   },
   {
-    id: "3", slug: "studio-moderno-bela-vista", title: "Studio Moderno Bela Vista", neighborhood: "Bela Vista",
-    price: "R$ 2.200/mês", priceLabel: "Aluguel", priceNumeric: 2200, area: 38, bedrooms: 1, parking: 1,
-    image: "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=600&h=400&fit=crop",
-    badge: "Novo",
-  },
-  {
     id: "4", slug: "casa-tres-figueiras", title: "Casa com Jardim Três Figueiras", neighborhood: "Três Figueiras",
     price: "R$ 3.200.000", priceLabel: "Venda", priceNumeric: 3200000, area: 320, bedrooms: 5, parking: 4,
     image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&h=400&fit=crop",
-  },
-  {
-    id: "5", slug: "apto-reformado-boa-vista", title: "Apto Reformado Boa Vista", neighborhood: "Boa Vista",
-    price: "R$ 3.800/mês", priceLabel: "Aluguel", priceNumeric: 3800, area: 95, bedrooms: 2, parking: 1,
-    image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&h=400&fit=crop",
   },
   {
     id: "6", slug: "loft-montserrat", title: "Loft Mont'Serrat", neighborhood: "Mont'Serrat",

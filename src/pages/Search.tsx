@@ -22,7 +22,7 @@ const Search = () => {
     const urlFinalidade = searchParams.get("finalidade");
     const urlTipo = searchParams.get("tipo");
     const urlQ = searchParams.get("q");
-    if (urlFinalidade === "venda" || urlFinalidade === "locacao") f.finalidade = urlFinalidade;
+    if (urlFinalidade === "venda") f.finalidade = urlFinalidade;
     if (urlTipo) f.tipo = urlTipo;
     if (urlQ) f.q = urlQ;
     if (Object.keys(f).length) setFilters(f as any);

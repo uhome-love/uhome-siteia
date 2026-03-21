@@ -12,7 +12,7 @@ export const bairrosData: BairroData[] = [
   {
     nome: "Moinhos de Vento",
     slug: "moinhos-de-vento",
-    foto: "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80",
+    foto: "/images/moinhos-de-vento.png",
     descricao:
       "Moinhos de Vento é o bairro mais nobre de Porto Alegre. Com ruas arborizadas, gastronomia sofisticada na Rua Padre Chagas e o icônico Parcão, reúne edifícios de alto padrão, boutiques e vida noturna refinada. Um endereço de prestígio para quem valoriza conveniência e qualidade de vida.",
     lat: -30.025,

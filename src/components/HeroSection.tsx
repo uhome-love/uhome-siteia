@@ -64,11 +64,17 @@ export function HeroSection() {
       {/* Background image */}
       <div className="absolute inset-0">
         <img
-          src="/hero-bg.jpg"
+          src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1600&q=85"
           alt=""
           className="h-full w-full object-cover"
+          style={{ objectPosition: "center center" }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-black/10" />
+        <div
+          className="absolute inset-0"
+          style={{
+            background: "linear-gradient(to right, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.0) 100%)",
+          }}
+        />
       </div>
 
       <div className="relative z-10 mx-auto w-full max-w-7xl px-6 py-16 sm:px-8">

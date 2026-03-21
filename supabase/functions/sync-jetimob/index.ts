@@ -49,20 +49,26 @@ function mapStatus(s?: string): string {
 function extractFotos(item: any): string {
   const fotos: Array<{ url: string; ordem: number; principal: boolean }> = [];
 
-  // Jetimob returns fotos in various formats
-  const rawFotos = item.fotos || item.imagens || item.photos || [];
+  const rawFotos = item.imagens || item.fotos || item.galeria || item.photos || [];
   if (Array.isArray(rawFotos)) {
     rawFotos.forEach((f: any, i: number) => {
-      const url = typeof f === "string" ? f : f.url || f.link || f.src || "";
+      let url = "";
+      if (typeof f === "string") {
+        url = f;
+      } else {
+        url = f.link_large || f.link || f.link_medio || f.link_thumb || f.url || f.arquivo || f.src || "";
+      }
       if (url) {
-        fotos.push({ url, ordem: f.ordem ?? i, principal: f.principal ?? i === 0 });
+        fotos.push({ url, ordem: f?.ordem ?? i, principal: f?.principal ?? i === 0 });
       }
     });
   }
 
-  // Also check for foto_principal
   if (item.foto_principal && !fotos.some((f) => f.url === item.foto_principal)) {
     fotos.unshift({ url: item.foto_principal, ordem: 0, principal: true });
+  }
+  if (item.foto_destaque && !fotos.some((f) => f.url === item.foto_destaque)) {
+    fotos.unshift({ url: item.foto_destaque, ordem: 0, principal: true });
   }
 
   return JSON.stringify(fotos);
@@ -87,26 +93,26 @@ function mapImovel(j: any) {
   return {
     jetimob_id: codigo,
     slug: slugify(titulo, codigo),
-    tipo: mapTipo(j.tipo || j.subtipo || j.type),
-    finalidade: mapFinalidade(j.finalidade || j.operacao),
+    tipo: mapTipo(j.subtipo || j.tipo_imovel || j.tipo || j.type),
+    finalidade: mapFinalidade(j.finalidade || j.operacao || j.contrato),
     status: mapStatus(j.status || j.situacao),
     destaque: j.destaque === true || j.destaque === 1,
-    preco: Number(j.valor || j.preco || j.price || 0),
+    preco: Number(j.valor_venda || j.valor || j.preco || j.valor_locacao || j.price || 0),
     preco_condominio: j.valor_condominio ? Number(j.valor_condominio) : null,
     preco_iptu: j.valor_iptu || j.iptu ? Number(j.valor_iptu || j.iptu) : null,
     area_total: j.area_total ? Number(j.area_total) : null,
-    area_util: j.area_util || j.area_privativa ? Number(j.area_util || j.area_privativa) : null,
-    quartos: j.quartos || j.dormitorios ? Number(j.quartos || j.dormitorios) : null,
+    area_util: j.area_privativa || j.area_util ? Number(j.area_privativa || j.area_util) : null,
+    quartos: j.dormitorios || j.quartos ? Number(j.dormitorios || j.quartos) : null,
     banheiros: j.banheiros ? Number(j.banheiros) : null,
-    vagas: j.vagas || j.garagens ? Number(j.vagas || j.garagens) : null,
+    vagas: j.garagens || j.vagas ? Number(j.garagens || j.vagas) : null,
     andar: j.andar ? Number(j.andar) : null,
-    bairro: j.bairro || j.neighborhood || "Sem bairro",
-    cidade: j.cidade || j.city || "Porto Alegre",
-    uf: j.uf || j.estado || "RS",
-    cep: j.cep || null,
-    endereco_completo: j.endereco || j.logradouro || null,
-    latitude: j.latitude || j.lat ? Number(j.latitude || j.lat) : null,
-    longitude: j.longitude || j.lng || j.lon ? Number(j.longitude || j.lng || j.lon) : null,
+    bairro: j.endereco_bairro || j.bairro || j.endereco?.bairro || "Sem bairro",
+    cidade: j.endereco_cidade || j.cidade || j.endereco?.cidade || "Porto Alegre",
+    uf: j.endereco_estado || j.uf || j.estado || "RS",
+    cep: j.endereco_cep || j.cep || null,
+    endereco_completo: j.endereco_logradouro || j.endereco || j.logradouro || null,
+    latitude: j.endereco_latitude || j.latitude || j.lat ? Number(j.endereco_latitude || j.latitude || j.lat) : null,
+    longitude: j.endereco_longitude || j.longitude || j.lng || j.lon ? Number(j.endereco_longitude || j.longitude || j.lng || j.lon) : null,
     titulo,
     descricao: j.descricao || j.description || null,
     diferenciais: extractDiferenciais(j),
@@ -137,60 +143,52 @@ serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Fetch all pages from Jetimob (v=6, paginated)
-    const allItems: any[] = [];
+    // Fetch and upsert page by page (stream to avoid timeout)
     const pageSize = 200;
     const maxPages = 50;
+    let totalFetched = 0;
+    let inseridos = 0;
+    let erros = 0;
+
+    console.log(`JETIMOB_KEY length: ${JETIMOB_KEY.length}`);
 
     for (let page = 1; page <= maxPages; page++) {
       const url = `${JETIMOB_BASE}/${JETIMOB_KEY}/imoveis/todos?v=6&page=${page}&pageSize=${pageSize}`;
-      console.log(`Fetching page ${page}...`);
+      console.log(`Page ${page}...`);
 
-      const response = await fetch(url, {
-        headers: { Accept: "application/json" },
-      });
+      const response = await fetch(url, { headers: { Accept: "application/json" } });
 
       if (!response.ok) {
         const text = await response.text();
-        console.error(`Jetimob page ${page} error: ${response.status}`, text);
+        console.error(`Page ${page} error: ${response.status}`, text.slice(0, 100));
         if (page === 1) throw new Error(`Jetimob API returned ${response.status}: ${text.slice(0, 200)}`);
         break;
       }
 
       const data = await response.json();
-      const items = Array.isArray(data) ? data : data.imoveis || data.data || data.items || [];
+      const rawItems = Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : Array.isArray(data?.result) ? data.result : data.imoveis || data.items || [];
+      const items = Array.isArray(rawItems) ? rawItems : [];
 
       if (items.length === 0) break;
-      allItems.push(...items);
+      totalFetched += items.length;
 
-      if (items.length < pageSize) break;
-    }
-
-    console.log(`Total: ${allItems.length} properties from Jetimob`);
-
-    let inseridos = 0;
-    let erros = 0;
-
-    // Upsert in batches
-    const batchSize = 20;
-    for (let i = 0; i < allItems.length; i += batchSize) {
-      const batch = allItems.slice(i, i + batchSize);
-      const mapped = batch.map(mapImovel);
-
-      const { error } = await supabase.from("imoveis").upsert(mapped, {
-        onConflict: "jetimob_id",
-        ignoreDuplicates: false,
-      });
-
-      if (error) {
-        console.error(`Upsert error batch ${i}:`, error.message);
-        erros += batch.length;
-      } else {
-        inseridos += batch.length;
+      // Upsert this page immediately in batches of 50
+      const batchSize = 50;
+      for (let i = 0; i < items.length; i += batchSize) {
+        const batch = items.slice(i, i + batchSize);
+        const mapped = batch.map(mapImovel);
+        const { error } = await supabase.from("imoveis").upsert(mapped, { onConflict: "jetimob_id", ignoreDuplicates: false });
+        if (error) { console.error(`Upsert err p${page}b${i}:`, error.message); erros += batch.length; }
+        else { inseridos += batch.length; }
       }
+
+      console.log(`Page ${page}: ${items.length} items, total: ${inseridos} ok, ${erros} err`);
+      if (items.length < pageSize) break;
+      const rawTotal = data?.total || data?.totalResults || 0;
+      if (rawTotal > 0 && totalFetched >= rawTotal) break;
     }
 
-    const result = { inseridos, erros, total: allItems.length };
+    const result = { inseridos, erros, total: totalFetched };
     console.log("Sync complete:", result);
 
     return new Response(JSON.stringify(result), {

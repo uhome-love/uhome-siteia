@@ -20,6 +20,15 @@ const BAIRRO_SLUGS = [
   "menino-deus", "centro-historico", "jardim-botanico",
 ];
 
+const BLOG_SLUGS = [
+  "guia-compra-primeiro-imovel-porto-alegre",
+  "melhores-bairros-para-investir-2025",
+  "financiamento-imobiliario-tudo-que-voce-precisa-saber",
+  "checklist-vistoria-imovel-usado",
+  "morar-em-porto-alegre-vale-a-pena",
+  "documentos-necessarios-compra-imovel",
+];
+
 function urlEntry(loc: string, lastmod: string, changefreq: string, priority: string) {
   return `  <url>
     <loc>${loc}</loc>

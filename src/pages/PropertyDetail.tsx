@@ -142,7 +142,7 @@ const PropertyDetail = () => {
             onClick={() => { setCurrentImage(0); setGalleryOpen(true); }}
             className="group relative col-span-2 row-span-2 overflow-hidden rounded-l-2xl"
           >
-            <img src={images[0]} alt={imovel.titulo} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
+            <FotoImovel src={images[0]} alt={imovel.titulo} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
           </button>
           {images.slice(1, 5).map((img, i) => (
             <button

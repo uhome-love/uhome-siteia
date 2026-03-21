@@ -144,7 +144,7 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
       <div className="px-0.5 pt-2.5">
         <div className="flex items-center justify-between gap-2">
           <span className="truncate font-body text-[13px] font-semibold text-foreground">
-            {imovel.tipo} · {imovel.bairro}
+            {imovel.tipo.charAt(0).toUpperCase() + imovel.tipo.slice(1)} · {imovel.bairro}
           </span>
         </div>
 

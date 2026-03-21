@@ -98,6 +98,12 @@ export interface BuscaFilters {
   q?: string;
   limit?: number;
   offset?: number;
+  bounds?: {
+    lat_min: number;
+    lat_max: number;
+    lng_min: number;
+    lng_max: number;
+  } | null;
 }
 
 export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: Imovel[]; count: number }> {

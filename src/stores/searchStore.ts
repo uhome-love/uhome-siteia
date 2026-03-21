@@ -1,5 +1,12 @@
 import { create } from "zustand";
 
+export interface MapBounds {
+  lat_min: number;
+  lat_max: number;
+  lng_min: number;
+  lng_max: number;
+}
+
 export interface SearchFilters {
   finalidade: "venda" | "";
   tipo: string;
@@ -14,6 +21,7 @@ export interface SearchFilters {
   diferenciais: string[];
   ordem: "recentes" | "preco_asc" | "preco_desc" | "area_desc";
   q: string;
+  bounds: MapBounds | null;
 }
 
 interface SearchState {
@@ -37,6 +45,7 @@ const defaultFilters: SearchFilters = {
   diferenciais: [],
   ordem: "recentes",
   q: "",
+  bounds: null,
 };
 
 export const useSearchStore = create<SearchState>((set) => ({

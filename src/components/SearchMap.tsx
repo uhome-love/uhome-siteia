@@ -1,5 +1,7 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Search } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { type Imovel, fotoPrincipal, formatPreco } from "@/services/imoveis";
 
 const MAPBOX_TOKEN = "pk.eyJ1IjoibHVjYXN1aG9tZSIsImEiOiJjbW16c2l2dmUwYmxsMnJwdDI2bGxrazBkIn0.B4dp727gJlQQIWTci7GpFQ";
@@ -14,9 +16,10 @@ interface SearchMapProps {
   imoveis: Imovel[];
   hoveredId?: string | null;
   onPinHover?: (id: string | null) => void;
+  onBoundsSearch?: (bounds: { lat_min: number; lat_max: number; lng_min: number; lng_max: number }) => void;
 }
 
-export function SearchMap({ imoveis, hoveredId, onPinHover }: SearchMapProps) {
+export function SearchMap({ imoveis, hoveredId, onPinHover, onBoundsSearch }: SearchMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
   const markersRef = useRef<Map<string, { el: HTMLElement; marker: any }>>(new Map());
@@ -24,6 +27,8 @@ export function SearchMap({ imoveis, hoveredId, onPinHover }: SearchMapProps) {
   const mapReadyRef = useRef(false);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [mapError, setMapError] = useState(false);
+  const [mapMoved, setMapMoved] = useState(false);
+  const boundsRef = useRef<any>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -68,8 +73,14 @@ export function SearchMap({ imoveis, hoveredId, onPinHover }: SearchMapProps) {
       map.on("load", () => {
         if (!cancelled) {
           setMapLoaded(true);
-          setTimeout(() => { mapReadyRef.current = true; }, 500);
+          setTimeout(() => { mapReadyRef.current = true; }, 800);
         }
+      });
+
+      map.on("moveend", () => {
+        if (!mapReadyRef.current) return;
+        boundsRef.current = map.getBounds();
+        setMapMoved(true);
       });
 
       mapRef.current = { map, mapboxgl: mapboxgl.default };
@@ -87,7 +98,6 @@ export function SearchMap({ imoveis, hoveredId, onPinHover }: SearchMapProps) {
     if (!mapRef.current || !mapLoaded) return;
     const { map, mapboxgl } = mapRef.current;
 
-    // Remove old markers
     markersRef.current.forEach(({ marker }) => marker.remove());
     markersRef.current.clear();
 
@@ -104,7 +114,6 @@ export function SearchMap({ imoveis, hoveredId, onPinHover }: SearchMapProps) {
       el.textContent = priceLabel;
       el.dataset.imovelId = p.id;
 
-      // Hover on pin
       el.addEventListener("mouseenter", () => {
         onPinHover?.(p.id);
         if (popupRef.current) popupRef.current.remove();
@@ -155,11 +164,14 @@ export function SearchMap({ imoveis, hoveredId, onPinHover }: SearchMapProps) {
       bounds.extend([p.longitude!, p.latitude!]);
     });
 
+    // Fit bounds but suppress the moveend from triggering "search this area"
+    mapReadyRef.current = false;
     if (withCoords.length > 1) {
       map.fitBounds(bounds, { padding: { top: 60, bottom: 60, left: 60, right: 60 }, maxZoom: 14, duration: 800 });
     } else {
       map.flyTo({ center: [withCoords[0].longitude!, withCoords[0].latitude!], zoom: 14, duration: 800 });
     }
+    setTimeout(() => { mapReadyRef.current = true; }, 1200);
   }, [imoveis, mapLoaded, navigate, onPinHover]);
 
   // Sync hover highlight from card → pin
@@ -169,6 +181,19 @@ export function SearchMap({ imoveis, hoveredId, onPinHover }: SearchMapProps) {
       el.classList.toggle("uhome-pin--active", selected);
     });
   }, [hoveredId]);
+
+  const handleBoundsSearch = () => {
+    if (!boundsRef.current || !onBoundsSearch) return;
+    const sw = boundsRef.current.getSouthWest();
+    const ne = boundsRef.current.getNorthEast();
+    onBoundsSearch({
+      lat_min: sw.lat,
+      lat_max: ne.lat,
+      lng_min: sw.lng,
+      lng_max: ne.lng,
+    });
+    setMapMoved(false);
+  };
 
   if (mapError) {
     return (
@@ -225,7 +250,26 @@ export function SearchMap({ imoveis, hoveredId, onPinHover }: SearchMapProps) {
           height: 36px !important;
         }
       `}</style>
-      <div ref={mapContainer} className="h-full w-full" />
+      <div className="relative h-full w-full">
+        <div ref={mapContainer} className="h-full w-full" />
+
+        {/* "Search this area" button */}
+        <AnimatePresence>
+          {mapMoved && onBoundsSearch && (
+            <motion.button
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
+              onClick={handleBoundsSearch}
+              className="absolute left-1/2 top-4 z-20 flex -translate-x-1/2 items-center gap-2 rounded-full border border-border bg-card px-5 py-2.5 font-body text-[13px] font-semibold text-foreground shadow-lg transition-transform hover:shadow-xl active:scale-[0.97]"
+            >
+              <Search className="h-3.5 w-3.5" />
+              Buscar nessa região
+            </motion.button>
+          )}
+        </AnimatePresence>
+      </div>
     </>
   );
 }

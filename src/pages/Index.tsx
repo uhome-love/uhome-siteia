@@ -31,7 +31,7 @@ const Index = () => {
       <HeroSection />
       <FeaturedNeighborhoods />
       <FeaturedProperties />
-      <AISearchSection />
+      
       <Footer />
     </div>
   );

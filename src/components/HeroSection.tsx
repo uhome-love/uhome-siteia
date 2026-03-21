@@ -150,7 +150,7 @@ export function HeroSection() {
 
                 {/* Tipo + Preço */}
                 <div className="mb-2 grid grid-cols-2 gap-2 sm:mb-2.5 sm:gap-2.5">
-                  <label className="block rounded-xl border-[1.5px] border-border p-3.5 transition-colors focus-within:border-primary">
+                  <label className="block rounded-xl border-[1.5px] border-border p-3 transition-colors focus-within:border-primary sm:p-3.5">
                     <span className="mb-0.5 block font-body text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                       Tipo de imóvel
                     </span>

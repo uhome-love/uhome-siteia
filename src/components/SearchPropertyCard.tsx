@@ -50,7 +50,7 @@ export function SearchPropertyCard({ property, index }: { property: MockProperty
                 padding: '3px 8px',
               }}
             >
-              {property.type}
+              {property.tipo}
             </span>
             {/* Badge destaque */}
             {property.badge && (

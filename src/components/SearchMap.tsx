@@ -33,7 +33,7 @@ export function SearchMap({ imoveis, onMarkerClick }: SearchMapProps) {
 
       const map = new mapboxgl.default.Map({
         container: mapContainer.current!,
-        style: "mapbox://styles/mapbox/streets-v12",
+        style: "mapbox://styles/mapbox/light-v11",
         center: [-51.18, -30.04],
         zoom: 12,
         attributionControl: false,

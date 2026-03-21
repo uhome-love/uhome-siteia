@@ -17,10 +17,10 @@ function formatPreco(preco: number): string {
   return `R$${preco}`;
 }
 
-function toGeoJSON(imoveis: Imovel[]): GeoJSON.FeatureCollection {
+function toGeoJSON(pins: MapPinData[]): GeoJSON.FeatureCollection {
   return {
     type: "FeatureCollection",
-    features: imoveis
+    features: pins
       .filter((i) => {
         const lat = Number(i.latitude);
         const lng = Number(i.longitude);

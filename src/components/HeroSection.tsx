@@ -30,38 +30,26 @@ export function HeroSection() {
   const [enviado, setEnviado] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Dynamic neighborhood suggestions from DB
+  // Dynamic neighborhood suggestions from DB — single efficient query
   const [dbBairros, setDbBairros] = useState<string[]>([]);
 
   useEffect(() => {
     async function loadBairros() {
-      // Fetch all bairros in batches to avoid 1000-row limit
-      let allBairros: string[] = [];
-      let from = 0;
-      const pageSize = 1000;
-      let hasMore = true;
-      
-      while (hasMore) {
-        const { data } = await supabase
-          .from("imoveis")
-          .select("bairro")
-          .eq("status", "disponivel")
-          .range(from, from + pageSize - 1);
-        
-        if (data && data.length > 0) {
-          allBairros = allBairros.concat(data.map((d) => d.bairro));
-          from += pageSize;
-          hasMore = data.length === pageSize;
-        } else {
-          hasMore = false;
-        }
+      const { data } = await supabase.rpc("get_bairros_disponiveis");
+      if (data) {
+        setDbBairros(data.map((d: { bairro: string }) => d.bairro));
       }
-      
-      const unique = [...new Set(allBairros)].sort();
-      setDbBairros(unique);
     }
     loadBairros();
   }, []);
+
+  const bairroSuggestions = useMemo(() => {
+    const allBairros = dbBairros.length > 0 ? dbBairros : bairrosData.map((b) => b.nome);
+    const base = allBairros.filter((b) => !bairrosSelecionados.includes(b));
+    if (!bairroInput.trim()) return base.slice(0, 8);
+    const q = bairroInput.toLowerCase();
+    return base.filter((b) => b.toLowerCase().includes(q)).slice(0, 10);
+  }, [bairroInput, bairrosSelecionados, dbBairros]);
 
   const bairroSuggestions = useMemo(() => {
     // Use DB bairros if loaded, otherwise fall back to static list

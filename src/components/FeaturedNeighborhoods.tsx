@@ -12,15 +12,23 @@ export function FeaturedNeighborhoods() {
 
   useEffect(() => {
     async function buscarContagens() {
-      const promises = bairrosConfig.map((b) =>
-        supabase
-          .from("imoveis")
-          .select("*", { count: "exact", head: true })
-          .eq("status", "disponivel")
-          .ilike("bairro", `%${b.nome}%`)
-      );
-      const results = await Promise.all(promises);
-      setContagens(results.map((r) => r.count ?? 0));
+      // Single efficient query instead of 6 separate count queries
+      const { data } = await supabase.rpc("get_bairros_disponiveis");
+      if (data) {
+        const map = new Map(data.map((d: { bairro: string; count: number }) => [d.bairro, d.count]));
+        setContagens(bairrosConfig.map((b) => {
+          // Try exact match first, then partial match
+          const exact = map.get(b.nome);
+          if (exact !== undefined) return Number(exact);
+          // Partial match for names that might differ slightly
+          for (const [key, val] of map) {
+            if (key.toLowerCase().includes(b.nome.toLowerCase()) || b.nome.toLowerCase().includes(key.toLowerCase())) {
+              return Number(val);
+            }
+          }
+          return 0;
+        }));
+      }
     }
     buscarContagens();
   }, []);

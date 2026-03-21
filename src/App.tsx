@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -7,20 +8,37 @@ import { ExitIntentModal } from "@/components/ExitIntentModal";
 import { FloatingCTA } from "@/components/FloatingCTA";
 import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index.tsx";
-import Search from "./pages/Search.tsx";
-import PropertyDetail from "./pages/PropertyDetail.tsx";
-import Anunciar from "./pages/Anunciar.tsx";
-import Carreiras from "./pages/Carreiras.tsx";
-import Bairro from "./pages/Bairro.tsx";
-import Bairros from "./pages/Bairros.tsx";
-import FAQ from "./pages/FAQ.tsx";
-import Onboarding from "./pages/Onboarding.tsx";
-import Blog from "./pages/Blog.tsx";
-import BlogPostPage from "./pages/BlogPost.tsx";
-import Favoritos from "./pages/Favoritos.tsx";
-import NotFound from "./pages/NotFound.tsx";
 
-const queryClient = new QueryClient();
+// Lazy load non-critical pages
+const Search = lazy(() => import("./pages/Search.tsx"));
+const PropertyDetail = lazy(() => import("./pages/PropertyDetail.tsx"));
+const Anunciar = lazy(() => import("./pages/Anunciar.tsx"));
+const Carreiras = lazy(() => import("./pages/Carreiras.tsx"));
+const Bairro = lazy(() => import("./pages/Bairro.tsx"));
+const Bairros = lazy(() => import("./pages/Bairros.tsx"));
+const FAQ = lazy(() => import("./pages/FAQ.tsx"));
+const Onboarding = lazy(() => import("./pages/Onboarding.tsx"));
+const Blog = lazy(() => import("./pages/Blog.tsx"));
+const BlogPostPage = lazy(() => import("./pages/BlogPost.tsx"));
+const Favoritos = lazy(() => import("./pages/Favoritos.tsx"));
+const NotFound = lazy(() => import("./pages/NotFound.tsx"));
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 min cache
+      gcTime: 10 * 60 * 1000, // 10 min garbage collection
+    },
+  },
+});
+
+function PageFallback() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+    </div>
+  );
+}
 
 const App = () => (
   <BrowserRouter>
@@ -29,22 +47,24 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/busca" element={<Search />} />
-            <Route path="/imovel/:slug" element={<PropertyDetail />} />
-            <Route path="/ia-search" element={<Navigate to="/busca?modo=ia" replace />} />
-            <Route path="/anunciar" element={<Anunciar />} />
-            <Route path="/carreiras" element={<Carreiras />} />
-            <Route path="/bairros" element={<Bairros />} />
-            <Route path="/bairros/:slug" element={<Bairro />} />
-            <Route path="/faq" element={<FAQ />} />
-            <Route path="/onboarding" element={<Onboarding />} />
-            <Route path="/blog" element={<Blog />} />
-            <Route path="/blog/:slug" element={<BlogPostPage />} />
-            <Route path="/favoritos" element={<Favoritos />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <Suspense fallback={<PageFallback />}>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/busca" element={<Search />} />
+              <Route path="/imovel/:slug" element={<PropertyDetail />} />
+              <Route path="/ia-search" element={<Navigate to="/busca?modo=ia" replace />} />
+              <Route path="/anunciar" element={<Anunciar />} />
+              <Route path="/carreiras" element={<Carreiras />} />
+              <Route path="/bairros" element={<Bairros />} />
+              <Route path="/bairros/:slug" element={<Bairro />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/onboarding" element={<Onboarding />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/blog/:slug" element={<BlogPostPage />} />
+              <Route path="/favoritos" element={<Favoritos />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
           <ExitIntentModal />
           <FloatingCTA />
         </TooltipProvider>

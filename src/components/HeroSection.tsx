@@ -14,6 +14,8 @@ export function HeroSection() {
 
   // Search state
   const [bairro, setBairro] = useState("");
+  const [bairroOpen, setBairroOpen] = useState(false);
+  const bairroRef = useRef<HTMLDivElement>(null);
   const [tipo, setTipo] = useState("");
   const [preco, setPreco] = useState("");
   const [quartos, setQuartos] = useState("");

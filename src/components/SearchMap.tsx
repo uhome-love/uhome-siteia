@@ -70,13 +70,13 @@ function createPillImage(fillColor: string, strokeColor: string): ImageData {
 }
 
 interface SearchMapProps {
-  imoveis?: Imovel[];
+  pins?: MapPinData[];
   hoveredId?: string | null;
   onPinHover?: (id: string | null) => void;
   onBoundsSearch?: (bounds: { lat_min: number; lat_max: number; lng_min: number; lng_max: number }) => void;
 }
 
-export function SearchMap({ imoveis = [], hoveredId, onPinHover, onBoundsSearch }: SearchMapProps) {
+export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch }: SearchMapProps) {
   const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);

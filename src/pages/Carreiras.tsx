@@ -40,35 +40,11 @@ const benefits = [
 const vagas = [
   {
     area: "Comercial",
-    cargo: "Corretor de Imóveis",
+    cargo: "Corretor Autônomo",
     tipo: "PJ / Autônomo",
     modelo: "Híbrido",
     descricao:
       "Atendimento de leads qualificados, apresentação de imóveis e fechamento de negócios. CRECI ativo obrigatório.",
-  },
-  {
-    area: "Comercial",
-    cargo: "Corretor de Imóveis Sênior",
-    tipo: "PJ / Autônomo",
-    modelo: "Híbrido",
-    descricao:
-      "Perfil consultivo para imóveis de alto padrão. Experiência mínima de 3 anos no mercado de POA.",
-  },
-  {
-    area: "Operações",
-    cargo: "Assistente Administrativo",
-    tipo: "CLT",
-    modelo: "Presencial",
-    descricao:
-      "Suporte à equipe comercial, gestão de documentos e atendimento ao cliente.",
-  },
-  {
-    area: "Marketing",
-    cargo: "Analista de Marketing Digital",
-    tipo: "CLT",
-    modelo: "Híbrido",
-    descricao:
-      "Gestão de redes sociais, campanhas de performance e conteúdo para o portal uhome.com.br.",
   },
 ];
 

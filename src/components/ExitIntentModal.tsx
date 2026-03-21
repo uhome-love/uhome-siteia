@@ -77,7 +77,8 @@ export function ExitIntentModal() {
           >
             <button
               onClick={() => setShow(false)}
-              className="absolute right-4 top-4 rounded-lg p-1 text-muted-foreground transition-colors hover:text-foreground"
+              className="absolute right-4 top-4 rounded-lg p-1 transition-colors hover:text-foreground"
+              style={{ color: "var(--gray-400)" }}
             >
               <X className="h-5 w-5" />
             </button>

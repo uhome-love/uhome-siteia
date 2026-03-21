@@ -16,8 +16,11 @@ export function FilterPill({ label, value, active, children, onClear }: FilterPi
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!open) return;
     const handler = (e: MouseEvent | TouchEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
     };
     document.addEventListener("mousedown", handler);
     document.addEventListener("touchstart", handler);
@@ -25,7 +28,7 @@ export function FilterPill({ label, value, active, children, onClear }: FilterPi
       document.removeEventListener("mousedown", handler);
       document.removeEventListener("touchstart", handler);
     };
-  }, []);
+  }, [open]);
 
   // Reposition dropdown if it goes off-screen on mobile
   const adjustPosition = useCallback(() => {

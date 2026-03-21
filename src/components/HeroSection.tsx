@@ -110,7 +110,7 @@ export function HeroSection() {
             className="w-full max-w-md rounded-2xl bg-card p-5 shadow-2xl sm:p-7 lg:ml-auto"
           >
             {/* Toggle */}
-            <div className="mb-6 flex gap-2">
+            <div className="mb-4 flex gap-2 sm:mb-6">
               {(["comprar", "anunciar"] as const).map((m) => (
                 <button
                   key={m}

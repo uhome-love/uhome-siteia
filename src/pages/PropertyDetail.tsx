@@ -98,6 +98,17 @@ const PropertyDetail = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>{imovel.titulo} | Uhome Imóveis</title>
+        <meta name="description" content={`${capitalize(imovel.tipo)} ${(imovel.quartos ?? 0) > 0 ? `com ${imovel.quartos} quartos` : ''} em ${imovel.bairro}, Porto Alegre. ${priceFormatted}. Veja fotos e entre em contato com a Uhome.`} />
+        <meta property="og:title" content={`${imovel.titulo} | Uhome`} />
+        <meta property="og:description" content={`${capitalize(imovel.tipo)} em ${imovel.bairro} — ${priceFormatted}`} />
+        <meta property="og:image" content={fotoPrincipal(imovel)} />
+        <meta property="og:url" content={`https://uhome.com.br/imovel/${imovel.slug}`} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${imovel.titulo} | Uhome`} />
+        <meta name="twitter:image" content={fotoPrincipal(imovel)} />
+      </Helmet>
       <Navbar />
 
       {/* Gallery */}

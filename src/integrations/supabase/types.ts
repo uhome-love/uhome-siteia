@@ -86,6 +86,27 @@ export type Database = {
         }
         Relationships: []
       }
+      favoritos: {
+        Row: {
+          created_at: string
+          id: string
+          imovel_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          imovel_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          imovel_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       imoveis: {
         Row: {
           andar: number | null
@@ -215,6 +236,27 @@ export type Database = {
           imovel_id?: string
           session_id?: string | null
           viewed_at?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          id: string
+          nome: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          id: string
+          nome?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          id?: string
+          nome?: string | null
         }
         Relationships: []
       }

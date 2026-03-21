@@ -292,7 +292,7 @@ serve(async (req) => {
       console.log(`✅ Page ${page}: ${items.length} items | Running: ${totalInserted} ok, ${totalErrors} err, ${totalFetched} fetched`);
 
       // Check if we should stop
-      if (!hasNextPage(data, items.length, PAGE_SIZE)) {
+      if (!hasNextPage(data, items.length, PAGE_SIZE, page)) {
         console.log(`🏁 No next page indicator — stopping.`);
         break;
       }

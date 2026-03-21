@@ -57,10 +57,19 @@ function PropertyCard({ property, index }: { property: Property; index: number }
       transition={{ duration: 0.5, delay: index * 0.08 }}
       className="group w-[300px] flex-shrink-0 sm:w-auto"
     >
-      <div className="overflow-hidden rounded-2xl bg-card hover-lift">
-        {/* Image — clickable to detail */}
+      <div
+        className="overflow-hidden bg-card transition-all duration-200 ease-out hover:-translate-y-[3px]"
+        style={{
+          borderRadius: '16px',
+          boxShadow: '0 2px 8px rgba(91,108,249,0.08), 0 0 0 1px rgba(0,0,0,0.04)',
+        }}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = '0 8px 24px rgba(91,108,249,0.15)'; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 8px rgba(91,108,249,0.08), 0 0 0 1px rgba(0,0,0,0.04)'; }}
+      >
+        {/* Image */}
         <div
-          className="relative aspect-[4/3] cursor-pointer overflow-hidden"
+          className="relative cursor-pointer overflow-hidden"
+          style={{ aspectRatio: '4/3', borderRadius: '12px 12px 0 0' }}
           onClick={() => navigate(`/imovel/${property.slug || property.id}`)}
         >
           <img
@@ -69,8 +78,33 @@ function PropertyCard({ property, index }: { property: Property; index: number }
             loading="lazy"
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
+          {/* Badge tipo */}
+          <span
+            className="absolute left-3 top-3 font-body"
+            style={{
+              background: 'hsl(233 100% 97%)',
+              color: 'hsl(235 93% 67%)',
+              borderRadius: '9999px',
+              fontSize: '12px',
+              fontWeight: 600,
+              padding: '4px 10px',
+            }}
+          >
+            {property.priceLabel}
+          </span>
+          {/* Badge destaque */}
           {property.badge && (
-            <span className="absolute left-3 top-3 rounded-full bg-primary px-3 py-1 font-body text-xs font-semibold text-primary-foreground">
+            <span
+              className="absolute left-3 top-10 font-body"
+              style={{
+                background: 'hsl(235 93% 67%)',
+                color: '#fff',
+                borderRadius: '9999px',
+                fontSize: '12px',
+                fontWeight: 600,
+                padding: '4px 10px',
+              }}
+            >
               {property.badge}
             </span>
           )}
@@ -80,11 +114,6 @@ function PropertyCard({ property, index }: { property: Property; index: number }
           >
             <Heart className={`h-4 w-4 ${liked ? "fill-red-500 text-red-500" : "text-white"}`} />
           </button>
-          <div className="absolute bottom-3 left-3">
-            <span className="rounded-md bg-black/40 px-2 py-1 font-body text-xs text-white/80 backdrop-blur-sm">
-              {property.priceLabel}
-            </span>
-          </div>
         </div>
 
         {/* Info */}
@@ -93,7 +122,7 @@ function PropertyCard({ property, index }: { property: Property; index: number }
           <h3 className="mt-1 font-body text-sm font-semibold text-foreground line-clamp-1">
             {property.title}
           </h3>
-          <p className="mt-2 text-price text-primary">{property.price}</p>
+          <p className="mt-2 font-mono text-lg font-bold text-foreground">{property.price}</p>
 
           <div className="mt-3 flex items-center gap-4 border-t border-border pt-3">
             <span className="flex items-center gap-1.5 font-body text-xs text-muted-foreground">
@@ -107,16 +136,14 @@ function PropertyCard({ property, index }: { property: Property; index: number }
             </span>
           </div>
 
-          {/* CTA button */}
           <button
             onClick={() => setShowLead(!showLead)}
-            className="mt-3 w-full rounded-lg border border-primary/30 py-2 font-body text-xs font-medium text-primary transition-all hover:bg-primary/10 active:scale-[0.97]"
+            className="mt-3 w-full rounded-full border-[1.5px] border-primary py-2 font-body text-xs font-semibold text-primary transition-all hover:bg-[hsl(233_100%_97%)] active:scale-[0.97]"
           >
             Tenho interesse
           </button>
         </div>
 
-        {/* Inline lead form */}
         <LeadFormInline
           isOpen={showLead}
           imovelId={property.id}

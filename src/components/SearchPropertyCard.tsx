@@ -16,11 +16,20 @@ export function SearchPropertyCard({ property, index }: { property: MockProperty
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: Math.min(index * 0.05, 0.3) }}
     >
-      <div className="overflow-hidden rounded-xl bg-card hover-lift">
+      <div
+        className="overflow-hidden bg-card transition-all duration-200 ease-out hover:-translate-y-[3px]"
+        style={{
+          borderRadius: '16px',
+          boxShadow: '0 2px 8px rgba(91,108,249,0.08), 0 0 0 1px rgba(0,0,0,0.04)',
+        }}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = '0 8px 24px rgba(91,108,249,0.15)'; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 8px rgba(91,108,249,0.08), 0 0 0 1px rgba(0,0,0,0.04)'; }}
+      >
         <div className="flex flex-col sm:flex-row">
           {/* Image */}
           <div
-            className="relative aspect-[4/3] w-full cursor-pointer overflow-hidden sm:aspect-auto sm:h-48 sm:w-56 sm:shrink-0"
+            className="relative w-full cursor-pointer overflow-hidden sm:h-48 sm:w-56 sm:shrink-0"
+            style={{ aspectRatio: '4/3', borderRadius: '12px 12px 0 0' }}
             onClick={() => navigate(`/imovel/${property.slug}`)}
           >
             <img
@@ -29,8 +38,33 @@ export function SearchPropertyCard({ property, index }: { property: MockProperty
               loading="lazy"
               className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
             />
+            {/* Badge tipo */}
+            <span
+              className="absolute left-2 top-2 font-body"
+              style={{
+                background: 'hsl(233 100% 97%)',
+                color: 'hsl(235 93% 67%)',
+                borderRadius: '9999px',
+                fontSize: '12px',
+                fontWeight: 600,
+                padding: '3px 8px',
+              }}
+            >
+              {property.tipo}
+            </span>
+            {/* Badge destaque */}
             {property.badge && (
-              <span className="absolute left-2 top-2 rounded-full bg-primary px-2.5 py-0.5 font-body text-[10px] font-semibold text-primary-foreground">
+              <span
+                className="absolute left-2 top-8 font-body"
+                style={{
+                  background: 'hsl(235 93% 67%)',
+                  color: '#fff',
+                  borderRadius: '9999px',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  padding: '3px 8px',
+                }}
+              >
                 {property.badge}
               </span>
             )}
@@ -45,19 +79,14 @@ export function SearchPropertyCard({ property, index }: { property: MockProperty
           {/* Info */}
           <div className="flex flex-1 flex-col justify-between p-4">
             <div>
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <p className="font-body text-[11px] text-muted-foreground">{property.neighborhood}</p>
-                  <h3
-                    className="mt-0.5 cursor-pointer font-body text-sm font-semibold text-foreground line-clamp-1 hover:text-primary transition-colors"
-                    onClick={() => navigate(`/imovel/${property.slug}`)}
-                  >
-                    {property.title}
-                  </h3>
-                </div>
-              </div>
-
-              <p className="mt-2 text-price text-primary">{property.priceFormatted}</p>
+              <p className="font-body text-[11px] text-muted-foreground">{property.neighborhood}</p>
+              <h3
+                className="mt-0.5 cursor-pointer font-body text-sm font-semibold text-foreground line-clamp-1 hover:text-primary transition-colors"
+                onClick={() => navigate(`/imovel/${property.slug}`)}
+              >
+                {property.title}
+              </h3>
+              <p className="mt-2 font-mono text-lg font-bold text-foreground">{property.priceFormatted}</p>
             </div>
 
             <div className="mt-3 flex items-center justify-between">
@@ -76,7 +105,7 @@ export function SearchPropertyCard({ property, index }: { property: MockProperty
               </div>
               <button
                 onClick={() => setShowLead(!showLead)}
-                className="rounded-lg border border-primary/30 px-3 py-1.5 font-body text-[11px] font-medium text-primary transition-all hover:bg-primary/10 active:scale-[0.97]"
+                className="rounded-full border-[1.5px] border-primary px-3 py-1.5 font-body text-[11px] font-semibold text-primary transition-all hover:bg-[hsl(233_100%_97%)] active:scale-[0.97]"
               >
                 Tenho interesse
               </button>

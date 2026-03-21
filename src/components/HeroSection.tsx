@@ -27,6 +27,22 @@ export function HeroSection() {
   const [enviado, setEnviado] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const bairroSuggestions = useMemo(() => {
+    if (!bairro.trim()) return bairrosData.slice(0, 6);
+    const q = bairro.toLowerCase();
+    return bairrosData.filter((b) => b.nome.toLowerCase().includes(q));
+  }, [bairro]);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (bairroRef.current && !bairroRef.current.contains(e.target as Node)) {
+        setBairroOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
   const handleBuscar = () => {
     const params = new URLSearchParams();
     params.set("finalidade", "venda");

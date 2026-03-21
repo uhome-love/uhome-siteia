@@ -127,7 +127,7 @@ const Search = () => {
       const { data, count } = await fetchImoveis({
         finalidade: f.finalidade || undefined,
         tipo: f.tipo || undefined,
-        bairro: f.bairros?.[0] || undefined,
+        bairros: f.bairros?.length ? f.bairros : undefined,
         precoMin: f.preco_min || undefined,
         precoMax: f.preco_max || undefined,
         areaMin: f.area_min || undefined,

@@ -6,6 +6,7 @@ import { FeaturedNeighborhoods } from "@/components/FeaturedNeighborhoods";
 import { FeaturedProperties } from "@/components/FeaturedProperties";
 import { AISearchSection } from "@/components/AISearchSection";
 import { Footer } from "@/components/Footer";
+import { setJsonLd, removeJsonLd, buildOrganizationJsonLd } from "@/lib/jsonld";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -16,6 +17,11 @@ const Index = () => {
       navigate("/onboarding", { replace: true });
     }
   }, [navigate]);
+
+  useEffect(() => {
+    setJsonLd("jsonld-org", buildOrganizationJsonLd());
+    return () => removeJsonLd("jsonld-org");
+  }, []);
   return (
     <div className="min-h-screen bg-background">
       <Navbar />

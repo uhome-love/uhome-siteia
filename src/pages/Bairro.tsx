@@ -7,6 +7,7 @@ import { getBairroBySlug, bairrosData } from "@/data/bairros";
 import { fetchImoveis, formatPreco, type Imovel } from "@/services/imoveis";
 import { motion } from "framer-motion";
 import { MapPin, Home, ArrowRight, Loader2, ChevronRight } from "lucide-react";
+import { setJsonLd, removeJsonLd, buildBairroJsonLd } from "@/lib/jsonld";
 
 function setMeta(attr: string, key: string, content: string) {
   const selector = `meta[${attr}="${key}"]`;
@@ -38,14 +39,25 @@ const Bairro = () => {
     setMeta("property", "og:description", desc);
     setMeta("property", "og:image", bairro.foto);
     setMeta("property", "og:url", `https://uhome.com.br/bairros/${bairro.slug}`);
-    return () => { document.title = "Uhome Imóveis | Porto Alegre"; };
+    return () => {
+      document.title = "Uhome Imóveis | Porto Alegre";
+      removeJsonLd("jsonld-bairro");
+    };
   }, [bairro]);
 
   useEffect(() => {
     if (!bairro) return;
     setLoading(true);
     fetchImoveis({ bairro: bairro.nome, limit: 40 })
-      .then((r) => { setImoveis(r.data); setTotal(r.count); })
+      .then((r) => {
+        setImoveis(r.data);
+        setTotal(r.count);
+        if (bairro) {
+          const precos = r.data.map((i) => i.preco).filter(Boolean);
+          const avg = precos.length ? precos.reduce((a, b) => a + b, 0) / precos.length : undefined;
+          setJsonLd("jsonld-bairro", buildBairroJsonLd(bairro, r.count, avg));
+        }
+      })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [bairro]);

@@ -120,8 +120,9 @@ const Search = () => {
   }, [filters]);
 
   // Normal mode: fetch list first (fast), then map pins in background
+  // Also loads when in IA mode without a query (shows default results)
   const loadImoveis = useCallback(async () => {
-    if (modoIA && !aiResult) return;
+    if (modoIA && !aiResult && queryIA.trim()) return; // only skip if IA mode WITH a typed query but no result yet
     setLoading(true);
     try {
       const baseFilters = buildFilters();

@@ -4,6 +4,8 @@ import { Navbar } from "@/components/Navbar";
 import { SearchFiltersBar } from "@/components/SearchFiltersBar";
 import { SearchPropertyCard } from "@/components/SearchPropertyCard";
 import { SearchMap } from "@/components/SearchMap";
+import { SkeletonCard } from "@/components/SkeletonCard";
+import { SearchCTACard } from "@/components/SearchCTACard";
 import { useSearchStore, type MapBounds } from "@/stores/searchStore";
 import { fetchImoveis, fetchMapPins, type Imovel, type MapPin as MapPinData } from "@/services/imoveis";
 import { interpretarBusca, type AISearchResult } from "@/services/aiSearch";
@@ -12,6 +14,7 @@ import { ArrowUpDown, Bell, Loader2, Map as MapIcon, MapPin, Sparkles, X } from 
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { useCanonical } from "@/hooks/useCanonical";
+import { useCountUp } from "@/hooks/useCountUp";
 
 const sortLabels: Record<string, string> = {
   recentes: "Mais recentes",

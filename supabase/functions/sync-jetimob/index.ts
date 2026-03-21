@@ -207,17 +207,26 @@ serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
+    // Accept start_page and max_pages from body for chunked sync
+    let startPage = 1;
+    let maxPagesToProcess = 15; // ~15 pages per invocation to stay within wall time
+    try {
+      const body = await req.json();
+      if (body?.start_page) startPage = Number(body.start_page);
+      if (body?.max_pages) maxPagesToProcess = Number(body.max_pages);
+    } catch { /* no body is fine */ }
+
     const PAGE_SIZE = 200;
-    const MAX_PAGES = 200;
     const MAX_RETRIES = 3;
-    const RATE_LIMIT_MS = 200;
+    const RATE_LIMIT_MS = 100;
 
     let totalInserted = 0;
     let totalErrors = 0;
     let totalFetched = 0;
     let expectedTotal: number | null = null;
+    let lastPage = startPage;
 
-    console.log(`🔄 Sync started | key length: ${JETIMOB_KEY.length}`);
+    console.log(`🔄 Sync started | startPage=${startPage} maxPages=${maxPagesToProcess} key=${JETIMOB_KEY.length}`);
 
     for (let page = 1; page <= MAX_PAGES; page++) {
       const url = `${JETIMOB_BASE}/${JETIMOB_KEY}/imoveis/todos?v=6&page=${page}&pageSize=${PAGE_SIZE}`;

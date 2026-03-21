@@ -273,7 +273,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch }: 
     source.setData(toGeoJSON(pins));
 
     // Fit bounds
-    const validos = imoveis.filter((i) => {
+    const validos = pins.filter((i) => {
       const lat = Number(i.latitude);
       const lng = Number(i.longitude);
       return lat && lng && lat < -28 && lat > -32 && lng < -49 && lng > -54;

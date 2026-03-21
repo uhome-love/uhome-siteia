@@ -272,17 +272,21 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch }: 
 
     source.setData(toGeoJSON(pins));
 
-    // Fit bounds
+    // Fit bounds — only zoom to fit when there's a filtered subset (< 2000 pins)
+    // Otherwise stay at default POA view to avoid zooming out to show all metro area
     const validos = pins.filter((i) => {
       const lat = Number(i.latitude);
       const lng = Number(i.longitude);
       return lat && lng && lat < -28 && lat > -32 && lng < -49 && lng > -54;
     });
 
-    if (validos.length > 0) {
+    if (validos.length > 0 && validos.length < 2000) {
       const bounds = new mapboxgl.LngLatBounds();
       validos.forEach((i) => bounds.extend([Number(i.longitude), Number(i.latitude)]));
       map.fitBounds(bounds, { padding: 60, maxZoom: 14, duration: 500 });
+    } else if (validos.length >= 2000) {
+      // Large dataset — center on Porto Alegre at comfortable zoom
+      map.easeTo({ center: [-51.2177, -30.0346], zoom: 12, duration: 500 });
     }
   }, [pins]);
 

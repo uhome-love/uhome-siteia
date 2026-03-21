@@ -93,7 +93,7 @@ function PropertyCard({ property, index }: { property: Property; index: number }
           <h3 className="mt-1 font-body text-sm font-semibold text-foreground line-clamp-1">
             {property.title}
           </h3>
-          <p className="mt-2 font-display text-lg font-bold text-primary">{property.price}</p>
+          <p className="mt-2 text-price text-primary">{property.price}</p>
 
           <div className="mt-3 flex items-center gap-4 border-t border-border pt-3">
             <span className="flex items-center gap-1.5 font-body text-xs text-muted-foreground">

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Heart } from "lucide-react";
 import { motion } from "framer-motion";
 import { type Imovel, fotoPrincipal, formatPreco } from "@/services/imoveis";
+import { useFavoritos } from "@/hooks/useFavoritos";
 
 interface Props {
   imovel: Imovel;
@@ -38,11 +39,12 @@ const badgeClasses: Record<BadgeStyle, string> = {
 };
 
 export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Props) {
-  const [liked, setLiked] = useState(false);
+  const { isFavorito, toggleFavorito } = useFavoritos();
   const [hovering, setHovering] = useState(false);
   const [fotoAtiva, setFotoAtiva] = useState(0);
   const navigate = useNavigate();
 
+  const liked = isFavorito(imovel.id);
   const fotos = imovel.fotos.length > 0 ? imovel.fotos.map((f) => f.url) : [fotoPrincipal(imovel)];
   const price = formatPreco(imovel.preco);
   const area = imovel.area_total ?? imovel.area_util ?? 0;
@@ -113,7 +115,7 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
 
           {/* Heart */}
           <button
-            onClick={(e) => { e.stopPropagation(); setLiked(!liked); }}
+            onClick={(e) => { e.stopPropagation(); toggleFavorito(imovel.id); }}
             className="absolute right-1.5 top-1.5 z-10 sm:right-3 sm:top-3"
           >
             <Heart

@@ -3,6 +3,7 @@ import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { Menu, X, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { UhomeLogo } from "@/components/UhomeLogo";
+import { UserMenu } from "@/components/UserMenu";
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -57,15 +58,19 @@ export function Navbar() {
           >
             Ajuda
           </Link>
+          <UserMenu />
         </div>
 
         {/* Mobile toggle */}
-        <button
-          onClick={() => setMobileOpen(!mobileOpen)}
-          className="rounded-full p-2 text-foreground md:hidden"
-        >
-          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
+        <div className="flex items-center gap-2 md:hidden">
+          <UserMenu />
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="rounded-full p-2 text-foreground"
+          >
+            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile menu */}

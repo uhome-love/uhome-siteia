@@ -21,7 +21,7 @@ export function Navbar() {
         </Link>
 
         {/* Desktop — centered pill toggle */}
-        <div className="hidden lg:flex items-center absolute left-1/2 -translate-x-1/2 rounded-full bg-secondary p-1 gap-0.5">
+        <div className="hidden xl:flex items-center absolute left-1/2 -translate-x-1/2 rounded-full bg-secondary p-1 gap-0.5">
           <Link
             to="/busca?finalidade=venda"
             className={`rounded-full px-[18px] py-[7px] text-[14px] font-semibold transition-all whitespace-nowrap ${

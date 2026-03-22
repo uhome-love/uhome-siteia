@@ -24,7 +24,7 @@ export function CorretorRef() {
         localStorage.setItem('corretor_ref_nome', corretor.nome || '');
         localStorage.setItem('corretor_ref_ts', Date.now().toString());
 
-        await (supabase as any).from('corretor_visitas').insert({
+        await supabase.from('corretor_visitas').insert({
           corretor_id: corretor.id,
           corretor_slug: slug,
           user_agent: navigator.userAgent,

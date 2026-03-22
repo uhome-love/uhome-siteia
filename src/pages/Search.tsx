@@ -52,6 +52,7 @@ function describeFilters(filters: Record<string, any>): string {
 
 const Search = () => {
   const { user } = useAuth();
+  const { isFavorito, toggleFavorito } = useFavoritos();
   useCanonical();
   const [searchParams, setSearchParams] = useSearchParams();
   const modoIA = searchParams.get("modo") === "ia";

@@ -74,20 +74,13 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
   const handleMouseEnter = () => { setHovering(true); onHover?.(imovel.id); };
   const handleMouseLeave = () => { setHovering(false); onHover?.(null); };
 
-  // Mobile swipe for carousel
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchRef.current = { startX: e.touches[0].clientX, startY: e.touches[0].clientY };
-  };
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (!touchRef.current || fotos.length <= 1) return;
-    const dx = e.changedTouches[0].clientX - touchRef.current.startX;
-    const dy = e.changedTouches[0].clientY - touchRef.current.startY;
-    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
-      if (dx < 0 && fotoAtiva < fotos.length - 1) setFotoAtiva(f => f + 1);
-      if (dx > 0 && fotoAtiva > 0) setFotoAtiva(f => f - 1);
-    }
-    touchRef.current = null;
-  };
+  // Track active dot via native scroll position
+  const handleScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const idx = Math.round(el.scrollLeft / el.offsetWidth);
+    setFotoAtiva(idx);
+  }, []);
 
   return (
     <motion.div

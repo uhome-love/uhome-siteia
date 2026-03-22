@@ -442,7 +442,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
     } else {
       map.getCanvas().style.cursor = "";
     }
-  }, [drawMode, onDrawFilter, onBoundsSearch]);
+  }, [drawMode]);
 
   function updateDrawSources(map: mapboxgl.Map, pts: [number, number][], closed: boolean) {
     const pointsSource = map.getSource("draw-points") as mapboxgl.GeoJSONSource | undefined;

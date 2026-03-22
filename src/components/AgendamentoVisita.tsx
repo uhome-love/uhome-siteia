@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { submitLead } from "@/services/leads";
 import { syncToCRM } from "@/services/syncCRM";
 import { toast } from "sonner";
+import { formatPhone } from "@/lib/phoneMask";
 
 interface Props {
   imovelId: string;
@@ -110,9 +111,9 @@ export function AgendamentoVisita({ imovelId, imovelSlug, imovelTitulo, imovelBa
             type="tel"
             placeholder="(51) 99999-9999"
             value={telefone}
-            onChange={(e) => setTelefone(e.target.value)}
+            onChange={(e) => setTelefone(formatPhone(e.target.value))}
             className="w-full rounded-lg border-[1.5px] border-border bg-background px-4 py-3 font-body text-sm text-foreground outline-none transition-colors focus:border-primary"
-            maxLength={20}
+            maxLength={16}
           />
           <button
             onClick={() => nome.trim() && telefone.trim() && setEtapa("horario")}

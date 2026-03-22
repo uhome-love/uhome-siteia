@@ -4,6 +4,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { formatPhone } from "@/lib/phoneMask";
 import { motion } from "framer-motion";
 import { UhomeLogo } from "@/components/UhomeLogo";
 import { useCanonical } from "@/hooks/useCanonical";
@@ -262,8 +263,8 @@ const Anunciar = () => {
 
               <FormField label="WhatsApp *">
                 <input
-                  value={telefone} onChange={(e) => setTelefone(e.target.value)}
-                  placeholder="(51) 99999-9999" type="tel" maxLength={20}
+                  value={telefone} onChange={(e) => setTelefone(formatPhone(e.target.value))}
+                  placeholder="(51) 99999-9999" type="tel" maxLength={16}
                   className="w-full rounded-lg border-[1.5px] border-border bg-background px-4 py-3 font-body text-sm text-foreground outline-none transition-colors focus:border-primary"
                 />
               </FormField>

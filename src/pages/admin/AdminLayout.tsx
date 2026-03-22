@@ -15,6 +15,7 @@ import {
   ShieldAlert,
   Menu,
   X,
+  Link2,
 } from "lucide-react";
 
 const navItems = [
@@ -24,6 +25,7 @@ const navItems = [
   { icon: FileText, label: "Captações", path: "/admin/captacoes" },
   { icon: RefreshCw, label: "Sync Jetimob", path: "/admin/sync" },
   { icon: PenSquare, label: "Integração CRM", path: "/admin/integracao" },
+  { icon: Link2, label: "Links Corretores", path: "/admin/links" },
   { icon: Settings, label: "Configurações", path: "/admin/config" },
 ];
 

@@ -288,6 +288,7 @@ export async function fetchImoveisDestaque(limit = 6): Promise<Imovel[]> {
     .from("imoveis")
     .select("*")
     .eq("destaque", true)
+    .eq("status", "disponivel")
     .in("cidade", CIDADES_PERMITIDAS)
     .order("publicado_em", { ascending: false })
     .limit(limit);

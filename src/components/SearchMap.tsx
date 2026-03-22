@@ -318,21 +318,19 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
 
       mapReadyRef.current = true;
 
-      // Set initial data
+      // Report initial viewport bounds so pins can be loaded for this area
+      const initialBounds = map.getBounds();
+      boundsRef.current = initialBounds;
+      if (onBoundsChange) {
+        const sw = initialBounds.getSouthWest();
+        const ne = initialBounds.getNorthEast();
+        onBoundsChange({ lat_min: sw.lat, lat_max: ne.lat, lng_min: sw.lng, lng_max: ne.lng });
+      }
+
+      // Set initial data if pins already available
       const source = map.getSource("imoveis") as mapboxgl.GeoJSONSource | undefined;
       if (source && pinsRef.current.length > 0) {
-        const geo = toGeoJSON(pinsRef.current);
-        source.setData(geo);
-        const validos = pinsRef.current.filter((i) => {
-          const lat = Number(i.latitude);
-          const lng = Number(i.longitude);
-          return lat && lng && lat < -28 && lat > -32 && lng < -49 && lng > -54;
-        });
-        if (validos.length > 0 && validos.length < 2000) {
-          const b = new mapboxgl.LngLatBounds();
-          validos.forEach((i) => b.extend([Number(i.longitude), Number(i.latitude)]));
-          map.fitBounds(b, { padding: 60, maxZoom: 14, duration: 500 });
-        }
+        source.setData(toGeoJSON(pinsRef.current));
       }
     });
 
@@ -342,13 +340,18 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       setPreviewPin(null);
       setPreviewPos(null);
 
-      // Auto-search on move (debounced)
+      const sw = boundsRef.current!.getSouthWest();
+      const ne = boundsRef.current!.getNorthEast();
+      const currentBounds = { lat_min: sw.lat, lat_max: ne.lat, lng_min: sw.lng, lng_max: ne.lng };
+
+      // Always report bounds change for lazy pin loading
+      onBoundsChange?.(currentBounds);
+
+      // Auto-search on move (debounced) — updates the listing, not just pins
       if (autoSearchRef.current && onBoundsSearch) {
         if (autoSearchTimerRef.current) clearTimeout(autoSearchTimerRef.current);
         autoSearchTimerRef.current = window.setTimeout(() => {
-          const sw = boundsRef.current!.getSouthWest();
-          const ne = boundsRef.current!.getNorthEast();
-          onBoundsSearch({ lat_min: sw.lat, lat_max: ne.lat, lng_min: sw.lng, lng_max: ne.lng });
+          onBoundsSearch(currentBounds);
         }, 400);
       } else {
         setMapMoved(true);
@@ -364,7 +367,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       mapRef.current = null;
       initRef.current = false;
     };
-  }, [navigate, onPinHover, onBoundsSearch]);
+  }, [navigate, onPinHover, onBoundsSearch, onBoundsChange]);
 
   // Draw mode
   useEffect(() => {

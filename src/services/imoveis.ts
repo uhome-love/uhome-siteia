@@ -26,6 +26,7 @@ export interface Imovel {
   diferenciais: string[];
   fotos: Array<{ url: string; ordem: number; principal: boolean }>;
   video_url: string | null;
+  condominio_nome: string | null;
   publicado_em: string;
 }
 
@@ -61,6 +62,7 @@ function mapRow(row: any): Imovel {
     destaque: row.destaque ?? false,
     cidade: row.cidade ?? "Porto Alegre",
     uf: row.uf ?? "RS",
+    condominio_nome: row.condominio_nome?.trim() || null,
   };
   // Always override with clean title
   mapped.titulo = tituloLimpo(mapped);

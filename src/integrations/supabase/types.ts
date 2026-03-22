@@ -125,6 +125,30 @@ export type Database = {
         }
         Relationships: []
       }
+      condominio_descricoes: {
+        Row: {
+          condominio_nome: string
+          created_at: string
+          descricao: string
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          condominio_nome: string
+          created_at?: string
+          descricao: string
+          id?: string
+          updated_at?: string | null
+        }
+        Update: {
+          condominio_nome?: string
+          created_at?: string
+          descricao?: string
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       favoritos: {
         Row: {
           created_at: string

@@ -9,7 +9,7 @@ import { AgendamentoVisita } from "@/components/AgendamentoVisita";
 import { SimilarProperties } from "@/components/SimilarProperties";
 import { PropertyMap } from "@/components/PropertyMap";
 import { FotoImovel } from "@/components/FotoImovel";
-import { Bed, Car, Maximize, Bath, MapPin, Share2, Heart, ChevronLeft, ChevronRight, Loader2, Camera, ArrowLeft, MoreVertical, Map as MapIcon, Play, MessageCircle } from "lucide-react";
+import { Bed, Car, Maximize, Bath, MapPin, Share2, Heart, ChevronLeft, ChevronRight, Loader2, Camera, ArrowLeft, MoreVertical, Map as MapIcon, Play, MessageCircle, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { whatsappLink } from "@/lib/whatsapp";
 import { submitLead } from "@/services/leads";
@@ -376,6 +376,17 @@ const PropertyDetail = () => {
               <Link to="/busca" className="hover:text-foreground">Imóveis</Link>
               {" › "}
               <Link to={`/busca?bairro=${encodeURIComponent(imovel.bairro)}`} className="hover:text-foreground">{imovel.bairro}</Link>
+              {imovel.condominio_nome && (
+                <>
+                  {" › "}
+                  <Link
+                    to={`/condominios/${imovel.condominio_nome.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`}
+                    className="hover:text-foreground"
+                  >
+                    {imovel.condominio_nome}
+                  </Link>
+                </>
+              )}
               {" › "}
               <span className="text-foreground">{capitalize(imovel.tipo)}</span>
             </nav>
@@ -392,6 +403,15 @@ const PropertyDetail = () => {
                 <MapPin className="h-4 w-4" />
                 {imovel.bairro}, {imovel.cidade}
               </p>
+              {imovel.condominio_nome && (
+                <Link
+                  to={`/condominios/${imovel.condominio_nome.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`}
+                  className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-border bg-secondary/50 px-3 py-1 font-body text-xs font-medium text-foreground hover:bg-secondary transition-colors"
+                >
+                  <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
+                  {imovel.condominio_nome}
+                </Link>
+              )}
             </div>
 
             {/* Price */}

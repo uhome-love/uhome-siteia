@@ -171,7 +171,7 @@ const CondominioDetail = () => {
       }).catch(console.error).finally(() => setDescLoading(false));
 
       // SEO
-      document.title = `${name} — Imóveis à Venda | Uhome Imóveis`;
+      document.title = `${matchedName} — Imóveis à Venda | Uhome Imóveis`;
       const meta = document.querySelector('meta[name="description"]');
       if (meta) {
         meta.setAttribute(

@@ -85,7 +85,7 @@ const App = () => (
             </Routes>
           </Suspense>
           <ExitIntentModal />
-          <FloatingCTA />
+          <FloatingWhatsApp />
         </TooltipProvider>
       </AuthProvider>
     </QueryClientProvider>

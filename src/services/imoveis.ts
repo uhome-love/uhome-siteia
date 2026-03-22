@@ -26,6 +26,7 @@ export interface Imovel {
   diferenciais: string[];
   fotos: Array<{ url: string; ordem: number; principal: boolean }>;
   video_url: string | null;
+  condominio_nome: string | null;
   publicado_em: string;
 }
 

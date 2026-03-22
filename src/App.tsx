@@ -136,7 +136,7 @@ const App = () => (
             </Routes>
           </Suspense>
           <ExitIntentModal />
-          <FloatingWhatsApp />
+          
         </TooltipProvider>
       </AuthProvider>
     </QueryClientProvider>

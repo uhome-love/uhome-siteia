@@ -146,7 +146,7 @@ export default function AvaliacaoPage() {
                 initial={{ opacity: 0, x: 24, filter: "blur(4px)" }}
                 animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
                 exit={{ opacity: 0, x: -24, filter: "blur(4px)" }}
-                transition={{ duration: 0.35, ease: ease as unknown as number[] }}
+                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] as any }}
               >
                 {/* STEP 1 — Tipo */}
                 {passo === 1 && (

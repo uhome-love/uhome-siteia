@@ -10,6 +10,12 @@ import { useCanonical } from "@/hooks/useCanonical";
 import { type Imovel } from "@/services/imoveis";
 import { motion } from "framer-motion";
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
   ChevronRight,
   Loader2,
   Building2,

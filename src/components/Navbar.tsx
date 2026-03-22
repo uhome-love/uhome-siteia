@@ -74,7 +74,7 @@ export function Navbar() {
         </div>
 
         {/* Mobile toggle */}
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="flex items-center gap-2 lg:hidden">
           <UserMenu />
           <button
             onClick={() => setMobileOpen(!mobileOpen)}

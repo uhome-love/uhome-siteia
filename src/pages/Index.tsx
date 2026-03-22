@@ -1,12 +1,13 @@
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import { Navbar } from "@/components/Navbar";
 import { HeroSection } from "@/components/HeroSection";
-import { FeaturedNeighborhoods } from "@/components/FeaturedNeighborhoods";
-import { FeaturedProperties } from "@/components/FeaturedProperties";
-
 import { Footer } from "@/components/Footer";
 import { setJsonLd, removeJsonLd, buildOrganizationJsonLd } from "@/lib/jsonld";
 import { useCanonical } from "@/hooks/useCanonical";
+
+// Lazy load below-fold sections
+const FeaturedNeighborhoods = lazy(() => import("@/components/FeaturedNeighborhoods").then(m => ({ default: m.FeaturedNeighborhoods })));
+const FeaturedProperties = lazy(() => import("@/components/FeaturedProperties").then(m => ({ default: m.FeaturedProperties })));
 
 const Index = () => {
   useCanonical("/");
@@ -20,9 +21,10 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <HeroSection />
-      <FeaturedNeighborhoods />
-      <FeaturedProperties />
-      
+      <Suspense fallback={null}>
+        <FeaturedNeighborhoods />
+        <FeaturedProperties />
+      </Suspense>
       <Footer />
     </div>
   );

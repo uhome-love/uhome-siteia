@@ -1,11 +1,12 @@
 import { motion } from "framer-motion";
 import { Bed, Car, Maximize, Heart } from "lucide-react";
-import { useState, useEffect, forwardRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { LeadFormInline } from "@/components/LeadFormInline";
+import { FotoImovel } from "@/components/FotoImovel";
 import { fetchImoveisDestaque, type Imovel, fotoPrincipal, formatPreco } from "@/services/imoveis";
 
-const PropertyCard = forwardRef<HTMLDivElement, { imovel: Imovel; index: number }>(function PropertyCard({ imovel, index }, ref) {
+function PropertyCard({ imovel, index }: { imovel: Imovel; index: number }) {
   const [liked, setLiked] = useState(false);
   const [showLead, setShowLead] = useState(false);
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ const PropertyCard = forwardRef<HTMLDivElement, { imovel: Imovel; index: number 
           style={{ aspectRatio: '4/3', borderRadius: '12px 12px 0 0' }}
           onClick={() => navigate(`/imovel/${imovel.slug}`)}
         >
-          <img
+          <FotoImovel
             src={image}
             alt={imovel.titulo}
             loading={index < 3 ? "eager" : "lazy"}
@@ -126,7 +127,7 @@ const PropertyCard = forwardRef<HTMLDivElement, { imovel: Imovel; index: number 
       </div>
     </motion.div>
   );
-});
+}
 
 export function FeaturedProperties() {
   const [imoveis, setImoveis] = useState<Imovel[]>([]);

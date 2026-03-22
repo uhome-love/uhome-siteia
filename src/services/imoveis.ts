@@ -118,7 +118,8 @@ const LISTING_COLUMNS = "id,slug,tipo,finalidade,status,destaque,preco,preco_con
 export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: Imovel[]; count: number }> {
   let query = supabase
     .from("imoveis")
-    .select(LISTING_COLUMNS, { count: "exact" });
+    .select(LISTING_COLUMNS, { count: "exact" })
+    .eq("status", "disponivel");
 
   // City filter: specific city or all allowed
   if (filters.cidade) {
@@ -194,7 +195,8 @@ export async function fetchMapPins(filters: BuscaFilters = {}): Promise<MapPin[]
   function buildPinQuery() {
     let query = supabase
       .from("imoveis")
-      .select("id,slug,preco,latitude,longitude,bairro,titulo,tipo,quartos,finalidade,fotos,area_total");
+      .select("id,slug,preco,latitude,longitude,bairro,titulo,tipo,quartos,finalidade,fotos,area_total")
+      .eq("status", "disponivel");
 
     if (filters.cidade) {
       query = query.eq("cidade", filters.cidade);
@@ -286,6 +288,7 @@ export async function fetchImoveisDestaque(limit = 6): Promise<Imovel[]> {
     .from("imoveis")
     .select("*")
     .eq("destaque", true)
+    .eq("status", "disponivel")
     .in("cidade", CIDADES_PERMITIDAS)
     .order("publicado_em", { ascending: false })
     .limit(limit);
@@ -298,6 +301,7 @@ export async function fetchImoveisDestaque(limit = 6): Promise<Imovel[]> {
     const { data: fallback } = await supabase
       .from("imoveis")
       .select("*")
+      .eq("status", "disponivel")
       .in("cidade", CIDADES_PERMITIDAS)
       .order("publicado_em", { ascending: false })
       .limit(limit);

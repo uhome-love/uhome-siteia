@@ -203,8 +203,8 @@ export interface MapPin {
   tipo?: string;
 }
 
-// Lightweight columns for map pins — NO fotos JSONB
-const PIN_COLUMNS = "id,slug,preco,latitude,longitude,bairro,titulo,tipo,quartos,finalidade,area_total,foto_principal";
+// Lightweight columns for map pins — minimal payload for clustering/render
+const PIN_COLUMNS = "id,slug,preco,latitude,longitude,bairro,tipo,quartos,area_total";
 
 // --- Pins cache ---
 const pinsCache = new Map<string, { data: MapPin[]; timestamp: number }>();

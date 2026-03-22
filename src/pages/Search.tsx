@@ -10,7 +10,7 @@ import { SkeletonCard } from "@/components/SkeletonCard";
 import { SearchCTACard } from "@/components/SearchCTACard";
 import { MobileFiltersSheet } from "@/components/MobileFiltersSheet";
 import { useSearchStore, type MapBounds } from "@/stores/searchStore";
-import { fetchImoveis, fetchMapPins, type Imovel, type MapPin as MapPinData } from "@/services/imoveis";
+import { fetchImoveis, fetchMapPins, type Imovel, type MapPin as MapPinData, type BuscaFilters } from "@/services/imoveis";
 import { interpretarBusca, type AISearchResult } from "@/services/aiSearch";
 import { supabase } from "@/integrations/supabase/client";
 import { syncToCRM } from "@/services/syncCRM";

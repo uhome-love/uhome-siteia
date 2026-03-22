@@ -7,9 +7,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
 
-// Lazy load non-critical global components
-const ExitIntentModal = lazy(() => import("@/components/ExitIntentModal").then(m => ({ default: m.ExitIntentModal })));
-const FloatingWhatsApp = lazy(() => import("@/components/FloatingWhatsApp").then(m => ({ default: m.FloatingWhatsApp })));
+import { ExitIntentModal } from "@/components/ExitIntentModal";
+import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
 
 // Eager load homepage
 import Index from "./pages/Index.tsx";

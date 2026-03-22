@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { type Imovel, fotoPrincipal, formatPreco } from "@/services/imoveis";
 import { FotoImovel } from "@/components/FotoImovel";
 import { useFavoritos } from "@/hooks/useFavoritos";
+import { useCorretor } from "@/contexts/CorretorContext";
 
 interface Props {
   imovel: Imovel;

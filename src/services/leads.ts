@@ -25,7 +25,7 @@ export async function submitLead(data: LeadData) {
   let corretor_ref_id: string | null = null;
   if (refSlug) {
     try {
-      const { data: profile } = await (sb as any)
+      const { data: profile } = await (supabase as any)
         .from('profiles')
         .select('id')
         .eq('slug_ref', refSlug)

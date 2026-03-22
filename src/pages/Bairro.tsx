@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { LeadFormInline } from "@/components/LeadFormInline";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { SearchPropertyCard } from "@/components/SearchPropertyCard";

@@ -97,20 +97,20 @@ const App = () => (
               <Route path="/comerciais-porto-alegre" element={<TipoImovel />} />
 
               {/* Rotas do corretor — mesmas páginas, mantendo /c/:slug na URL */}
-              <Route path="/c/:slug" element={<CorretorRefLayout />}>
+              <Route path="/c/:corretorSlug" element={<CorretorRefLayout />}>
                 <Route index element={<Index />} />
                 <Route path="busca" element={<Search />} />
-                <Route path="imovel/:imovelSlug" element={<PropertyDetail />} />
+                <Route path="imovel/:slug" element={<PropertyDetail />} />
                 <Route path="anunciar" element={<Anunciar />} />
                 <Route path="carreiras" element={<Carreiras />} />
                 <Route path="bairros" element={<Bairros />} />
-                <Route path="bairros/:bairroSlug" element={<Bairro />} />
+                <Route path="bairros/:slug" element={<Bairro />} />
                 <Route path="faq" element={<FAQ />} />
                 <Route path="blog" element={<Blog />} />
-                <Route path="blog/:blogSlug" element={<BlogPostPage />} />
+                <Route path="blog/:slug" element={<BlogPostPage />} />
                 <Route path="favoritos" element={<Favoritos />} />
                 <Route path="condominios" element={<Condominios />} />
-                <Route path="condominios/:condoSlug" element={<CondominioDetail />} />
+                <Route path="condominios/:slug" element={<CondominioDetail />} />
                 <Route path="avaliar-imovel" element={<AvaliacaoPage />} />
               </Route>
 

@@ -3,7 +3,7 @@ import { useParams, Outlet } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 
 export function CorretorRefLayout() {
-  const { slug } = useParams();
+  const { corretorSlug } = useParams();
   const [ready, setReady] = useState(false);
 
   useEffect(() => {

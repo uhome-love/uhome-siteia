@@ -112,7 +112,7 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
               <div
                 key={i}
                 className="w-full shrink-0 snap-center"
-                onClick={() => navigate(`/imovel/${imovel.slug}`)}
+                onClick={() => navigate(prefixLink(`/imovel/${imovel.slug}`))}
               >
                 <FotoImovel
                   src={foto}

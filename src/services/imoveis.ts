@@ -70,8 +70,10 @@ function mapRow(row: any): Imovel {
 
 /** Get primary photo URL or a placeholder */
 export function fotoPrincipal(imovel: Imovel): string {
+  // Use foto_principal column first (populated by DB trigger)
+  if ((imovel as any).foto_principal) return (imovel as any).foto_principal;
   const fotos = imovel.fotos;
-  if (fotos.length === 0) return "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&h=400&fit=crop";
+  if (!fotos || fotos.length === 0) return "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&h=400&fit=crop";
   const principal = fotos.find((f) => f.principal);
   return (principal ?? fotos[0]).url;
 }

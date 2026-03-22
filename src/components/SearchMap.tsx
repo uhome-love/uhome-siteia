@@ -331,10 +331,10 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       // Report initial viewport bounds so pins can be loaded for this area
       const initialBounds = map.getBounds();
       boundsRef.current = initialBounds;
-      if (onBoundsChange) {
+      if (onBoundsChangeRef.current) {
         const sw = initialBounds.getSouthWest();
         const ne = initialBounds.getNorthEast();
-        onBoundsChange({ lat_min: sw.lat, lat_max: ne.lat, lng_min: sw.lng, lng_max: ne.lng });
+        onBoundsChangeRef.current({ lat_min: sw.lat, lat_max: ne.lat, lng_min: sw.lng, lng_max: ne.lng });
       }
 
       // Set initial data if pins already available

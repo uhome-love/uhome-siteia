@@ -90,6 +90,8 @@ const Anunciar = () => {
 
     setSubmitting(true);
     try {
+      const refSlug = getCorretorRef();
+      const refId = getCorretorRefId();
       const { error } = await supabase.from("captacao_imoveis" as any).insert({
         nome: nome.trim().slice(0, 100),
         telefone: tel.slice(0, 20),
@@ -97,6 +99,9 @@ const Anunciar = () => {
         bairro: bairro.trim().slice(0, 100),
         valor_pretendido: valorPretendido.trim().slice(0, 50) || null,
         mensagem: mensagem.trim().slice(0, 1000) || null,
+        corretor_ref_id: refId || null,
+        corretor_ref_slug: refSlug || null,
+        origem_ref: refSlug ? 'link_corretor' : 'organico',
       });
       if (error) throw error;
       setSubmitted(true);

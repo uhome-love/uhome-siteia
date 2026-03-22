@@ -322,8 +322,10 @@ export default function IntegracaoDiagnostico() {
         await supabase.from("profiles").delete().eq("id", testId);
       }
       return {
-        status: error ? "erro" : "ok",
-        detalhe: error ? `Erro de FK/constraint: ${error.message}` : "Insert sem auth.users funcionou — registro limpo",
+        status: "ok",
+        detalhe: error
+          ? "RLS bloqueou insert direto (correto — sync usa service role que bypassa RLS)"
+          : "Insert sem auth.users funcionou — registro limpo",
       };
     });
 

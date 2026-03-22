@@ -202,7 +202,7 @@ export function SearchFiltersBar({ onOpenMobileFilters }: { onOpenMobileFilters?
   }
 
   return (
-    <div className="sticky top-16 z-10 flex items-center gap-2 overflow-x-auto border-b border-border bg-background px-5 py-3 scrollbar-none">
+    <div className="sticky top-16 z-20 flex items-center gap-2 overflow-x-auto border-b border-border bg-background px-5 py-3 scrollbar-none">
       {/* Search input with chips + autocomplete */}
       <div className="relative shrink-0" ref={dropdownRef}>
         <div

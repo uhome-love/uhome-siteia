@@ -10,6 +10,12 @@ import { useCanonical } from "@/hooks/useCanonical";
 import { type Imovel } from "@/services/imoveis";
 import { motion } from "framer-motion";
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
   ChevronRight,
   Loader2,
   Building2,
@@ -97,6 +103,74 @@ function setLabel(s: Set<number>) {
   return `${arr[0]} a ${arr[arr.length - 1]}`;
 }
 
+function formatPrecoFull(v: number) {
+  return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+}
+
+function buildFaqItems(name: string, stats: CondoStats, diferenciais: string[]): { pergunta: string; resposta: string }[] {
+  const faqs: { pergunta: string; resposta: string }[] = [];
+
+  // Price
+  faqs.push({
+    pergunta: `Qual o preço dos imóveis no ${name}?`,
+    resposta: stats.precoMin === stats.precoMax
+      ? `As unidades disponíveis no ${name} estão com valor de ${formatPrecoFull(stats.precoMin)}.`
+      : `Os imóveis no ${name} variam de ${formatPrecoFull(stats.precoMin)} a ${formatPrecoFull(stats.precoMax)}, dependendo da metragem e configuração da unidade.`,
+  });
+
+  // Units available
+  faqs.push({
+    pergunta: `Quantas unidades estão disponíveis no ${name}?`,
+    resposta: `Atualmente há ${stats.totalUnidades} ${stats.totalUnidades === 1 ? "unidade disponível" : "unidades disponíveis"} no ${name}, incluindo ${Array.from(stats.tiposSet).join(" e ")}.`,
+  });
+
+  // Location
+  faqs.push({
+    pergunta: `Onde fica o ${name}?`,
+    resposta: `O ${name} está localizado no bairro ${stats.bairro}, em ${stats.cidade}. A região é conhecida por sua infraestrutura completa com fácil acesso a comércio, serviços e transporte público.`,
+  });
+
+  // Area
+  if (stats.areaMin > 0) {
+    faqs.push({
+      pergunta: `Qual a metragem dos apartamentos no ${name}?`,
+      resposta: stats.areaMin === stats.areaMax
+        ? `As unidades possuem ${stats.areaMin} m² de área.`
+        : `As unidades variam de ${stats.areaMin} m² a ${stats.areaMax} m², oferecendo opções para diferentes perfis de moradores.`,
+    });
+  }
+
+  // Bedrooms
+  if (stats.quartosSet.size > 0) {
+    const q = Array.from(stats.quartosSet).sort((a, b) => a - b);
+    faqs.push({
+      pergunta: `Quantos quartos têm os imóveis do ${name}?`,
+      resposta: q.length === 1
+        ? `As unidades do ${name} possuem ${q[0]} ${q[0] === 1 ? "quarto" : "quartos"}.`
+        : `O empreendimento oferece opções de ${q.join(", ")} quartos, atendendo desde casais até famílias maiores.`,
+    });
+  }
+
+  // Parking
+  if (stats.vagasSet.size > 0) {
+    const v = Array.from(stats.vagasSet).sort((a, b) => a - b);
+    faqs.push({
+      pergunta: `O ${name} tem vaga de garagem?`,
+      resposta: `Sim, as unidades contam com ${v.length === 1 ? `${v[0]} ${v[0] === 1 ? "vaga" : "vagas"}` : `${v[0]} a ${v[v.length - 1]} vagas`} de garagem.`,
+    });
+  }
+
+  // Diferenciais / infrastructure
+  if (diferenciais.length > 0) {
+    faqs.push({
+      pergunta: `Quais são os diferenciais e a infraestrutura do ${name}?`,
+      resposta: `O ${name} conta com: ${diferenciais.slice(0, 10).join(", ")}. Esses diferenciais tornam o empreendimento uma excelente opção de moradia no bairro ${stats.bairro}.`,
+    });
+  }
+
+  return faqs;
+}
+
 const CondominioDetail = () => {
   const { slug } = useParams<{ slug: string }>();
   useCanonical(slug);
@@ -180,7 +254,7 @@ const CondominioDetail = () => {
         );
       }
 
-      // JSON-LD
+      // JSON-LD Residence
       const jsonLd = {
         "@context": "https://schema.org",
         "@type": "Residence",
@@ -204,11 +278,40 @@ const CondominioDetail = () => {
 
       return () => {
         document.getElementById("condo-jsonld")?.remove();
+        document.getElementById("condo-faq-jsonld")?.remove();
       };
     })();
   }, [slug]);
 
   const stats = imoveis.length > 0 ? buildStats(imoveis) : null;
+
+  // Collect unique diferenciais across all units
+  const allDiferenciais = [...new Set(imoveis.flatMap((im) => im.diferenciais || []))];
+
+  // Build FAQ items from real data
+  const faqItems = condoName && stats ? buildFaqItems(condoName, stats, allDiferenciais) : [];
+
+  // Inject FAQ JSON-LD
+  useEffect(() => {
+    if (faqItems.length === 0) return;
+    const faqJsonLd = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: faqItems.map((f) => ({
+        "@type": "Question",
+        name: f.pergunta,
+        acceptedAnswer: { "@type": "Answer", text: f.resposta },
+      })),
+    };
+    let el = document.getElementById("condo-faq-jsonld");
+    if (!el) {
+      el = document.createElement("script");
+      el.id = "condo-faq-jsonld";
+      el.setAttribute("type", "application/ld+json");
+      document.head.appendChild(el);
+    }
+    el.textContent = JSON.stringify(faqJsonLd);
+  }, [faqItems.length, condoName]);
 
   // Hero images — up to 5 unique photos from the condo's units
   const heroImages = imoveis
@@ -348,6 +451,33 @@ const CondominioDetail = () => {
                 </motion.div>
               ))}
             </div>
+
+            {/* FAQ Section */}
+            {faqItems.length > 0 && (
+              <motion.section
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.5 }}
+                className="mt-12"
+              >
+                <h2 className="font-body text-lg font-extrabold text-foreground sm:text-xl mb-4">
+                  Perguntas frequentes sobre o {condoName}
+                </h2>
+                <Accordion type="multiple" className="w-full">
+                  {faqItems.map((faq, i) => (
+                    <AccordionItem key={i} value={`faq-${i}`}>
+                      <AccordionTrigger className="font-body text-sm font-semibold text-foreground text-left">
+                        {faq.pergunta}
+                      </AccordionTrigger>
+                      <AccordionContent className="font-body text-sm text-muted-foreground leading-relaxed">
+                        {faq.resposta}
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              </motion.section>
+            )}
 
             {/* Lead form */}
             <motion.div

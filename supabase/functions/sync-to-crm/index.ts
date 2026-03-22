@@ -1,7 +1,18 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 Deno.serve(async (req) => {
-  const { record } = await req.json()
+  // Called by pg_net trigger — no CORS needed
+  let record: Record<string, unknown>
+
+  try {
+    const body = await req.json()
+    record = body.record
+  } catch {
+    return new Response(JSON.stringify({ ok: false, error: 'Invalid JSON' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' }
+    })
+  }
 
   const supabaseSite = createClient(
     Deno.env.get('SUPABASE_URL')!,
@@ -19,7 +30,7 @@ Deno.serve(async (req) => {
     const { data: perfil } = await supabaseSite
       .from('profiles')
       .select('uhomesales_id')
-      .eq('id', record.corretor_ref_id)
+      .eq('id', record.corretor_ref_id as string)
       .maybeSingle()
     corretorCRMId = perfil?.uhomesales_id ?? null
   }
@@ -69,7 +80,7 @@ Deno.serve(async (req) => {
         uhomesales_lead_id: leadCRM.id,
         sincronizado_em: new Date().toISOString()
       })
-      .eq('id', record.id)
+      .eq('id', record.id as string)
   }
 
   // 5. Log

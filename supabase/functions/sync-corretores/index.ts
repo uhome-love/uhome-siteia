@@ -1,10 +1,13 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
+}
+
 Deno.serve(async (req) => {
-  // Verificar secret
-  const auth = req.headers.get('authorization')
-  if (auth !== `Bearer ${Deno.env.get('SYNC_SECRET')}`) {
-    return new Response('Unauthorized', { status: 401 })
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders })
   }
 
   const supabaseSite = createClient(
@@ -18,20 +21,30 @@ Deno.serve(async (req) => {
   )
 
   // 1. Buscar corretores ativos no CRM
-  const { data: corretoresCRM } = await supabaseCRM
+  const { data: corretoresCRM, error: fetchError } = await supabaseCRM
     .from('profiles')
     .select('id, nome, email, telefone, foto_url, creci')
     .eq('role', 'corretor')
     .eq('ativo', true)
 
+  if (fetchError) {
+    console.error('[sync-corretores] Erro ao buscar CRM:', fetchError.message)
+    return new Response(JSON.stringify({ ok: false, error: fetchError.message }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    })
+  }
+
   if (!corretoresCRM?.length) {
     return new Response(JSON.stringify({ ok: true, sincronizados: 0 }), {
-      headers: { 'Content-Type': 'application/json' }
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     })
   }
 
   // 2. Para cada corretor, upsert no site
   let sincronizados = 0
+  const erros: string[] = []
+
   for (const corretor of corretoresCRM) {
     const slugRef = gerarSlug(corretor.nome)
 
@@ -53,7 +66,12 @@ Deno.serve(async (req) => {
         ignoreDuplicates: false
       })
 
-    if (!error) sincronizados++
+    if (!error) {
+      sincronizados++
+    } else {
+      erros.push(`${corretor.nome}: ${error.message}`)
+      console.error(`[sync-corretores] Erro upsert ${corretor.nome}:`, error.message)
+    }
 
     // Log
     await supabaseSite.from('sync_log').insert({
@@ -68,9 +86,10 @@ Deno.serve(async (req) => {
   return new Response(JSON.stringify({
     ok: true,
     sincronizados,
-    total: corretoresCRM.length
+    total: corretoresCRM.length,
+    erros: erros.length > 0 ? erros : undefined
   }), {
-    headers: { 'Content-Type': 'application/json' }
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' }
   })
 })
 

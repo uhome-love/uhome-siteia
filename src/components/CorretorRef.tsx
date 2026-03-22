@@ -11,12 +11,12 @@ export function CorretorRef() {
     async function registrar() {
       if (!slug) { navigate('/'); return; }
 
-      const { data: corretor } = await (supabase as any)
+      const { data: corretor } = await supabase
         .from('profiles')
         .select('id, nome')
         .eq('slug_ref', slug)
         .eq('ativo', true)
-        .single();
+        .maybeSingle();
 
       if (corretor) {
         localStorage.setItem('corretor_ref_id', corretor.id);
@@ -24,7 +24,7 @@ export function CorretorRef() {
         localStorage.setItem('corretor_ref_nome', corretor.nome || '');
         localStorage.setItem('corretor_ref_ts', Date.now().toString());
 
-        await (supabase as any).from('corretor_visitas').insert({
+        await supabase.from('corretor_visitas').insert({
           corretor_id: corretor.id,
           corretor_slug: slug,
           user_agent: navigator.userAgent,

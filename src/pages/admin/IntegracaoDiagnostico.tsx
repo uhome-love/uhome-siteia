@@ -117,10 +117,32 @@ function initialTests(): TestResult[] {
   ];
 }
 
+interface DiagLog {
+  id: string;
+  created_at: string;
+  total_testes: number;
+  ok: number;
+  avisos: number;
+  erros: number;
+  origem: string;
+  resultados: TestResult[];
+}
+
 export default function IntegracaoDiagnostico() {
   const [testes, setTestes] = useState<TestResult[]>([]);
   const [rodando, setRodando] = useState(false);
   const [concluido, setConcluido] = useState(false);
+  const [historico, setHistorico] = useState<DiagLog[]>([]);
+  const [historicoAberto, setHistoricoAberto] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase
+      .from("diagnostico_log")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(10)
+      .then(({ data }) => setHistorico((data as DiagLog[]) ?? []));
+  }, [concluido]);
 
   function up(nome: string, resultado: Partial<TestResult>) {
     setTestes((prev) =>

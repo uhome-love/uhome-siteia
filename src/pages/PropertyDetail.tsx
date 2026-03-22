@@ -8,7 +8,7 @@ import { AgendamentoVisita } from "@/components/AgendamentoVisita";
 import { SimilarProperties } from "@/components/SimilarProperties";
 import { PropertyMap } from "@/components/PropertyMap";
 import { FotoImovel } from "@/components/FotoImovel";
-import { Bed, Car, Maximize, Bath, MapPin, Share2, Heart, ChevronLeft, ChevronRight, Loader2, Camera } from "lucide-react";
+import { Bed, Car, Maximize, Bath, MapPin, Share2, Heart, ChevronLeft, ChevronRight, Loader2, Camera, ArrowLeft, MoreVertical, Map as MapIcon, Play } from "lucide-react";
 import { motion } from "framer-motion";
 import { trackView, getViewCount } from "@/services/leads";
 import { fetchImovelBySlug, type Imovel, formatPreco, fotoPrincipal } from "@/services/imoveis";

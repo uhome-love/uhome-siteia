@@ -50,8 +50,7 @@ export function tituloLimpo(imovel: { tipo: string; finalidade: string; quartos:
   if (quartos > 0) {
     return `${tipo} ${quartos} quarto${quartos > 1 ? "s" : ""} — ${imovel.bairro}`;
   }
-  const label = imovel.finalidade === "locacao" ? "para Alugar" : "para Venda";
-  return `${tipo} ${label} — ${imovel.bairro}`;
+  return `${tipo} para Venda — ${imovel.bairro}`;
 }
 
 function mapRow(row: any): Imovel {

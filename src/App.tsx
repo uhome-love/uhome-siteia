@@ -72,7 +72,11 @@ const App = () => (
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPostPage />} />
               <Route path="/favoritos" element={<Favoritos />} />
-              <Route path="/:slug" element={<TipoImovel />} />
+              <Route path="/apartamentos-porto-alegre" element={<TipoImovel />} />
+              <Route path="/casas-porto-alegre" element={<TipoImovel />} />
+              <Route path="/coberturas-porto-alegre" element={<TipoImovel />} />
+              <Route path="/studios-porto-alegre" element={<TipoImovel />} />
+              <Route path="/comerciais-porto-alegre" element={<TipoImovel />} />
               <Route path="/admin" element={<AdminLayout />}>
                 <Route index element={<AdminDashboard />} />
                 <Route path="imoveis" element={<AdminImoveis />} />

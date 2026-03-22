@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Heart } from "lucide-react";
 import { motion } from "framer-motion";
@@ -43,9 +43,8 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
   const { isFavorito, toggleFavorito } = useFavoritos();
   const [hovering, setHovering] = useState(false);
   const [fotoAtiva, setFotoAtiva] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-  const touchRef = useRef<{ startX: number; startY: number } | null>(null);
-
   const liked = isFavorito(imovel.id);
   const fotos = imovel.fotos.length > 0 ? imovel.fotos.map((f) => f.url) : [fotoPrincipal(imovel)];
   const price = formatPreco(imovel.preco);
@@ -77,20 +76,13 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
   const handleMouseEnter = () => { setHovering(true); onHover?.(imovel.id); };
   const handleMouseLeave = () => { setHovering(false); onHover?.(null); };
 
-  // Mobile swipe for carousel
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchRef.current = { startX: e.touches[0].clientX, startY: e.touches[0].clientY };
-  };
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (!touchRef.current || fotos.length <= 1) return;
-    const dx = e.changedTouches[0].clientX - touchRef.current.startX;
-    const dy = e.changedTouches[0].clientY - touchRef.current.startY;
-    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
-      if (dx < 0 && fotoAtiva < fotos.length - 1) setFotoAtiva(f => f + 1);
-      if (dx > 0 && fotoAtiva > 0) setFotoAtiva(f => f - 1);
-    }
-    touchRef.current = null;
-  };
+  // Track active dot via native scroll position
+  const handleScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const idx = Math.round(el.scrollLeft / el.offsetWidth);
+    setFotoAtiva(idx);
+  }, []);
 
   return (
     <motion.div
@@ -104,23 +96,35 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
     >
       {/* ===== MOBILE: QuintoAndar-style full-width vertical card ===== */}
       <div className="sm:hidden">
-        {/* Full-width image carousel */}
-        <div
-          className="relative overflow-hidden rounded-xl"
-          style={{ aspectRatio: "4/3" }}
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
-        >
-          <FotoImovel
-            src={fotos[fotoAtiva]}
-            alt={imovel.titulo}
-            loading={index < 4 ? "eager" : "lazy"}
-            decoding="async"
-            className="h-full w-full object-cover"
-          />
+        {/* Native scroll-snap carousel */}
+        <div className="relative overflow-hidden rounded-xl">
+          <div
+            ref={scrollRef}
+            onScroll={handleScroll}
+            className="flex snap-x snap-mandatory overflow-x-auto scrollbar-hide"
+            style={{ aspectRatio: "4/3", WebkitOverflowScrolling: "touch" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {fotos.slice(0, 7).map((foto, i) => (
+              <div
+                key={i}
+                className="w-full shrink-0 snap-center"
+                onClick={() => navigate(`/imovel/${imovel.slug}`)}
+              >
+                <FotoImovel
+                  src={foto}
+                  alt={`${imovel.titulo} - foto ${i + 1}`}
+                  loading={index < 4 && i === 0 ? "eager" : "lazy"}
+                  decoding="async"
+                  className="h-full w-full object-cover"
+                  style={{ aspectRatio: "4/3" }}
+                />
+              </div>
+            ))}
+          </div>
 
           {/* Badges */}
-          <div className="absolute left-3 top-3 z-10 flex gap-1.5">
+          <div className="pointer-events-none absolute left-3 top-3 z-10 flex gap-1.5">
             {badge && (
               <span className={`rounded-md px-2.5 py-1 font-body text-[11px] ${badgeClasses[badge.style]}`}>
                 {badge.label}
@@ -143,7 +147,7 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
 
           {/* Dots */}
           {fotos.length > 1 && (
-            <div className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
+            <div className="pointer-events-none absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
               {fotos.slice(0, 7).map((_, i) => (
                 <div
                   key={i}

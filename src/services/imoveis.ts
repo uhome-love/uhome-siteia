@@ -278,7 +278,7 @@ export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSig
       .lte("longitude", filters.bounds.lng_max);
   }
 
-  query = query.order("preco", { ascending: false }).limit(2000);
+  query = query.limit(2000);
 
   if (signal) {
     query = query.abortSignal(signal);

@@ -167,11 +167,22 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
   const offset = filters.offset ?? 0;
   query = query.range(offset, offset + limit - 1);
 
+  const t0 = performance.now();
   const { data, error, count } = await query;
+  const loadMs = Math.round(performance.now() - t0);
   if (error) throw error;
 
+  const rows = data || [];
+  // Emit perf metrics in dev
+  if (import.meta.env.DEV) {
+    const payloadKB = Math.round(JSON.stringify(rows).length / 1024);
+    window.dispatchEvent(new CustomEvent("perf:update", {
+      detail: { listaLoadMs: loadMs, listaPayloadKB: payloadKB },
+    }));
+  }
+
   return {
-    data: (data || []).map(mapRow),
+    data: rows.map(mapRow),
     count: count || 0,
   };
 }

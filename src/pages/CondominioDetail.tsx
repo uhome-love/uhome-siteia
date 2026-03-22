@@ -317,10 +317,10 @@ const CondominioDetail = () => {
                   Deixe seus dados e um corretor entrará em contato.
                 </p>
                 <LeadFormInline
-                  origemComponente="condominio_detail"
-                  origemPagina={`/condominios/${slug}`}
+                  isOpen={true}
                   imovelTitulo={condoName}
                   imovelBairro={stats.bairro}
+                  onClose={() => {}}
                 />
               </div>
             </motion.div>

@@ -29,7 +29,7 @@ const DIFERENCIAIS = [
   "Portaria 24h", "Elevador", "Salão de festas", "Playground", "Academia",
 ];
 
-const ease = [0.16, 1, 0.3, 1] as const;
+const ease = [0.16, 1, 0.3, 1];
 
 export default function AvaliacaoPage() {
   const [passo, setPasso] = useState(1);

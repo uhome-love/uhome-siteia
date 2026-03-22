@@ -402,10 +402,14 @@ export function HeroSection() {
                 >
                   {loading ? "Enviando..." : "Quero anunciar →"}
                 </button>
-                <p className="mt-3 text-center font-body text-[11px] text-muted-foreground">
-                  Gratuito · Resposta em até 1h
-                </p>
+                <Link
+                  to="/avaliar-imovel"
+                  className="mt-3 block text-center font-body text-xs font-semibold text-primary transition-colors hover:text-primary/80"
+                >
+                  Descobrir o valor do meu imóvel →
+                </Link>
               </>
+
             )}
           </motion.div>
         </div>

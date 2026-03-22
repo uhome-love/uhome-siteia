@@ -53,6 +53,12 @@ export function Navbar() {
 
         <div className="hidden items-center gap-2 md:flex flex-shrink-0">
           <Link
+            to="/avaliar-imovel"
+            className="rounded-full px-4 py-2 font-body text-sm font-semibold text-primary transition-colors hover:bg-primary/5 active:scale-[0.97]"
+          >
+            Quanto vale meu imóvel?
+          </Link>
+          <Link
             to="/anunciar"
             className="rounded-full border-[1.5px] border-primary px-[18px] py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary/5 active:scale-[0.97]"
           >

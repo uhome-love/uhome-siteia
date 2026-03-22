@@ -196,6 +196,39 @@ export type Database = {
           },
         ]
       }
+      diagnostico_log: {
+        Row: {
+          avisos: number
+          created_at: string
+          erros: number
+          id: string
+          ok: number
+          origem: string
+          resultados: Json
+          total_testes: number
+        }
+        Insert: {
+          avisos?: number
+          created_at?: string
+          erros?: number
+          id?: string
+          ok?: number
+          origem?: string
+          resultados?: Json
+          total_testes?: number
+        }
+        Update: {
+          avisos?: number
+          created_at?: string
+          erros?: number
+          id?: string
+          ok?: number
+          origem?: string
+          resultados?: Json
+          total_testes?: number
+        }
+        Relationships: []
+      }
       favoritos: {
         Row: {
           created_at: string

@@ -103,6 +103,74 @@ function setLabel(s: Set<number>) {
   return `${arr[0]} a ${arr[arr.length - 1]}`;
 }
 
+function formatPrecoFull(v: number) {
+  return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+}
+
+function buildFaqItems(name: string, stats: CondoStats, diferenciais: string[]): { pergunta: string; resposta: string }[] {
+  const faqs: { pergunta: string; resposta: string }[] = [];
+
+  // Price
+  faqs.push({
+    pergunta: `Qual o preço dos imóveis no ${name}?`,
+    resposta: stats.precoMin === stats.precoMax
+      ? `As unidades disponíveis no ${name} estão com valor de ${formatPrecoFull(stats.precoMin)}.`
+      : `Os imóveis no ${name} variam de ${formatPrecoFull(stats.precoMin)} a ${formatPrecoFull(stats.precoMax)}, dependendo da metragem e configuração da unidade.`,
+  });
+
+  // Units available
+  faqs.push({
+    pergunta: `Quantas unidades estão disponíveis no ${name}?`,
+    resposta: `Atualmente há ${stats.totalUnidades} ${stats.totalUnidades === 1 ? "unidade disponível" : "unidades disponíveis"} no ${name}, incluindo ${Array.from(stats.tiposSet).join(" e ")}.`,
+  });
+
+  // Location
+  faqs.push({
+    pergunta: `Onde fica o ${name}?`,
+    resposta: `O ${name} está localizado no bairro ${stats.bairro}, em ${stats.cidade}. A região é conhecida por sua infraestrutura completa com fácil acesso a comércio, serviços e transporte público.`,
+  });
+
+  // Area
+  if (stats.areaMin > 0) {
+    faqs.push({
+      pergunta: `Qual a metragem dos apartamentos no ${name}?`,
+      resposta: stats.areaMin === stats.areaMax
+        ? `As unidades possuem ${stats.areaMin} m² de área.`
+        : `As unidades variam de ${stats.areaMin} m² a ${stats.areaMax} m², oferecendo opções para diferentes perfis de moradores.`,
+    });
+  }
+
+  // Bedrooms
+  if (stats.quartosSet.size > 0) {
+    const q = Array.from(stats.quartosSet).sort((a, b) => a - b);
+    faqs.push({
+      pergunta: `Quantos quartos têm os imóveis do ${name}?`,
+      resposta: q.length === 1
+        ? `As unidades do ${name} possuem ${q[0]} ${q[0] === 1 ? "quarto" : "quartos"}.`
+        : `O empreendimento oferece opções de ${q.join(", ")} quartos, atendendo desde casais até famílias maiores.`,
+    });
+  }
+
+  // Parking
+  if (stats.vagasSet.size > 0) {
+    const v = Array.from(stats.vagasSet).sort((a, b) => a - b);
+    faqs.push({
+      pergunta: `O ${name} tem vaga de garagem?`,
+      resposta: `Sim, as unidades contam com ${v.length === 1 ? `${v[0]} ${v[0] === 1 ? "vaga" : "vagas"}` : `${v[0]} a ${v[v.length - 1]} vagas`} de garagem.`,
+    });
+  }
+
+  // Diferenciais / infrastructure
+  if (diferenciais.length > 0) {
+    faqs.push({
+      pergunta: `Quais são os diferenciais e a infraestrutura do ${name}?`,
+      resposta: `O ${name} conta com: ${diferenciais.slice(0, 10).join(", ")}. Esses diferenciais tornam o empreendimento uma excelente opção de moradia no bairro ${stats.bairro}.`,
+    });
+  }
+
+  return faqs;
+}
+
 const CondominioDetail = () => {
   const { slug } = useParams<{ slug: string }>();
   useCanonical(slug);

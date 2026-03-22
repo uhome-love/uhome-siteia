@@ -492,10 +492,10 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       if (pointsSource) pointsSource.setData({ type: "FeatureCollection", features: [] });
       if (polySource) polySource.setData({ type: "FeatureCollection", features: [] });
     }
-    if (onBoundsSearch) {
+    if (onBoundsSearchRef.current) {
       setMapMoved(false);
     }
-  }, [onBoundsSearch]);
+  }, []);
 
   // Update data — pins are already viewport-filtered, just set them on the source
   useEffect(() => {

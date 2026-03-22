@@ -279,7 +279,7 @@ export async function fetchImovelBySlug(slug: string): Promise<Imovel | null> {
 export async function fetchImoveisDestaque(limit = 6): Promise<Imovel[]> {
   const { data, error } = await supabase
     .from("imoveis")
-    .select("*")
+    .select(LISTING_COLUMNS)
     .eq("destaque", true)
     .eq("status", "disponivel")
     .in("cidade", CIDADES_PERMITIDAS)
@@ -293,7 +293,7 @@ export async function fetchImoveisDestaque(limit = 6): Promise<Imovel[]> {
   if (result.length === 0) {
     const { data: fallback } = await supabase
       .from("imoveis")
-      .select("*")
+      .select(LISTING_COLUMNS)
       .eq("status", "disponivel")
       .in("cidade", CIDADES_PERMITIDAS)
       .order("publicado_em", { ascending: false })

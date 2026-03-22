@@ -71,7 +71,6 @@ Deno.serve(async (req) => {
       status: 'novo',
       atribuido_para: corretorCRMId,
       site_lead_id: record.id,
-      origem_site: record.origem_ref ?? 'organico',
       utm_source: record.utm_source ?? null,
       utm_campaign: record.utm_campaign ?? null,
       created_at: record.created_at,

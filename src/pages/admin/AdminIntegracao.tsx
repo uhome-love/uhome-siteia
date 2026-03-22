@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { RefreshCw, ArrowRightLeft, CheckCircle2, XCircle, Users, Send, AlertTriangle, Clock } from "lucide-react";
+import { RefreshCw, ArrowRightLeft, CheckCircle2, XCircle, Users, Send, AlertTriangle, Clock, Stethoscope } from "lucide-react";
 
 interface SyncLog {
   id: string;

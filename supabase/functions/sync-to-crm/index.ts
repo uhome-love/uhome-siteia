@@ -108,6 +108,6 @@ Deno.serve(async (req) => {
     ok: !error,
     crm_lead_id: leadCRM?.id ?? null
   }), {
-    headers: { 'Content-Type': 'application/json' }
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' }
   })
 })

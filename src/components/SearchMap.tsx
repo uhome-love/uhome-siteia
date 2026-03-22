@@ -406,20 +406,20 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
           setHasDrawn(true);
           map.getCanvas().style.cursor = "";
 
-          if (onDrawFilter) {
+          if (onDrawFilterRef.current) {
             const inside = pinsRef.current.filter(pin => {
               const lat = Number(pin.latitude);
               const lng = Number(pin.longitude);
               if (!lat || !lng) return false;
               return pointInPolygon([lng, lat], finalPoints);
             });
-            onDrawFilter(inside);
+            onDrawFilterRef.current(inside);
           }
 
-          if (onBoundsSearch && finalPoints.length >= 3) {
+          if (onBoundsSearchRef.current && finalPoints.length >= 3) {
             const lngs = finalPoints.map(p => p[0]);
             const lats = finalPoints.map(p => p[1]);
-            onBoundsSearch({
+            onBoundsSearchRef.current({
               lng_min: Math.min(...lngs),
               lng_max: Math.max(...lngs),
               lat_min: Math.min(...lats),

@@ -146,9 +146,9 @@ Diferenciais:
 - "sacada" / "varanda" / "terraço" → sacada
 - "vista" / "vista para o Guaíba" → vista
 
-Finalidade (padrão = venda):
-- "alugar" / "aluguel" / "por mês" / "locação" → locacao
-- "comprar" / "financiar" → venda
+Finalidade:
+- A Uhome é SOMENTE venda. Ignore termos como "alugar", "aluguel", "locação".
+- SEMPRE retorne finalidade: "venda"
 
 Quartos:
 - "1 quarto" / "um dormitório" → 1

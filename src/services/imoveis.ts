@@ -211,6 +211,7 @@ export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSig
     .from("imoveis")
     .select(PIN_COLUMNS)
     .eq("status", "disponivel")
+    .eq("finalidade", "venda")
     .not("latitude", "is", null)
     .not("longitude", "is", null);
 

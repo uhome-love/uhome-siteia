@@ -264,13 +264,40 @@ serve(async (req) => {
     const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
 
     if (!toolCall) {
-      return new Response(JSON.stringify({ error: "Não foi possível interpretar a busca" }), {
+      // Fallback: try to parse from message content (some models return JSON directly)
+      const content = data.choices?.[0]?.message?.content;
+      if (content) {
+        try {
+          const parsed = JSON.parse(content);
+          return new Response(JSON.stringify({ filtros: parsed.filtros || parsed }), {
+            status: 200,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        } catch {
+          // ignore parse error
+        }
+      }
+      return new Response(JSON.stringify({ error: "Não foi possível interpretar a busca. Tente reformular." }), {
         status: 422,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const filtros = JSON.parse(toolCall.function.arguments);
+    let filtros: any;
+    try {
+      filtros = JSON.parse(toolCall.function.arguments);
+    } catch {
+      return new Response(JSON.stringify({ error: "Erro ao processar resposta da IA. Tente novamente." }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Default finalidade to "venda" if not specified
+    if (!filtros.finalidade) {
+      filtros.finalidade = "venda";
+    }
+
     console.log("AI filtros extraídos:", JSON.stringify(filtros));
 
     return new Response(JSON.stringify({ filtros }), {

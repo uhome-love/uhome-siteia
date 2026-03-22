@@ -166,6 +166,43 @@ export function SearchFiltersBar({ onOpenMobileFilters }: { onOpenMobileFilters?
   const hasInput = bairroInput.trim().length > 0;
   const hasChips = bairrosSelecionados.length > 0;
 
+  // Mobile: QuintoAndar-style summary card
+  if (isMobile) {
+    const tipoText = propertyTypes.find(t => t.value === filters.tipo)?.label || "";
+    const bairroText = bairrosSelecionados.length > 0
+      ? bairrosSelecionados.join(", ")
+      : (filters.cidade || "Porto Alegre");
+    const summaryTitle = tipoText
+      ? `${tipoText} em ${bairroText}`
+      : bairroText;
+
+    const filterParts: string[] = [];
+    if (filters.finalidade) filterParts.push(filters.finalidade === "venda" ? "Comprar" : "Alugar");
+    if (filters.quartos) filterParts.push(`${filters.quartos}+ quartos`);
+    if (filters.precoMin || filters.precoMax) {
+      const fmt = (v: number) => v >= 1000000 ? `${(v / 1000000).toFixed(v % 1000000 === 0 ? 0 : 1)}M` : `${(v / 1000).toFixed(0)}k`;
+      if (filters.precoMin && filters.precoMax) filterParts.push(`R$${fmt(filters.precoMin)}–${fmt(filters.precoMax)}`);
+      else if (filters.precoMax) filterParts.push(`até R$${fmt(filters.precoMax)}`);
+      else filterParts.push(`a partir de R$${fmt(filters.precoMin)}`);
+    }
+    const filterSummary = filterParts.length > 0 ? filterParts.join(" · ") : "Sem filtros de imóvel";
+
+    return (
+      <div className="sticky top-16 z-10 border-b border-border bg-background px-4 py-3">
+        <button
+          onClick={onOpenMobileFilters}
+          className="flex w-full items-center justify-between rounded-2xl bg-muted/40 border border-border px-4 py-3 text-left transition-colors active:bg-muted/60"
+        >
+          <div className="min-w-0 flex-1">
+            <p className="font-body text-sm font-bold text-foreground truncate">{summaryTitle}</p>
+            <p className="mt-0.5 font-body text-xs text-muted-foreground truncate">{filterSummary}</p>
+          </div>
+          <SlidersHorizontal className="h-5 w-5 shrink-0 ml-3 text-muted-foreground" />
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="sticky top-16 z-10 flex items-center gap-2 overflow-x-auto border-b border-border bg-background px-5 py-3 scrollbar-none">
       {/* Search input with chips + autocomplete */}

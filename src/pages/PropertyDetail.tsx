@@ -9,7 +9,10 @@ import { AgendamentoVisita } from "@/components/AgendamentoVisita";
 import { SimilarProperties } from "@/components/SimilarProperties";
 import { PropertyMap } from "@/components/PropertyMap";
 import { FotoImovel } from "@/components/FotoImovel";
-import { Bed, Car, Maximize, Bath, MapPin, Share2, Heart, ChevronLeft, ChevronRight, Loader2, Camera, ArrowLeft, MoreVertical, Map as MapIcon, Play } from "lucide-react";
+import { Bed, Car, Maximize, Bath, MapPin, Share2, Heart, ChevronLeft, ChevronRight, Loader2, Camera, ArrowLeft, MoreVertical, Map as MapIcon, Play, MessageCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { whatsappLink } from "@/lib/whatsapp";
+import { submitLead } from "@/services/leads";
 import { motion } from "framer-motion";
 import { trackView, getViewCount } from "@/services/leads";
 import { fetchImovelBySlug, type Imovel, formatPreco, fotoPrincipal } from "@/services/imoveis";
@@ -419,6 +422,33 @@ const PropertyDetail = () => {
                   </div>
                 </div>
               ))}
+            </div>
+
+            {/* Mobile CTA buttons */}
+            <div className="flex gap-3 sm:hidden">
+              <Button
+                size="lg"
+                className="flex-1 text-sm"
+                onClick={() => {
+                  const sidebar = document.querySelector('[data-lead-sidebar]');
+                  if (sidebar) sidebar.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }}
+              >
+                <Heart className="h-4 w-4" />
+                Tenho interesse
+              </Button>
+              <Button
+                variant="whatsapp"
+                size="lg"
+                className="flex-1 text-sm"
+                onClick={() => {
+                  const msg = `Olá! Tenho interesse no imóvel: ${imovel.titulo} — ${priceFormatted}. Link: https://uhome.com.br/imovel/${imovel.slug}`;
+                  window.open(whatsappLink(msg), '_blank');
+                }}
+              >
+                <MessageCircle className="h-4 w-4" />
+                Falar no WhatsApp
+              </Button>
             </div>
 
             <div className="h-px bg-border" />

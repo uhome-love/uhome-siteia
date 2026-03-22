@@ -51,7 +51,7 @@ export function Navbar() {
           </Link>
         </div>
 
-        <div className="hidden items-center gap-2 md:flex flex-shrink-0 relative z-10">
+        <div className="hidden items-center gap-2 lg:flex flex-shrink-0 relative z-10">
           <Link
             to="/avaliar-imovel"
             className="rounded-full px-4 py-2 font-body text-sm font-semibold text-primary transition-colors hover:bg-primary/5 active:scale-[0.97]"

@@ -1,8 +1,11 @@
 import { Link } from "react-router-dom";
 import { UhomeLogo } from "@/components/UhomeLogo";
 import { WHATSAPP_NUMBER, WHATSAPP_DISPLAY } from "@/lib/whatsapp";
+import { useCorretor } from "@/contexts/CorretorContext";
 
 export function Footer() {
+  const { prefixLink } = useCorretor();
+
   return (
     <footer className="border-t border-border bg-background py-16">
       <div className="mx-auto max-w-7xl px-6">
@@ -19,24 +22,24 @@ export function Footer() {
           <div>
             <h4 className="font-body text-sm font-semibold text-foreground">Imóveis</h4>
             <ul className="mt-3 space-y-2">
-              <li><Link to="/busca?finalidade=venda" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Comprar</Link></li>
-              <li><Link to="/apartamentos-porto-alegre" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Apartamentos</Link></li>
-              <li><Link to="/casas-porto-alegre" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Casas</Link></li>
-              <li><Link to="/coberturas-porto-alegre" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Coberturas</Link></li>
-              <li><Link to="/bairros" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Bairros</Link></li>
-              <li><Link to="/condominios" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Condomínios</Link></li>
-              <li><Link to="/anunciar" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Anunciar imóvel</Link></li>
+              <li><Link to={prefixLink("/busca?finalidade=venda")} className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Comprar</Link></li>
+              <li><Link to={prefixLink("/apartamentos-porto-alegre")} className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Apartamentos</Link></li>
+              <li><Link to={prefixLink("/casas-porto-alegre")} className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Casas</Link></li>
+              <li><Link to={prefixLink("/coberturas-porto-alegre")} className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Coberturas</Link></li>
+              <li><Link to={prefixLink("/bairros")} className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Bairros</Link></li>
+              <li><Link to={prefixLink("/condominios")} className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Condomínios</Link></li>
+              <li><Link to={prefixLink("/anunciar")} className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Anunciar imóvel</Link></li>
             </ul>
           </div>
 
           <div>
             <h4 className="font-body text-sm font-semibold text-foreground">Uhome</h4>
             <ul className="mt-3 space-y-2">
-              <li><Link to="/busca?modo=ia" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Busca IA</Link></li>
+              <li><Link to={prefixLink("/busca?modo=ia")} className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Busca IA</Link></li>
+              <li><Link to={prefixLink("/avaliar-imovel")} className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Avaliar imóvel</Link></li>
               <li><Link to="/faq" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Perguntas frequentes</Link></li>
               <li><Link to="/carreiras" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Trabalhe conosco</Link></li>
               <li><Link to="/blog" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Blog</Link></li>
-              
             </ul>
           </div>
 

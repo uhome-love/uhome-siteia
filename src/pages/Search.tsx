@@ -310,6 +310,9 @@ const Search = () => {
     setQueryIA("");
     setImoveis([]);
     setTotal(0);
+    // Reset filters in the store so map also clears
+    const { resetFilters } = useSearchStore.getState();
+    resetFilters();
   };
 
   const handleBoundsSearch = useCallback((bounds: MapBounds) => {

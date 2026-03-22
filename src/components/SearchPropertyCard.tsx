@@ -44,6 +44,7 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
   const { isFavorito, toggleFavorito } = useFavoritos();
   const [hovering, setHovering] = useState(false);
   const [fotoAtiva, setFotoAtiva] = useState(0);
+  const [showAuth, setShowAuth] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const liked = isFavorito(imovel.id);

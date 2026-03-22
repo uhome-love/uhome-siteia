@@ -492,8 +492,8 @@ const PropertyDetail = () => {
               />
             </div>
 
-            {/* Secondary actions below sidebar */}
-            <div className="mt-4 flex gap-3">
+            {/* Secondary actions below sidebar — desktop only */}
+            <div className="mt-4 hidden gap-3 sm:flex">
               <button
                 onClick={() => setLiked(!liked)}
                 className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-border bg-card py-3 font-body text-sm text-muted-foreground transition-colors hover:border-foreground hover:text-foreground active:scale-[0.97]"
@@ -502,10 +502,7 @@ const PropertyDetail = () => {
                 Salvar
               </button>
               <button
-                onClick={() => {
-                  navigator.clipboard.writeText(window.location.href);
-                  import("sonner").then(({ toast }) => toast.success("Link copiado!"));
-                }}
+                onClick={handleShare}
                 className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-border bg-card py-3 font-body text-sm text-muted-foreground transition-colors hover:border-foreground hover:text-foreground active:scale-[0.97]"
               >
                 <Share2 className="h-4 w-4" />

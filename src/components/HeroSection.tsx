@@ -36,13 +36,9 @@ export function HeroSection() {
   const [dbBairros, setDbBairros] = useState<string[]>([]);
 
   useEffect(() => {
-    async function loadBairros() {
-      const { data } = await supabase.rpc("get_bairros_disponiveis");
-      if (data) {
-        setDbBairros(data.map((d: { bairro: string }) => d.bairro));
-      }
-    }
-    loadBairros();
+    getBairrosDisponiveis().then((data) => {
+      setDbBairros(data.map((d) => d.bairro));
+    });
   }, []);
 
   const bairroSuggestions = useMemo(() => {

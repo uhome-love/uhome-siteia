@@ -43,7 +43,7 @@ const badgeClasses: Record<BadgeStyle, string> = {
 };
 
 export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Props) {
-  const { isFavorito, toggleFavorito } = useFavoritos();
+  export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavorito: isFavoritoProp, toggleFavorito: toggleFavoritoProp }: Props) {
   const [hovering, setHovering] = useState(false);
   const [fotoAtiva, setFotoAtiva] = useState(0);
   const [showAuth, setShowAuth] = useState(false);

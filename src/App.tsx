@@ -100,6 +100,7 @@ const App = () => (
                 <Route path="leads" element={<AdminLeads />} />
                 <Route path="captacoes" element={<AdminCaptacoes />} />
                 <Route path="sync" element={<AdminSync />} />
+                <Route path="integracao" element={<AdminIntegracao />} />
                 <Route path="config" element={<AdminConfig />} />
               </Route>
               <Route path="*" element={<NotFound />} />

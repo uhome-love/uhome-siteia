@@ -21,6 +21,7 @@ const navItems = [
   { icon: Users, label: "Leads", path: "/admin/leads" },
   { icon: FileText, label: "Captações", path: "/admin/captacoes" },
   { icon: RefreshCw, label: "Sync Jetimob", path: "/admin/sync" },
+  { icon: PenSquare, label: "Integração CRM", path: "/admin/integracao" },
   { icon: Settings, label: "Configurações", path: "/admin/config" },
 ];
 

@@ -38,18 +38,14 @@ export async function submitLead(data: LeadData) {
     session_id,
   };
 
-  const { data: inserted, error } = await supabase
+  const { error } = await supabase
     .from("public_leads")
-    .insert(payload)
-    .select()
-    .single();
+    .insert(payload);
 
   if (error) throw error;
 
   // Fire-and-forget sync to CRM
-  if (inserted) {
-    syncToCRM("lead", inserted);
-  }
+  syncToCRM("lead", payload);
 
   return true;
 }

@@ -162,8 +162,8 @@ Quartos:
 "apartamento próximo ao Iguatemi até 800 mil"
 → tipo: apartamento, bairros: [Boa Vista, Três Figueiras, Jardim Europa, Vila Jardim], preco_max: 800000
 
-"studio boêmio pra alugar até 2 mil"
-→ tipo: studio, bairros: [Cidade Baixa, Bom Fim], preco_max: 2000, finalidade: locacao
+"studio boêmio até 600 mil"
+→ tipo: studio, bairros: [Cidade Baixa, Bom Fim], preco_max: 600000, finalidade: venda
 
 "casa com piscina perto da orla"
 → tipo: casa, bairros: [Menino Deus, Cristal, Ipanema, Tristeza], diferenciais: [piscina]

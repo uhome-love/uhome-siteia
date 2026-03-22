@@ -531,7 +531,7 @@ const Search = () => {
         <div className="flex items-center gap-2">
           {/* Sort */}
           {!modoIA && (
-            <div className="relative">
+            <div className="relative" ref={sortRef}>
               <button
                 onClick={() => setSortOpen(!sortOpen)}
                 className="flex items-center gap-1 rounded-full border border-border px-2.5 py-1.5 font-body text-[11px] font-medium text-foreground transition-colors hover:border-foreground sm:gap-1.5 sm:px-3 sm:text-xs"

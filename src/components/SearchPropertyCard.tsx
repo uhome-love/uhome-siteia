@@ -48,7 +48,7 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const liked = isFavorito(imovel.id);
-  const fotos = imovel.fotos.length > 0 ? imovel.fotos.map((f) => f.url) : [fotoPrincipal(imovel)];
+  const fotos = imovel.fotos && imovel.fotos.length > 0 ? imovel.fotos.map((f) => f.url) : [fotoPrincipal(imovel)];
   const price = formatPreco(imovel.preco);
   const area = imovel.area_total ?? imovel.area_util ?? 0;
 

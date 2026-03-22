@@ -146,6 +146,8 @@ function mapImovel(j: any) {
     fotos: extractFotos(j),
     video_url: j.video_url || j.video || null,
     origem: "jetimob",
+    condominio_nome: j.condominio_nome || null,
+    condominio_id: j.id_condominio ? String(j.id_condominio) : null,
     jetimob_raw: j,
   };
 }

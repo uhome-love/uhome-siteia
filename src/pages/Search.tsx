@@ -56,6 +56,7 @@ const Search = () => {
   const { filters, setFilter, setFilters } = useSearchStore();
   const [sortOpen, setSortOpen] = useState(false);
   const [mobileMap, setMobileMap] = useState(false);
+  const [mobileFilters, setMobileFilters] = useState(false);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [alertEmail, setAlertEmail] = useState("");

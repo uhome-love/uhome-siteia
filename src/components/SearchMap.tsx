@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { type MapPin as MapPinData } from "@/services/imoveis";
-import { FotoImovel } from "@/components/FotoImovel";
+
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || "pk.eyJ1IjoibHVjYXN1aG9tZSIsImEiOiJjbW16c2l2dmUwYmxsMnJwdDI2bGxrazBkIn0.B4dp727gJlQQIWTci7GpFQ";
 
@@ -600,15 +600,6 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
             onClick={() => navigate(`/imovel/${previewPin.slug}`)}
           >
             <div className="overflow-hidden rounded-xl border border-border bg-card shadow-xl">
-              {previewPin.foto && (
-                <div className="relative aspect-[16/10] overflow-hidden">
-                  <FotoImovel
-                    src={previewPin.foto}
-                    alt={previewPin.titulo}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-              )}
               <div className="px-3 py-2.5">
                 <p className="font-body text-sm font-bold text-foreground">{formatPrecoFull(previewPin.preco)}</p>
                 <div className="mt-0.5 flex items-center gap-2 font-body text-xs text-muted-foreground">

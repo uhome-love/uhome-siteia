@@ -203,8 +203,8 @@ export interface MapPin {
   tipo?: string;
 }
 
-// Lightweight columns for map pins — NO fotos JSONB
-const PIN_COLUMNS = "id,slug,preco,latitude,longitude,bairro,titulo,tipo,quartos,finalidade,area_total,foto_principal";
+// Lightweight columns for map pins — minimal payload for clustering/render
+const PIN_COLUMNS = "id,slug,preco,latitude,longitude,bairro,tipo,quartos,area_total";
 
 // --- Pins cache ---
 const pinsCache = new Map<string, { data: MapPin[]; timestamp: number }>();
@@ -278,7 +278,7 @@ export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSig
       .lte("longitude", filters.bounds.lng_max);
   }
 
-  query = query.order("preco", { ascending: false }).limit(2000);
+  query = query.limit(2000);
 
   if (signal) {
     query = query.abortSignal(signal);
@@ -308,8 +308,12 @@ export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSig
     latitude: row.latitude!,
     longitude: row.longitude!,
     bairro: row.bairro,
-    titulo: tituloLimpo(row),
-    foto: row.foto_principal ?? undefined,
+    titulo: tituloLimpo({
+      tipo: row.tipo ?? "imóvel",
+      finalidade: "venda",
+      quartos: row.quartos ?? null,
+      bairro: row.bairro ?? "Porto Alegre",
+    }),
     quartos: row.quartos ?? undefined,
     area_total: row.area_total ?? undefined,
     tipo: row.tipo ?? undefined,

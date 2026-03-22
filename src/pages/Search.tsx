@@ -8,6 +8,7 @@ import { SearchPropertyCard } from "@/components/SearchPropertyCard";
 import { SearchMap } from "@/components/SearchMap";
 import { SkeletonCard } from "@/components/SkeletonCard";
 import { SearchCTACard } from "@/components/SearchCTACard";
+import { MobileFiltersSheet } from "@/components/MobileFiltersSheet";
 import { useSearchStore, type MapBounds } from "@/stores/searchStore";
 import { fetchImoveis, fetchMapPins, type Imovel, type MapPin as MapPinData } from "@/services/imoveis";
 import { interpretarBusca, type AISearchResult } from "@/services/aiSearch";

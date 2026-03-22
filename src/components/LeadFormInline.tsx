@@ -14,7 +14,7 @@ interface LeadFormInlineProps {
   onClose: () => void;
 }
 
-export const LeadFormInline = forwardRef<HTMLDivElement, LeadFormInlineProps>(function LeadFormInline({ isOpen, imovelId, imovelTitulo, imovelBairro, imovelPreco, onClose }, ref) {
+export function LeadFormInline({ isOpen, imovelId, imovelTitulo, imovelBairro, imovelPreco, onClose }: LeadFormInlineProps) {
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
   const [email, setEmail] = useState("");

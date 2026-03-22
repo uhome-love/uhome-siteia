@@ -27,6 +27,21 @@ const PropertyDetail = () => {
   const [imovel, setImovel] = useState<Imovel | null>(null);
   const [loading, setLoading] = useState(true);
   const mapRef = useRef<HTMLDivElement>(null);
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, dragFree: false });
+
+  // Sync embla with currentImage state
+  useEffect(() => {
+    if (!emblaApi) return;
+    const onSelect = () => setCurrentImage(emblaApi.selectedScrollSnap());
+    emblaApi.on("select", onSelect);
+    return () => { emblaApi.off("select", onSelect); };
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (emblaApi && emblaApi.selectedScrollSnap() !== currentImage) {
+      emblaApi.scrollTo(currentImage);
+    }
+  }, [emblaApi, currentImage]);
 
   useEffect(() => {
     if (!slug) return;

@@ -70,7 +70,6 @@ Deno.serve(async (req) => {
       bairro_interesse: record.imovel_bairro ?? null,
       status: 'novo',
       atribuido_para: corretorCRMId,
-      corretor_ref_slug: record.corretor_ref_slug ?? null,
       site_lead_id: record.id,
       origem_site: record.origem_ref ?? 'organico',
       utm_source: record.utm_source ?? null,

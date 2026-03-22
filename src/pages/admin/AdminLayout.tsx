@@ -15,6 +15,7 @@ import {
   ShieldAlert,
   Menu,
   X,
+  Link2,
 } from "lucide-react";
 
 const navItems = [

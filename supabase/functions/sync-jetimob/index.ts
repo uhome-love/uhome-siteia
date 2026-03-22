@@ -209,13 +209,15 @@ serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Accept start_page and max_pages from body for chunked sync
+    // Accept start_page, max_pages, and auto_chain from body
     let startPage = 1;
-    let maxPagesToProcess = 15; // ~15 pages per invocation to stay within wall time
+    let maxPagesToProcess = 15;
+    let autoChain = false;
     try {
       const body = await req.json();
       if (body?.start_page) startPage = Number(body.start_page);
       if (body?.max_pages) maxPagesToProcess = Number(body.max_pages);
+      if (body?.auto_chain) autoChain = true;
     } catch { /* no body is fine */ }
 
     const PAGE_SIZE = 200;
@@ -306,14 +308,41 @@ serve(async (req) => {
       await sleep(RATE_LIMIT_MS);
     }
 
+    // Check if there are more pages to sync
+    const morePages = hasNextPage({ totalPages: expectedTotal ? Math.ceil(expectedTotal / PAGE_SIZE) : null }, 0, PAGE_SIZE, lastPage);
+    const nextStartPage = lastPage + 1;
+
     const result = {
       inseridos: totalInserted,
       erros: totalErrors,
       total: totalFetched,
       total_esperado: expectedTotal,
       last_page: lastPage,
-      next_start_page: lastPage + 1,
+      next_start_page: nextStartPage,
+      more_pages: morePages,
+      chained: false,
     };
+
+    // Auto-chain: trigger the next chunk if there are more pages
+    if (autoChain && morePages && totalFetched > 0) {
+      try {
+        const selfUrl = `${SUPABASE_URL}/functions/v1/sync-jetimob`;
+        const anonKey = Deno.env.get("SUPABASE_ANON_KEY") || Deno.env.get("SUPABASE_PUBLISHABLE_KEY") || "";
+        console.log(`🔗 Chaining next chunk: start_page=${nextStartPage}`);
+        fetch(selfUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${anonKey}`,
+          },
+          body: JSON.stringify({ start_page: nextStartPage, max_pages: maxPagesToProcess, auto_chain: true }),
+        }).catch((err) => console.error("Chain fetch error:", err));
+        result.chained = true;
+      } catch (chainErr) {
+        console.error("Chain error:", chainErr);
+      }
+    }
+
     console.log(`✅ Sync chunk complete:`, JSON.stringify(result));
 
     return new Response(JSON.stringify(result), {

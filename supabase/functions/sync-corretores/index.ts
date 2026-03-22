@@ -55,7 +55,7 @@ Deno.serve(async (req) => {
         nome: corretor.nome,
         email: corretor.email,
         telefone: corretor.telefone,
-        foto_url: corretor.foto_url,
+        foto_url: corretor.avatar_url ?? null,
         creci: corretor.creci,
         role: 'corretor',
         ativo: true,

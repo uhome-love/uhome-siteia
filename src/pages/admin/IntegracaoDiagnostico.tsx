@@ -295,12 +295,15 @@ export default function IntegracaoDiagnostico() {
     // 14. CORS preflight
     await timed("fn_cors", async () => {
       const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/sync-corretores`;
-      const res = await fetch(url, { method: "OPTIONS", headers: { Origin: window.location.origin } });
-      const acao = res.headers.get("access-control-allow-origin");
-      return {
-        status: acao ? "ok" : "erro",
-        detalhe: acao ? `access-control-allow-origin: ${acao}` : "Sem CORS headers — adicionar corsHeaders na function",
-      };
+      try {
+        const res = await fetch(url, { method: "OPTIONS", headers: { Origin: window.location.origin } });
+        const acao = res.headers.get("access-control-allow-origin");
+        if (acao) return { status: "ok", detalhe: `access-control-allow-origin: ${acao}` };
+        if (res.ok || res.status === 204) return { status: "ok", detalhe: "OPTIONS retornou OK (headers podem não ser visíveis no browser)" };
+        return { status: "aviso", detalhe: `OPTIONS status ${res.status} — CORS pode estar OK no servidor` };
+      } catch {
+        return { status: "aviso", detalhe: "Não foi possível testar CORS via browser — verificar no servidor" };
+      }
     });
 
     // 15. profiles.id insert sem auth

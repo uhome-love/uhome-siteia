@@ -10,6 +10,7 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 export async function getBairrosDisponiveis(): Promise<BairroCount[]> {
   if (cache && Date.now() - cache.ts < CACHE_TTL) {
+    emitCacheHit();
     return cache.data;
   }
 

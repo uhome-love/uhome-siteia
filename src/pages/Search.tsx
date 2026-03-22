@@ -273,8 +273,10 @@ const Search = () => {
       const { data, count } = await fetchImoveis({ ...aiFilters, limit: 40 });
       setImoveis(data);
       setTotal(count);
-      // Load pins in background
-      fetchMapPins(aiFilters).then(setMapPins).catch(console.error);
+      // Pins will be loaded via viewport bounds change callback
+      if (mapViewBounds) {
+        fetchMapPins({ ...aiFilters, bounds: mapViewBounds }).then(setMapPins).catch(console.error);
+      }
     } catch (e: any) {
       toast.error(e?.message || "Erro ao interpretar busca");
     } finally {

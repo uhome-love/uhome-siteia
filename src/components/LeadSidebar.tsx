@@ -33,6 +33,7 @@ export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, 
       await submitLead({
         nome: nome.trim(),
         telefone: telefone.trim(),
+        email: email.trim() || undefined,
         imovel_id: imovelId,
         imovel_slug: imovelSlug,
         imovel_titulo: imovelTitulo,

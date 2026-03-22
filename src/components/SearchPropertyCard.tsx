@@ -48,7 +48,7 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const liked = isFavorito(imovel.id);
-  const fotos = imovel.fotos.length > 0 ? imovel.fotos.map((f) => f.url) : [fotoPrincipal(imovel)];
+  const fotos = imovel.fotos && imovel.fotos.length > 0 ? imovel.fotos.map((f) => f.url) : [fotoPrincipal(imovel)];
   const price = formatPreco(imovel.preco);
   const area = imovel.area_total ?? imovel.area_util ?? 0;
 
@@ -61,13 +61,10 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
 
   const badge = getBadge(imovel);
 
-  const totalMensal = (imovel.preco_condominio ?? 0) + (imovel.preco_iptu ?? 0);
-  const finalidadeLabel = imovel.finalidade === "locacao" ? "aluguel" : "venda";
-
-  // Build a short description like QuintoAndar
+  // Build a short description
   const tipoCapitalized = imovel.tipo.charAt(0).toUpperCase() + imovel.tipo.slice(1);
   const descParts = [
-    `${tipoCapitalized} ${imovel.finalidade === "locacao" ? "para alugar" : "à venda"} em ${imovel.bairro}`,
+    `${tipoCapitalized} à venda em ${imovel.bairro}`,
   ];
   if ((imovel.quartos ?? 0) > 0) descParts[0] += `. ${imovel.quartos} quarto${imovel.quartos! > 1 ? "s" : ""}`;
   if (imovel.diferenciais.length > 0) {
@@ -179,7 +176,6 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
           <div className="mt-2 flex items-baseline justify-between">
             <div>
               <span className="font-body text-lg font-extrabold text-foreground">{price}</span>
-              <span className="ml-1.5 font-body text-sm text-muted-foreground">{finalidadeLabel}</span>
             </div>
             <button
               onClick={async (e) => { e.stopPropagation(); const r = await toggleFavorito(imovel.id); if (r === "needs_auth") setShowAuth(true); }}
@@ -194,10 +190,15 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
             </button>
           </div>
 
-          {/* Total cost */}
-          {totalMensal > 0 && (
+          {/* Monthly costs */}
+          {(imovel.preco_condominio ?? 0) > 0 && (
             <p className="mt-0.5 font-body text-[12px] text-muted-foreground">
-              R$ {(imovel.preco + totalMensal).toLocaleString("pt-BR")} total
+              R$ {(imovel.preco_condominio!).toLocaleString("pt-BR")}/mês cond.
+            </p>
+          )}
+          {(imovel.preco_iptu ?? 0) > 0 && (
+            <p className="mt-0.5 font-body text-[12px] text-muted-foreground">
+              R$ {(imovel.preco_iptu!).toLocaleString("pt-BR")}/mês IPTU
             </p>
           )}
 

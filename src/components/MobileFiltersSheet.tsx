@@ -3,7 +3,7 @@ import { X, ArrowLeft, Search, MapPin, Navigation, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSearchStore } from "@/stores/searchStore";
 import { propertyTypes } from "@/data/properties";
-import { supabase } from "@/integrations/supabase/client";
+import { getBairrosDisponiveis } from "@/services/bairrosCache";
 
 const quartoOptions = [1, 2, 3, 4];
 const vagaOptions = [0, 1, 2, 3];
@@ -24,11 +24,9 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
   const [dbBairros, setDbBairros] = useState<string[]>([]);
 
   useEffect(() => {
-    async function load() {
-      const { data } = await supabase.rpc("get_bairros_disponiveis");
-      if (data) setDbBairros(data.map((d: { bairro: string }) => d.bairro));
-    }
-    load();
+    getBairrosDisponiveis().then(data => {
+      setDbBairros(data.map(d => d.bairro));
+    });
   }, []);
 
   const bairrosSelecionados = useMemo(() => {

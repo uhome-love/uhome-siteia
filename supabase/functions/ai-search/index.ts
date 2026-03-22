@@ -5,11 +5,11 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const systemPrompt = `Você é um assistente imobiliário especializado em Porto Alegre/RS. Interprete buscas em linguagem natural e retorne APENAS um JSON válido com esta estrutura:
+const systemPrompt = `Você é um assistente imobiliário especializado em Porto Alegre/RS. A Uhome trabalha EXCLUSIVAMENTE com venda de imóveis. NUNCA retorne finalidade: "locacao". Interprete buscas em linguagem natural e retorne APENAS um JSON válido com esta estrutura:
 
 {
   "filtros": {
-    "finalidade": "venda" | null,
+    "finalidade": "venda",
     "tipo": "apartamento" | "casa" | "cobertura" | "studio" | "comercial" | null,
     "bairros": string[] | null,
     "preco_max": number | null,
@@ -146,9 +146,9 @@ Diferenciais:
 - "sacada" / "varanda" / "terraço" → sacada
 - "vista" / "vista para o Guaíba" → vista
 
-Finalidade (padrão = venda):
-- "alugar" / "aluguel" / "por mês" / "locação" → locacao
-- "comprar" / "financiar" → venda
+Finalidade:
+- A Uhome é SOMENTE venda. Ignore termos como "alugar", "aluguel", "locação".
+- SEMPRE retorne finalidade: "venda"
 
 Quartos:
 - "1 quarto" / "um dormitório" → 1
@@ -162,8 +162,8 @@ Quartos:
 "apartamento próximo ao Iguatemi até 800 mil"
 → tipo: apartamento, bairros: [Boa Vista, Três Figueiras, Jardim Europa, Vila Jardim], preco_max: 800000
 
-"studio boêmio pra alugar até 2 mil"
-→ tipo: studio, bairros: [Cidade Baixa, Bom Fim], preco_max: 2000, finalidade: locacao
+"studio boêmio até 600 mil"
+→ tipo: studio, bairros: [Cidade Baixa, Bom Fim], preco_max: 600000, finalidade: venda
 
 "casa com piscina perto da orla"
 → tipo: casa, bairros: [Menino Deus, Cristal, Ipanema, Tristeza], diferenciais: [piscina]
@@ -219,7 +219,7 @@ serve(async (req) => {
               parameters: {
                 type: "object",
                 properties: {
-                  finalidade: { type: "string", enum: ["venda", "locacao"], description: "Finalidade: venda ou locação. Padrão venda." },
+                  finalidade: { type: "string", enum: ["venda"], description: "Sempre 'venda'. A Uhome não trabalha com locação." },
                   tipo: { type: "string", enum: ["apartamento", "casa", "cobertura", "studio", "comercial"], description: "Tipo do imóvel" },
                   bairros: { type: "array", items: { type: "string" }, description: "OBRIGATÓRIO quando localização mencionada. Lista de bairros de Porto Alegre." },
                   preco_max: { type: "number", description: "OBRIGATÓRIO quando valor máximo mencionado. Preço máximo em reais (ex: 800000)." },

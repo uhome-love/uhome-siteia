@@ -5,7 +5,7 @@ import { useSearchStore } from "@/stores/searchStore";
 import { FilterPill, PillOption } from "@/components/FilterPill";
 import { propertyTypes } from "@/data/properties";
 import { CIDADES_PERMITIDAS } from "@/services/imoveis";
-import { supabase } from "@/integrations/supabase/client";
+import { getBairrosDisponiveis } from "@/services/bairrosCache";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const quartoOptions = [1, 2, 3, 4];
@@ -64,11 +64,9 @@ export function SearchFiltersBar({ onOpenMobileFilters }: { onOpenMobileFilters?
 
   // Load neighborhoods from DB once
   useEffect(() => {
-    async function load() {
-      const { data } = await supabase.rpc("get_bairros_disponiveis");
-      if (data) setDbBairros(data.map((d: { bairro: string }) => d.bairro));
-    }
-    load();
+    getBairrosDisponiveis().then(data => {
+      setDbBairros(data.map(d => d.bairro));
+    });
   }, []);
 
   // Autocomplete suggestions
@@ -177,7 +175,7 @@ export function SearchFiltersBar({ onOpenMobileFilters }: { onOpenMobileFilters?
       : bairroText;
 
     const filterParts: string[] = [];
-    if (filters.finalidade) filterParts.push(filters.finalidade === "venda" ? "Comprar" : "Alugar");
+    filterParts.push("Comprar");
     if (filters.quartos) filterParts.push(`${filters.quartos}+ quartos`);
     if (filters.precoMin || filters.precoMax) {
       const fmt = (v: number) => v >= 1000000 ? `${(v / 1000000).toFixed(v % 1000000 === 0 ? 0 : 1)}M` : `${(v / 1000).toFixed(0)}k`;
@@ -185,7 +183,7 @@ export function SearchFiltersBar({ onOpenMobileFilters }: { onOpenMobileFilters?
       else if (filters.precoMax) filterParts.push(`até R$${fmt(filters.precoMax)}`);
       else filterParts.push(`a partir de R$${fmt(filters.precoMin)}`);
     }
-    const filterSummary = filterParts.length > 0 ? filterParts.join(" · ") : "Sem filtros de imóvel";
+    const filterSummary = filterParts.join(" · ");
 
     return (
       <div className="sticky top-16 z-10 border-b border-border bg-background px-4 py-3">

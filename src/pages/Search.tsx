@@ -54,8 +54,10 @@ const Search = () => {
   useCanonical();
   const [searchParams, setSearchParams] = useSearchParams();
   const modoIA = searchParams.get("modo") === "ia";
-  const { filters, setFilter, setFilters } = useSearchStore();
+  const { filters, setFilter, setFilters, resetFilters } = useSearchStore();
   const [sortOpen, setSortOpen] = useState(false);
+  const sortRef = React.useRef<HTMLDivElement>(null);
+  const ultimaBuscaIA = React.useRef(0);
   const [mobileMap, setMobileMap] = useState(false);
   const [mobileFilters, setMobileFilters] = useState(false);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
@@ -101,13 +103,27 @@ const Search = () => {
   useEffect(() => {
     if (!modoIA) {
       const f: Record<string, string | number> = {};
-      const urlFinalidade = searchParams.get("finalidade");
       const urlTipo = searchParams.get("tipo");
       const urlQ = searchParams.get("q");
-      if (urlFinalidade === "venda") f.finalidade = urlFinalidade;
+      const urlBairro = searchParams.get("bairro");
+      const urlCidade = searchParams.get("cidade");
+      const urlQuartos = searchParams.get("quartos");
+      const urlBanheiros = searchParams.get("banheiros");
+      const urlVagas = searchParams.get("vagas");
+      const urlPrecoMin = searchParams.get("preco_min");
+      const urlPrecoMax = searchParams.get("preco_max");
+      const urlAreaMin = searchParams.get("area_min");
       if (urlTipo) f.tipo = urlTipo;
-      if (urlQ) {
-        // Multiple neighborhoods separated by comma → use bairros filter
+      if (urlCidade) f.cidade = urlCidade;
+      if (urlQuartos) f.quartos = Number(urlQuartos);
+      if (urlBanheiros) f.banheiros = Number(urlBanheiros);
+      if (urlVagas) f.vagas = Number(urlVagas);
+      if (urlPrecoMin) f.precoMin = Number(urlPrecoMin);
+      if (urlPrecoMax) f.precoMax = Number(urlPrecoMax);
+      if (urlAreaMin) f.areaMin = Number(urlAreaMin);
+      if (urlBairro) {
+        f.bairro = urlBairro;
+      } else if (urlQ) {
         const parts = urlQ.split(",").map(s => s.trim()).filter(Boolean);
         if (parts.length > 1) {
           f.q = "";
@@ -117,7 +133,6 @@ const Search = () => {
         }
       }
       if (Object.keys(f).length) setFilters(f as any);
-      // Clear AI state
       setResumoIA(null);
       setAiResult(null);
     }
@@ -153,7 +168,7 @@ const Search = () => {
       : [];
     
     return {
-      finalidade: filters.finalidade || undefined,
+      finalidade: "venda" as const,
       tipo: filters.tipo || undefined,
       bairro: bairrosParts.length ? undefined : (filters.bairro || undefined),
       bairros: bairrosParts.length ? bairrosParts : undefined,
@@ -264,10 +279,49 @@ const Search = () => {
     loadImoveis();
   }, [loadImoveis]);
 
-  // AI search handler
+  // Sort dropdown click-outside
+  useEffect(() => {
+    if (!sortOpen) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (sortRef.current && !sortRef.current.contains(e.target as Node)) {
+        setSortOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [sortOpen]);
+
+  // URL sync — write filters to URL when they change
+  useEffect(() => {
+    if (modoIA) return;
+    const params = new URLSearchParams();
+    if (filters.tipo) params.set("tipo", filters.tipo);
+    if (filters.cidade && filters.cidade !== "Porto Alegre") params.set("cidade", filters.cidade);
+    if (filters.q) params.set("q", filters.q);
+    if (filters.bairro) params.set("bairro", filters.bairro);
+    if (filters.quartos) params.set("quartos", String(filters.quartos));
+    if (filters.banheiros) params.set("banheiros", String(filters.banheiros));
+    if (filters.vagas) params.set("vagas", String(filters.vagas));
+    if (filters.precoMin) params.set("preco_min", String(filters.precoMin));
+    if (filters.precoMax) params.set("preco_max", String(filters.precoMax));
+    if (filters.areaMin) params.set("area_min", String(filters.areaMin));
+    const qs = params.toString();
+    window.history.replaceState(null, "", qs ? `/busca?${qs}` : "/busca");
+  }, [filters.tipo, filters.bairro, filters.cidade, filters.quartos, filters.banheiros, filters.vagas, filters.precoMin, filters.precoMax, filters.areaMin, filters.q, modoIA]);
+
+  // AI search handler with throttle
   const buscarComIA = useCallback(async (query?: string) => {
     const q = query || queryIA;
     if (!q.trim()) return;
+
+    const agora = Date.now();
+    const restante = Math.ceil((3000 - (agora - ultimaBuscaIA.current)) / 1000);
+    if (agora - ultimaBuscaIA.current < 3000) {
+      toast.error(`Aguarde ${restante}s antes de buscar novamente`);
+      return;
+    }
+    ultimaBuscaIA.current = agora;
+
     setBuscandoIA(true);
     setLoading(true);
     try {
@@ -277,9 +331,7 @@ const Search = () => {
 
       const f = res.filtros;
       
-      // Sync AI filters to the search store so map pins use the same filters
       const storeUpdate: Record<string, any> = {};
-      if (f.finalidade) storeUpdate.finalidade = f.finalidade;
       if (f.tipo) storeUpdate.tipo = f.tipo;
       if (f.bairros?.length) storeUpdate.bairro = f.bairros.join(",");
       if (f.preco_max) storeUpdate.precoMax = f.preco_max;
@@ -290,7 +342,7 @@ const Search = () => {
       setFilters(storeUpdate);
 
       const aiFilters: BuscaFilters = {
-        finalidade: f.finalidade || undefined,
+        finalidade: "venda",
         tipo: f.tipo || undefined,
         bairros: f.bairros?.length ? f.bairros : undefined,
         precoMin: f.preco_min || undefined,
@@ -302,7 +354,6 @@ const Search = () => {
       const { data, count } = await fetchImoveis({ ...aiFilters, limit: 40 });
       setImoveis(data);
       setTotal(count);
-      // Pins will be reloaded automatically via the filters change effect
     } catch (e: any) {
       toast.error(e?.message || "Erro ao interpretar busca");
     } finally {
@@ -326,8 +377,6 @@ const Search = () => {
     setQueryIA("");
     setImoveis([]);
     setTotal(0);
-    // Reset filters in the store so map also clears
-    const { resetFilters } = useSearchStore.getState();
     resetFilters();
   };
 
@@ -482,7 +531,7 @@ const Search = () => {
         <div className="flex items-center gap-2">
           {/* Sort */}
           {!modoIA && (
-            <div className="relative">
+            <div className="relative" ref={sortRef}>
               <button
                 onClick={() => setSortOpen(!sortOpen)}
                 className="flex items-center gap-1 rounded-full border border-border px-2.5 py-1.5 font-body text-[11px] font-medium text-foreground transition-colors hover:border-foreground sm:gap-1.5 sm:px-3 sm:text-xs"

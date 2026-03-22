@@ -142,7 +142,7 @@ const PropertyDetail = () => {
   }
 
   const priceFormatted = formatPreco(imovel.preco);
-  const finalidadeLabel = imovel.finalidade === "locacao" ? "Locação" : "Venda";
+  const finalidadeLabel = "Venda";
   const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
   const area = imovel.area_total ?? imovel.area_util ?? 0;
 

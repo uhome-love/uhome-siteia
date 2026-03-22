@@ -56,7 +56,7 @@ function PropertyCard({ imovel, index }: { imovel: Imovel; index: number }) {
               padding: '4px 10px',
             }}
           >
-            {imovel.finalidade === "locacao" ? "Locação" : "Venda"}
+            Venda
           </span>
           {/* Badge destaque */}
           {imovel.destaque && (

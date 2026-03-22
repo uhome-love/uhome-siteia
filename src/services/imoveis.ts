@@ -50,8 +50,7 @@ export function tituloLimpo(imovel: { tipo: string; finalidade: string; quartos:
   if (quartos > 0) {
     return `${tipo} ${quartos} quarto${quartos > 1 ? "s" : ""} — ${imovel.bairro}`;
   }
-  const label = imovel.finalidade === "locacao" ? "para Alugar" : "para Venda";
-  return `${tipo} ${label} — ${imovel.bairro}`;
+  return `${tipo} para Venda — ${imovel.bairro}`;
 }
 
 function mapRow(row: any): Imovel {
@@ -71,8 +70,10 @@ function mapRow(row: any): Imovel {
 
 /** Get primary photo URL or a placeholder */
 export function fotoPrincipal(imovel: Imovel): string {
+  // Use foto_principal column first (populated by DB trigger)
+  if ((imovel as any).foto_principal) return (imovel as any).foto_principal;
   const fotos = imovel.fotos;
-  if (fotos.length === 0) return "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&h=400&fit=crop";
+  if (!fotos || fotos.length === 0) return "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&h=400&fit=crop";
   const principal = fotos.find((f) => f.principal);
   return (principal ?? fotos[0]).url;
 }
@@ -113,13 +114,14 @@ export interface BuscaFilters {
 export const CIDADES_PERMITIDAS = ["Porto Alegre", "Canoas", "Cachoeirinha", "Gravataí", "Guaíba"];
 
 // Only select columns needed for listing — skip heavy jetimob_raw, descricao, etc.
-const LISTING_COLUMNS = "id,slug,tipo,finalidade,status,destaque,preco,preco_condominio,preco_iptu,area_total,area_util,quartos,banheiros,vagas,andar,bairro,cidade,uf,latitude,longitude,titulo,diferenciais,fotos,video_url,condominio_nome,publicado_em,foto_principal";
+const LISTING_COLUMNS = "id,slug,tipo,finalidade,status,destaque,preco,preco_condominio,preco_iptu,area_total,area_util,quartos,banheiros,vagas,andar,bairro,cidade,uf,latitude,longitude,titulo,diferenciais,video_url,condominio_nome,publicado_em,foto_principal";
 
 export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: Imovel[]; count: number }> {
   let query = supabase
     .from("imoveis")
     .select(LISTING_COLUMNS, { count: "exact" })
-    .eq("status", "disponivel");
+    .eq("status", "disponivel")
+    .eq("finalidade", "venda");
 
   // City filter: specific city or all allowed
   if (filters.cidade) {
@@ -128,7 +130,7 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
     query = query.in("cidade", CIDADES_PERMITIDAS);
   }
 
-  if (filters.finalidade) query = query.eq("finalidade", filters.finalidade);
+  // finalidade always "venda" — no conditional needed
   if (filters.tipo) query = query.eq("tipo", filters.tipo);
   if (filters.bairros?.length) {
     const bairroFilter = filters.bairros.map(b => `bairro.ilike.%${b}%`).join(",");
@@ -210,6 +212,7 @@ export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSig
     .from("imoveis")
     .select(PIN_COLUMNS)
     .eq("status", "disponivel")
+    .eq("finalidade", "venda")
     .not("latitude", "is", null)
     .not("longitude", "is", null);
 
@@ -220,7 +223,7 @@ export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSig
     query = query.in("cidade", CIDADES_PERMITIDAS);
   }
 
-  if (filters.finalidade) query = query.eq("finalidade", filters.finalidade);
+  // finalidade always "venda" — already filtered above
   if (filters.tipo) query = query.eq("tipo", filters.tipo);
   if (filters.bairros?.length) {
     const bairroFilter = filters.bairros.map(b => `bairro.ilike.%${b}%`).join(",");

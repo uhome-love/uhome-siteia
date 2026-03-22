@@ -8,7 +8,6 @@ export interface MapBounds {
 }
 
 export interface SearchFilters {
-  finalidade: "venda" | "";
   tipo: string;
   bairro: string;
   cidade: string;
@@ -33,7 +32,6 @@ interface SearchState {
 }
 
 const defaultFilters: SearchFilters = {
-  finalidade: "",
   tipo: "",
   bairro: "",
   cidade: "Porto Alegre",

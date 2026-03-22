@@ -685,6 +685,7 @@ const Search = () => {
                   onClick={() => {
                     setShowAlertModal(false);
                     if (!user) {
+                      setPendingAlert(true);
                       setShowAuthAfterAlert(true);
                     } else {
                       handleCreateAlert();

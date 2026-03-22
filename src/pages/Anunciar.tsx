@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import { UhomeLogo } from "@/components/UhomeLogo";
 import { useCanonical } from "@/hooks/useCanonical";
 import { whatsappLink } from "@/lib/whatsapp";
+import { getCorretorRef, getCorretorRefId } from "@/lib/session";
 
 const steps = [
   {

@@ -146,6 +146,14 @@ const CondominioDetail = () => {
       })));
       setLoading(false);
 
+      // Fetch AI description
+      setDescLoading(true);
+      supabase.functions.invoke("generate-condo-description", {
+        body: { condominio_nome: name },
+      }).then(({ data: descData }) => {
+        if (descData?.descricao) setDescricao(descData.descricao);
+      }).catch(console.error).finally(() => setDescLoading(false));
+
       // SEO
       document.title = `${name} — Imóveis à Venda | Uhome Imóveis`;
       const meta = document.querySelector('meta[name="description"]');

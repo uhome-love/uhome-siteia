@@ -1,5 +1,5 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { LeadSidebar } from "@/components/LeadSidebar";
@@ -187,8 +187,59 @@ const PropertyDetail = () => {
 
       {/* Mobile hero — QuintoAndar style */}
       <div className="relative sm:hidden mt-16">
-        <div className="relative aspect-[4/3] overflow-hidden">
-          <img src={images[currentImage]} alt={imovel.titulo} className="h-full w-full object-cover" />
+        <div
+          className="relative aspect-[4/3] overflow-hidden touch-pan-y"
+          onTouchStart={(e) => {
+            const touch = e.touches[0];
+            (e.currentTarget as any)._swipe = { startX: touch.clientX, startY: touch.clientY, dx: 0, swiping: false };
+          }}
+          onTouchMove={(e) => {
+            const sw = (e.currentTarget as any)._swipe;
+            if (!sw) return;
+            const dx = e.touches[0].clientX - sw.startX;
+            const dy = e.touches[0].clientY - sw.startY;
+            if (!sw.swiping && Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) {
+              sw.swiping = true;
+            }
+            if (sw.swiping) {
+              e.preventDefault();
+              sw.dx = dx;
+              const strip = e.currentTarget.querySelector('[data-swipe-strip]') as HTMLElement;
+              if (strip) strip.style.transform = `translateX(calc(-${currentImage * 100}% + ${dx}px))`;
+            }
+          }}
+          onTouchEnd={(e) => {
+            const sw = (e.currentTarget as any)._swipe;
+            if (!sw?.swiping) return;
+            const strip = e.currentTarget.querySelector('[data-swipe-strip]') as HTMLElement;
+            if (Math.abs(sw.dx) > 50) {
+              if (sw.dx < 0) nextImage();
+              else prevImage();
+            }
+            if (strip) {
+              strip.style.transition = 'transform 0.3s cubic-bezier(0.16,1,0.3,1)';
+              strip.style.transform = '';
+              setTimeout(() => { if (strip) strip.style.transition = ''; }, 300);
+            }
+          }}
+        >
+          {/* Swipeable strip */}
+          <div
+            data-swipe-strip
+            className="flex h-full"
+            style={{
+              width: `${images.length * 100}%`,
+              transform: `translateX(-${currentImage * 100 / images.length}%)`,
+              transition: 'transform 0.3s cubic-bezier(0.16,1,0.3,1)',
+            }}
+          >
+            {images.map((img, i) => (
+              <div key={i} className="relative h-full" style={{ width: `${100 / images.length}%` }}>
+                <img src={img} alt={`Foto ${i + 1}`} className="h-full w-full object-cover" />
+              </div>
+            ))}
+          </div>
+
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60 pointer-events-none" />
 
           {/* Top action bar */}
@@ -252,18 +303,6 @@ const PropertyDetail = () => {
               </button>
             )}
           </div>
-
-          {/* Swipe arrows */}
-          {images.length > 1 && (
-            <>
-              <button onClick={prevImage} className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 active:scale-95">
-                <ChevronLeft className="h-6 w-6 text-white drop-shadow-lg" />
-              </button>
-              <button onClick={nextImage} className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 active:scale-95">
-                <ChevronRight className="h-6 w-6 text-white drop-shadow-lg" />
-              </button>
-            </>
-          )}
         </div>
       </div>
 

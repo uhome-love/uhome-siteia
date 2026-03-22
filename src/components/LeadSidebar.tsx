@@ -66,7 +66,7 @@ export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, 
 
       <div className="my-5 h-px bg-border" />
 
-      <h3 className="font-body text-base font-bold text-foreground">Fale com um corretor</h3>
+      <h3 className="font-body text-base font-bold text-foreground">Tenho interesse</h3>
 
       {success ? (
         <div className="mt-6 flex flex-col items-center gap-3 py-8">
@@ -106,7 +106,7 @@ export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, 
             className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3 font-body text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 active:scale-[0.97] disabled:opacity-50"
           >
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-            Quero visitar este imóvel
+            Quero saber mais
           </button>
         </form>
       )}

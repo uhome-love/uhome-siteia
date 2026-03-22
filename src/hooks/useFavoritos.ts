@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
+import { syncToCRM } from "@/services/syncCRM";
 
 export function useFavoritos() {
   const { user } = useAuth();

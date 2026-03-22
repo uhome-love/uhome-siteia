@@ -440,6 +440,16 @@ const PropertyDetail = () => {
         </div>
       </div>
 
+      {/* Similar properties */}
+      <div className="mx-auto max-w-7xl px-6 pb-12">
+        <SimilarProperties
+          currentId={imovel.id}
+          bairro={imovel.bairro}
+          tipo={imovel.tipo}
+          preco={imovel.preco}
+        />
+      </div>
+
       <Footer />
     </div>
   );

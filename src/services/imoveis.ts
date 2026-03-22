@@ -301,6 +301,7 @@ export async function fetchImoveisDestaque(limit = 6): Promise<Imovel[]> {
     const { data: fallback } = await supabase
       .from("imoveis")
       .select("*")
+      .eq("status", "disponivel")
       .in("cidade", CIDADES_PERMITIDAS)
       .order("publicado_em", { ascending: false })
       .limit(limit);

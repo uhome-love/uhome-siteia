@@ -420,9 +420,11 @@ export type Database = {
           origem_pagina: string | null
           origem_ref: string | null
           session_id: string | null
+          sincronizado_em: string | null
           status: string | null
           telefone: string
           tipo_interesse: string | null
+          uhomesales_lead_id: string | null
           utm_campaign: string | null
           utm_medium: string | null
           utm_source: string | null
@@ -443,9 +445,11 @@ export type Database = {
           origem_pagina?: string | null
           origem_ref?: string | null
           session_id?: string | null
+          sincronizado_em?: string | null
           status?: string | null
           telefone: string
           tipo_interesse?: string | null
+          uhomesales_lead_id?: string | null
           utm_campaign?: string | null
           utm_medium?: string | null
           utm_source?: string | null
@@ -466,9 +470,11 @@ export type Database = {
           origem_pagina?: string | null
           origem_ref?: string | null
           session_id?: string | null
+          sincronizado_em?: string | null
           status?: string | null
           telefone?: string
           tipo_interesse?: string | null
+          uhomesales_lead_id?: string | null
           utm_campaign?: string | null
           utm_medium?: string | null
           utm_source?: string | null

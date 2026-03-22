@@ -191,44 +191,48 @@ export interface MapPin {
 
 /** Fetch lightweight pin data for the map — filtered by viewport bounds for performance */
 export async function fetchMapPins(filters: BuscaFilters = {}): Promise<MapPin[]> {
-  let query = supabase
-    .from("imoveis")
-    .select("id,slug,preco,latitude,longitude,bairro,titulo,tipo,quartos,finalidade,fotos,area_total");
+  function buildPinQuery() {
+    let query = supabase
+      .from("imoveis")
+      .select("id,slug,preco,latitude,longitude,bairro,titulo,tipo,quartos,finalidade,fotos,area_total");
 
-  if (filters.cidade) {
-    query = query.eq("cidade", filters.cidade);
-  } else {
-    query = query.in("cidade", CIDADES_PERMITIDAS);
-  }
+    if (filters.cidade) {
+      query = query.eq("cidade", filters.cidade);
+    } else {
+      query = query.in("cidade", CIDADES_PERMITIDAS);
+    }
 
-  if (filters.finalidade) query = query.eq("finalidade", filters.finalidade);
-  if (filters.tipo) query = query.eq("tipo", filters.tipo);
-  if (filters.bairros?.length) {
-    const bairroFilter = filters.bairros.map(b => `bairro.ilike.%${b}%`).join(",");
-    query = query.or(bairroFilter);
-  } else if (filters.bairro) {
-    query = query.ilike("bairro", `%${filters.bairro}%`);
-  }
-  if (filters.precoMin) query = query.gte("preco", filters.precoMin);
-  if (filters.precoMax) query = query.lte("preco", filters.precoMax);
-  if (filters.areaMin) query = query.gte("area_total", filters.areaMin);
-  if (filters.areaMax) query = query.lte("area_total", filters.areaMax);
-  if (filters.quartos) query = query.gte("quartos", filters.quartos);
-  if (filters.banheiros) query = query.gte("banheiros", filters.banheiros);
-  if (filters.vagas) query = query.gte("vagas", filters.vagas);
-  if (filters.diferenciais?.length) query = query.contains("diferenciais", filters.diferenciais);
-  if (filters.q) query = query.or(`titulo.ilike.%${filters.q}%,bairro.ilike.%${filters.q}%,tipo.ilike.%${filters.q}%`);
+    if (filters.finalidade) query = query.eq("finalidade", filters.finalidade);
+    if (filters.tipo) query = query.eq("tipo", filters.tipo);
+    if (filters.bairros?.length) {
+      const bairroFilter = filters.bairros.map(b => `bairro.ilike.%${b}%`).join(",");
+      query = query.or(bairroFilter);
+    } else if (filters.bairro) {
+      query = query.ilike("bairro", `%${filters.bairro}%`);
+    }
+    if (filters.precoMin) query = query.gte("preco", filters.precoMin);
+    if (filters.precoMax) query = query.lte("preco", filters.precoMax);
+    if (filters.areaMin) query = query.gte("area_total", filters.areaMin);
+    if (filters.areaMax) query = query.lte("area_total", filters.areaMax);
+    if (filters.quartos) query = query.gte("quartos", filters.quartos);
+    if (filters.banheiros) query = query.gte("banheiros", filters.banheiros);
+    if (filters.vagas) query = query.gte("vagas", filters.vagas);
+    if (filters.diferenciais?.length) query = query.contains("diferenciais", filters.diferenciais);
+    if (filters.q) query = query.or(`titulo.ilike.%${filters.q}%,bairro.ilike.%${filters.q}%,tipo.ilike.%${filters.q}%`);
 
-  // Only properties with coordinates
-  query = query.not("latitude", "is", null).not("longitude", "is", null);
+    // Only properties with coordinates
+    query = query.not("latitude", "is", null).not("longitude", "is", null);
 
-  // Viewport bounds filter — huge performance win, loads only visible pins
-  if (filters.bounds) {
-    query = query
-      .gte("latitude", filters.bounds.lat_min)
-      .lte("latitude", filters.bounds.lat_max)
-      .gte("longitude", filters.bounds.lng_min)
-      .lte("longitude", filters.bounds.lng_max);
+    // Viewport bounds filter
+    if (filters.bounds) {
+      query = query
+        .gte("latitude", filters.bounds.lat_min)
+        .lte("latitude", filters.bounds.lat_max)
+        .gte("longitude", filters.bounds.lng_min)
+        .lte("longitude", filters.bounds.lng_max);
+    }
+
+    return query;
   }
 
   // Fetch in pages (Supabase default limit is 1000)
@@ -237,7 +241,7 @@ export async function fetchMapPins(filters: BuscaFilters = {}): Promise<MapPin[]
   const PAGE = 1000;
 
   while (true) {
-    const { data, error } = await query.range(offset, offset + PAGE - 1);
+    const { data, error } = await buildPinQuery().range(offset, offset + PAGE - 1);
     if (error) throw error;
     if (!data || data.length === 0) break;
 

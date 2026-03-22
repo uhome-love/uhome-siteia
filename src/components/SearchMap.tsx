@@ -1,10 +1,11 @@
 import { useRef, useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, X } from "lucide-react";
+import { Search, X, Bed, Maximize, ToggleLeft, ToggleRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { type MapPin as MapPinData } from "@/services/imoveis";
+import { FotoImovel } from "@/components/FotoImovel";
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || "pk.eyJ1IjoibHVjYXN1aG9tZSIsImEiOiJjbW16c2l2dmUwYmxsMnJwdDI2bGxrazBkIn0.B4dp727gJlQQIWTci7GpFQ";
 
@@ -15,6 +16,11 @@ function formatPreco(preco: number): string {
   if (preco >= 1_000_000) return `R$${(preco / 1_000_000).toFixed(1)}M`;
   if (preco >= 1_000) return `R$${Math.round(preco / 1_000)}k`;
   return `R$${preco}`;
+}
+
+function formatPrecoFull(preco: number): string {
+  if (!preco) return "Consulte";
+  return preco.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
 }
 
 function toGeoJSON(pins: MapPinData[]): GeoJSON.FeatureCollection {
@@ -69,7 +75,6 @@ function createPillImage(fillColor: string, strokeColor: string): ImageData {
   return ctx.getImageData(0, 0, 80, 28);
 }
 
-// Check if a point is inside a polygon using ray casting
 function pointInPolygon(point: [number, number], polygon: [number, number][]): boolean {
   const [x, y] = point;
   let inside = false;
@@ -100,6 +105,13 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
   const boundsRef = useRef<mapboxgl.LngLatBounds | null>(null);
   const pinsRef = useRef(pins);
   const [mapMoved, setMapMoved] = useState(false);
+  const [autoSearch, setAutoSearch] = useState(false);
+  const autoSearchRef = useRef(false);
+  const autoSearchTimerRef = useRef<number | null>(null);
+
+  // Preview popup state
+  const [previewPin, setPreviewPin] = useState<MapPinData | null>(null);
+  const [previewPos, setPreviewPos] = useState<{ x: number; y: number } | null>(null);
 
   // Draw mode state
   const [drawMode, setDrawMode] = useState(false);
@@ -110,8 +122,9 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
   // Keep ref in sync
   useEffect(() => { pinsRef.current = pins; }, [pins]);
   useEffect(() => { drawPointsRef.current = drawPoints; }, [drawPoints]);
+  useEffect(() => { autoSearchRef.current = autoSearch; }, [autoSearch]);
 
-  // Listen for draw-area event from SearchFiltersBar
+  // Listen for draw-area event
   useEffect(() => {
     const handler = () => {
       setDrawMode(true);
@@ -140,7 +153,6 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
     map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "top-right");
 
     map.on("load", () => {
-      // Source with clustering
       map.addSource("imoveis", {
         type: "geojson",
         data: { type: "FeatureCollection", features: [] },
@@ -149,7 +161,6 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         clusterRadius: 60,
       });
 
-      // Draw polygon source
       map.addSource("draw-polygon", {
         type: "geojson",
         data: { type: "FeatureCollection", features: [] },
@@ -160,7 +171,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         data: { type: "FeatureCollection", features: [] },
       });
 
-      // Layer 1: cluster circles
+      // Cluster circles
       map.addLayer({
         id: "clusters",
         type: "circle",
@@ -175,7 +186,6 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         },
       });
 
-      // Layer 2: cluster count label
       map.addLayer({
         id: "cluster-count",
         type: "symbol",
@@ -187,16 +197,14 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
           "text-size": 13,
           "text-allow-overlap": true,
         },
-        paint: {
-          "text-color": "#FFFFFF",
-        },
+        paint: { "text-color": "#FFFFFF" },
       });
 
       // Pill images
       map.addImage("pin-bg", createPillImage("#FFFFFF", "rgba(0,0,0,0.2)"));
       map.addImage("pin-bg-dark", createPillImage("#222222", "#222222"));
 
-      // Layer 3: individual pins with price
+      // Individual pins
       map.addLayer({
         id: "imoveis-pins",
         type: "symbol",
@@ -213,13 +221,10 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
           "text-allow-overlap": true,
           "text-anchor": "center",
         },
-        paint: {
-          "text-color": "#222222",
-          "icon-opacity": 1,
-        },
+        paint: { "text-color": "#222222", "icon-opacity": 1 },
       });
 
-      // Layer 4: hovered pin (dark)
+      // Hovered pin
       map.addLayer({
         id: "imoveis-pins-hover",
         type: "symbol",
@@ -236,35 +241,22 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
           "text-allow-overlap": true,
           "text-anchor": "center",
         },
-        paint: {
-          "text-color": "#FFFFFF",
-        },
+        paint: { "text-color": "#FFFFFF" },
       });
 
-      // Draw polygon fill layer
+      // Draw layers
       map.addLayer({
         id: "draw-polygon-fill",
         type: "fill",
         source: "draw-polygon",
-        paint: {
-          "fill-color": "#5B6CF9",
-          "fill-opacity": 0.12,
-        },
+        paint: { "fill-color": "#5B6CF9", "fill-opacity": 0.12 },
       });
-
-      // Draw polygon outline
       map.addLayer({
         id: "draw-polygon-line",
         type: "line",
         source: "draw-polygon",
-        paint: {
-          "line-color": "#5B6CF9",
-          "line-width": 2.5,
-          "line-dasharray": [2, 2],
-        },
+        paint: { "line-color": "#5B6CF9", "line-width": 2.5, "line-dasharray": [2, 2] },
       });
-
-      // Draw vertices
       map.addLayer({
         id: "draw-points-layer",
         type: "circle",
@@ -290,9 +282,25 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         });
       });
 
+      // Pin click → show preview popup (Airbnb style)
       map.on("click", "imoveis-pins", (e) => {
-        const slug = e.features?.[0]?.properties?.slug;
-        if (slug) navigate(`/imovel/${slug}`);
+        const props = e.features?.[0]?.properties;
+        if (!props) return;
+        const pinData = pinsRef.current.find(p => p.id === props.id);
+        if (pinData) {
+          const point = map.project((e.features![0].geometry as GeoJSON.Point).coordinates as [number, number]);
+          setPreviewPin(pinData);
+          setPreviewPos({ x: point.x, y: point.y });
+        }
+      });
+
+      // Click on map (not pin) → close preview
+      map.on("click", (e) => {
+        const features = map.queryRenderedFeatures(e.point, { layers: ["imoveis-pins", "clusters"] });
+        if (features.length === 0) {
+          setPreviewPin(null);
+          setPreviewPos(null);
+        }
       });
 
       map.on("mouseenter", "clusters", () => { map.getCanvas().style.cursor = "pointer"; });
@@ -330,20 +338,34 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
     map.on("moveend", () => {
       if (!mapReadyRef.current) return;
       boundsRef.current = map.getBounds();
-      setMapMoved(true);
+      setPreviewPin(null);
+      setPreviewPos(null);
+
+      // Auto-search on move (debounced)
+      if (autoSearchRef.current && onBoundsSearch) {
+        if (autoSearchTimerRef.current) clearTimeout(autoSearchTimerRef.current);
+        autoSearchTimerRef.current = window.setTimeout(() => {
+          const sw = boundsRef.current!.getSouthWest();
+          const ne = boundsRef.current!.getNorthEast();
+          onBoundsSearch({ lat_min: sw.lat, lat_max: ne.lat, lng_min: sw.lng, lng_max: ne.lng });
+        }, 400);
+      } else {
+        setMapMoved(true);
+      }
     });
 
     mapRef.current = map;
 
     return () => {
       mapReadyRef.current = false;
+      if (autoSearchTimerRef.current) clearTimeout(autoSearchTimerRef.current);
       map.remove();
       mapRef.current = null;
       initRef.current = false;
     };
-  }, [navigate, onPinHover]);
+  }, [navigate, onPinHover, onBoundsSearch]);
 
-  // Handle draw mode clicks
+  // Draw mode
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -370,7 +392,6 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
           setHasDrawn(true);
           map.getCanvas().style.cursor = "";
 
-          // Filter pins inside polygon
           if (onDrawFilter) {
             const inside = pinsRef.current.filter(pin => {
               const lat = Number(pin.latitude);
@@ -381,7 +402,6 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
             onDrawFilter(inside);
           }
 
-          // Also set bounds to the polygon bbox
           if (onBoundsSearch && finalPoints.length >= 3) {
             const lngs = finalPoints.map(p => p[0]);
             const lats = finalPoints.map(p => p[1]);
@@ -397,7 +417,6 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
 
       map.on("click", onClick);
       map.on("dblclick", onDblClick);
-      // Disable double-click zoom during draw
       map.doubleClickZoom.disable();
 
       return () => {
@@ -437,7 +456,6 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         }],
       });
     } else if (polySource && pts.length >= 2) {
-      // Show a line while drawing
       polySource.setData({
         type: "FeatureCollection",
         features: [{
@@ -460,14 +478,12 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       if (pointsSource) pointsSource.setData({ type: "FeatureCollection", features: [] });
       if (polySource) polySource.setData({ type: "FeatureCollection", features: [] });
     }
-    // Clear the bounds filter
     if (onBoundsSearch) {
-      // Reset by triggering a normal search
       setMapMoved(false);
     }
   }, [onBoundsSearch]);
 
-  // Update data via source.setData
+  // Update data
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReadyRef.current) return;
@@ -516,6 +532,81 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
     <div className="relative h-full w-full">
       <div ref={containerRef} style={{ width: "100%", height: "100%", borderRadius: "12px" }} />
 
+      {/* Property preview popup — Airbnb style */}
+      <AnimatePresence>
+        {previewPin && previewPos && (
+          <motion.div
+            initial={{ opacity: 0, y: 8, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 4, scale: 0.97 }}
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="absolute z-30 w-[260px] cursor-pointer"
+            style={{
+              left: Math.min(Math.max(previewPos.x - 130, 8), (containerRef.current?.offsetWidth ?? 400) - 268),
+              top: previewPos.y - 10,
+              transform: "translateY(-100%)",
+            }}
+            onClick={() => navigate(`/imovel/${previewPin.slug}`)}
+          >
+            <div className="overflow-hidden rounded-xl border border-border bg-card shadow-xl">
+              {previewPin.foto && (
+                <div className="relative aspect-[16/10] overflow-hidden">
+                  <FotoImovel
+                    src={previewPin.foto}
+                    alt={previewPin.titulo}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              )}
+              <div className="px-3 py-2.5">
+                <p className="font-body text-sm font-bold text-foreground">{formatPrecoFull(previewPin.preco)}</p>
+                <div className="mt-0.5 flex items-center gap-2 font-body text-xs text-muted-foreground">
+                  {previewPin.quartos && (
+                    <span className="flex items-center gap-0.5">
+                      <Bed className="h-3 w-3" />
+                      {previewPin.quartos}
+                    </span>
+                  )}
+                  {previewPin.area_total && (
+                    <span className="flex items-center gap-0.5">
+                      <Maximize className="h-3 w-3" />
+                      {previewPin.area_total}m²
+                    </span>
+                  )}
+                  <span>· {previewPin.bairro}</span>
+                </div>
+                <p className="mt-1 font-body text-[11px] text-primary font-medium">Ver detalhes →</p>
+              </div>
+            </div>
+            {/* Triangle pointer */}
+            <div className="flex justify-center">
+              <div className="h-2.5 w-2.5 rotate-45 border-b border-r border-border bg-card -mt-[6px]" />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Auto-search toggle */}
+      {onBoundsSearch && !drawMode && !hasDrawn && (
+        <div className="absolute bottom-4 right-4 z-20">
+          <button
+            onClick={() => setAutoSearch(prev => !prev)}
+            className={`flex items-center gap-2 rounded-full px-3.5 py-2 font-body text-[12px] font-semibold shadow-lg transition-all active:scale-[0.97] ${
+              autoSearch
+                ? "border border-primary bg-primary/10 text-primary"
+                : "border border-border bg-card text-muted-foreground"
+            }`}
+          >
+            {autoSearch ? (
+              <ToggleRight className="h-4 w-4 text-primary" />
+            ) : (
+              <ToggleLeft className="h-4 w-4" />
+            )}
+            Buscar ao mover
+          </button>
+        </div>
+      )}
+
       {/* Draw mode indicator */}
       <AnimatePresence>
         {drawMode && (
@@ -557,9 +648,9 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         )}
       </AnimatePresence>
 
-      {/* Buscar nessa região */}
+      {/* Buscar nessa região — only show when NOT auto-searching */}
       <AnimatePresence>
-        {mapMoved && onBoundsSearch && !drawMode && !hasDrawn && (
+        {mapMoved && onBoundsSearch && !drawMode && !hasDrawn && !autoSearch && (
           <div className="pointer-events-none absolute left-0 right-0 top-4 z-20 flex justify-center">
             <motion.button
               initial={{ opacity: 0, y: -8 }}

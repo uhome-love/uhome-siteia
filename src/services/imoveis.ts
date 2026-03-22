@@ -113,7 +113,7 @@ export interface BuscaFilters {
 export const CIDADES_PERMITIDAS = ["Porto Alegre", "Canoas", "Cachoeirinha", "Gravataí", "Guaíba"];
 
 // Only select columns needed for listing — skip heavy jetimob_raw, descricao, etc.
-const LISTING_COLUMNS = "id,slug,tipo,finalidade,status,destaque,preco,preco_condominio,preco_iptu,area_total,area_util,quartos,banheiros,vagas,andar,bairro,cidade,uf,latitude,longitude,titulo,diferenciais,fotos,video_url,publicado_em";
+const LISTING_COLUMNS = "id,slug,tipo,finalidade,status,destaque,preco,preco_condominio,preco_iptu,area_total,area_util,quartos,banheiros,vagas,andar,bairro,cidade,uf,latitude,longitude,titulo,diferenciais,fotos,video_url,condominio_nome,publicado_em";
 
 export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: Imovel[]; count: number }> {
   let query = supabase
@@ -183,13 +183,17 @@ export interface MapPin {
   longitude: number;
   bairro: string;
   titulo: string;
+  foto?: string;
+  quartos?: number;
+  area_total?: number;
+  tipo?: string;
 }
 
 /** Fetch lightweight pin data for the map — all matching properties, no limit */
 export async function fetchMapPins(filters: BuscaFilters = {}): Promise<MapPin[]> {
   let query = supabase
     .from("imoveis")
-    .select("id,slug,preco,latitude,longitude,bairro,titulo,tipo,quartos,finalidade");
+    .select("id,slug,preco,latitude,longitude,bairro,titulo,tipo,quartos,finalidade,fotos,area_total");
 
   if (filters.cidade) {
     query = query.eq("cidade", filters.cidade);
@@ -229,6 +233,7 @@ export async function fetchMapPins(filters: BuscaFilters = {}): Promise<MapPin[]
     if (!data || data.length === 0) break;
 
     for (const row of data) {
+      const fotos = parseFotos(row.fotos);
       allPins.push({
         id: row.id,
         slug: row.slug,
@@ -237,6 +242,10 @@ export async function fetchMapPins(filters: BuscaFilters = {}): Promise<MapPin[]
         longitude: row.longitude!,
         bairro: row.bairro,
         titulo: tituloLimpo(row),
+        foto: fotos.length > 0 ? (fotos.find((f: any) => f.principal) ?? fotos[0])?.url : undefined,
+        quartos: row.quartos ?? undefined,
+        area_total: row.area_total ?? undefined,
+        tipo: row.tipo ?? undefined,
       });
     }
 

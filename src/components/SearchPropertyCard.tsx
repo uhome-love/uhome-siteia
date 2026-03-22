@@ -176,7 +176,6 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
           <div className="mt-2 flex items-baseline justify-between">
             <div>
               <span className="font-body text-lg font-extrabold text-foreground">{price}</span>
-              <span className="ml-1.5 font-body text-sm text-muted-foreground">{finalidadeLabel}</span>
             </div>
             <button
               onClick={async (e) => { e.stopPropagation(); const r = await toggleFavorito(imovel.id); if (r === "needs_auth") setShowAuth(true); }}
@@ -191,10 +190,15 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
             </button>
           </div>
 
-          {/* Total cost */}
-          {totalMensal > 0 && (
+          {/* Monthly costs */}
+          {(imovel.preco_condominio ?? 0) > 0 && (
             <p className="mt-0.5 font-body text-[12px] text-muted-foreground">
-              R$ {(imovel.preco + totalMensal).toLocaleString("pt-BR")} total
+              R$ {(imovel.preco_condominio!).toLocaleString("pt-BR")}/mês cond.
+            </p>
+          )}
+          {(imovel.preco_iptu ?? 0) > 0 && (
+            <p className="mt-0.5 font-body text-[12px] text-muted-foreground">
+              R$ {(imovel.preco_iptu!).toLocaleString("pt-BR")}/mês IPTU
             </p>
           )}
 

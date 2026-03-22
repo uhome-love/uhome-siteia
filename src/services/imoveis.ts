@@ -129,7 +129,7 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
     query = query.in("cidade", CIDADES_PERMITIDAS);
   }
 
-  if (filters.finalidade) query = query.eq("finalidade", filters.finalidade);
+  // finalidade always "venda" — no conditional needed
   if (filters.tipo) query = query.eq("tipo", filters.tipo);
   if (filters.bairros?.length) {
     const bairroFilter = filters.bairros.map(b => `bairro.ilike.%${b}%`).join(",");

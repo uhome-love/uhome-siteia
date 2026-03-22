@@ -451,8 +451,6 @@ const PropertyDetail = () => {
               </Button>
             </div>
 
-            <div className="h-px bg-border" />
-
             {/* Description */}
             {imovel.descricao && (
               <div>

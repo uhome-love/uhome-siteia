@@ -32,6 +32,7 @@ export function LeadFormInline({ isOpen, imovelId, imovelTitulo, imovelBairro, i
       await submitLead({
         nome: nome.trim(),
         telefone: telefone.trim(),
+        email: email.trim() || undefined,
         imovel_id: imovelId,
         imovel_titulo: imovelTitulo,
         imovel_bairro: imovelBairro,

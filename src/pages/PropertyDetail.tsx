@@ -266,12 +266,6 @@ const PropertyDetail = () => {
             </div>
           </div>
 
-          {/* Title overlay */}
-          <div className="absolute bottom-16 left-0 right-0 px-5">
-            <h1 className="font-body text-xl font-bold text-white leading-snug drop-shadow-lg" style={{ textWrap: "balance" as any }}>
-              {imovel.titulo}
-            </h1>
-          </div>
 
           {/* Bottom pills */}
           <div className="absolute bottom-4 left-0 right-0 flex items-center justify-center gap-2 px-5">

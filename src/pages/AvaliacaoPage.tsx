@@ -134,7 +134,7 @@ export default function AvaliacaoPage() {
                     className="h-full rounded-full bg-primary"
                     initial={false}
                     animate={{ width: `${(passo / totalPassos) * 100}%` }}
-                    transition={{ duration: 0.4, ease: ease as unknown as number[] }}
+                    transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] as any }}
                   />
                 </div>
               </div>

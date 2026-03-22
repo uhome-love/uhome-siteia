@@ -183,13 +183,17 @@ export interface MapPin {
   longitude: number;
   bairro: string;
   titulo: string;
+  foto?: string;
+  quartos?: number;
+  area_total?: number;
+  tipo?: string;
 }
 
 /** Fetch lightweight pin data for the map — all matching properties, no limit */
 export async function fetchMapPins(filters: BuscaFilters = {}): Promise<MapPin[]> {
   let query = supabase
     .from("imoveis")
-    .select("id,slug,preco,latitude,longitude,bairro,titulo,tipo,quartos,finalidade");
+    .select("id,slug,preco,latitude,longitude,bairro,titulo,tipo,quartos,finalidade,fotos,area_total");
 
   if (filters.cidade) {
     query = query.eq("cidade", filters.cidade);

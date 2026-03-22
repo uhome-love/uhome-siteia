@@ -254,7 +254,7 @@ const CondominioDetail = () => {
         );
       }
 
-      // JSON-LD
+      // JSON-LD Residence
       const jsonLd = {
         "@context": "https://schema.org",
         "@type": "Residence",
@@ -278,6 +278,7 @@ const CondominioDetail = () => {
 
       return () => {
         document.getElementById("condo-jsonld")?.remove();
+        document.getElementById("condo-faq-jsonld")?.remove();
       };
     })();
   }, [slug]);

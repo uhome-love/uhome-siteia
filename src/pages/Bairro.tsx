@@ -31,6 +31,7 @@ const Bairro = () => {
   const [imoveis, setImoveis] = useState<Imovel[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [showLead, setShowLead] = useState(false);
 
   useEffect(() => {
     if (!bairro) return;

@@ -43,9 +43,10 @@ function formatAreaLabel(min: number, max: number): string {
   return "";
 }
 
-export function SearchFiltersBar() {
+export function SearchFiltersBar({ onOpenMobileFilters }: { onOpenMobileFilters?: () => void }) {
   const { filters, setFilter, resetFilters } = useSearchStore();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);

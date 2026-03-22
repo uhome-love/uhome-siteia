@@ -1,5 +1,6 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef, useCallback } from "react";
+import useEmblaCarousel from "embla-carousel-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { LeadSidebar } from "@/components/LeadSidebar";

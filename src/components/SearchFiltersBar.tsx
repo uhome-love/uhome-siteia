@@ -50,6 +50,7 @@ export function SearchFiltersBar({ onOpenMobileFilters }: { onOpenMobileFilters?
   const isMobile = useIsMobile();
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const portalDropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Multi-bairro state

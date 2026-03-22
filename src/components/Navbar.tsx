@@ -117,6 +117,20 @@ export function Navbar() {
               </div>
 
               <Link
+                to="/condominios"
+                onClick={() => setMobileOpen(false)}
+                className="font-body text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Condomínios
+              </Link>
+              <Link
+                to="/bairros"
+                onClick={() => setMobileOpen(false)}
+                className="font-body text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Bairros
+              </Link>
+              <Link
                 to="/anunciar"
                 onClick={() => setMobileOpen(false)}
                 className="mt-2 inline-block rounded-full border-[1.5px] border-primary px-5 py-2.5 text-center font-body text-base font-semibold text-primary"

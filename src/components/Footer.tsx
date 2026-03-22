@@ -24,6 +24,7 @@ export function Footer() {
               <li><Link to="/casas-porto-alegre" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Casas</Link></li>
               <li><Link to="/coberturas-porto-alegre" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Coberturas</Link></li>
               <li><Link to="/bairros" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Bairros</Link></li>
+              <li><Link to="/condominios" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Condomínios</Link></li>
               <li><Link to="/anunciar" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Anunciar imóvel</Link></li>
             </ul>
           </div>

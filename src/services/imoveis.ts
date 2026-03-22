@@ -243,13 +243,25 @@ export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSig
     query = query.abortSignal(signal);
   }
 
+  const t0 = performance.now();
   const { data, error } = await query;
+  const loadMs = Math.round(performance.now() - t0);
+
   if (error) {
     if (error.message?.includes("aborted")) return [];
     throw error;
   }
 
-  return (data || []).map((row: any) => ({
+  const rows = data || [];
+  // Emit perf metrics in dev
+  if (import.meta.env.DEV) {
+    const payloadKB = Math.round(JSON.stringify(rows).length / 1024);
+    window.dispatchEvent(new CustomEvent("perf:update", {
+      detail: { mapaLoadMs: loadMs, mapaPayloadKB: payloadKB, pinsCarregados: rows.length },
+    }));
+  }
+
+  return rows.map((row: any) => ({
     id: row.id,
     slug: row.slug,
     preco: row.preco,

@@ -19,3 +19,10 @@ export async function getBairrosDisponiveis(): Promise<BairroCount[]> {
   cache = { data: result, ts: Date.now() };
   return result;
 }
+
+/** Emit a cache-hit perf event (call when returning cached data) */
+function emitCacheHit() {
+  if (import.meta.env.DEV) {
+    window.dispatchEvent(new CustomEvent("perf:update", { detail: { cacheHit: true } }));
+  }
+}

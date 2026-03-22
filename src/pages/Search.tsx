@@ -605,7 +605,7 @@ const Search = () => {
               <X className="h-4 w-4" />
               Voltar à lista
             </button>
-            <SearchMap pins={mapPins} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} />
+            <SearchMap pins={mapPins} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} onBoundsChange={handleMapBoundsChange} />
           </motion.div>
         )}
       </AnimatePresence>

@@ -62,6 +62,7 @@ function mapRow(row: any): Imovel {
     destaque: row.destaque ?? false,
     cidade: row.cidade ?? "Porto Alegre",
     uf: row.uf ?? "RS",
+    condominio_nome: row.condominio_nome?.trim() || null,
   };
   // Always override with clean title
   mapped.titulo = tituloLimpo(mapped);

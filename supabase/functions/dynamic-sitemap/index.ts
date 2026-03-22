@@ -67,6 +67,35 @@ Deno.serve(async (req) => {
       entries.push(urlEntry(`${SITE}/blog/${slug}`, today, "monthly", "0.6"));
     }
 
+    // Condominium pages
+    {
+      const { data: condoData } = await supabase
+        .from("imoveis")
+        .select("condominio_nome")
+        .eq("status", "disponivel")
+        .not("condominio_nome", "is", null);
+
+      if (condoData) {
+        const uniqueCondos = new Set<string>();
+        for (const row of condoData) {
+          const name = (row as any).condominio_nome?.trim();
+          if (name) uniqueCondos.add(name);
+        }
+        for (const name of uniqueCondos) {
+          const slug = name
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/(^-|-$)/g, "");
+          entries.push(urlEntry(`${SITE}/condominios/${slug}`, today, "weekly", "0.7"));
+        }
+      }
+    }
+
+    // Condominios listing page
+    entries.push(urlEntry(`${SITE}/condominios`, today, "weekly", "0.8"));
+
     // All available properties
     let offset = 0;
     const PAGE_SIZE = 1000;

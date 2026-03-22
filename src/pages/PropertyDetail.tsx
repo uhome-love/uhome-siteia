@@ -376,6 +376,17 @@ const PropertyDetail = () => {
               <Link to="/busca" className="hover:text-foreground">Imóveis</Link>
               {" › "}
               <Link to={`/busca?bairro=${encodeURIComponent(imovel.bairro)}`} className="hover:text-foreground">{imovel.bairro}</Link>
+              {imovel.condominio_nome && (
+                <>
+                  {" › "}
+                  <Link
+                    to={`/condominios/${imovel.condominio_nome.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`}
+                    className="hover:text-foreground"
+                  >
+                    {imovel.condominio_nome}
+                  </Link>
+                </>
+              )}
               {" › "}
               <span className="text-foreground">{capitalize(imovel.tipo)}</span>
             </nav>

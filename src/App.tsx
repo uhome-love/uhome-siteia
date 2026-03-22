@@ -127,6 +127,7 @@ const App = () => (
                 <Route path="integracao/diagnostico" element={<IntegracaoDiagnostico />} />
                 <Route path="config" element={<AdminConfig />} />
                 <Route path="links" element={<AdminLinks />} />
+                <Route path="corretores" element={<AdminCorretores />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>

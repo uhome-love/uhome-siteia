@@ -73,7 +73,7 @@ const App = () => (
           <Sonner />
           <Suspense fallback={<PageFallback />}>
             <Routes>
-              <Route path="/c/:slug/*" element={<CorretorRef />} />
+              {/* Rotas normais */}
               <Route path="/" element={<Index />} />
               <Route path="/busca" element={<Search />} />
               <Route path="/imovel/:slug" element={<PropertyDetail />} />
@@ -95,6 +95,26 @@ const App = () => (
               <Route path="/coberturas-porto-alegre" element={<TipoImovel />} />
               <Route path="/studios-porto-alegre" element={<TipoImovel />} />
               <Route path="/comerciais-porto-alegre" element={<TipoImovel />} />
+
+              {/* Rotas do corretor — mesmas páginas, mantendo /c/:slug na URL */}
+              <Route path="/c/:slug" element={<CorretorRefLayout />}>
+                <Route index element={<Index />} />
+                <Route path="busca" element={<Search />} />
+                <Route path="imovel/:imovelSlug" element={<PropertyDetail />} />
+                <Route path="anunciar" element={<Anunciar />} />
+                <Route path="carreiras" element={<Carreiras />} />
+                <Route path="bairros" element={<Bairros />} />
+                <Route path="bairros/:bairroSlug" element={<Bairro />} />
+                <Route path="faq" element={<FAQ />} />
+                <Route path="blog" element={<Blog />} />
+                <Route path="blog/:blogSlug" element={<BlogPostPage />} />
+                <Route path="favoritos" element={<Favoritos />} />
+                <Route path="condominios" element={<Condominios />} />
+                <Route path="condominios/:condoSlug" element={<CondominioDetail />} />
+                <Route path="avaliar-imovel" element={<AvaliacaoPage />} />
+              </Route>
+
+              {/* Admin */}
               <Route path="/admin" element={<AdminLayout />}>
                 <Route index element={<AdminDashboard />} />
                 <Route path="imoveis" element={<AdminImoveis />} />

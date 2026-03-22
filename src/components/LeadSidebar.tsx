@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Send, Loader2, Check, MessageCircle } from "lucide-react";
+import { formatPhone } from "@/lib/phoneMask";
 import { submitLead } from "@/services/leads";
 import { toast } from "sonner";
 import { formatPreco } from "@/services/imoveis";

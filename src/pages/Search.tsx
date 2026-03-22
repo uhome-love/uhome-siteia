@@ -10,6 +10,7 @@ import { useSearchStore, type MapBounds } from "@/stores/searchStore";
 import { fetchImoveis, fetchMapPins, type Imovel, type MapPin as MapPinData } from "@/services/imoveis";
 import { interpretarBusca, type AISearchResult } from "@/services/aiSearch";
 import { supabase } from "@/integrations/supabase/client";
+import { syncToCRM } from "@/services/syncCRM";
 import { ArrowUpDown, Bell, Loader2, Map as MapIcon, MapPin, Sparkles, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";

@@ -275,24 +275,26 @@ const Search = () => {
   }, [setFilter]);
 
   const handleCreateAlert = async () => {
-    if (!alertEmail || !alertEmail.includes("@")) {
-      toast.error("Informe um e-mail válido");
-      return;
-    }
+    const email = user?.email || alertEmail;
     setAlertLoading(true);
     try {
       const alertPayload = {
-        nome: "Alerta de busca",
+        nome: user?.user_metadata?.nome || user?.user_metadata?.full_name || "Alerta de busca",
         telefone: "-",
-        email: alertEmail,
+        email: email || "-",
         tipo_interesse: "alerta_busca",
         origem_pagina: "/busca",
         origem_componente: "alerta_busca_modal",
       };
       await supabase.from("public_leads").insert(alertPayload);
 
-      // Sync busca salva to CRM
-      syncToCRM("busca_salva", { email: alertEmail, filters, descricao_humana: filterDesc });
+      const prefsDesc = [
+        alertPrefs.notificacoes && "notificações",
+        alertPrefs.whatsapp && "whatsapp",
+        alertPrefs.email && "email",
+      ].filter(Boolean).join(", ");
+
+      syncToCRM("busca_salva", { email, filters, descricao_humana: filterDesc, preferencias: prefsDesc });
       toast.success("Alerta criado! Avisaremos quando houver novidades.");
       setShowAlertModal(false);
       setAlertEmail("");

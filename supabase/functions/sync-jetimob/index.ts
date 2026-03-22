@@ -127,7 +127,7 @@ function mapImovel(j: any) {
     preco: extractPreco(j),
     preco_condominio: j.valor_condominio ? Number(j.valor_condominio) : null,
     preco_iptu: j.valor_iptu || j.iptu ? Number(j.valor_iptu || j.iptu) : null,
-    area_total: j.area_total ? Number(j.area_total) : null,
+    area_total: j.area_total ? Number(j.area_total) : (j.area_privativa ? Number(j.area_privativa) : (j.area_util ? Number(j.area_util) : null)),
     area_util: j.area_privativa || j.area_util ? Number(j.area_privativa || j.area_util) : null,
     quartos: j.dormitorios || j.quartos ? Number(j.dormitorios || j.quartos) : null,
     banheiros: j.banheiros ? Number(j.banheiros) : null,

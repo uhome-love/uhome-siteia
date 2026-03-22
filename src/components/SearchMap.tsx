@@ -13,7 +13,7 @@ mapboxgl.accessToken = MAPBOX_TOKEN;
 
 function formatPreco(preco: number): string {
   if (!preco) return "";
-  if (preco >= 1_000_000) return `R$${(preco / 1_000_000).toFixed(1)}M`;
+  if (preco >= 1_000_000) return `R$${(preco / 1_000_000).toFixed(1).replace(".0", "")}M`;
   if (preco >= 1_000) return `R$${Math.round(preco / 1_000)}k`;
   return `R$${preco}`;
 }
@@ -23,6 +23,7 @@ function formatPrecoFull(preco: number): string {
   return preco.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
 }
 
+// FIX 10 — Expanded bbox to include RS + SC
 function toGeoJSON(pins: MapPinData[]): GeoJSON.FeatureCollection {
   return {
     type: "FeatureCollection",
@@ -30,7 +31,12 @@ function toGeoJSON(pins: MapPinData[]): GeoJSON.FeatureCollection {
       .filter((i) => {
         const lat = Number(i.latitude);
         const lng = Number(i.longitude);
-        return lat && lng && lat < -28 && lat > -32 && lng < -49 && lng > -54;
+        return (
+          lat !== 0 && lng !== 0 &&
+          !isNaN(lat) && !isNaN(lng) &&
+          lat > -34 && lat < -27 &&
+          lng > -55 && lng < -48
+        );
       })
       .map((i) => ({
         type: "Feature" as const,
@@ -45,6 +51,10 @@ function toGeoJSON(pins: MapPinData[]): GeoJSON.FeatureCollection {
           preco_label: formatPreco(Number(i.preco)),
           titulo: i.titulo ?? "",
           bairro: i.bairro ?? "",
+          tipo: i.tipo ?? "",
+          quartos: i.quartos ?? 0,
+          area: i.area_total ?? 0,
+          foto: i.foto ?? "",
         },
       })),
   };
@@ -110,6 +120,12 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
   const autoSearchRef = useRef(false);
   const autoSearchTimerRef = useRef<number | null>(null);
 
+  // FIX 3 — Flag to prevent double initial load
+  const initialBoundsReportedRef = useRef(false);
+
+  // FIX 9 — Track last center to avoid closing popup on micro-movements
+  const lastCenterRef = useRef<{ lat: number; lng: number }>({ lat: -30.0346, lng: -51.2177 });
+
   // Stable callback refs — prevent map re-initialization when parent re-renders
   const onPinHoverRef = useRef(onPinHover);
   const onBoundsSearchRef = useRef(onBoundsSearch);
@@ -164,12 +180,15 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
     map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "top-right");
 
     map.on("load", () => {
+      // FIX 8 — clusterMaxZoom reduced to 13 (neighborhood level)
       map.addSource("imoveis", {
         type: "geojson",
         data: { type: "FeatureCollection", features: [] },
         cluster: true,
-        clusterMaxZoom: 15,
-        clusterRadius: 60,
+        clusterMaxZoom: 13,
+        clusterRadius: 52,
+        buffer: 64,
+        tolerance: 0.4,
       });
 
       map.addSource("draw-polygon", {
@@ -215,7 +234,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       map.addImage("pin-bg", createPillImage("#FFFFFF", "rgba(0,0,0,0.2)"));
       map.addImage("pin-bg-dark", createPillImage("#222222", "#222222"));
 
-      // Individual pins
+      // FIX 7 — Individual pins with collision management
       map.addLayer({
         id: "imoveis-pins",
         type: "symbol",
@@ -225,17 +244,21 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
           "icon-image": "pin-bg",
           "icon-text-fit": "both",
           "icon-text-fit-padding": [5, 10, 5, 10],
-          "icon-allow-overlap": true,
+          "icon-allow-overlap": false,
+          "icon-ignore-placement": false,
+          "icon-padding": 4,
           "text-field": ["get", "preco_label"],
           "text-font": ["DIN Pro Bold", "Arial Unicode MS Bold"],
           "text-size": 12,
-          "text-allow-overlap": true,
+          "text-allow-overlap": false,
+          "text-optional": true,
           "text-anchor": "center",
+          "symbol-sort-key": ["get", "preco"],
         },
         paint: { "text-color": "#222222", "icon-opacity": 1 },
       });
 
-      // Hovered pin
+      // Hovered pin — always on top
       map.addLayer({
         id: "imoveis-pins-hover",
         type: "symbol",
@@ -293,7 +316,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         });
       });
 
-      // Pin click → show preview popup (Airbnb style)
+      // Pin click → show preview popup
       map.on("click", "imoveis-pins", (e) => {
         const props = e.features?.[0]?.properties;
         if (!props) return;
@@ -328,10 +351,13 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
 
       mapReadyRef.current = true;
 
-      // Report initial viewport bounds so pins can be loaded for this area
+      // FIX 3 — Report initial bounds once, flag it
       const initialBounds = map.getBounds();
       boundsRef.current = initialBounds;
-      if (onBoundsChangeRef.current) {
+      lastCenterRef.current = { lat: map.getCenter().lat, lng: map.getCenter().lng };
+
+      if (onBoundsChangeRef.current && !initialBoundsReportedRef.current) {
+        initialBoundsReportedRef.current = true;
         const sw = initialBounds.getSouthWest();
         const ne = initialBounds.getNorthEast();
         onBoundsChangeRef.current({ lat_min: sw.lat, lat_max: ne.lat, lng_min: sw.lng, lng_max: ne.lng });
@@ -344,11 +370,22 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       }
     });
 
+    // FIX 5 & 9 — Debounce 800ms, smart popup close
     map.on("moveend", () => {
       if (!mapReadyRef.current) return;
       boundsRef.current = map.getBounds();
-      setPreviewPin(null);
-      setPreviewPos(null);
+
+      // FIX 9 — Only close popup on significant movement
+      const newCenter = map.getCenter();
+      const distanceMoved = Math.sqrt(
+        Math.pow(newCenter.lat - lastCenterRef.current.lat, 2) +
+        Math.pow(newCenter.lng - lastCenterRef.current.lng, 2)
+      );
+      if (distanceMoved > 0.003) {
+        setPreviewPin(null);
+        setPreviewPos(null);
+      }
+      lastCenterRef.current = { lat: newCenter.lat, lng: newCenter.lng };
 
       const sw = boundsRef.current!.getSouthWest();
       const ne = boundsRef.current!.getNorthEast();
@@ -357,12 +394,12 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       // Always report bounds change for lazy pin loading
       onBoundsChangeRef.current?.(currentBounds);
 
-      // Auto-search on move (debounced) — updates the listing, not just pins
+      // FIX 5 — Auto-search with 800ms debounce
       if (autoSearchRef.current && onBoundsSearchRef.current) {
         if (autoSearchTimerRef.current) clearTimeout(autoSearchTimerRef.current);
         autoSearchTimerRef.current = window.setTimeout(() => {
           onBoundsSearchRef.current?.(currentBounds);
-        }, 400);
+        }, 800);
       } else {
         setMapMoved(true);
       }
@@ -376,10 +413,11 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       map.remove();
       mapRef.current = null;
       initRef.current = false;
+      initialBoundsReportedRef.current = false;
     };
   }, [navigate]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Draw mode
+  // Draw mode — FIX 11: use all loaded pins + bounds-based server search
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -406,6 +444,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
           setHasDrawn(true);
           map.getCanvas().style.cursor = "";
 
+          // FIX 11 — Filter loaded pins client-side AND trigger bounds search for full results
           if (onDrawFilterRef.current) {
             const inside = pinsRef.current.filter(pin => {
               const lat = Number(pin.latitude);
@@ -416,6 +455,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
             onDrawFilterRef.current(inside);
           }
 
+          // Also trigger bounds-based search to get server-side results
           if (onBoundsSearchRef.current && finalPoints.length >= 3) {
             const lngs = finalPoints.map(p => p[0]);
             const lats = finalPoints.map(p => p[1]);
@@ -497,7 +537,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
     }
   }, []);
 
-  // Update data — pins are already viewport-filtered, just set them on the source
+  // FIX 6 — Update data using requestIdleCallback to avoid jank
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReadyRef.current) return;
@@ -505,7 +545,18 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
     const source = map.getSource("imoveis") as mapboxgl.GeoJSONSource | undefined;
     if (!source) return;
 
-    source.setData(toGeoJSON(pins));
+    const geojson = toGeoJSON(pins);
+
+    if ("requestIdleCallback" in window) {
+      const id = requestIdleCallback(() => {
+        source.setData(geojson);
+      }, { timeout: 500 });
+      return () => cancelIdleCallback(id);
+    } else {
+      requestAnimationFrame(() => {
+        source.setData(geojson);
+      });
+    }
   }, [pins]);
 
   // Hover from card → highlight pin

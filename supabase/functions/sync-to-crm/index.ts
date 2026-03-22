@@ -66,6 +66,19 @@ Deno.serve(async (req) => {
     corretorCRMId = plantao?.id ?? null
   }
 
+  // Validate corretor exists in CRM profiles to avoid FK violations
+  if (corretorCRMId) {
+    const { data: exists } = await supabaseCRM
+      .from('profiles')
+      .select('id')
+      .eq('id', corretorCRMId)
+      .maybeSingle()
+    if (!exists) {
+      console.warn(`[sync-to-crm] Corretor ${corretorCRMId} not found in CRM profiles, setting null`)
+      corretorCRMId = null
+    }
+  }
+
   let result: { ok: boolean; crm_lead_id?: string | null; error?: string } = { ok: false }
 
   try {

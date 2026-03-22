@@ -6,7 +6,7 @@ import { LeadFormInline } from "@/components/LeadFormInline";
 import { FotoImovel } from "@/components/FotoImovel";
 import { fetchImoveisDestaque, type Imovel, fotoPrincipal, formatPreco } from "@/services/imoveis";
 
-const PropertyCard = forwardRef<HTMLDivElement, { imovel: Imovel; index: number }>(function PropertyCard({ imovel, index }, ref) {
+function PropertyCard({ imovel, index }: { imovel: Imovel; index: number }) {
   const [liked, setLiked] = useState(false);
   const [showLead, setShowLead] = useState(false);
   const navigate = useNavigate();

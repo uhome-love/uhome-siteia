@@ -165,7 +165,7 @@ const CondominioDetail = () => {
       // Fetch AI description
       setDescLoading(true);
       supabase.functions.invoke("generate-condo-description", {
-        body: { condominio_nome: name },
+        body: { condominio_nome: matchedName },
       }).then(({ data: descData }) => {
         if (descData?.descricao) setDescricao(descData.descricao);
       }).catch(console.error).finally(() => setDescLoading(false));

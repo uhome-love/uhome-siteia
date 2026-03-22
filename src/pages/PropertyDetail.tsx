@@ -425,28 +425,28 @@ const PropertyDetail = () => {
             </div>
 
             {/* Mobile CTA buttons */}
-            <div className="flex gap-3 sm:hidden">
+            <div className="grid grid-cols-2 gap-3 sm:hidden">
               <Button
                 size="lg"
-                className="flex-1 text-sm"
+                className="w-full text-[13px] px-3"
                 onClick={() => {
                   const sidebar = document.querySelector('[data-lead-sidebar]');
                   if (sidebar) sidebar.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }}
               >
-                <Heart className="h-4 w-4" />
+                <Heart className="h-4 w-4 shrink-0" />
                 Tenho interesse
               </Button>
               <Button
                 variant="whatsapp"
                 size="lg"
-                className="flex-1 text-sm"
+                className="w-full text-[13px] px-3"
                 onClick={() => {
                   const msg = `Olá! Tenho interesse no imóvel: ${imovel.titulo} — ${priceFormatted}. Link: https://uhome.com.br/imovel/${imovel.slug}`;
                   window.open(whatsappLink(msg), '_blank');
                 }}
               >
-                <MessageCircle className="h-4 w-4" />
+                <MessageCircle className="h-4 w-4 shrink-0" />
                 Falar no WhatsApp
               </Button>
             </div>

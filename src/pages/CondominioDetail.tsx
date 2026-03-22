@@ -7,7 +7,7 @@ import { SearchPropertyCard } from "@/components/SearchPropertyCard";
 import { LeadFormInline } from "@/components/LeadFormInline";
 import { supabase } from "@/integrations/supabase/client";
 import { useCanonical } from "@/hooks/useCanonical";
-import { type Imovel, parseImovel } from "@/services/imoveis";
+import { type Imovel } from "@/services/imoveis";
 import { motion } from "framer-motion";
 import {
   ChevronRight,

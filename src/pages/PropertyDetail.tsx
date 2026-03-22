@@ -443,7 +443,7 @@ const PropertyDetail = () => {
 
             {/* Location */}
             {imovel.latitude && imovel.longitude && (
-              <div>
+              <div ref={mapRef}>
                 <h2 className="font-body text-lg font-bold text-foreground">Localização</h2>
                 <p className="mt-2 font-body text-sm text-muted-foreground">
                   {imovel.bairro}, Porto Alegre — endereço exato após contato

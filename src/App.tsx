@@ -71,6 +71,7 @@ const App = () => (
           <Sonner />
           <Suspense fallback={<PageFallback />}>
             <Routes>
+              <Route path="/c/:slug" element={<CorretorRef />} />
               <Route path="/" element={<Index />} />
               <Route path="/busca" element={<Search />} />
               <Route path="/imovel/:slug" element={<PropertyDetail />} />

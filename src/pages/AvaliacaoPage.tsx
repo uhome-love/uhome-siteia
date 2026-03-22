@@ -63,12 +63,17 @@ export default function AvaliacaoPage() {
   async function finalizar() {
     setCalculando(true);
     try {
+      const refSlug = getCorretorRef();
+      const refId = getCorretorRefId();
       await supabase.from("captacao_imoveis").insert({
         nome,
         telefone: rawPhone(telefone),
         bairro: dados.bairro,
         tipo_imovel: dados.tipo,
         utm_source: "calculadora_avaliacao",
+        corretor_ref_id: refId || null,
+        corretor_ref_slug: refSlug || null,
+        origem_ref: refSlug ? 'link_corretor' : 'organico',
       } as any);
 
       const res = await avaliarImovel(dados);

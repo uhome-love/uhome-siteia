@@ -285,6 +285,34 @@ const CondominioDetail = () => {
 
   const stats = imoveis.length > 0 ? buildStats(imoveis) : null;
 
+  // Collect unique diferenciais across all units
+  const allDiferenciais = [...new Set(imoveis.flatMap((im) => im.diferenciais || []))];
+
+  // Build FAQ items from real data
+  const faqItems = condoName && stats ? buildFaqItems(condoName, stats, allDiferenciais) : [];
+
+  // Inject FAQ JSON-LD
+  useEffect(() => {
+    if (faqItems.length === 0) return;
+    const faqJsonLd = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: faqItems.map((f) => ({
+        "@type": "Question",
+        name: f.pergunta,
+        acceptedAnswer: { "@type": "Answer", text: f.resposta },
+      })),
+    };
+    let el = document.getElementById("condo-faq-jsonld");
+    if (!el) {
+      el = document.createElement("script");
+      el.id = "condo-faq-jsonld";
+      el.setAttribute("type", "application/ld+json");
+      document.head.appendChild(el);
+    }
+    el.textContent = JSON.stringify(faqJsonLd);
+  }, [faqItems.length, condoName]);
+
   // Hero images — up to 5 unique photos from the condo's units
   const heroImages = imoveis
     .flatMap((im) => im.fotos.map((f) => f.url))

@@ -83,6 +83,7 @@ const Search = () => {
 
   const [imoveis, setImoveis] = useState<Imovel[]>([]);
   const [mapPins, setMapPins] = useState<MapPinData[]>([]);
+  const [mapViewBounds, setMapViewBounds] = useState<MapBounds | null>(null);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -168,8 +169,7 @@ const Search = () => {
     };
   }, [filters]);
 
-  // Normal mode: fetch list first (fast), then map pins in background
-  // Also loads when in IA mode without a query (shows default results)
+  // Normal mode: fetch list only (pins loaded separately by viewport)
   const loadImoveis = useCallback(async () => {
     if (modoIA && !aiResult && queryIA.trim()) return;
     setLoading(true);
@@ -186,17 +186,39 @@ const Search = () => {
       setImoveis(result.data);
       setTotal(result.count);
       setLoading(false);
-
-      setMapLoading(true);
-      fetchMapPins(baseFilters)
-        .then(setMapPins)
-        .catch((err) => console.error("Erro ao buscar pins:", err))
-        .finally(() => setMapLoading(false));
     } catch (err) {
       console.error("Erro ao buscar imóveis:", err);
       setLoading(false);
     }
   }, [filters, modoIA, aiResult, buildFilters]);
+
+  // Lazy load pins by viewport bounds — only fetches what's visible on the map
+  const pinLoadTimerRef = React.useRef<number | null>(null);
+
+  const handleMapBoundsChange = useCallback((bounds: MapBounds) => {
+    setMapViewBounds(bounds);
+    // Debounce pin fetching to avoid rapid re-fetches during pan/zoom
+    if (pinLoadTimerRef.current) clearTimeout(pinLoadTimerRef.current);
+    pinLoadTimerRef.current = window.setTimeout(() => {
+      setMapLoading(true);
+      const baseFilters = buildFilters();
+      fetchMapPins({ ...baseFilters, bounds })
+        .then(setMapPins)
+        .catch((err) => console.error("Erro ao buscar pins:", err))
+        .finally(() => setMapLoading(false));
+    }, 300);
+  }, [buildFilters]);
+
+  // Reload pins when filters change (using current map viewport)
+  useEffect(() => {
+    if (!mapViewBounds) return;
+    setMapLoading(true);
+    const baseFilters = buildFilters();
+    fetchMapPins({ ...baseFilters, bounds: mapViewBounds })
+      .then(setMapPins)
+      .catch((err) => console.error("Erro ao buscar pins:", err))
+      .finally(() => setMapLoading(false));
+  }, [filters.tipo, filters.bairro, filters.precoMin, filters.precoMax, filters.quartos, filters.areaMin, filters.areaMax, filters.vagas, filters.banheiros]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadMore = useCallback(async () => {
     if (loadingMore || loading) return;
@@ -251,8 +273,10 @@ const Search = () => {
       const { data, count } = await fetchImoveis({ ...aiFilters, limit: 40 });
       setImoveis(data);
       setTotal(count);
-      // Load pins in background
-      fetchMapPins(aiFilters).then(setMapPins).catch(console.error);
+      // Pins will be loaded via viewport bounds change callback
+      if (mapViewBounds) {
+        fetchMapPins({ ...aiFilters, bounds: mapViewBounds }).then(setMapPins).catch(console.error);
+      }
     } catch (e: any) {
       toast.error(e?.message || "Erro ao interpretar busca");
     } finally {
@@ -542,7 +566,7 @@ const Search = () => {
         {/* Map — desktop */}
         <div className="relative hidden w-[45%] shrink-0 border-l border-border lg:block" style={{ overflow: "visible" }}>
           <div className="h-full w-full overflow-hidden rounded-none">
-            <SearchMap pins={mapPins} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} />
+            <SearchMap pins={mapPins} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} onBoundsChange={handleMapBoundsChange} />
           </div>
         </div>
       </div>
@@ -581,7 +605,7 @@ const Search = () => {
               <X className="h-4 w-4" />
               Voltar à lista
             </button>
-            <SearchMap pins={mapPins} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} />
+            <SearchMap pins={mapPins} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} onBoundsChange={handleMapBoundsChange} />
           </motion.div>
         )}
       </AnimatePresence>

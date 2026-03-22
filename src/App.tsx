@@ -59,6 +59,8 @@ function RefCapture() {
   return null;
 }
 
+const CorretorRef = lazy(() => import("./components/CorretorRef").then(m => ({ default: m.CorretorRef })));
+
 const App = () => (
   <BrowserRouter>
     <RefCapture />

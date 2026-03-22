@@ -161,6 +161,41 @@ export type Database = {
         }
         Relationships: []
       }
+      corretor_visitas: {
+        Row: {
+          corretor_id: string | null
+          corretor_slug: string | null
+          created_at: string | null
+          id: string
+          referrer: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          corretor_id?: string | null
+          corretor_slug?: string | null
+          created_at?: string | null
+          id?: string
+          referrer?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          corretor_id?: string | null
+          corretor_slug?: string | null
+          created_at?: string | null
+          id?: string
+          referrer?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "corretor_visitas_corretor_id_fkey"
+            columns: ["corretor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       favoritos: {
         Row: {
           created_at: string
@@ -322,27 +357,35 @@ export type Database = {
       }
       profiles: {
         Row: {
+          ativo: boolean | null
           avatar_url: string | null
           created_at: string
           id: string
           nome: string | null
+          slug_ref: string | null
         }
         Insert: {
+          ativo?: boolean | null
           avatar_url?: string | null
           created_at?: string
           id: string
           nome?: string | null
+          slug_ref?: string | null
         }
         Update: {
+          ativo?: boolean | null
           avatar_url?: string | null
           created_at?: string
           id?: string
           nome?: string | null
+          slug_ref?: string | null
         }
         Relationships: []
       }
       public_leads: {
         Row: {
+          corretor_ref_id: string | null
+          corretor_ref_slug: string | null
           created_at: string | null
           email: string | null
           id: string
@@ -354,6 +397,7 @@ export type Database = {
           nome: string
           origem_componente: string | null
           origem_pagina: string | null
+          origem_ref: string | null
           session_id: string | null
           status: string | null
           telefone: string
@@ -363,6 +407,8 @@ export type Database = {
           utm_source: string | null
         }
         Insert: {
+          corretor_ref_id?: string | null
+          corretor_ref_slug?: string | null
           created_at?: string | null
           email?: string | null
           id?: string
@@ -374,6 +420,7 @@ export type Database = {
           nome: string
           origem_componente?: string | null
           origem_pagina?: string | null
+          origem_ref?: string | null
           session_id?: string | null
           status?: string | null
           telefone: string
@@ -383,6 +430,8 @@ export type Database = {
           utm_source?: string | null
         }
         Update: {
+          corretor_ref_id?: string | null
+          corretor_ref_slug?: string | null
           created_at?: string | null
           email?: string | null
           id?: string
@@ -394,6 +443,7 @@ export type Database = {
           nome?: string
           origem_componente?: string | null
           origem_pagina?: string | null
+          origem_ref?: string | null
           session_id?: string | null
           status?: string | null
           telefone?: string
@@ -402,7 +452,15 @@ export type Database = {
           utm_medium?: string | null
           utm_source?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "public_leads_corretor_ref_id_fkey"
+            columns: ["corretor_ref_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       site_config: {
         Row: {

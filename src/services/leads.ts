@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { getSessionId, getUtmParams } from "@/lib/session";
+import { getSessionId, getUtmParams, getCorretorRef } from "@/lib/session";
 import { syncToCRM } from "./syncCRM";
 
 interface LeadData {
@@ -19,6 +19,20 @@ interface LeadData {
 export async function submitLead(data: LeadData) {
   const utm = getUtmParams();
   const session_id = getSessionId();
+  const refSlug = getCorretorRef();
+
+  // Resolve corretor ref to profile id
+  let corretor_ref_id: string | null = null;
+  if (refSlug) {
+    try {
+      const { data: profile } = await (supabase as any)
+        .from('profiles')
+        .select('id')
+        .eq('slug_ref', refSlug)
+        .maybeSingle();
+      corretor_ref_id = profile?.id || null;
+    } catch { /* silent */ }
+  }
 
   const payload = {
     nome: data.nome,
@@ -36,11 +50,14 @@ export async function submitLead(data: LeadData) {
     utm_medium: utm.utm_medium || null,
     utm_campaign: utm.utm_campaign || null,
     session_id,
+    corretor_ref_id,
+    corretor_ref_slug: refSlug || null,
+    origem_ref: refSlug ? 'link_corretor' : 'organico',
   };
 
   const { error } = await supabase
     .from("public_leads")
-    .insert(payload);
+    .insert(payload as any);
 
   if (error) throw error;
 

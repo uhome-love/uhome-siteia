@@ -21,9 +21,9 @@ export async function submitLead(data: LeadData) {
   const session_id = getSessionId();
   const refSlug = getCorretorRef();
 
-  // Resolve corretor ref to profile id
-  let corretor_ref_id: string | null = null;
-  if (refSlug) {
+  // Resolve corretor ref to profile id — prefer cached id from /c/ route
+  let corretor_ref_id: string | null = getCorretorRefId();
+  if (!corretor_ref_id && refSlug) {
     try {
       const { data: profile } = await (supabase as any)
         .from('profiles')

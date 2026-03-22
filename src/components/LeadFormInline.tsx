@@ -17,6 +17,7 @@ interface LeadFormInlineProps {
 export function LeadFormInline({ isOpen, imovelId, imovelTitulo, imovelBairro, imovelPreco, onClose }: LeadFormInlineProps) {
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 

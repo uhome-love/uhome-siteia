@@ -68,6 +68,16 @@ const Search = () => {
     whatsapp: false,
     email: true,
   });
+  const [pendingAlert, setPendingAlert] = useState(false);
+
+  // After login from alert flow, auto-create the alert
+  useEffect(() => {
+    if (user && pendingAlert) {
+      setPendingAlert(false);
+      setShowAuthAfterAlert(false);
+      handleCreateAlert();
+    }
+  }, [user, pendingAlert]);
 
   const [imoveis, setImoveis] = useState<Imovel[]>([]);
   const [mapPins, setMapPins] = useState<MapPinData[]>([]);

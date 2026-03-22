@@ -11,8 +11,8 @@ import { AuthProvider } from "@/hooks/useAuth";
 const ExitIntentModal = lazy(() => import("@/components/ExitIntentModal").then(m => ({ default: m.ExitIntentModal })));
 const FloatingWhatsApp = lazy(() => import("@/components/FloatingWhatsApp").then(m => ({ default: m.FloatingWhatsApp })));
 
-// Lazy load all pages
-const Index = lazy(() => import("./pages/Index.tsx"));
+// Eager load homepage
+import Index from "./pages/Index.tsx";
 
 // Lazy load non-critical pages
 const Search = lazy(() => import("./pages/Search.tsx"));

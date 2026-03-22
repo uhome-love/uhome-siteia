@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { getSessionId, getUtmParams } from "@/lib/session";
+import { syncToCRM } from "./syncCRM";
 
 interface LeadData {
   nome: string;
@@ -19,7 +20,7 @@ export async function submitLead(data: LeadData) {
   const utm = getUtmParams();
   const session_id = getSessionId();
 
-  const { error } = await supabase.from("public_leads").insert({
+  const payload = {
     nome: data.nome,
     telefone: data.telefone,
     email: data.email || null,
@@ -35,9 +36,21 @@ export async function submitLead(data: LeadData) {
     utm_medium: utm.utm_medium || null,
     utm_campaign: utm.utm_campaign || null,
     session_id,
-  });
+  };
+
+  const { data: inserted, error } = await supabase
+    .from("public_leads")
+    .insert(payload)
+    .select()
+    .single();
 
   if (error) throw error;
+
+  // Fire-and-forget sync to CRM
+  if (inserted) {
+    syncToCRM("lead", inserted);
+  }
+
   return true;
 }
 

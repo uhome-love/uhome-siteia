@@ -2,6 +2,7 @@ import { useState } from "react";
 import { CalendarDays, Check, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { submitLead } from "@/services/leads";
+import { syncToCRM } from "@/services/syncCRM";
 import { toast } from "sonner";
 
 interface Props {
@@ -38,7 +39,7 @@ export function AgendamentoVisita({ imovelId, imovelSlug, imovelTitulo, imovelBa
     if (!dataEscolhida || !horario) return;
     setLoading(true);
     try {
-      await supabase.from("agendamentos" as any).insert({
+      const agendamentoPayload = {
         nome: nome.trim(),
         telefone: telefone.trim(),
         imovel_id: imovelId,
@@ -47,7 +48,11 @@ export function AgendamentoVisita({ imovelId, imovelSlug, imovelTitulo, imovelBa
         data_visita: dataEscolhida.toISOString().split("T")[0],
         horario,
         status: "confirmado",
-      });
+      };
+      await supabase.from("agendamentos" as any).insert(agendamentoPayload);
+
+      // Fire-and-forget sync to CRM
+      syncToCRM("agendamento", agendamentoPayload);
       await submitLead({
         nome: nome.trim(),
         telefone: telefone.trim(),

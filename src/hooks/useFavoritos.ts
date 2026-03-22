@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
+import { syncToCRM } from "@/services/syncCRM";
 
 export function useFavoritos() {
   const { user } = useAuth();
@@ -41,6 +42,8 @@ export function useFavoritos() {
           await supabase
             .from("favoritos")
             .insert({ user_id: user.id, imovel_id: imovelId });
+          // Fire-and-forget sync to CRM
+          syncToCRM("favorito", { user_id: user.id, imovel_id: imovelId, created_at: new Date().toISOString() });
         }
       } else {
         // Anonymous: localStorage

@@ -378,7 +378,7 @@ export type Database = {
           creci?: string | null
           email?: string | null
           foto_url?: string | null
-          id: string
+          id?: string
           nome?: string | null
           role?: string | null
           sincronizado_em?: string | null

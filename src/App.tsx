@@ -24,6 +24,7 @@ const Favoritos = lazy(() => import("./pages/Favoritos.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 const TipoImovel = lazy(() => import("./pages/TipoImovel.tsx"));
 const Condominios = lazy(() => import("./pages/Condominios.tsx"));
+const CondominioDetail = lazy(() => import("./pages/CondominioDetail.tsx"));
 
 // Admin
 const AdminLayout = lazy(() => import("./pages/admin/AdminLayout.tsx"));

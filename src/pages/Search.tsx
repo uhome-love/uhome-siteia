@@ -759,6 +759,7 @@ const Search = () => {
       {/* Auth modal triggered after alert preferences */}
       <AuthModal open={showAuthAfterAlert} onClose={() => setShowAuthAfterAlert(false)} />
       <MobileFiltersSheet open={mobileFilters} onClose={() => setMobileFilters(false)} total={total} />
+      <PerformanceDebug />
     </div>
   );
 };

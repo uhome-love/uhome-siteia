@@ -20,11 +20,10 @@ Deno.serve(async (req) => {
     Deno.env.get('UHOMESALES_SERVICE_ROLE_KEY')!
   )
 
-  // 1. Buscar corretores ativos no CRM
+  // 1. Buscar corretores ativos no CRM (tabela do CRM não tem coluna 'role')
   const { data: corretoresCRM, error: fetchError } = await supabaseCRM
     .from('profiles')
     .select('id, nome, email, telefone, avatar_url, creci')
-    .eq('role', 'corretor')
     .eq('ativo', true)
 
   if (fetchError) {

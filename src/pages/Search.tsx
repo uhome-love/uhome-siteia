@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { AuthModal } from "@/components/AuthModal";
+import { useAuth } from "@/hooks/useAuth";
 import { useSearchParams } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { SearchFiltersBar } from "@/components/SearchFiltersBar";
@@ -46,6 +48,7 @@ function describeFilters(filters: Record<string, any>): string {
 }
 
 const Search = () => {
+  const { user } = useAuth();
   useCanonical();
   const [searchParams, setSearchParams] = useSearchParams();
   const modoIA = searchParams.get("modo") === "ia";
@@ -57,6 +60,24 @@ const Search = () => {
   const [alertEmail, setAlertEmail] = useState("");
   const [showLeadCTA, setShowLeadCTA] = useState(false);
   const [alertLoading, setAlertLoading] = useState(false);
+  const [showAuthAfterAlert, setShowAuthAfterAlert] = useState(false);
+  
+  // Alert preferences
+  const [alertPrefs, setAlertPrefs] = useState({
+    notificacoes: true,
+    whatsapp: false,
+    email: true,
+  });
+  const [pendingAlert, setPendingAlert] = useState(false);
+
+  // After login from alert flow, auto-create the alert
+  useEffect(() => {
+    if (user && pendingAlert) {
+      setPendingAlert(false);
+      setShowAuthAfterAlert(false);
+      handleCreateAlert();
+    }
+  }, [user, pendingAlert]);
 
   const [imoveis, setImoveis] = useState<Imovel[]>([]);
   const [mapPins, setMapPins] = useState<MapPinData[]>([]);
@@ -264,24 +285,26 @@ const Search = () => {
   }, [setFilter]);
 
   const handleCreateAlert = async () => {
-    if (!alertEmail || !alertEmail.includes("@")) {
-      toast.error("Informe um e-mail válido");
-      return;
-    }
+    const email = user?.email || alertEmail;
     setAlertLoading(true);
     try {
       const alertPayload = {
-        nome: "Alerta de busca",
+        nome: user?.user_metadata?.nome || user?.user_metadata?.full_name || "Alerta de busca",
         telefone: "-",
-        email: alertEmail,
+        email: email || "-",
         tipo_interesse: "alerta_busca",
         origem_pagina: "/busca",
         origem_componente: "alerta_busca_modal",
       };
       await supabase.from("public_leads").insert(alertPayload);
 
-      // Sync busca salva to CRM
-      syncToCRM("busca_salva", { email: alertEmail, filters, descricao_humana: filterDesc });
+      const prefsDesc = [
+        alertPrefs.notificacoes && "notificações",
+        alertPrefs.whatsapp && "whatsapp",
+        alertPrefs.email && "email",
+      ].filter(Boolean).join(", ");
+
+      syncToCRM("busca_salva", { email, filters, descricao_humana: filterDesc, preferencias: prefsDesc });
       toast.success("Alerta criado! Avisaremos quando houver novidades.");
       setShowAlertModal(false);
       setAlertEmail("");
@@ -561,53 +584,126 @@ const Search = () => {
         )}
       </AnimatePresence>
 
-      {/* Alert modal */}
+      {/* Alert preferences modal — QuintoAndar style */}
       <AnimatePresence>
         {showAlertModal && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm"
             onClick={() => setShowAlertModal(false)}
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              transition={{ duration: 0.2 }}
-              className="mx-4 w-full max-w-sm rounded-2xl bg-card p-7 shadow-2xl"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 40 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              className="w-full max-w-md rounded-t-2xl sm:rounded-2xl bg-card px-6 py-7 shadow-2xl sm:mx-4"
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="font-body text-lg font-bold text-foreground">Criar alerta de imóvel</h3>
-              <p className="mt-1.5 font-body text-sm text-muted-foreground">
-                Avise-me quando aparecerem imóveis como:
+              <h3 className="font-body text-xl font-extrabold text-foreground leading-snug">
+                Escolha onde quer receber novos imóveis dessa busca
+              </h3>
+
+              {/* Preferences */}
+              <div className="mt-6">
+                <p className="font-body text-sm font-bold text-foreground">Assim que o imóvel chegar</p>
+                
+                <label className="mt-4 flex items-center justify-between cursor-pointer">
+                  <span className="font-body text-sm text-foreground">Notificações no app</span>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={alertPrefs.notificacoes}
+                    onClick={() => setAlertPrefs(p => ({ ...p, notificacoes: !p.notificacoes }))}
+                    className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors ${alertPrefs.notificacoes ? "bg-primary" : "bg-muted"}`}
+                  >
+                    <span className={`inline-block h-5 w-5 rounded-full bg-white shadow transition-transform ${alertPrefs.notificacoes ? "translate-x-6" : "translate-x-1"}`} />
+                    {alertPrefs.notificacoes && (
+                      <svg className="absolute left-1.5 h-3.5 w-3.5 text-primary-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    )}
+                  </button>
+                </label>
+
+                <label className="mt-3 flex items-center justify-between cursor-pointer">
+                  <span className="font-body text-sm text-foreground">WhatsApp</span>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={alertPrefs.whatsapp}
+                    onClick={() => setAlertPrefs(p => ({ ...p, whatsapp: !p.whatsapp }))}
+                    className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors ${alertPrefs.whatsapp ? "bg-primary" : "bg-muted"}`}
+                  >
+                    <span className={`inline-block h-5 w-5 rounded-full bg-white shadow transition-transform ${alertPrefs.whatsapp ? "translate-x-6" : "translate-x-1"}`} />
+                    {alertPrefs.whatsapp && (
+                      <svg className="absolute left-1.5 h-3.5 w-3.5 text-primary-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    )}
+                  </button>
+                </label>
+              </div>
+
+              <div className="mt-6">
+                <p className="font-body text-sm font-bold text-foreground">Imóveis que chegaram no dia</p>
+
+                <label className="mt-4 flex items-center justify-between cursor-pointer">
+                  <span className="font-body text-sm text-foreground">E-mail</span>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={alertPrefs.email}
+                    onClick={() => setAlertPrefs(p => ({ ...p, email: !p.email }))}
+                    className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors ${alertPrefs.email ? "bg-primary" : "bg-muted"}`}
+                  >
+                    <span className={`inline-block h-5 w-5 rounded-full bg-white shadow transition-transform ${alertPrefs.email ? "translate-x-6" : "translate-x-1"}`} />
+                    {alertPrefs.email && (
+                      <svg className="absolute left-1.5 h-3.5 w-3.5 text-primary-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    )}
+                  </button>
+                </label>
+              </div>
+
+              <p className="mt-6 font-body text-xs text-muted-foreground">
+                Você pode alterar suas preferências quando quiser dentro da página de alertas criados.
               </p>
-              <p className="mt-1 font-body text-sm font-semibold text-foreground">{filterDesc}</p>
 
-              <input
-                type="email"
-                placeholder="Seu e-mail"
-                value={alertEmail}
-                onChange={(e) => setAlertEmail(e.target.value)}
-                className="mt-5 w-full rounded-lg border-[1.5px] border-border bg-background px-4 py-3 font-body text-sm text-foreground outline-none transition-colors focus:border-primary"
-              />
-
-              <button
-                onClick={handleCreateAlert}
-                disabled={alertLoading}
-                className="mt-3 w-full rounded-lg bg-primary px-4 py-3 font-body text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 active:scale-[0.98] disabled:opacity-60"
-              >
-                {alertLoading ? "Criando..." : "Criar alerta gratuito"}
-              </button>
-
-              <p className="mt-3 text-center font-body text-xs text-muted-foreground">
-                Sem spam. Cancele quando quiser.
-              </p>
+              {/* Bottom actions */}
+              <div className="mt-6 flex items-center gap-3">
+                <button
+                  onClick={() => setShowAlertModal(false)}
+                  className="rounded-full border border-border px-5 py-3 font-body text-sm font-semibold text-foreground transition-colors hover:bg-secondary active:scale-[0.97]"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={() => {
+                    setShowAlertModal(false);
+                    if (!user) {
+                      setPendingAlert(true);
+                      setShowAuthAfterAlert(true);
+                    } else {
+                      handleCreateAlert();
+                    }
+                  }}
+                  className="flex flex-1 items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 font-body text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90 active:scale-[0.97]"
+                >
+                  <Bell className="h-4 w-4" />
+                  Criar alerta de imóveis
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Auth modal triggered after alert preferences */}
+      <AuthModal open={showAuthAfterAlert} onClose={() => setShowAuthAfterAlert(false)} />
     </div>
   );
 };

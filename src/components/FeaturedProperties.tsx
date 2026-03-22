@@ -37,7 +37,7 @@ function PropertyCard({ imovel, index }: { imovel: Imovel; index: number }) {
           style={{ aspectRatio: '4/3', borderRadius: '12px 12px 0 0' }}
           onClick={() => navigate(`/imovel/${imovel.slug}`)}
         >
-          <img
+          <FotoImovel
             src={image}
             alt={imovel.titulo}
             loading={index < 3 ? "eager" : "lazy"}

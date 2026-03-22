@@ -141,7 +141,7 @@ export default function IntegracaoDiagnostico() {
       .select("*")
       .order("created_at", { ascending: false })
       .limit(10)
-      .then(({ data }) => setHistorico((data as DiagLog[]) ?? []));
+      .then(({ data }) => setHistorico((data as unknown as DiagLog[]) ?? []));
   }, [concluido]);
 
   function up(nome: string, resultado: Partial<TestResult>) {

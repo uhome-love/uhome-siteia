@@ -136,7 +136,7 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
 
           {/* Heart */}
           <button
-            onClick={(e) => { e.stopPropagation(); toggleFavorito(imovel.id); }}
+            onClick={async (e) => { e.stopPropagation(); const r = await toggleFavorito(imovel.id); if (r === "needs_auth") setShowAuth(true); }}
             className="absolute right-3 top-3 z-10"
           >
             <Heart
@@ -180,7 +180,7 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
               <span className="ml-1.5 font-body text-sm text-muted-foreground">{finalidadeLabel}</span>
             </div>
             <button
-              onClick={(e) => { e.stopPropagation(); toggleFavorito(imovel.id); }}
+              onClick={async (e) => { e.stopPropagation(); const r = await toggleFavorito(imovel.id); if (r === "needs_auth") setShowAuth(true); }}
               className="p-1"
             >
               <Heart
@@ -257,7 +257,7 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
 
           {/* Heart */}
           <button
-            onClick={(e) => { e.stopPropagation(); toggleFavorito(imovel.id); }}
+            onClick={async (e) => { e.stopPropagation(); const r = await toggleFavorito(imovel.id); if (r === "needs_auth") setShowAuth(true); }}
             className="absolute right-3 top-3 z-10"
           >
             <Heart

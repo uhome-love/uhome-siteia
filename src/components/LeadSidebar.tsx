@@ -66,7 +66,7 @@ export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, 
 
       <div className="my-5 h-px bg-border" />
 
-      <h3 className="font-body text-base font-bold text-foreground">Fale com um corretor</h3>
+      <h3 className="font-body text-base font-bold text-foreground">Tenho interesse</h3>
 
       {success ? (
         <div className="mt-6 flex flex-col items-center gap-3 py-8">

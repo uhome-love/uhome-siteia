@@ -2,8 +2,8 @@ import { useState } from "react";
 import { CalendarDays, Check, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { submitLead } from "@/services/leads";
-import { syncToCRM } from "@/services/syncCRM";
 import { toast } from "sonner";
+import { getCorretorRef, getCorretorRefId } from "@/lib/session";
 import { formatPhone } from "@/lib/phoneMask";
 
 interface Props {

@@ -24,6 +24,7 @@ const Favoritos = lazy(() => import("./pages/Favoritos.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 const TipoImovel = lazy(() => import("./pages/TipoImovel.tsx"));
 const Condominios = lazy(() => import("./pages/Condominios.tsx"));
+const CondominioDetail = lazy(() => import("./pages/CondominioDetail.tsx"));
 
 // Admin
 const AdminLayout = lazy(() => import("./pages/admin/AdminLayout.tsx"));
@@ -75,6 +76,7 @@ const App = () => (
               <Route path="/favoritos" element={<Favoritos />} />
               <Route path="/apartamentos-porto-alegre" element={<TipoImovel />} />
               <Route path="/condominios" element={<Condominios />} />
+              <Route path="/condominios/:slug" element={<CondominioDetail />} />
               <Route path="/casas-porto-alegre" element={<TipoImovel />} />
               <Route path="/coberturas-porto-alegre" element={<TipoImovel />} />
               <Route path="/studios-porto-alegre" element={<TipoImovel />} />

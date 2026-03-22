@@ -23,6 +23,15 @@ interface BairroGroup {
   totalImoveis: number;
 }
 
+function slugify(name: string) {
+  return name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
 const TOP_BAIRROS = [
   "Moinhos de Vento", "Petrópolis", "Rio Branco", "Menino Deus",
   "Centro", "Cidade Baixa", "Tristeza", "Auxiliadora", "Bela Vista",
@@ -134,7 +143,7 @@ function HorizontalCarousel({ items }: { items: CondominioData[] }) {
         {items.map((c, i) => (
           <Link
             key={`${c.condominio_nome}-${i}`}
-            to={`/busca?q=${encodeURIComponent(c.condominio_nome)}`}
+            to={`/condominios/${slugify(c.condominio_nome)}`}
             className="w-[260px] shrink-0 snap-start sm:w-[300px]"
           >
             <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-muted">

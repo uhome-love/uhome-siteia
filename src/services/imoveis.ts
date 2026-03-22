@@ -189,7 +189,7 @@ export interface MapPin {
   tipo?: string;
 }
 
-/** Fetch lightweight pin data for the map — all matching properties, no limit */
+/** Fetch lightweight pin data for the map — filtered by viewport bounds for performance */
 export async function fetchMapPins(filters: BuscaFilters = {}): Promise<MapPin[]> {
   let query = supabase
     .from("imoveis")
@@ -222,7 +222,16 @@ export async function fetchMapPins(filters: BuscaFilters = {}): Promise<MapPin[]
   // Only properties with coordinates
   query = query.not("latitude", "is", null).not("longitude", "is", null);
 
-  // Supabase default limit is 1000, we need all — fetch in pages
+  // Viewport bounds filter — huge performance win, loads only visible pins
+  if (filters.bounds) {
+    query = query
+      .gte("latitude", filters.bounds.lat_min)
+      .lte("latitude", filters.bounds.lat_max)
+      .gte("longitude", filters.bounds.lng_min)
+      .lte("longitude", filters.bounds.lng_max);
+  }
+
+  // Fetch in pages (Supabase default limit is 1000)
   const allPins: MapPin[] = [];
   let offset = 0;
   const PAGE = 1000;

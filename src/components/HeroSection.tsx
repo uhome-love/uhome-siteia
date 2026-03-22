@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { MapPin, Sparkles, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
+import { getBairrosDisponiveis } from "@/services/bairrosCache";
 import { toast } from "sonner";
 import { formatPhone } from "@/lib/phoneMask";
 import { bairrosData } from "@/data/bairros";
@@ -35,13 +36,9 @@ export function HeroSection() {
   const [dbBairros, setDbBairros] = useState<string[]>([]);
 
   useEffect(() => {
-    async function loadBairros() {
-      const { data } = await supabase.rpc("get_bairros_disponiveis");
-      if (data) {
-        setDbBairros(data.map((d: { bairro: string }) => d.bairro));
-      }
-    }
-    loadBairros();
+    getBairrosDisponiveis().then((data) => {
+      setDbBairros(data.map((d) => d.bairro));
+    });
   }, []);
 
   const bairroSuggestions = useMemo(() => {

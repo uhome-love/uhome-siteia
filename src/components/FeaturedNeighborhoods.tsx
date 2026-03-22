@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { getBairrosDisponiveis } from "@/services/bairrosCache";
 import { bairrosData } from "@/data/bairros";
 
 const bairrosConfig = bairrosData.slice(0, 6);
@@ -12,16 +12,13 @@ export function FeaturedNeighborhoods() {
 
   useEffect(() => {
     async function buscarContagens() {
-      // Single efficient query instead of 6 separate count queries
-      const { data } = await supabase.rpc("get_bairros_disponiveis");
-      if (data) {
-        const map = new Map(data.map((d: { bairro: string; count: number }) => [d.bairro, d.count]));
+      const data = await getBairrosDisponiveis();
+      if (data.length > 0) {
+        const bairroMap = new Map(data.map((d) => [d.bairro, d.count]));
         setContagens(bairrosConfig.map((b) => {
-          // Try exact match first, then partial match
-          const exact = map.get(b.nome);
+          const exact = bairroMap.get(b.nome);
           if (exact !== undefined) return Number(exact);
-          // Partial match for names that might differ slightly
-          for (const [key, val] of map) {
+          for (const [key, val] of bairroMap) {
             if (key.toLowerCase().includes(b.nome.toLowerCase()) || b.nome.toLowerCase().includes(key.toLowerCase())) {
               return Number(val);
             }

@@ -49,6 +49,8 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavo
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { prefixLink } = useCorretor();
+  const isFavorito = isFavoritoProp ?? (() => false);
+  const toggleFavorito = toggleFavoritoProp ?? (async () => undefined as "needs_auth" | void);
   const liked = isFavorito(imovel.id);
   const fotos = imovel.fotos && imovel.fotos.length > 0 ? imovel.fotos.map((f) => f.url) : [fotoPrincipal(imovel)];
   const price = formatPreco(imovel.preco);

@@ -113,11 +113,11 @@ export function ExitIntentModal() {
                 <form onSubmit={handleSubmit} className="mt-6 space-y-3">
                   <input
                     type="tel"
-                    placeholder="Seu WhatsApp"
+                    placeholder="(51) 99999-9999"
                     value={telefone}
-                    onChange={(e) => setTelefone(e.target.value)}
+                    onChange={(e) => setTelefone(formatPhone(e.target.value))}
                     className="w-full rounded-xl border-[1.5px] border-border bg-card px-4 py-3 font-body text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
-                    maxLength={20}
+                    maxLength={16}
                     autoFocus
                   />
                   <button

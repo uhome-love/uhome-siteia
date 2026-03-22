@@ -80,9 +80,9 @@ export function LeadFormInline({ isOpen, imovelId, imovelTitulo, imovelBairro, i
                   type="tel"
                   placeholder="WhatsApp (51) 99999-9999"
                   value={telefone}
-                  onChange={(e) => setTelefone(e.target.value)}
+                  onChange={(e) => setTelefone(formatPhone(e.target.value))}
                   className="w-full rounded-lg bg-input px-3 py-2.5 font-body text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                  maxLength={20}
+                  maxLength={16}
                 />
                 <button
                   type="submit"

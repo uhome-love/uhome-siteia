@@ -63,7 +63,7 @@ function buildStats(imoveis: Imovel[]): CondoStats {
     tiposSet: new Set(),
     bairro: imoveis[0]?.bairro || "",
     cidade: imoveis[0]?.cidade || "Porto Alegre",
-    endereco: imoveis[0]?.endereco_completo || null,
+    
     foto: "",
   };
 

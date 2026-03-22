@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 
 export function CorretorRef() {
-  const { slug } = useParams();
+  const { slug, '*': restPath } = useParams();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const location = useLocation();
 
   useEffect(() => {
     async function registrar() {
@@ -32,12 +32,13 @@ export function CorretorRef() {
         });
       }
 
-      const destino = searchParams.get('para') || '/busca';
-      navigate(decodeURIComponent(destino), { replace: true });
+      // Use the rest of the path as destination, or default to home
+      const destino = restPath ? `/${restPath}${location.search}` : '/';
+      navigate(destino, { replace: true });
     }
 
     registrar();
-  }, [slug, navigate, searchParams]);
+  }, [slug, restPath, navigate, location.search]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background">

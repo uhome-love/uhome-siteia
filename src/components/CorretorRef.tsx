@@ -15,7 +15,7 @@ export function CorretorRefLayout() {
 
       const { data: corretor } = await supabase
         .from('profiles')
-        .select('id, nome')
+        .select('id, nome, foto_url')
         .eq('slug_ref', slug)
         .eq('ativo', true)
         .maybeSingle();
@@ -23,7 +23,9 @@ export function CorretorRefLayout() {
       if (corretor) {
         localStorage.setItem('corretor_ref_id', corretor.id);
         localStorage.setItem('corretor_ref_slug', slug);
+        localStorage.setItem('uhome_corretor_ref', slug);
         localStorage.setItem('corretor_ref_nome', corretor.nome || '');
+        localStorage.setItem('corretor_ref_foto', corretor.foto_url || '');
         localStorage.setItem('corretor_ref_ts', Date.now().toString());
 
         if (jaRegistrado !== slug) {

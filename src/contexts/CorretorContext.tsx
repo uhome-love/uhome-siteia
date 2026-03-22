@@ -1,4 +1,5 @@
 import { createContext, useContext, useMemo, ReactNode } from "react";
+import { useLocation } from "react-router-dom";
 import { getCorretorRef } from "@/lib/session";
 
 interface CorretorContextValue {
@@ -12,8 +13,15 @@ const CorretorContext = createContext<CorretorContextValue>({
 });
 
 export function CorretorProvider({ children }: { children: ReactNode }) {
+  const location = useLocation();
+
+  // Recalcular quando a URL mudar — captura /c/:slug dinamicamente
   const value = useMemo(() => {
-    const slug = getCorretorRef();
+    const match = location.pathname.match(/^\/c\/([^/]+)/);
+    const slugFromUrl = match?.[1] ?? null;
+
+    // Priorizar URL, depois localStorage
+    const slug = slugFromUrl || getCorretorRef();
 
     function prefixLink(path: string): string {
       if (!slug) return path;
@@ -22,7 +30,7 @@ export function CorretorProvider({ children }: { children: ReactNode }) {
     }
 
     return { slug, prefixLink };
-  }, []);
+  }, [location.pathname]);
 
   return (
     <CorretorContext.Provider value={value}>

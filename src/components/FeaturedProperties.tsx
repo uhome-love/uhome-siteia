@@ -1,8 +1,9 @@
 import { motion } from "framer-motion";
 import { Bed, Car, Maximize, Heart } from "lucide-react";
-import { useState, useEffect, forwardRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { LeadFormInline } from "@/components/LeadFormInline";
+import { FotoImovel } from "@/components/FotoImovel";
 import { fetchImoveisDestaque, type Imovel, fotoPrincipal, formatPreco } from "@/services/imoveis";
 
 const PropertyCard = forwardRef<HTMLDivElement, { imovel: Imovel; index: number }>(function PropertyCard({ imovel, index }, ref) {

@@ -12,6 +12,8 @@ interface Props {
   index: number;
   highlighted?: boolean;
   onHover?: (id: string | null) => void;
+  isFavorito?: (id: string) => boolean;
+  toggleFavorito?: (id: string) => Promise<"needs_auth" | void>;
 }
 
 type BadgeStyle = "novo" | "exclusivo" | "visto";

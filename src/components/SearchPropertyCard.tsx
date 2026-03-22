@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Heart } from "lucide-react";
 import { motion } from "framer-motion";
@@ -25,7 +25,7 @@ function getBadge(imovel: Imovel): { label: string; style: BadgeStyle } | null {
     const dias = Math.floor(
       (Date.now() - new Date(imovel.publicado_em).getTime()) / 86400000
     );
-    if (dias <= 7) return { label: "Novo", style: "novo" };
+    if (dias <= 7) return { label: "Anúncio novo", style: "novo" };
   }
 
   if (imovel.destaque) return { label: "Exclusivo", style: "exclusivo" };
@@ -44,22 +44,53 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
   const [hovering, setHovering] = useState(false);
   const [fotoAtiva, setFotoAtiva] = useState(0);
   const navigate = useNavigate();
+  const touchRef = useRef<{ startX: number; startY: number } | null>(null);
 
   const liked = isFavorito(imovel.id);
   const fotos = imovel.fotos.length > 0 ? imovel.fotos.map((f) => f.url) : [fotoPrincipal(imovel)];
   const price = formatPreco(imovel.preco);
   const area = imovel.area_total ?? imovel.area_util ?? 0;
 
-  const stats = [
-    area > 0 ? `${area}m²` : null,
-    (imovel.quartos ?? 0) > 0 ? `${imovel.quartos} quartos` : null,
+  const statsArr = [
+    area > 0 ? `${area} m²` : null,
+    (imovel.quartos ?? 0) > 0 ? `${imovel.quartos} quarto${imovel.quartos! > 1 ? "s" : ""}` : null,
     (imovel.vagas ?? 0) > 0 ? `${imovel.vagas} vaga${imovel.vagas! > 1 ? "s" : ""}` : null,
-  ].filter(Boolean).join(" · ");
+  ].filter(Boolean);
+  const stats = statsArr.join(" · ");
 
   const badge = getBadge(imovel);
 
+  const totalMensal = (imovel.preco_condominio ?? 0) + (imovel.preco_iptu ?? 0);
+  const finalidadeLabel = imovel.finalidade === "locacao" ? "aluguel" : "venda";
+
+  // Build a short description like QuintoAndar
+  const tipoCapitalized = imovel.tipo.charAt(0).toUpperCase() + imovel.tipo.slice(1);
+  const descParts = [
+    `${tipoCapitalized} ${imovel.finalidade === "locacao" ? "para alugar" : "à venda"} em ${imovel.bairro}`,
+  ];
+  if ((imovel.quartos ?? 0) > 0) descParts[0] += `. ${imovel.quartos} quarto${imovel.quartos! > 1 ? "s" : ""}`;
+  if (imovel.diferenciais.length > 0) {
+    descParts[0] += `, ${imovel.diferenciais.slice(0, 2).join(", ").toLowerCase()}`;
+  }
+  descParts[0] += ".";
+
   const handleMouseEnter = () => { setHovering(true); onHover?.(imovel.id); };
   const handleMouseLeave = () => { setHovering(false); onHover?.(null); };
+
+  // Mobile swipe for carousel
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchRef.current = { startX: e.touches[0].clientX, startY: e.touches[0].clientY };
+  };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!touchRef.current || fotos.length <= 1) return;
+    const dx = e.changedTouches[0].clientX - touchRef.current.startX;
+    const dy = e.changedTouches[0].clientY - touchRef.current.startY;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
+      if (dx < 0 && fotoAtiva < fotos.length - 1) setFotoAtiva(f => f + 1);
+      if (dx > 0 && fotoAtiva > 0) setFotoAtiva(f => f - 1);
+    }
+    touchRef.current = null;
+  };
 
   return (
     <motion.div
@@ -71,35 +102,138 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
       onMouseLeave={handleMouseLeave}
       onClick={() => navigate(`/imovel/${imovel.slug}`)}
     >
-      {/* Mobile: horizontal layout / Desktop: vertical */}
-      <div className="flex gap-3 sm:block">
+      {/* ===== MOBILE: QuintoAndar-style full-width vertical card ===== */}
+      <div className="sm:hidden">
+        {/* Full-width image carousel */}
+        <div
+          className="relative overflow-hidden rounded-xl"
+          style={{ aspectRatio: "4/3" }}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
+          <FotoImovel
+            src={fotos[fotoAtiva]}
+            alt={imovel.titulo}
+            loading={index < 4 ? "eager" : "lazy"}
+            decoding="async"
+            className="h-full w-full object-cover"
+          />
+
+          {/* Badges */}
+          <div className="absolute left-3 top-3 z-10 flex gap-1.5">
+            {badge && (
+              <span className={`rounded-md px-2.5 py-1 font-body text-[11px] ${badgeClasses[badge.style]}`}>
+                {badge.label}
+              </span>
+            )}
+          </div>
+
+          {/* Heart */}
+          <button
+            onClick={(e) => { e.stopPropagation(); toggleFavorito(imovel.id); }}
+            className="absolute right-3 top-3 z-10"
+          >
+            <Heart
+              className="h-6 w-6 drop-shadow-md transition-colors"
+              fill={liked ? "#ff385c" : "rgba(255,255,255,0.85)"}
+              stroke={liked ? "#ff385c" : "rgba(0,0,0,0.3)"}
+              strokeWidth={1.5}
+            />
+          </button>
+
+          {/* Dots */}
+          {fotos.length > 1 && (
+            <div className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
+              {fotos.slice(0, 7).map((_, i) => (
+                <div
+                  key={i}
+                  className="rounded-full transition-all duration-200"
+                  style={{
+                    width: 6,
+                    height: 6,
+                    background: i === fotoAtiva ? "white" : "rgba(255,255,255,0.5)",
+                    transform: i === fotoAtiva ? "scale(1.2)" : "scale(1)",
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Text content — QuintoAndar style */}
+        <div className="px-0.5 pt-3 pb-2">
+          {/* Description */}
+          <p className="font-body text-[13px] leading-snug text-muted-foreground line-clamp-2">
+            {descParts[0]}
+          </p>
+
+          {/* Price row */}
+          <div className="mt-2 flex items-baseline justify-between">
+            <div>
+              <span className="font-body text-lg font-extrabold text-foreground">{price}</span>
+              <span className="ml-1.5 font-body text-sm text-muted-foreground">{finalidadeLabel}</span>
+            </div>
+            <button
+              onClick={(e) => { e.stopPropagation(); toggleFavorito(imovel.id); }}
+              className="p-1"
+            >
+              <Heart
+                className="h-5 w-5 transition-colors"
+                fill={liked ? "#ff385c" : "transparent"}
+                stroke={liked ? "#ff385c" : "hsl(var(--muted-foreground))"}
+                strokeWidth={1.5}
+              />
+            </button>
+          </div>
+
+          {/* Total cost */}
+          {totalMensal > 0 && (
+            <p className="mt-0.5 font-body text-[12px] text-muted-foreground">
+              R$ {(imovel.preco + totalMensal).toLocaleString("pt-BR")} total
+            </p>
+          )}
+
+          {/* Stats line */}
+          {stats && (
+            <p className="mt-2 font-body text-[13px] font-medium text-foreground">{stats}</p>
+          )}
+
+          {/* Address */}
+          <p className="mt-0.5 font-body text-[12px] text-muted-foreground truncate">
+            {imovel.bairro} · {imovel.cidade || "Porto Alegre"}
+          </p>
+        </div>
+      </div>
+
+      {/* ===== DESKTOP: existing vertical card ===== */}
+      <div className="hidden sm:block">
         {/* Photo */}
-        <div className="relative w-[120px] shrink-0 overflow-hidden rounded-lg sm:w-full sm:rounded-xl" style={{ aspectRatio: "1/1" }}>
+        <div className="relative w-full overflow-hidden rounded-xl" style={{ aspectRatio: "4/3" }}>
           <FotoImovel
             src={fotos[fotoAtiva]}
             alt={imovel.titulo}
             loading={index < 6 ? "eager" : "lazy"}
             decoding="async"
-            className="h-full w-full object-cover transition-transform duration-500 sm:aspect-[4/3]"
+            className="h-full w-full object-cover transition-transform duration-500"
             style={{ transform: hovering ? "scale(1.03)" : "scale(1)" }}
           />
 
           {/* Badge */}
           {badge && (
             <span
-              className={`absolute left-1.5 top-1.5 z-10 rounded-md px-2 py-0.5 font-body text-[10px] font-semibold backdrop-blur-sm sm:left-2.5 sm:top-2.5 sm:px-2.5 sm:py-1 sm:text-xs ${badgeClasses[badge.style]}`}
+              className={`absolute left-2.5 top-2.5 z-10 rounded-md px-2.5 py-1 font-body text-xs ${badgeClasses[badge.style]}`}
             >
               {badge.label}
             </span>
           )}
 
-          {/* Nav arrows on hover (desktop only) */}
+          {/* Nav arrows on hover */}
           {hovering && fotos.length > 1 && (
             <>
               {fotoAtiva > 0 && (
                 <button
                   onClick={(e) => { e.stopPropagation(); setFotoAtiva((i) => i - 1); }}
-                  className="absolute left-2 top-1/2 z-10 hidden h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-sm shadow transition-transform hover:scale-105 active:scale-95 sm:flex"
+                  className="absolute left-2 top-1/2 z-10 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-sm shadow transition-transform hover:scale-105 active:scale-95"
                 >
                   ‹
                 </button>
@@ -107,7 +241,7 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
               {fotoAtiva < fotos.length - 1 && (
                 <button
                   onClick={(e) => { e.stopPropagation(); setFotoAtiva((i) => i + 1); }}
-                  className="absolute right-2 top-1/2 z-10 hidden h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-sm shadow transition-transform hover:scale-105 active:scale-95 sm:flex"
+                  className="absolute right-2 top-1/2 z-10 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-sm shadow transition-transform hover:scale-105 active:scale-95"
                 >
                   ›
                 </button>
@@ -118,19 +252,19 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
           {/* Heart */}
           <button
             onClick={(e) => { e.stopPropagation(); toggleFavorito(imovel.id); }}
-            className="absolute right-1.5 top-1.5 z-10 sm:right-3 sm:top-3"
+            className="absolute right-3 top-3 z-10"
           >
             <Heart
-              className="h-5 w-5 drop-shadow-md transition-colors sm:h-6 sm:w-6"
+              className="h-6 w-6 drop-shadow-md transition-colors"
               fill={liked ? "#ff385c" : "rgba(255,255,255,0.85)"}
               stroke={liked ? "#ff385c" : "rgba(0,0,0,0.3)"}
               strokeWidth={1.5}
             />
           </button>
 
-          {/* Dots (desktop only) */}
+          {/* Dots */}
           {hovering && fotos.length > 1 && (
-            <div className="absolute bottom-2.5 left-1/2 z-10 hidden -translate-x-1/2 gap-1 sm:flex">
+            <div className="absolute bottom-2.5 left-1/2 z-10 flex -translate-x-1/2 gap-1">
               {fotos.slice(0, 5).map((_, i) => (
                 <div
                   key={i}
@@ -147,16 +281,16 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
         </div>
 
         {/* Text */}
-        <div className="flex min-w-0 flex-1 flex-col justify-center sm:px-0.5 sm:pt-2.5">
+        <div className="px-0.5 pt-2.5">
           <span className="truncate font-body text-[13px] font-semibold text-foreground">
-            {imovel.tipo.charAt(0).toUpperCase() + imovel.tipo.slice(1)} · {imovel.bairro}
+            {tipoCapitalized} · {imovel.bairro}
           </span>
 
           {stats && (
-            <p className="mt-0.5 truncate font-body text-[11px] text-muted-foreground sm:text-xs">{stats}</p>
+            <p className="mt-0.5 truncate font-body text-xs text-muted-foreground">{stats}</p>
           )}
 
-          <p className="mt-1 font-body text-[15px] font-bold text-foreground sm:text-sm">{price}</p>
+          <p className="mt-1 font-body text-sm font-bold text-foreground">{price}</p>
         </div>
       </div>
     </motion.div>

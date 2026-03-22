@@ -451,7 +451,7 @@ const Search = () => {
       {/* Main area: cards + map */}
       <div className="flex flex-1 overflow-hidden">
         {/* Cards column */}
-        <div className="flex-1 overflow-y-auto px-3 pt-2 pb-4 sm:px-6 sm:pt-3 sm:pb-5" style={{ minWidth: 0 }}>
+        <div className="flex-1 overflow-y-auto px-4 pt-2 pb-20 sm:px-6 sm:pt-3 sm:pb-5" style={{ minWidth: 0 }}>
           {loading ? (
             <div className="grid grid-cols-1 gap-4 pb-16 sm:grid-cols-2 sm:gap-6 sm:pb-4 xl:grid-cols-3">
               {Array.from({ length: 6 }).map((_, i) => (
@@ -476,7 +476,7 @@ const Search = () => {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
                 {imoveis.map((imovel, i) => (
                   <React.Fragment key={imovel.id}>
                     <SearchPropertyCard
@@ -522,14 +522,23 @@ const Search = () => {
         </div>
       </div>
 
-      {/* Mobile: floating map button */}
-      <button
-        onClick={() => setMobileMap(true)}
-        className="fixed bottom-6 left-1/2 z-30 flex -translate-x-1/2 items-center gap-2 rounded-full bg-foreground px-5 py-3 font-body text-sm font-semibold text-background shadow-xl transition-transform active:scale-95 lg:hidden"
-      >
-        <MapIcon className="h-4 w-4" />
-        Ver no mapa
-      </button>
+      {/* Mobile: floating bottom bar — QuintoAndar style */}
+      <div className="fixed bottom-0 left-0 right-0 z-30 flex items-center justify-center gap-3 border-t border-border bg-background/95 px-4 py-3 backdrop-blur-sm lg:hidden">
+        <button
+          onClick={() => setMobileMap(true)}
+          className="flex items-center gap-2 rounded-full border border-border bg-card px-5 py-2.5 font-body text-[13px] font-semibold text-foreground shadow-sm transition-all active:scale-95"
+        >
+          <MapIcon className="h-4 w-4" />
+          Mostrar mapa
+        </button>
+        <button
+          onClick={() => setShowAlertModal(true)}
+          className="flex items-center gap-2 rounded-full bg-foreground px-5 py-2.5 font-body text-[13px] font-semibold text-background shadow-sm transition-all active:scale-95"
+        >
+          <Bell className="h-4 w-4" />
+          Criar alerta
+        </button>
+      </div>
 
       {/* Mobile fullscreen map */}
       <AnimatePresence>

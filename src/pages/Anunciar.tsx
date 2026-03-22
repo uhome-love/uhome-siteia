@@ -4,6 +4,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { formatPhone } from "@/lib/phoneMask";
 import { motion } from "framer-motion";
 import { UhomeLogo } from "@/components/UhomeLogo";
 import { useCanonical } from "@/hooks/useCanonical";

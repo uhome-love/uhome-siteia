@@ -42,6 +42,8 @@ export function useFavoritos() {
           await supabase
             .from("favoritos")
             .insert({ user_id: user.id, imovel_id: imovelId });
+          // Fire-and-forget sync to CRM
+          syncToCRM("favorito", { user_id: user.id, imovel_id: imovelId, created_at: new Date().toISOString() });
         }
       } else {
         // Anonymous: localStorage

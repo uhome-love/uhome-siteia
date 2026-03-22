@@ -219,7 +219,7 @@ serve(async (req) => {
               parameters: {
                 type: "object",
                 properties: {
-                  finalidade: { type: "string", enum: ["venda", "locacao"], description: "Finalidade: venda ou locação. Padrão venda." },
+                  finalidade: { type: "string", enum: ["venda"], description: "Sempre 'venda'. A Uhome não trabalha com locação." },
                   tipo: { type: "string", enum: ["apartamento", "casa", "cobertura", "studio", "comercial"], description: "Tipo do imóvel" },
                   bairros: { type: "array", items: { type: "string" }, description: "OBRIGATÓRIO quando localização mencionada. Lista de bairros de Porto Alegre." },
                   preco_max: { type: "number", description: "OBRIGATÓRIO quando valor máximo mencionado. Preço máximo em reais (ex: 800000)." },

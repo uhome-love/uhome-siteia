@@ -45,13 +45,13 @@ export function getCorretorRef(): string | null {
 async function registerCorretorVisit(slug: string): Promise<void> {
   try {
     // Look up corretor by slug
-    const { data: profile } = await supabase
+    const { data: profile } = await (supabase as any)
       .from('profiles')
       .select('id')
-      .eq('slug_ref' as any, slug)
+      .eq('slug_ref', slug)
       .maybeSingle();
 
-    await supabase.from('corretor_visitas' as any).insert({
+    await (supabase as any).from('corretor_visitas').insert({
       corretor_id: profile?.id || null,
       corretor_slug: slug,
       user_agent: navigator.userAgent,

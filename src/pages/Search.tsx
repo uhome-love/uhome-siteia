@@ -101,13 +101,27 @@ const Search = () => {
   useEffect(() => {
     if (!modoIA) {
       const f: Record<string, string | number> = {};
-      const urlFinalidade = searchParams.get("finalidade");
       const urlTipo = searchParams.get("tipo");
       const urlQ = searchParams.get("q");
-      if (urlFinalidade === "venda") f.finalidade = urlFinalidade;
+      const urlBairro = searchParams.get("bairro");
+      const urlCidade = searchParams.get("cidade");
+      const urlQuartos = searchParams.get("quartos");
+      const urlBanheiros = searchParams.get("banheiros");
+      const urlVagas = searchParams.get("vagas");
+      const urlPrecoMin = searchParams.get("preco_min");
+      const urlPrecoMax = searchParams.get("preco_max");
+      const urlAreaMin = searchParams.get("area_min");
       if (urlTipo) f.tipo = urlTipo;
-      if (urlQ) {
-        // Multiple neighborhoods separated by comma → use bairros filter
+      if (urlCidade) f.cidade = urlCidade;
+      if (urlQuartos) f.quartos = Number(urlQuartos);
+      if (urlBanheiros) f.banheiros = Number(urlBanheiros);
+      if (urlVagas) f.vagas = Number(urlVagas);
+      if (urlPrecoMin) f.precoMin = Number(urlPrecoMin);
+      if (urlPrecoMax) f.precoMax = Number(urlPrecoMax);
+      if (urlAreaMin) f.areaMin = Number(urlAreaMin);
+      if (urlBairro) {
+        f.bairro = urlBairro;
+      } else if (urlQ) {
         const parts = urlQ.split(",").map(s => s.trim()).filter(Boolean);
         if (parts.length > 1) {
           f.q = "";
@@ -117,7 +131,6 @@ const Search = () => {
         }
       }
       if (Object.keys(f).length) setFilters(f as any);
-      // Clear AI state
       setResumoIA(null);
       setAiResult(null);
     }

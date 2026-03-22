@@ -21,7 +21,7 @@ export function Navbar() {
         </Link>
 
         {/* Desktop — centered pill toggle */}
-        <div className="hidden lg:flex items-center absolute left-1/2 -translate-x-1/2 rounded-full bg-secondary p-1 gap-0.5">
+        <div className="hidden xl:flex items-center absolute left-1/2 -translate-x-1/2 rounded-full bg-secondary p-1 gap-0.5">
           <Link
             to="/busca?finalidade=venda"
             className={`rounded-full px-[18px] py-[7px] text-[14px] font-semibold transition-all whitespace-nowrap ${
@@ -51,10 +51,10 @@ export function Navbar() {
           </Link>
         </div>
 
-        <div className="hidden items-center gap-2 lg:flex flex-shrink-0 relative z-10">
+        <div className="hidden items-center gap-2 xl:flex flex-shrink-0 relative z-10">
           <Link
             to="/avaliar-imovel"
-            className="rounded-full px-4 py-2 font-body text-sm font-semibold text-primary transition-colors hover:bg-primary/5 active:scale-[0.97]"
+            className="hidden 2xl:inline-block rounded-full px-4 py-2 font-body text-sm font-semibold text-primary transition-colors hover:bg-primary/5 active:scale-[0.97]"
           >
             Quanto vale meu imóvel?
           </Link>
@@ -74,7 +74,7 @@ export function Navbar() {
         </div>
 
         {/* Mobile toggle */}
-        <div className="flex items-center gap-2 lg:hidden">
+        <div className="flex items-center gap-2 xl:hidden">
           <UserMenu />
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
@@ -92,7 +92,7 @@ export function Navbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="border-t border-border bg-background lg:hidden"
+            className="border-t border-border bg-background xl:hidden"
           >
             <div className="flex flex-col gap-4 px-8 py-6">
               {/* Mobile pill toggle */}

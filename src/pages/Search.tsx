@@ -98,6 +98,27 @@ const Search = () => {
     }
   }, [modoIA]);
 
+  // Dynamic SEO title based on filters
+  useEffect(() => {
+    const parts: string[] = [];
+    if (filters.tipo) {
+      const t = filters.tipo;
+      parts.push(t === "apartamento" ? "Apartamentos" : t === "casa" ? "Casas" : t === "cobertura" ? "Coberturas" : t.charAt(0).toUpperCase() + t.slice(1) + "s");
+    } else {
+      parts.push("Imóveis");
+    }
+    parts.push("à Venda");
+    const city = filters.cidade || "Porto Alegre";
+    if (filters.bairro) {
+      parts.push(`em ${filters.bairro}, ${city}`);
+    } else {
+      parts.push(`em ${city}`);
+    }
+    if (filters.quartos) parts.push(`com ${filters.quartos}+ quartos`);
+    document.title = `${parts.join(" ")} | Uhome Imóveis`;
+    return () => { document.title = "Uhome Imóveis | Apartamentos e Casas à Venda em Porto Alegre"; };
+  }, [filters.tipo, filters.bairro, filters.cidade, filters.quartos]);
+
   // Build filter object (shared between list and map)
   const buildFilters = useCallback(() => {
     // If bairro contains commas, treat as multiple bairros

@@ -5,11 +5,11 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const systemPrompt = `Você é um assistente imobiliário especializado em Porto Alegre/RS. Interprete buscas em linguagem natural e retorne APENAS um JSON válido com esta estrutura:
+const systemPrompt = `Você é um assistente imobiliário especializado em Porto Alegre/RS. A Uhome trabalha EXCLUSIVAMENTE com venda de imóveis. NUNCA retorne finalidade: "locacao". Interprete buscas em linguagem natural e retorne APENAS um JSON válido com esta estrutura:
 
 {
   "filtros": {
-    "finalidade": "venda" | null,
+    "finalidade": "venda",
     "tipo": "apartamento" | "casa" | "cobertura" | "studio" | "comercial" | null,
     "bairros": string[] | null,
     "preco_max": number | null,

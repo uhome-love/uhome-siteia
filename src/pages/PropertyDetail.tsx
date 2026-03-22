@@ -403,6 +403,15 @@ const PropertyDetail = () => {
                 <MapPin className="h-4 w-4" />
                 {imovel.bairro}, {imovel.cidade}
               </p>
+              {imovel.condominio_nome && (
+                <Link
+                  to={`/condominios/${imovel.condominio_nome.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`}
+                  className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-border bg-secondary/50 px-3 py-1 font-body text-xs font-medium text-foreground hover:bg-secondary transition-colors"
+                >
+                  <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
+                  {imovel.condominio_nome}
+                </Link>
+              )}
             </div>
 
             {/* Price */}

@@ -123,6 +123,20 @@ export function Navbar() {
               </div>
 
               <Link
+                to="/onboarding"
+                onClick={() => setMobileOpen(false)}
+                className="font-body text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Busca guiada
+              </Link>
+              <Link
+                to="/avaliar-imovel"
+                onClick={() => setMobileOpen(false)}
+                className="font-body text-sm font-semibold text-primary transition-colors hover:text-foreground"
+              >
+                Quanto vale meu imóvel?
+              </Link>
+              <Link
                 to="/condominios"
                 onClick={() => setMobileOpen(false)}
                 className="font-body text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
@@ -135,6 +149,13 @@ export function Navbar() {
                 className="font-body text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
                 Bairros
+              </Link>
+              <Link
+                to="/faq"
+                onClick={() => setMobileOpen(false)}
+                className="font-body text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Ajuda
               </Link>
               <Link
                 to="/anunciar"

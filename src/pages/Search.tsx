@@ -260,7 +260,20 @@ const Search = () => {
       setResumoIA(res.resumo);
 
       const f = res.filtros;
-      const aiFilters = {
+      
+      // Sync AI filters to the search store so map pins use the same filters
+      const storeUpdate: Record<string, any> = {};
+      if (f.finalidade) storeUpdate.finalidade = f.finalidade;
+      if (f.tipo) storeUpdate.tipo = f.tipo;
+      if (f.bairros?.length) storeUpdate.bairro = f.bairros.join(",");
+      if (f.preco_max) storeUpdate.precoMax = f.preco_max;
+      if (f.preco_min) storeUpdate.precoMin = f.preco_min;
+      if (f.area_min) storeUpdate.areaMin = f.area_min;
+      if (f.quartos) storeUpdate.quartos = f.quartos;
+      if (f.diferenciais?.length) storeUpdate.diferenciais = f.diferenciais;
+      setFilters(storeUpdate);
+
+      const aiFilters: BuscaFilters = {
         finalidade: f.finalidade || undefined,
         tipo: f.tipo || undefined,
         bairros: f.bairros?.length ? f.bairros : undefined,
@@ -273,17 +286,14 @@ const Search = () => {
       const { data, count } = await fetchImoveis({ ...aiFilters, limit: 40 });
       setImoveis(data);
       setTotal(count);
-      // Pins will be loaded via viewport bounds change callback
-      if (mapViewBounds) {
-        fetchMapPins({ ...aiFilters, bounds: mapViewBounds }).then(setMapPins).catch(console.error);
-      }
+      // Pins will be reloaded automatically via the filters change effect
     } catch (e: any) {
       toast.error(e?.message || "Erro ao interpretar busca");
     } finally {
       setBuscandoIA(false);
       setLoading(false);
     }
-  }, [queryIA]);
+  }, [queryIA, setFilters]);
 
   // Auto-search if arriving with ?modo=ia&q=...
   useEffect(() => {

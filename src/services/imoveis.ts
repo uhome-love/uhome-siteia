@@ -233,6 +233,7 @@ export async function fetchMapPins(filters: BuscaFilters = {}): Promise<MapPin[]
     if (!data || data.length === 0) break;
 
     for (const row of data) {
+      const fotos = parseFotos(row.fotos);
       allPins.push({
         id: row.id,
         slug: row.slug,
@@ -241,6 +242,10 @@ export async function fetchMapPins(filters: BuscaFilters = {}): Promise<MapPin[]
         longitude: row.longitude!,
         bairro: row.bairro,
         titulo: tituloLimpo(row),
+        foto: fotos.length > 0 ? (fotos.find((f: any) => f.principal) ?? fotos[0])?.url : undefined,
+        quartos: row.quartos ?? undefined,
+        area_total: row.area_total ?? undefined,
+        tipo: row.tipo ?? undefined,
       });
     }
 

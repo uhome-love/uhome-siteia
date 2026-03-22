@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from "react";
+import { AuthModal } from "@/components/AuthModal";
 import { useNavigate } from "react-router-dom";
 import { Heart } from "lucide-react";
 import { motion } from "framer-motion";

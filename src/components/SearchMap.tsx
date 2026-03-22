@@ -355,13 +355,13 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       const currentBounds = { lat_min: sw.lat, lat_max: ne.lat, lng_min: sw.lng, lng_max: ne.lng };
 
       // Always report bounds change for lazy pin loading
-      onBoundsChange?.(currentBounds);
+      onBoundsChangeRef.current?.(currentBounds);
 
       // Auto-search on move (debounced) — updates the listing, not just pins
-      if (autoSearchRef.current && onBoundsSearch) {
+      if (autoSearchRef.current && onBoundsSearchRef.current) {
         if (autoSearchTimerRef.current) clearTimeout(autoSearchTimerRef.current);
         autoSearchTimerRef.current = window.setTimeout(() => {
-          onBoundsSearch(currentBounds);
+          onBoundsSearchRef.current?.(currentBounds);
         }, 400);
       } else {
         setMapMoved(true);

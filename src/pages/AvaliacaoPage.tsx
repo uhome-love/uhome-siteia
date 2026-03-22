@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatPhone, rawPhone } from "@/lib/phoneMask";
 import { whatsappLink } from "@/lib/whatsapp";
 import { avaliarImovel, precoM2Fallback, formatPreco } from "@/services/avaliacao";
+import { getCorretorRef, getCorretorRefId } from "@/lib/session";
 import type { DadosImovel, ResultadoAvaliacao } from "@/services/avaliacao";
 
 const TIPOS = [

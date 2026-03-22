@@ -166,7 +166,7 @@ const Search = () => {
       : [];
     
     return {
-      finalidade: filters.finalidade || undefined,
+      finalidade: "venda" as const,
       tipo: filters.tipo || undefined,
       bairro: bairrosParts.length ? undefined : (filters.bairro || undefined),
       bairros: bairrosParts.length ? bairrosParts : undefined,

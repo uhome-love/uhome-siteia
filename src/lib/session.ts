@@ -39,11 +39,20 @@ export function captureCorretorRef(): void {
 }
 
 export function getCorretorRef(): string | null {
-  // Check both keys — REF_KEY from ?ref= param, and corretor_ref_slug from /c/:slug route
-  return localStorage.getItem(REF_KEY) || localStorage.getItem('corretor_ref_slug');
+  const slug = localStorage.getItem(REF_KEY) || localStorage.getItem('corretor_ref_slug');
+  if (!slug) return null;
+  // Check TTL
+  const ts = localStorage.getItem('corretor_ref_ts');
+  if (ts && Date.now() - Number(ts) > 30 * 24 * 60 * 60 * 1000) {
+    [REF_KEY, 'corretor_ref_id', 'corretor_ref_slug', 'corretor_ref_nome', 'corretor_ref_ts']
+      .forEach(k => localStorage.removeItem(k));
+    return null;
+  }
+  return slug;
 }
 
 export function getCorretorRefId(): string | null {
+  if (!getCorretorRef()) return null; // respects TTL
   return localStorage.getItem('corretor_ref_id');
 }
 

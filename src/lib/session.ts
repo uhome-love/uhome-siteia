@@ -39,7 +39,12 @@ export function captureCorretorRef(): void {
 }
 
 export function getCorretorRef(): string | null {
-  return localStorage.getItem(REF_KEY);
+  // Check both keys — REF_KEY from ?ref= param, and corretor_ref_slug from /c/:slug route
+  return localStorage.getItem(REF_KEY) || localStorage.getItem('corretor_ref_slug');
+}
+
+export function getCorretorRefId(): string | null {
+  return localStorage.getItem('corretor_ref_id');
 }
 
 async function registerCorretorVisit(slug: string): Promise<void> {

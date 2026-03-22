@@ -42,8 +42,7 @@ const badgeClasses: Record<BadgeStyle, string> = {
   visto: "bg-white/90 text-primary font-semibold shadow-sm backdrop-blur-sm",
 };
 
-export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Props) {
-  export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavorito: isFavoritoProp, toggleFavorito: toggleFavoritoProp }: Props) {
+export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavorito: isFavoritoProp, toggleFavorito: toggleFavoritoProp }: Props) {
   const [hovering, setHovering] = useState(false);
   const [fotoAtiva, setFotoAtiva] = useState(0);
   const [showAuth, setShowAuth] = useState(false);

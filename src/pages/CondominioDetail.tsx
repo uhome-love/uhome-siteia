@@ -47,7 +47,6 @@ interface CondoStats {
   tiposSet: Set<string>;
   bairro: string;
   cidade: string;
-  endereco: string | null;
   foto: string;
 }
 

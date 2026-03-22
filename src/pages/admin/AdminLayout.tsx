@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import {
   LayoutDashboard,
   Home,
+  BarChart3,
   Users,
   FileText,
   RefreshCw,

@@ -42,7 +42,9 @@ const badgeClasses: Record<BadgeStyle, string> = {
 export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Props) {
   const { isFavorito, toggleFavorito } = useFavoritos();
   const [hovering, setHovering] = useState(false);
+  const [fotoAtiva, setFotoAtiva] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
   const liked = isFavorito(imovel.id);
   const fotos = imovel.fotos.length > 0 ? imovel.fotos.map((f) => f.url) : [fotoPrincipal(imovel)];
   const price = formatPreco(imovel.preco);

@@ -451,7 +451,7 @@ const Search = () => {
       {/* Main area: cards + map */}
       <div className="flex flex-1 overflow-hidden">
         {/* Cards column */}
-        <div className="flex-1 overflow-y-auto px-3 pt-2 pb-4 sm:px-6 sm:pt-3 sm:pb-5" style={{ minWidth: 0 }}>
+        <div className="flex-1 overflow-y-auto px-4 pt-2 pb-20 sm:px-6 sm:pt-3 sm:pb-5" style={{ minWidth: 0 }}>
           {loading ? (
             <div className="grid grid-cols-1 gap-4 pb-16 sm:grid-cols-2 sm:gap-6 sm:pb-4 xl:grid-cols-3">
               {Array.from({ length: 6 }).map((_, i) => (

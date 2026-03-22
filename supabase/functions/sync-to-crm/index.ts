@@ -128,26 +128,40 @@ async function handleLead(
   record: Record<string, unknown>,
   corretorCRMId: string | null
 ) {
-  const { data: leadCRM, error } = await supabaseCRM
+  const payload = {
+    nome: record.nome,
+    telefone: record.telefone,
+    email: record.email ?? null,
+    origem: 'site_uhome',
+    origem_detalhe: record.origem_componente,
+    imovel_interesse: record.imovel_titulo ?? null,
+    imovel_id_site: record.imovel_id ?? null,
+    bairro_interesse: record.imovel_bairro ?? null,
+    status: 'novo',
+    atribuido_para: corretorCRMId,
+    site_lead_id: record.id,
+    utm_source: record.utm_source ?? null,
+    utm_campaign: record.utm_campaign ?? null,
+    created_at: record.created_at,
+  }
+
+  let { data: leadCRM, error } = await supabaseCRM
     .from('leads')
-    .insert({
-      nome: record.nome,
-      telefone: record.telefone,
-      email: record.email ?? null,
-      origem: 'site_uhome',
-      origem_detalhe: record.origem_componente,
-      imovel_interesse: record.imovel_titulo ?? null,
-      imovel_id_site: record.imovel_id ?? null,
-      bairro_interesse: record.imovel_bairro ?? null,
-      status: 'novo',
-      atribuido_para: corretorCRMId,
-      site_lead_id: record.id,
-      utm_source: record.utm_source ?? null,
-      utm_campaign: record.utm_campaign ?? null,
-      created_at: record.created_at,
-    })
+    .insert(payload)
     .select()
     .single()
+
+  // Retry without corretor if FK violation
+  if (error?.message?.includes('foreign key constraint') && corretorCRMId) {
+    console.warn('[sync-to-crm] FK violation on atribuido_para, retrying without corretor')
+    const retryResult = await supabaseCRM
+      .from('leads')
+      .insert({ ...payload, atribuido_para: null })
+      .select()
+      .single()
+    leadCRM = retryResult.data
+    error = retryResult.error
+  }
 
   if (leadCRM) {
     await supabaseSite

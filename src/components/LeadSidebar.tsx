@@ -18,6 +18,7 @@ interface LeadSidebarProps {
 export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, imovelPreco, viewCount }: LeadSidebarProps) {
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -32,6 +33,7 @@ export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, 
       await submitLead({
         nome: nome.trim(),
         telefone: telefone.trim(),
+        email: email.trim() || undefined,
         imovel_id: imovelId,
         imovel_slug: imovelSlug,
         imovel_titulo: imovelTitulo,
@@ -99,6 +101,17 @@ export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, 
               onChange={(e) => setTelefone(formatPhone(e.target.value))}
               className="w-full rounded-lg border-[1.5px] border-border bg-background px-4 py-3 font-body text-sm text-foreground outline-none transition-colors focus:border-primary"
               maxLength={16}
+            />
+          </div>
+          <div>
+            <label className="mb-1 block font-body text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">E-mail <span className="normal-case font-normal tracking-normal">(opcional)</span></label>
+            <input
+              type="email"
+              placeholder="seu@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full rounded-lg border-[1.5px] border-border bg-background px-4 py-3 font-body text-sm text-foreground outline-none transition-colors focus:border-primary"
+              maxLength={255}
             />
           </div>
           <button

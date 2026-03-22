@@ -17,6 +17,7 @@ interface LeadFormInlineProps {
 export function LeadFormInline({ isOpen, imovelId, imovelTitulo, imovelBairro, imovelPreco, onClose }: LeadFormInlineProps) {
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -31,6 +32,7 @@ export function LeadFormInline({ isOpen, imovelId, imovelTitulo, imovelBairro, i
       await submitLead({
         nome: nome.trim(),
         telefone: telefone.trim(),
+        email: email.trim() || undefined,
         imovel_id: imovelId,
         imovel_titulo: imovelTitulo,
         imovel_bairro: imovelBairro,
@@ -43,6 +45,7 @@ export function LeadFormInline({ isOpen, imovelId, imovelTitulo, imovelBairro, i
         setSuccess(false);
         setNome("");
         setTelefone("");
+        setEmail("");
         onClose();
       }, 2500);
     } catch {
@@ -84,6 +87,14 @@ export function LeadFormInline({ isOpen, imovelId, imovelTitulo, imovelBairro, i
                   onChange={(e) => setTelefone(formatPhone(e.target.value))}
                   className="w-full rounded-lg bg-input px-3 py-2.5 font-body text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                   maxLength={16}
+                />
+                <input
+                  type="email"
+                  placeholder="E-mail (opcional)"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full rounded-lg bg-input px-3 py-2.5 font-body text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                  maxLength={255}
                 />
                 <button
                   type="submit"

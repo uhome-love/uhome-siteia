@@ -65,7 +65,7 @@ function mapStatus(s?: string): string {
   return "disponivel";
 }
 
-function extractFotos(item: any): string {
+function extractFotos(item: any): Array<{ url: string; ordem: number; principal: boolean }> {
   const fotos: Array<{ url: string; ordem: number; principal: boolean }> = [];
   const rawFotos = item.imagens || item.fotos || item.galeria || item.photos || [];
   if (Array.isArray(rawFotos)) {
@@ -87,7 +87,7 @@ function extractFotos(item: any): string {
   if (item.foto_destaque && !fotos.some((f) => f.url === item.foto_destaque)) {
     fotos.unshift({ url: item.foto_destaque, ordem: 0, principal: true });
   }
-  return JSON.stringify(fotos);
+  return fotos;
 }
 
 function extractDiferenciais(item: any): string[] {

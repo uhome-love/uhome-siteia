@@ -39,6 +39,7 @@ const AdminConfig = lazy(() => import("./pages/admin/AdminConfig.tsx"));
 const AdminIntegracao = lazy(() => import("./pages/admin/AdminIntegracao.tsx"));
 const IntegracaoDiagnostico = lazy(() => import("./pages/admin/IntegracaoDiagnostico.tsx"));
 const AdminLinks = lazy(() => import("./pages/admin/AdminLinks.tsx"));
+const AdminCorretores = lazy(() => import("./pages/admin/AdminCorretores.tsx"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -126,6 +127,7 @@ const App = () => (
                 <Route path="integracao/diagnostico" element={<IntegracaoDiagnostico />} />
                 <Route path="config" element={<AdminConfig />} />
                 <Route path="links" element={<AdminLinks />} />
+                <Route path="corretores" element={<AdminCorretores />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>

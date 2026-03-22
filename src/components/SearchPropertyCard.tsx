@@ -95,7 +95,7 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
       className={`relative cursor-pointer select-none outline-none [&_*]:outline-none [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] ${highlighted ? "ring-2 ring-primary rounded-xl" : ""}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      onClick={() => navigate(`/imovel/${imovel.slug}`)}
+      onClick={() => navigate(prefixLink(`/imovel/${imovel.slug}`))}
     >
       {/* ===== MOBILE: QuintoAndar-style full-width vertical card ===== */}
       <div className="sm:hidden">

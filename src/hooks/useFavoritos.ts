@@ -21,9 +21,7 @@ export function useFavoritos() {
           setLoading(false);
         });
     } else {
-      // Load from localStorage for anonymous
-      const raw = localStorage.getItem("favoritos_anonimos");
-      setFavoritos(new Set(raw ? JSON.parse(raw) : []));
+      setFavoritos(new Set());
     }
   }, [user]);
 

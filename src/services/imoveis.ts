@@ -119,7 +119,8 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
   let query = supabase
     .from("imoveis")
     .select(LISTING_COLUMNS, { count: "exact" })
-    .eq("status", "disponivel");
+    .eq("status", "disponivel")
+    .eq("finalidade", "venda");
 
   // City filter: specific city or all allowed
   if (filters.cidade) {

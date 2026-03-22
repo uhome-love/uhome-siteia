@@ -535,6 +535,41 @@ const PropertyDetail = () => {
       </div>
 
       <Footer />
+
+      {/* Fixed bottom bar — mobile only */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-md px-4 py-3 sm:hidden">
+        <div className="flex items-center gap-3">
+          <div className="flex-1 min-w-0">
+            <p className="font-body text-xs text-muted-foreground truncate">{imovel.bairro}</p>
+            <p className="font-body text-base font-bold text-foreground">{priceFormatted}</p>
+          </div>
+          <Button
+            size="sm"
+            className="shrink-0 text-[13px] px-4 py-2.5 h-auto"
+            onClick={() => {
+              const sidebar = document.querySelector('[data-lead-sidebar]');
+              if (sidebar) sidebar.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }}
+          >
+            <Heart className="h-4 w-4 mr-1.5" />
+            Interesse
+          </Button>
+          <Button
+            variant="whatsapp"
+            size="sm"
+            className="shrink-0 text-[13px] px-4 py-2.5 h-auto"
+            onClick={() => {
+              const msg = `Olá! Tenho interesse no imóvel: ${imovel.titulo} — ${priceFormatted}. Link: https://uhome.com.br/imovel/${imovel.slug}`;
+              window.open(whatsappLink(msg), '_blank');
+            }}
+          >
+            <MessageCircle className="h-4 w-4 mr-1.5" />
+            WhatsApp
+          </Button>
+        </div>
+      </div>
+      {/* Spacer for fixed bottom bar */}
+      <div className="h-16 sm:hidden" />
     </div>
   );
 };

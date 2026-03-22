@@ -169,8 +169,7 @@ const Search = () => {
     };
   }, [filters]);
 
-  // Normal mode: fetch list first (fast), then map pins in background
-  // Also loads when in IA mode without a query (shows default results)
+  // Normal mode: fetch list only (pins loaded separately by viewport)
   const loadImoveis = useCallback(async () => {
     if (modoIA && !aiResult && queryIA.trim()) return;
     setLoading(true);
@@ -187,17 +186,39 @@ const Search = () => {
       setImoveis(result.data);
       setTotal(result.count);
       setLoading(false);
-
-      setMapLoading(true);
-      fetchMapPins(baseFilters)
-        .then(setMapPins)
-        .catch((err) => console.error("Erro ao buscar pins:", err))
-        .finally(() => setMapLoading(false));
     } catch (err) {
       console.error("Erro ao buscar imóveis:", err);
       setLoading(false);
     }
   }, [filters, modoIA, aiResult, buildFilters]);
+
+  // Lazy load pins by viewport bounds — only fetches what's visible on the map
+  const pinLoadTimerRef = React.useRef<number | null>(null);
+
+  const handleMapBoundsChange = useCallback((bounds: MapBounds) => {
+    setMapViewBounds(bounds);
+    // Debounce pin fetching to avoid rapid re-fetches during pan/zoom
+    if (pinLoadTimerRef.current) clearTimeout(pinLoadTimerRef.current);
+    pinLoadTimerRef.current = window.setTimeout(() => {
+      setMapLoading(true);
+      const baseFilters = buildFilters();
+      fetchMapPins({ ...baseFilters, bounds })
+        .then(setMapPins)
+        .catch((err) => console.error("Erro ao buscar pins:", err))
+        .finally(() => setMapLoading(false));
+    }, 300);
+  }, [buildFilters]);
+
+  // Reload pins when filters change (using current map viewport)
+  useEffect(() => {
+    if (!mapViewBounds) return;
+    setMapLoading(true);
+    const baseFilters = buildFilters();
+    fetchMapPins({ ...baseFilters, bounds: mapViewBounds })
+      .then(setMapPins)
+      .catch((err) => console.error("Erro ao buscar pins:", err))
+      .finally(() => setMapLoading(false));
+  }, [filters.tipo, filters.bairro, filters.precoMin, filters.precoMax, filters.quartos, filters.areaMin, filters.areaMax, filters.vagas, filters.banheiros]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadMore = useCallback(async () => {
     if (loadingMore || loading) return;

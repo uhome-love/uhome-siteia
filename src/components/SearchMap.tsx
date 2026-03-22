@@ -487,7 +487,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
     }
   }, [onBoundsSearch]);
 
-  // Update data
+  // Update data — pins are already viewport-filtered, just set them on the source
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReadyRef.current) return;
@@ -496,21 +496,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
     if (!source) return;
 
     source.setData(toGeoJSON(pins));
-
-    const validos = pins.filter((i) => {
-      const lat = Number(i.latitude);
-      const lng = Number(i.longitude);
-      return lat && lng && lat < -28 && lat > -32 && lng < -49 && lng > -54;
-    });
-
-    if (validos.length > 0 && validos.length < 2000 && !hasDrawn) {
-      const bounds = new mapboxgl.LngLatBounds();
-      validos.forEach((i) => bounds.extend([Number(i.longitude), Number(i.latitude)]));
-      map.fitBounds(bounds, { padding: 60, maxZoom: 14, duration: 500 });
-    } else if (validos.length >= 2000 && !hasDrawn) {
-      map.easeTo({ center: [-51.2177, -30.0346], zoom: 12, duration: 500 });
-    }
-  }, [pins, hasDrawn]);
+  }, [pins]);
 
   // Hover from card → highlight pin
   useEffect(() => {

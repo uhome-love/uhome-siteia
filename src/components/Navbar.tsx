@@ -92,7 +92,7 @@ export function Navbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="border-t border-border bg-background md:hidden"
+            className="border-t border-border bg-background lg:hidden"
           >
             <div className="flex flex-col gap-4 px-8 py-6">
               {/* Mobile pill toggle */}

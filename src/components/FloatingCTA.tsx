@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, X } from "lucide-react";
-import { whatsappLink } from "@/lib/whatsapp";
+import { buildWhatsAppUrl } from "@/lib/whatsapp";
+import { trackWhatsAppClick } from "@/services/whatsappTracker";
 
 const DISMISSED_KEY = "uhome_float_dismissed";
 
@@ -30,7 +31,8 @@ export function FloatingCTA() {
   };
 
   const handleClick = () => {
-    window.open(whatsappLink("Olá! Vim pelo site da Uhome e gostaria de saber mais sobre os imóveis disponíveis."), "_blank");
+    trackWhatsAppClick({ origem_pagina: window.location.pathname });
+    window.open(buildWhatsAppUrl(), "_blank");
   };
 
   if (dismissed) return null;

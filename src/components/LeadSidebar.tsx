@@ -5,7 +5,7 @@ import { submitLead } from "@/services/leads";
 import { trackWhatsAppClick } from "@/services/whatsappTracker";
 import { toast } from "sonner";
 import { formatPreco } from "@/services/imoveis";
-import { whatsappLink } from "@/lib/whatsapp";
+import { buildWhatsAppUrl } from "@/lib/whatsapp";
 
 interface LeadSidebarProps {
   imovelId?: string;
@@ -57,7 +57,14 @@ export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, 
       imovel_titulo: imovelTitulo,
       imovel_slug: imovelSlug,
     });
-    window.open(whatsappLink(`Olá! Tenho interesse no imóvel: ${imovelTitulo || ""}. Vi no site da Uhome.`), "_blank");
+    window.open(
+      buildWhatsAppUrl(undefined, {
+        titulo: imovelTitulo,
+        bairro: imovelBairro,
+        slug: imovelSlug,
+      }),
+      "_blank"
+    );
   };
 
   const priceLabel = imovelPreco ? formatPreco(imovelPreco) : null;
@@ -65,7 +72,6 @@ export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, 
 
   return (
     <div data-lead-sidebar className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-      {/* Price at top */}
       {priceLabel && (
         <p className="font-body text-2xl font-extrabold text-foreground">{priceLabel}</p>
       )}
@@ -131,14 +137,12 @@ export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, 
         </form>
       )}
 
-      {/* Separator */}
       <div className="my-4 flex items-center gap-3">
         <div className="h-px flex-1 bg-border" />
         <span className="font-body text-xs text-muted-foreground">ou</span>
         <div className="h-px flex-1 bg-border" />
       </div>
 
-      {/* WhatsApp */}
       <button
         onClick={handleWhatsApp}
         className="flex w-full items-center justify-center gap-2 rounded-lg py-3 font-body text-sm font-semibold text-white transition-all hover:brightness-110 active:scale-[0.97]"
@@ -148,7 +152,6 @@ export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, 
         Falar via WhatsApp
       </button>
 
-      {/* Social proof */}
       <div className="mt-5 space-y-2">
         <p className="flex items-center gap-2 font-body text-xs text-muted-foreground">
           <span>⚡</span>

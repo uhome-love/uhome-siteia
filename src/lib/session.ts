@@ -21,31 +21,66 @@ export function getUtmParams() {
   };
 }
 
-/** Capture ?ref=slug from URL once per session and persist it */
-export function captureCorretorRef(): void {
+/** Capture ?ref=slug from URL once per session, persist all corretor data */
+export async function captureCorretorRef(): Promise<void> {
   const params = new URLSearchParams(window.location.search);
   const ref = params.get('ref');
-  if (ref) {
-    // Always overwrite — latest link wins
-    localStorage.setItem(REF_KEY, ref.toLowerCase().trim());
-    // Clean the URL without reload
-    params.delete('ref');
-    const clean = params.toString();
-    const newUrl = window.location.pathname + (clean ? `?${clean}` : '') + window.location.hash;
-    window.history.replaceState(null, '', newUrl);
-    // Fire-and-forget: register visit
-    registerCorretorVisit(ref.toLowerCase().trim());
+  if (!ref) return;
+
+  const slug = ref.toLowerCase().trim();
+
+  // Clean the URL without reload
+  params.delete('ref');
+  const clean = params.toString();
+  const newUrl = window.location.pathname + (clean ? `?${clean}` : '') + window.location.hash;
+  window.history.replaceState(null, '', newUrl);
+
+  // Evita registrar visita duplicada na mesma sessão
+  if (sessionStorage.getItem(`ref_captured_${slug}`)) return;
+  sessionStorage.setItem(`ref_captured_${slug}`, '1');
+
+  try {
+    // Buscar dados completos do corretor
+    const { data: corretor } = await supabase
+      .from('profiles')
+      .select('id, nome, foto_url, slug_ref')
+      .eq('slug_ref', slug)
+      .eq('ativo', true)
+      .maybeSingle();
+
+    if (!corretor) {
+      // Still save the slug for basic tracking
+      localStorage.setItem(REF_KEY, slug);
+      localStorage.setItem('corretor_ref_ts', Date.now().toString());
+      return;
+    }
+
+    // Salvar tudo no localStorage — igual ao que /c/:slug faz
+    localStorage.setItem(REF_KEY, slug);
+    localStorage.setItem('corretor_ref_id', corretor.id);
+    localStorage.setItem('corretor_ref_slug', slug);
+    localStorage.setItem('corretor_ref_nome', corretor.nome || '');
+    localStorage.setItem('corretor_ref_ts', Date.now().toString());
+
+    // Registrar visita
+    await (supabase as any).from('corretor_visitas').insert({
+      corretor_id: corretor.id,
+      corretor_slug: slug,
+      user_agent: navigator.userAgent,
+      referrer: document.referrer || null,
+    });
+  } catch (err) {
+    console.error('captureCorretorRef error:', err);
   }
 }
 
 export function getCorretorRef(): string | null {
   const slug = localStorage.getItem(REF_KEY) || localStorage.getItem('corretor_ref_slug');
   if (!slug) return null;
-  // Check TTL
+  // Check TTL (30 days)
   const ts = localStorage.getItem('corretor_ref_ts');
   if (ts && Date.now() - Number(ts) > 30 * 24 * 60 * 60 * 1000) {
-    [REF_KEY, 'corretor_ref_id', 'corretor_ref_slug', 'corretor_ref_nome', 'corretor_ref_ts']
-      .forEach(k => localStorage.removeItem(k));
+    clearCorretorRef();
     return null;
   }
   return slug;
@@ -56,22 +91,14 @@ export function getCorretorRefId(): string | null {
   return localStorage.getItem('corretor_ref_id');
 }
 
-async function registerCorretorVisit(slug: string): Promise<void> {
-  try {
-    // Look up corretor by slug
-    const { data: profile } = await (supabase as any)
-      .from('profiles')
-      .select('id')
-      .eq('slug_ref', slug)
-      .maybeSingle();
+export function getCorretorRefNome(): string | null {
+  if (!getCorretorRef()) return null;
+  return localStorage.getItem('corretor_ref_nome');
+}
 
-    await (supabase as any).from('corretor_visitas').insert({
-      corretor_id: profile?.id || null,
-      corretor_slug: slug,
-      user_agent: navigator.userAgent,
-      referrer: document.referrer || null,
-    });
-  } catch {
-    // silent
-  }
+export function clearCorretorRef(): void {
+  [
+    REF_KEY, 'corretor_ref_id', 'corretor_ref_slug',
+    'corretor_ref_nome', 'corretor_ref_ts'
+  ].forEach(k => localStorage.removeItem(k));
 }

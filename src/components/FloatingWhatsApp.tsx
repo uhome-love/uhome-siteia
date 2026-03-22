@@ -1,5 +1,5 @@
 import { MessageCircle } from "lucide-react";
-import { whatsappLink } from "@/lib/whatsapp";
+import { buildWhatsAppUrl } from "@/lib/whatsapp";
 import { trackWhatsAppClick } from "@/services/whatsappTracker";
 import { motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
@@ -14,10 +14,7 @@ export function FloatingWhatsApp() {
 
   const handleClick = () => {
     trackWhatsAppClick({ origem_pagina: location.pathname });
-    window.open(
-      whatsappLink("Olá! Vim pelo site da Uhome e gostaria de saber mais sobre os imóveis disponíveis."),
-      "_blank"
-    );
+    window.open(buildWhatsAppUrl(), "_blank");
   };
 
   return (

@@ -206,8 +206,38 @@ export interface MapPin {
 // Lightweight columns for map pins — NO fotos JSONB
 const PIN_COLUMNS = "id,slug,preco,latitude,longitude,bairro,titulo,tipo,quartos,finalidade,area_total,foto_principal";
 
+// --- Pins cache ---
+const pinsCache = new Map<string, { data: MapPin[]; timestamp: number }>();
+const PINS_CACHE_TTL = 2 * 60 * 1000; // 2 minutes
+
+function pinsCacheKey(filters: BuscaFilters): string {
+  const b = filters.bounds;
+  return JSON.stringify({
+    n: b ? b.lat_max.toFixed(2) : null,
+    s: b ? b.lat_min.toFixed(2) : null,
+    e: b ? b.lng_max.toFixed(2) : null,
+    w: b ? b.lng_min.toFixed(2) : null,
+    t: filters.tipo || "",
+    ba: filters.bairro || filters.bairros?.join(",") || "",
+    pMin: filters.precoMin || 0,
+    pMax: filters.precoMax || 0,
+    q: filters.quartos || 0,
+    ci: filters.cidade || "",
+  });
+}
+
 /** Fetch lightweight pin data for the map — single query, max 2000 pins, no fotos payload */
 export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSignal): Promise<MapPin[]> {
+  // Check cache first
+  const cacheKey = pinsCacheKey(filters);
+  const cached = pinsCache.get(cacheKey);
+  if (cached && Date.now() - cached.timestamp < PINS_CACHE_TTL) {
+    if (import.meta.env.DEV) {
+      window.dispatchEvent(new CustomEvent("perf:update", { detail: { cacheHit: true } }));
+    }
+    return cached.data;
+  }
+
   let query = supabase
     .from("imoveis")
     .select(PIN_COLUMNS)
@@ -223,7 +253,6 @@ export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSig
     query = query.in("cidade", CIDADES_PERMITIDAS);
   }
 
-  // finalidade always "venda" — already filtered above
   if (filters.tipo) query = query.eq("tipo", filters.tipo);
   if (filters.bairros?.length) {
     const bairroFilter = filters.bairros.map(b => `bairro.ilike.%${b}%`).join(",");
@@ -241,7 +270,6 @@ export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSig
   if (filters.diferenciais?.length) query = query.contains("diferenciais", filters.diferenciais);
   if (filters.q) query = query.or(`titulo.ilike.%${filters.q}%,bairro.ilike.%${filters.q}%,tipo.ilike.%${filters.q}%`);
 
-  // Viewport bounds filter
   if (filters.bounds) {
     query = query
       .gte("latitude", filters.bounds.lat_min)
@@ -252,7 +280,6 @@ export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSig
 
   query = query.order("preco", { ascending: false }).limit(2000);
 
-  // Support AbortSignal
   if (signal) {
     query = query.abortSignal(signal);
   }
@@ -267,7 +294,6 @@ export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSig
   }
 
   const rows = data || [];
-  // Emit perf metrics in dev
   if (import.meta.env.DEV) {
     const payloadKB = Math.round(JSON.stringify(rows).length / 1024);
     window.dispatchEvent(new CustomEvent("perf:update", {
@@ -275,7 +301,7 @@ export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSig
     }));
   }
 
-  return rows.map((row: any) => ({
+  const mapped = rows.map((row: any) => ({
     id: row.id,
     slug: row.slug,
     preco: row.preco,
@@ -288,6 +314,15 @@ export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSig
     area_total: row.area_total ?? undefined,
     tipo: row.tipo ?? undefined,
   }));
+
+  // Save to cache (max 15 entries)
+  pinsCache.set(cacheKey, { data: mapped, timestamp: Date.now() });
+  if (pinsCache.size > 15) {
+    const firstKey = pinsCache.keys().next().value;
+    if (firstKey) pinsCache.delete(firstKey);
+  }
+
+  return mapped;
 }
 
 export async function fetchImovelBySlug(slug: string): Promise<Imovel | null> {

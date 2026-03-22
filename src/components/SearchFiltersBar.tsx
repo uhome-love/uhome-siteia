@@ -5,7 +5,7 @@ import { useSearchStore } from "@/stores/searchStore";
 import { FilterPill, PillOption } from "@/components/FilterPill";
 import { propertyTypes } from "@/data/properties";
 import { CIDADES_PERMITIDAS } from "@/services/imoveis";
-import { supabase } from "@/integrations/supabase/client";
+import { getBairrosDisponiveis } from "@/services/bairrosCache";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const quartoOptions = [1, 2, 3, 4];

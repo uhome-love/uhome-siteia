@@ -613,6 +613,8 @@ const Search = () => {
                       index={i}
                       highlighted={hoveredId === imovel.id}
                       onHover={setHoveredId}
+                      isFavorito={isFavorito}
+                      toggleFavorito={toggleFavorito}
                     />
                     {i === 5 && (
                       <SearchCTACard onClickCTA={() => setShowAlertModal(true)} />

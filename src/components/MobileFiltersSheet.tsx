@@ -3,7 +3,7 @@ import { X, ArrowLeft, Search, MapPin, Navigation, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSearchStore } from "@/stores/searchStore";
 import { propertyTypes } from "@/data/properties";
-import { supabase } from "@/integrations/supabase/client";
+import { getBairrosDisponiveis } from "@/services/bairrosCache";
 
 const quartoOptions = [1, 2, 3, 4];
 const vagaOptions = [0, 1, 2, 3];

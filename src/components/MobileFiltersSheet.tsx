@@ -24,11 +24,9 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
   const [dbBairros, setDbBairros] = useState<string[]>([]);
 
   useEffect(() => {
-    async function load() {
-      const { data } = await supabase.rpc("get_bairros_disponiveis");
-      if (data) setDbBairros(data.map((d: { bairro: string }) => d.bairro));
-    }
-    load();
+    getBairrosDisponiveis().then(data => {
+      setDbBairros(data.map(d => d.bairro));
+    });
   }, []);
 
   const bairrosSelecionados = useMemo(() => {

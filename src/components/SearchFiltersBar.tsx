@@ -175,7 +175,7 @@ export function SearchFiltersBar({ onOpenMobileFilters }: { onOpenMobileFilters?
       : bairroText;
 
     const filterParts: string[] = [];
-    if (filters.finalidade) filterParts.push(filters.finalidade === "venda" ? "Comprar" : "Alugar");
+    filterParts.push("Comprar");
     if (filters.quartos) filterParts.push(`${filters.quartos}+ quartos`);
     if (filters.precoMin || filters.precoMax) {
       const fmt = (v: number) => v >= 1000000 ? `${(v / 1000000).toFixed(v % 1000000 === 0 ? 0 : 1)}M` : `${(v / 1000).toFixed(0)}k`;
@@ -183,7 +183,7 @@ export function SearchFiltersBar({ onOpenMobileFilters }: { onOpenMobileFilters?
       else if (filters.precoMax) filterParts.push(`até R$${fmt(filters.precoMax)}`);
       else filterParts.push(`a partir de R$${fmt(filters.precoMin)}`);
     }
-    const filterSummary = filterParts.length > 0 ? filterParts.join(" · ") : "Sem filtros de imóvel";
+    const filterSummary = filterParts.join(" · ");
 
     return (
       <div className="sticky top-16 z-10 border-b border-border bg-background px-4 py-3">

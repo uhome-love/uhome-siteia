@@ -522,6 +522,9 @@ const PropertyDetail = () => {
                 imovelBairro={imovel.bairro}
                 imovelPreco={imovel.preco}
               />
+
+              {/* Análise de preço */}
+              <CardUhomePreco imovel={imovel} />
             </div>
 
             {/* Secondary actions below sidebar — desktop only */}

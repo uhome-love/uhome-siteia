@@ -61,13 +61,10 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
 
   const badge = getBadge(imovel);
 
-  const totalMensal = (imovel.preco_condominio ?? 0) + (imovel.preco_iptu ?? 0);
-  const finalidadeLabel = imovel.finalidade === "locacao" ? "aluguel" : "venda";
-
-  // Build a short description like QuintoAndar
+  // Build a short description
   const tipoCapitalized = imovel.tipo.charAt(0).toUpperCase() + imovel.tipo.slice(1);
   const descParts = [
-    `${tipoCapitalized} ${imovel.finalidade === "locacao" ? "para alugar" : "à venda"} em ${imovel.bairro}`,
+    `${tipoCapitalized} à venda em ${imovel.bairro}`,
   ];
   if ((imovel.quartos ?? 0) > 0) descParts[0] += `. ${imovel.quartos} quarto${imovel.quartos! > 1 ? "s" : ""}`;
   if (imovel.diferenciais.length > 0) {

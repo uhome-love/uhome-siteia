@@ -8,6 +8,7 @@ import { SearchPropertyCard } from "@/components/SearchPropertyCard";
 import { SearchMap } from "@/components/SearchMap";
 import { SkeletonCard } from "@/components/SkeletonCard";
 import { SearchCTACard } from "@/components/SearchCTACard";
+import { MobileFiltersSheet } from "@/components/MobileFiltersSheet";
 import { useSearchStore, type MapBounds } from "@/stores/searchStore";
 import { fetchImoveis, fetchMapPins, type Imovel, type MapPin as MapPinData } from "@/services/imoveis";
 import { interpretarBusca, type AISearchResult } from "@/services/aiSearch";
@@ -55,6 +56,7 @@ const Search = () => {
   const { filters, setFilter, setFilters } = useSearchStore();
   const [sortOpen, setSortOpen] = useState(false);
   const [mobileMap, setMobileMap] = useState(false);
+  const [mobileFilters, setMobileFilters] = useState(false);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [alertEmail, setAlertEmail] = useState("");
@@ -372,7 +374,7 @@ const Search = () => {
           )}
         </div>
       ) : (
-        <SearchFiltersBar />
+        <SearchFiltersBar onOpenMobileFilters={() => setMobileFilters(true)} />
       )}
 
       {/* AI resumo badge */}
@@ -704,6 +706,7 @@ const Search = () => {
 
       {/* Auth modal triggered after alert preferences */}
       <AuthModal open={showAuthAfterAlert} onClose={() => setShowAuthAfterAlert(false)} />
+      <MobileFiltersSheet open={mobileFilters} onClose={() => setMobileFilters(false)} total={total} />
     </div>
   );
 };

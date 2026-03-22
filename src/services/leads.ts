@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { getSessionId, getUtmParams, getCorretorRef } from "@/lib/session";
+import { getSessionId, getUtmParams, getCorretorRef, getCorretorRefId } from "@/lib/session";
 import { syncToCRM } from "./syncCRM";
 
 interface LeadData {
@@ -21,9 +21,9 @@ export async function submitLead(data: LeadData) {
   const session_id = getSessionId();
   const refSlug = getCorretorRef();
 
-  // Resolve corretor ref to profile id
-  let corretor_ref_id: string | null = null;
-  if (refSlug) {
+  // Resolve corretor ref to profile id — prefer cached id from /c/ route
+  let corretor_ref_id: string | null = getCorretorRefId();
+  if (!corretor_ref_id && refSlug) {
     try {
       const { data: profile } = await (supabase as any)
         .from('profiles')

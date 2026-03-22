@@ -5,7 +5,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ExitIntentModal } from "@/components/ExitIntentModal";
-import { FloatingCTA } from "@/components/FloatingCTA";
+import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
 import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index.tsx";
 

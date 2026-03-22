@@ -1,5 +1,6 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef, useCallback } from "react";
+import useEmblaCarousel from "embla-carousel-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { LeadSidebar } from "@/components/LeadSidebar";
@@ -26,6 +27,21 @@ const PropertyDetail = () => {
   const [imovel, setImovel] = useState<Imovel | null>(null);
   const [loading, setLoading] = useState(true);
   const mapRef = useRef<HTMLDivElement>(null);
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, dragFree: false });
+
+  // Sync embla with currentImage state
+  useEffect(() => {
+    if (!emblaApi) return;
+    const onSelect = () => setCurrentImage(emblaApi.selectedScrollSnap());
+    emblaApi.on("select", onSelect);
+    return () => { emblaApi.off("select", onSelect); };
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (emblaApi && emblaApi.selectedScrollSnap() !== currentImage) {
+      emblaApi.scrollTo(currentImage);
+    }
+  }, [emblaApi, currentImage]);
 
   useEffect(() => {
     if (!slug) return;
@@ -187,57 +203,16 @@ const PropertyDetail = () => {
 
       {/* Mobile hero — QuintoAndar style */}
       <div className="relative sm:hidden mt-16">
-        <div
-          className="relative aspect-[4/3] overflow-hidden touch-pan-y"
-          onTouchStart={(e) => {
-            const touch = e.touches[0];
-            (e.currentTarget as any)._swipe = { startX: touch.clientX, startY: touch.clientY, dx: 0, swiping: false };
-          }}
-          onTouchMove={(e) => {
-            const sw = (e.currentTarget as any)._swipe;
-            if (!sw) return;
-            const dx = e.touches[0].clientX - sw.startX;
-            const dy = e.touches[0].clientY - sw.startY;
-            if (!sw.swiping && Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) {
-              sw.swiping = true;
-            }
-            if (sw.swiping) {
-              e.preventDefault();
-              sw.dx = dx;
-              const strip = e.currentTarget.querySelector('[data-swipe-strip]') as HTMLElement;
-              if (strip) strip.style.transform = `translateX(calc(-${currentImage * 100}% + ${dx}px))`;
-            }
-          }}
-          onTouchEnd={(e) => {
-            const sw = (e.currentTarget as any)._swipe;
-            if (!sw?.swiping) return;
-            const strip = e.currentTarget.querySelector('[data-swipe-strip]') as HTMLElement;
-            if (Math.abs(sw.dx) > 50) {
-              if (sw.dx < 0) nextImage();
-              else prevImage();
-            }
-            if (strip) {
-              strip.style.transition = 'transform 0.3s cubic-bezier(0.16,1,0.3,1)';
-              strip.style.transform = '';
-              setTimeout(() => { if (strip) strip.style.transition = ''; }, 300);
-            }
-          }}
-        >
-          {/* Swipeable strip */}
-          <div
-            data-swipe-strip
-            className="flex h-full"
-            style={{
-              width: `${images.length * 100}%`,
-              transform: `translateX(-${currentImage * 100 / images.length}%)`,
-              transition: 'transform 0.3s cubic-bezier(0.16,1,0.3,1)',
-            }}
-          >
-            {images.map((img, i) => (
-              <div key={i} className="relative h-full" style={{ width: `${100 / images.length}%` }}>
-                <img src={img} alt={`Foto ${i + 1}`} className="h-full w-full object-cover" />
-              </div>
-            ))}
+        <div className="relative aspect-[4/3] overflow-hidden">
+          {/* Embla carousel */}
+          <div ref={emblaRef} className="h-full overflow-hidden">
+            <div className="flex h-full">
+              {images.map((img, i) => (
+                <div key={i} className="relative h-full min-w-0 flex-[0_0_100%]">
+                  <img src={img} alt={`Foto ${i + 1}`} className="h-full w-full object-cover" draggable={false} />
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60 pointer-events-none" />
@@ -265,7 +240,6 @@ const PropertyDetail = () => {
               </button>
             </div>
           </div>
-
 
           {/* Bottom pills */}
           <div className="absolute bottom-4 left-0 right-0 flex items-center justify-center gap-2 px-5">
@@ -299,6 +273,7 @@ const PropertyDetail = () => {
           </div>
         </div>
       </div>
+
 
       {/* Fullscreen lightbox */}
       {galleryOpen && (

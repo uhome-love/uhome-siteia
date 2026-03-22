@@ -113,7 +113,7 @@ export interface BuscaFilters {
 export const CIDADES_PERMITIDAS = ["Porto Alegre", "Canoas", "Cachoeirinha", "Gravataí", "Guaíba"];
 
 // Only select columns needed for listing — skip heavy jetimob_raw, descricao, etc.
-const LISTING_COLUMNS = "id,slug,tipo,finalidade,status,destaque,preco,preco_condominio,preco_iptu,area_total,area_util,quartos,banheiros,vagas,andar,bairro,cidade,uf,latitude,longitude,titulo,diferenciais,fotos,video_url,publicado_em";
+const LISTING_COLUMNS = "id,slug,tipo,finalidade,status,destaque,preco,preco_condominio,preco_iptu,area_total,area_util,quartos,banheiros,vagas,andar,bairro,cidade,uf,latitude,longitude,titulo,diferenciais,fotos,video_url,condominio_nome,publicado_em";
 
 export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: Imovel[]; count: number }> {
   let query = supabase

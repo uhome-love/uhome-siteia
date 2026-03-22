@@ -69,7 +69,7 @@ async function fetchCondominios(): Promise<BairroGroup[]> {
     tipos: Set<string>;
   }> = {};
 
-  for (const row of data) {
+  for (const row of allData) {
     const name = (row as any).condominio_nome?.trim();
     if (!name) continue;
 

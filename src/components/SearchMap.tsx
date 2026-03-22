@@ -110,6 +110,16 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
   const autoSearchRef = useRef(false);
   const autoSearchTimerRef = useRef<number | null>(null);
 
+  // Stable callback refs — prevent map re-initialization when parent re-renders
+  const onPinHoverRef = useRef(onPinHover);
+  const onBoundsSearchRef = useRef(onBoundsSearch);
+  const onBoundsChangeRef = useRef(onBoundsChange);
+  const onDrawFilterRef = useRef(onDrawFilter);
+  useEffect(() => { onPinHoverRef.current = onPinHover; }, [onPinHover]);
+  useEffect(() => { onBoundsSearchRef.current = onBoundsSearch; }, [onBoundsSearch]);
+  useEffect(() => { onBoundsChangeRef.current = onBoundsChange; }, [onBoundsChange]);
+  useEffect(() => { onDrawFilterRef.current = onDrawFilter; }, [onDrawFilter]);
+
   // Preview popup state
   const [previewPin, setPreviewPin] = useState<MapPinData | null>(null);
   const [previewPos, setPreviewPos] = useState<{ x: number; y: number } | null>(null);

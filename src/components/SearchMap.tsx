@@ -93,10 +93,11 @@ interface SearchMapProps {
   hoveredId?: string | null;
   onPinHover?: (id: string | null) => void;
   onBoundsSearch?: (bounds: { lat_min: number; lat_max: number; lng_min: number; lng_max: number }) => void;
+  onBoundsChange?: (bounds: { lat_min: number; lat_max: number; lng_min: number; lng_max: number }) => void;
   onDrawFilter?: (filteredPins: MapPinData[]) => void;
 }
 
-export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, onDrawFilter }: SearchMapProps) {
+export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, onBoundsChange, onDrawFilter }: SearchMapProps) {
   const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);

@@ -5,7 +5,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ExitIntentModal } from "@/components/ExitIntentModal";
-import { FloatingCTA } from "@/components/FloatingCTA";
+import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
 import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index.tsx";
 
@@ -22,6 +22,7 @@ const Blog = lazy(() => import("./pages/Blog.tsx"));
 const BlogPostPage = lazy(() => import("./pages/BlogPost.tsx"));
 const Favoritos = lazy(() => import("./pages/Favoritos.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
+const TipoImovel = lazy(() => import("./pages/TipoImovel.tsx"));
 
 // Admin
 const AdminLayout = lazy(() => import("./pages/admin/AdminLayout.tsx"));
@@ -71,6 +72,11 @@ const App = () => (
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPostPage />} />
               <Route path="/favoritos" element={<Favoritos />} />
+              <Route path="/apartamentos-porto-alegre" element={<TipoImovel />} />
+              <Route path="/casas-porto-alegre" element={<TipoImovel />} />
+              <Route path="/coberturas-porto-alegre" element={<TipoImovel />} />
+              <Route path="/studios-porto-alegre" element={<TipoImovel />} />
+              <Route path="/comerciais-porto-alegre" element={<TipoImovel />} />
               <Route path="/admin" element={<AdminLayout />}>
                 <Route index element={<AdminDashboard />} />
                 <Route path="imoveis" element={<AdminImoveis />} />
@@ -83,7 +89,7 @@ const App = () => (
             </Routes>
           </Suspense>
           <ExitIntentModal />
-          <FloatingCTA />
+          <FloatingWhatsApp />
         </TooltipProvider>
       </AuthProvider>
     </QueryClientProvider>

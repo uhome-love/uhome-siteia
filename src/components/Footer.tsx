@@ -20,7 +20,9 @@ export function Footer() {
             <h4 className="font-body text-sm font-semibold text-foreground">Imóveis</h4>
             <ul className="mt-3 space-y-2">
               <li><Link to="/busca?finalidade=venda" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Comprar</Link></li>
-              <li><Link to="/busca" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Todos os imóveis</Link></li>
+              <li><Link to="/apartamentos-porto-alegre" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Apartamentos</Link></li>
+              <li><Link to="/casas-porto-alegre" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Casas</Link></li>
+              <li><Link to="/coberturas-porto-alegre" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Coberturas</Link></li>
               <li><Link to="/bairros" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Bairros</Link></li>
               <li><Link to="/anunciar" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Anunciar imóvel</Link></li>
             </ul>

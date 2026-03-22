@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { LeadFormInline } from "@/components/LeadFormInline";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { SearchPropertyCard } from "@/components/SearchPropertyCard";
@@ -30,6 +31,7 @@ const Bairro = () => {
   const [imoveis, setImoveis] = useState<Imovel[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [showLead, setShowLead] = useState(false);
 
   useEffect(() => {
     if (!bairro) return;
@@ -237,6 +239,34 @@ const Bairro = () => {
               </button>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* Lead CTA */}
+      <section className="border-t border-border bg-primary/[0.03] py-12">
+        <div className="mx-auto max-w-lg px-6 text-center">
+          <p className="font-body text-xl font-bold text-foreground">
+            Quer ajuda para encontrar seu imóvel em {bairro.nome}?
+          </p>
+          <p className="mt-2 font-body text-sm text-muted-foreground">
+            Um corretor especializado no bairro te ajuda gratuitamente
+          </p>
+          <button
+            onClick={() => setShowLead(!showLead)}
+            className="mt-5 rounded-full bg-primary px-8 py-3 font-body text-sm font-bold text-primary-foreground transition-all hover:brightness-110 active:scale-[0.97]"
+          >
+            Falar com corretor
+          </button>
+          <div className="mt-3">
+            <LeadFormInline
+              isOpen={showLead}
+              imovelBairro={bairro.nome}
+              onClose={() => setShowLead(false)}
+            />
+          </div>
+          <p className="mt-3 font-body text-[11px] text-muted-foreground">
+            Gratuito · Resposta em até 1h
+          </p>
         </div>
       </section>
 

@@ -209,13 +209,15 @@ serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Accept start_page and max_pages from body for chunked sync
+    // Accept start_page, max_pages, and auto_chain from body
     let startPage = 1;
-    let maxPagesToProcess = 15; // ~15 pages per invocation to stay within wall time
+    let maxPagesToProcess = 15;
+    let autoChain = false;
     try {
       const body = await req.json();
       if (body?.start_page) startPage = Number(body.start_page);
       if (body?.max_pages) maxPagesToProcess = Number(body.max_pages);
+      if (body?.auto_chain) autoChain = true;
     } catch { /* no body is fine */ }
 
     const PAGE_SIZE = 200;

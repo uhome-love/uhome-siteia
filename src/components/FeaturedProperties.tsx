@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
 import { Bed, Car, Maximize, Heart } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, forwardRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { LeadFormInline } from "@/components/LeadFormInline";
 import { fetchImoveisDestaque, type Imovel, fotoPrincipal, formatPreco } from "@/services/imoveis";
 
-function PropertyCard({ imovel, index }: { imovel: Imovel; index: number }) {
+const PropertyCard = forwardRef<HTMLDivElement, { imovel: Imovel; index: number }>(function PropertyCard({ imovel, index }, ref) {
   const [liked, setLiked] = useState(false);
   const [showLead, setShowLead] = useState(false);
   const navigate = useNavigate();

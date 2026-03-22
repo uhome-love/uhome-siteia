@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, forwardRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, Check, Loader2 } from "lucide-react";
 import { submitLead } from "@/services/leads";
@@ -14,7 +14,7 @@ interface LeadFormInlineProps {
   onClose: () => void;
 }
 
-export function LeadFormInline({ isOpen, imovelId, imovelTitulo, imovelBairro, imovelPreco, onClose }: LeadFormInlineProps) {
+export const LeadFormInline = forwardRef<HTMLDivElement, LeadFormInlineProps>(function LeadFormInline({ isOpen, imovelId, imovelTitulo, imovelBairro, imovelPreco, onClose }, ref) {
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
   const [email, setEmail] = useState("");

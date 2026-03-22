@@ -452,6 +452,33 @@ const CondominioDetail = () => {
               ))}
             </div>
 
+            {/* FAQ Section */}
+            {faqItems.length > 0 && (
+              <motion.section
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.5 }}
+                className="mt-12"
+              >
+                <h2 className="font-body text-lg font-extrabold text-foreground sm:text-xl mb-4">
+                  Perguntas frequentes sobre o {condoName}
+                </h2>
+                <Accordion type="multiple" className="w-full">
+                  {faqItems.map((faq, i) => (
+                    <AccordionItem key={i} value={`faq-${i}`}>
+                      <AccordionTrigger className="font-body text-sm font-semibold text-foreground text-left">
+                        {faq.pergunta}
+                      </AccordionTrigger>
+                      <AccordionContent className="font-body text-sm text-muted-foreground leading-relaxed">
+                        {faq.resposta}
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              </motion.section>
+            )}
+
             {/* Lead form */}
             <motion.div
               initial={{ opacity: 0, y: 16 }}

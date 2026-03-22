@@ -1,0 +1,30 @@
+import { MessageCircle } from "lucide-react";
+import { whatsappLink } from "@/lib/whatsapp";
+import { motion } from "framer-motion";
+
+/**
+ * Persistent WhatsApp floating button — always visible, not dismissable.
+ * Replaces the old FloatingCTA bar.
+ */
+export function FloatingWhatsApp() {
+  const handleClick = () => {
+    window.open(
+      whatsappLink("Olá! Vim pelo site da Uhome e gostaria de saber mais sobre os imóveis disponíveis."),
+      "_blank"
+    );
+  };
+
+  return (
+    <motion.button
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.4, delay: 1.5, ease: [0.16, 1, 0.3, 1] }}
+      onClick={handleClick}
+      aria-label="Falar no WhatsApp"
+      className="fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full shadow-[0_4px_14px_rgba(37,211,102,0.4)] transition-all hover:scale-105 hover:shadow-[0_6px_20px_rgba(37,211,102,0.5)] active:scale-95"
+      style={{ background: "#25D366" }}
+    >
+      <MessageCircle className="h-6 w-6 text-white" fill="white" />
+    </motion.button>
+  );
+}

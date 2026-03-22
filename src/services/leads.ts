@@ -60,8 +60,7 @@ export async function submitLead(data: LeadData) {
 
   if (error) throw error;
 
-  // Fire-and-forget sync to CRM
-  syncToCRM("lead", payload);
+  // Sync to CRM is handled automatically by DB trigger (on_lead_created)
 
   return true;
 }

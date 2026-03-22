@@ -112,30 +112,45 @@ const CondominioDetail = () => {
     (async () => {
       setLoading(true);
 
-      // Fetch all available properties with a condominio_nome
-      const { data, error } = await supabase
+      // First, find the condominio_nome that matches this slug
+      // We do a lightweight query to get unique condo names
+      const { data: nameData } = await supabase
         .from("imoveis")
-        .select("*")
+        .select("condominio_nome")
         .eq("status", "disponivel")
-        .not("condominio_nome", "is", null);
+        .not("condominio_nome", "is", null)
+        .limit(1000);
 
-      if (error || !data) {
+      if (!nameData) {
         setLoading(false);
         return;
       }
 
-      // Find matching condominio by slug
-      const matched = data.filter(
-        (row: any) => slugify(row.condominio_nome?.trim() || "") === slug
-      );
+      // Find matching name by slug
+      const uniqueNames = [...new Set(nameData.map((r: any) => r.condominio_nome?.trim()).filter(Boolean))];
+      const matchedName = uniqueNames.find((n: string) => slugify(n) === slug);
 
-      if (matched.length === 0) {
+      if (!matchedName) {
         setLoading(false);
         return;
       }
 
-      const name = (matched[0] as any).condominio_nome?.trim() || "";
-      setCondoName(name);
+      setCondoName(matchedName);
+
+      // Now fetch ONLY properties for this condominium with needed columns
+      const CONDO_COLUMNS = "id,slug,tipo,finalidade,status,destaque,preco,preco_condominio,preco_iptu,area_total,area_util,quartos,banheiros,vagas,andar,bairro,cidade,uf,latitude,longitude,titulo,diferenciais,fotos,video_url,condominio_nome,publicado_em,endereco_completo";
+      
+      const { data: matched, error } = await supabase
+        .from("imoveis")
+        .select(CONDO_COLUMNS)
+        .eq("status", "disponivel")
+        .eq("condominio_nome", matchedName);
+
+      if (error || !matched || matched.length === 0) {
+        setLoading(false);
+        return;
+      }
+
       setImoveis(matched.map((row: any) => ({
         ...row,
         fotos: Array.isArray(row.fotos) ? row.fotos : [],
@@ -143,6 +158,7 @@ const CondominioDetail = () => {
         destaque: row.destaque ?? false,
         cidade: row.cidade ?? "Porto Alegre",
         uf: row.uf ?? "RS",
+        condominio_nome: row.condominio_nome?.trim() || null,
       })));
       setLoading(false);
 

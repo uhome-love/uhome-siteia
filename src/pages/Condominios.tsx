@@ -39,13 +39,26 @@ const TOP_BAIRROS = [
 ];
 
 async function fetchCondominios(): Promise<BairroGroup[]> {
-  const { data, error } = await supabase
-    .from("imoveis")
-    .select("condominio_nome, bairro, preco, fotos, tipo")
-    .eq("status", "disponivel")
-    .not("condominio_nome", "is", null);
+  // Only fetch the columns we actually need — NOT select("*")
+  const allData: any[] = [];
+  let offset = 0;
+  const PAGE = 1000;
+  
+  while (true) {
+    const { data, error } = await supabase
+      .from("imoveis")
+      .select("condominio_nome, bairro, preco, fotos, tipo")
+      .eq("status", "disponivel")
+      .not("condominio_nome", "is", null)
+      .range(offset, offset + PAGE - 1);
 
-  if (error || !data) return [];
+    if (error || !data || data.length === 0) break;
+    allData.push(...data);
+    if (data.length < PAGE) break;
+    offset += PAGE;
+  }
+
+  if (allData.length === 0) return [];
 
   // Group by condominio_nome
   const byName: Record<string, {

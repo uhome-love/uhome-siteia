@@ -103,6 +103,8 @@ const CondominioDetail = () => {
   const [condoName, setCondoName] = useState<string | null>(null);
   const [imoveis, setImoveis] = useState<Imovel[]>([]);
   const [loading, setLoading] = useState(true);
+  const [descricao, setDescricao] = useState<string | null>(null);
+  const [descLoading, setDescLoading] = useState(false);
 
   useEffect(() => {
     if (!slug) return;

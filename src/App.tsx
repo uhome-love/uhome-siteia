@@ -6,9 +6,10 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
+import { CorretorProvider } from "@/contexts/CorretorContext";
 
 import { ExitIntentModal } from "@/components/ExitIntentModal";
-import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
+import { BannerCorretor } from "@/components/BannerCorretor";
 
 // Eager load homepage
 import Index from "./pages/Index.tsx";
@@ -73,71 +74,73 @@ const App = () => (
     <RefCapture />
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <Suspense fallback={<PageFallback />}>
-            <Routes>
-              {/* Rotas normais */}
-              <Route path="/" element={<Index />} />
-              <Route path="/busca" element={<Search />} />
-              <Route path="/imovel/:slug" element={<PropertyDetail />} />
-              <Route path="/ia-search" element={<Navigate to="/busca?modo=ia" replace />} />
-              <Route path="/anunciar" element={<Anunciar />} />
-              <Route path="/carreiras" element={<Carreiras />} />
-              <Route path="/bairros" element={<Bairros />} />
-              <Route path="/bairros/:slug" element={<Bairro />} />
-              <Route path="/faq" element={<FAQ />} />
-              <Route path="/onboarding" element={<Onboarding />} />
-              <Route path="/blog" element={<Blog />} />
-              <Route path="/blog/:slug" element={<BlogPostPage />} />
-              <Route path="/favoritos" element={<Favoritos />} />
-              <Route path="/apartamentos-porto-alegre" element={<TipoImovel />} />
-              <Route path="/condominios" element={<Condominios />} />
-              <Route path="/condominios/:slug" element={<CondominioDetail />} />
-              <Route path="/avaliar-imovel" element={<AvaliacaoPage />} />
-              <Route path="/casas-porto-alegre" element={<TipoImovel />} />
-              <Route path="/coberturas-porto-alegre" element={<TipoImovel />} />
-              <Route path="/studios-porto-alegre" element={<TipoImovel />} />
-              <Route path="/comerciais-porto-alegre" element={<TipoImovel />} />
+        <CorretorProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BannerCorretor />
+            <Suspense fallback={<PageFallback />}>
+              <Routes>
+                {/* Rotas normais */}
+                <Route path="/" element={<Index />} />
+                <Route path="/busca" element={<Search />} />
+                <Route path="/imovel/:slug" element={<PropertyDetail />} />
+                <Route path="/ia-search" element={<Navigate to="/busca?modo=ia" replace />} />
+                <Route path="/anunciar" element={<Anunciar />} />
+                <Route path="/carreiras" element={<Carreiras />} />
+                <Route path="/bairros" element={<Bairros />} />
+                <Route path="/bairros/:slug" element={<Bairro />} />
+                <Route path="/faq" element={<FAQ />} />
+                <Route path="/onboarding" element={<Onboarding />} />
+                <Route path="/blog" element={<Blog />} />
+                <Route path="/blog/:slug" element={<BlogPostPage />} />
+                <Route path="/favoritos" element={<Favoritos />} />
+                <Route path="/apartamentos-porto-alegre" element={<TipoImovel />} />
+                <Route path="/condominios" element={<Condominios />} />
+                <Route path="/condominios/:slug" element={<CondominioDetail />} />
+                <Route path="/avaliar-imovel" element={<AvaliacaoPage />} />
+                <Route path="/casas-porto-alegre" element={<TipoImovel />} />
+                <Route path="/coberturas-porto-alegre" element={<TipoImovel />} />
+                <Route path="/studios-porto-alegre" element={<TipoImovel />} />
+                <Route path="/comerciais-porto-alegre" element={<TipoImovel />} />
 
-              {/* Rotas do corretor — mesmas páginas, mantendo /c/:slug na URL */}
-              <Route path="/c/:corretorSlug" element={<CorretorRefLayout />}>
-                <Route index element={<Index />} />
-                <Route path="busca" element={<Search />} />
-                <Route path="imovel/:slug" element={<PropertyDetail />} />
-                <Route path="anunciar" element={<Anunciar />} />
-                <Route path="carreiras" element={<Carreiras />} />
-                <Route path="bairros" element={<Bairros />} />
-                <Route path="bairros/:slug" element={<Bairro />} />
-                <Route path="faq" element={<FAQ />} />
-                <Route path="blog" element={<Blog />} />
-                <Route path="blog/:slug" element={<BlogPostPage />} />
-                <Route path="favoritos" element={<Favoritos />} />
-                <Route path="condominios" element={<Condominios />} />
-                <Route path="condominios/:slug" element={<CondominioDetail />} />
-                <Route path="avaliar-imovel" element={<AvaliacaoPage />} />
-              </Route>
+                {/* Rotas do corretor — mesmas páginas, mantendo /c/:slug na URL */}
+                <Route path="/c/:corretorSlug" element={<CorretorRefLayout />}>
+                  <Route index element={<Index />} />
+                  <Route path="busca" element={<Search />} />
+                  <Route path="imovel/:slug" element={<PropertyDetail />} />
+                  <Route path="anunciar" element={<Anunciar />} />
+                  <Route path="carreiras" element={<Carreiras />} />
+                  <Route path="bairros" element={<Bairros />} />
+                  <Route path="bairros/:slug" element={<Bairro />} />
+                  <Route path="faq" element={<FAQ />} />
+                  <Route path="blog" element={<Blog />} />
+                  <Route path="blog/:slug" element={<BlogPostPage />} />
+                  <Route path="favoritos" element={<Favoritos />} />
+                  <Route path="condominios" element={<Condominios />} />
+                  <Route path="condominios/:slug" element={<CondominioDetail />} />
+                  <Route path="avaliar-imovel" element={<AvaliacaoPage />} />
+                </Route>
 
-              {/* Admin */}
-              <Route path="/admin" element={<AdminLayout />}>
-                <Route index element={<AdminDashboard />} />
-                <Route path="imoveis" element={<AdminImoveis />} />
-                <Route path="leads" element={<AdminLeads />} />
-                <Route path="captacoes" element={<AdminCaptacoes />} />
-                <Route path="sync" element={<AdminSync />} />
-                <Route path="integracao" element={<AdminIntegracao />} />
-                <Route path="integracao/diagnostico" element={<IntegracaoDiagnostico />} />
-                <Route path="config" element={<AdminConfig />} />
-                <Route path="links" element={<AdminLinks />} />
-                <Route path="corretores" element={<AdminCorretores />} />
-              </Route>
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-          <ExitIntentModal />
-          
-        </TooltipProvider>
+                {/* Admin */}
+                <Route path="/admin" element={<AdminLayout />}>
+                  <Route index element={<AdminDashboard />} />
+                  <Route path="imoveis" element={<AdminImoveis />} />
+                  <Route path="leads" element={<AdminLeads />} />
+                  <Route path="captacoes" element={<AdminCaptacoes />} />
+                  <Route path="sync" element={<AdminSync />} />
+                  <Route path="integracao" element={<AdminIntegracao />} />
+                  <Route path="integracao/diagnostico" element={<IntegracaoDiagnostico />} />
+                  <Route path="config" element={<AdminConfig />} />
+                  <Route path="links" element={<AdminLinks />} />
+                  <Route path="corretores" element={<AdminCorretores />} />
+                </Route>
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+            <ExitIntentModal />
+          </TooltipProvider>
+        </CorretorProvider>
       </AuthProvider>
     </QueryClientProvider>
   </BrowserRouter>

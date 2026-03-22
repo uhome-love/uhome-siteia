@@ -10,10 +10,17 @@ const DOMAIN = "https://uhome.com.br";
 const PAGES = [
   { label: "Home", path: "" },
   { label: "Busca", path: "/busca" },
+  { label: "Busca IA", path: "/busca?modo=ia" },
   { label: "Anunciar", path: "/anunciar" },
   { label: "Avaliação", path: "/avaliar-imovel" },
   { label: "Blog", path: "/blog" },
   { label: "FAQ", path: "/faq" },
+  { label: "Condomínios", path: "/condominios" },
+  { label: "Bairro Moinhos de Vento", path: "/bairros/moinhos-de-vento" },
+  { label: "Bairro Petrópolis", path: "/bairros/petropolis" },
+  { label: "Bairro Bela Vista", path: "/bairros/bela-vista" },
+  { label: "Bairro Três Figueiras", path: "/bairros/tres-figueiras" },
+  { label: "Carreiras", path: "/carreiras" },
 ];
 
 interface Corretor {

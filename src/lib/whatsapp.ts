@@ -1,3 +1,5 @@
+import { getCorretorRef } from "./session";
+
 /** Número do WhatsApp da Uhome — lido de env var ou fallback padrão */
 export const WHATSAPP_NUMBER =
   import.meta.env.VITE_WHATSAPP_NUMBER || "5551992597097";
@@ -8,7 +10,39 @@ export const WHATSAPP_DISPLAY = WHATSAPP_NUMBER.replace(
   "($1) $2-$3"
 );
 
-/** Gera link wa.me com mensagem pré-preenchida */
+/** Gera link wa.me com mensagem pré-preenchida (legado) */
 export function whatsappLink(message: string) {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+}
+
+/**
+ * Gera URL do WhatsApp incluindo referência do corretor quando disponível.
+ * Usar esta função em vez de whatsappLink() para novos componentes.
+ */
+export function buildWhatsAppUrl(
+  mensagem?: string,
+  imovel?: { titulo?: string; bairro?: string; slug?: string }
+): string {
+  const corretorNome = localStorage.getItem("corretor_ref_nome");
+
+  let msg = "";
+
+  if (imovel?.titulo) {
+    msg = `Olá! Tenho interesse no imóvel: ${imovel.titulo}`;
+    if (imovel.bairro) msg += ` em ${imovel.bairro}`;
+    msg += ".";
+    if (imovel.slug) msg += `\nLink: https://uhome.com.br/imovel/${imovel.slug}`;
+  } else {
+    msg =
+      mensagem ??
+      "Olá! Vim pelo site da Uhome e gostaria de saber mais sobre os imóveis disponíveis.";
+  }
+
+  // Incluir referência do corretor na mensagem
+  const ref = getCorretorRef();
+  if (ref && corretorNome) {
+    msg += `\n\n_Atendimento: ${corretorNome}_`;
+  }
+
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
 }

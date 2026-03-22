@@ -4,26 +4,28 @@ import { Menu, X, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { UhomeLogo } from "@/components/UhomeLogo";
 import { UserMenu } from "@/components/UserMenu";
+import { useCorretor } from "@/contexts/CorretorContext";
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const [searchParams] = useSearchParams();
+  const { prefixLink } = useCorretor();
 
-  const isSearchPage = location.pathname === "/busca";
+  const isSearchPage = location.pathname === "/busca" || location.pathname.endsWith("/busca");
   const modoIA = searchParams.get("modo") === "ia";
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border/50">
       <div className="relative flex h-16 w-full items-center justify-between px-5 sm:px-10">
-        <Link to="/" className="flex items-center flex-shrink-0">
+        <Link to={prefixLink("/")} className="flex items-center flex-shrink-0">
           <UhomeLogo variant="full" height={32} />
         </Link>
 
         {/* Desktop — centered pill toggle */}
         <div className="hidden xl:flex items-center absolute left-1/2 -translate-x-1/2 rounded-full bg-secondary p-1 gap-0.5">
           <Link
-            to="/busca?finalidade=venda"
+            to={prefixLink("/busca?finalidade=venda")}
             className={`rounded-full px-[18px] py-[7px] text-[14px] font-semibold transition-all whitespace-nowrap ${
               isSearchPage && !modoIA
                 ? "bg-background text-foreground shadow-[0_1px_4px_rgba(0,0,0,0.1)]"
@@ -33,7 +35,7 @@ export function Navbar() {
             Comprar
           </Link>
           <Link
-            to="/busca?modo=ia"
+            to={prefixLink("/busca?modo=ia")}
             className={`rounded-full px-[18px] py-[7px] text-[14px] font-semibold transition-all whitespace-nowrap flex items-center gap-1.5 ${
               isSearchPage && modoIA
                 ? "bg-background text-primary shadow-[0_1px_4px_rgba(0,0,0,0.1)]"
@@ -44,7 +46,7 @@ export function Navbar() {
             Busca IA
           </Link>
           <Link
-            to="/onboarding"
+            to={prefixLink("/onboarding")}
             className="rounded-full px-[18px] py-[7px] text-[14px] font-semibold transition-all whitespace-nowrap text-muted-foreground hover:text-foreground"
           >
             Busca guiada
@@ -53,19 +55,19 @@ export function Navbar() {
 
         <div className="hidden items-center gap-2 xl:flex flex-shrink-0 relative z-10">
           <Link
-            to="/avaliar-imovel"
+            to={prefixLink("/avaliar-imovel")}
             className="hidden 2xl:inline-block rounded-full px-4 py-2 font-body text-sm font-semibold text-primary transition-colors hover:bg-primary/5 active:scale-[0.97]"
           >
             Quanto vale meu imóvel?
           </Link>
           <Link
-            to="/anunciar"
+            to={prefixLink("/anunciar")}
             className="rounded-full border-[1.5px] border-primary px-[18px] py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary/5 active:scale-[0.97]"
           >
             Anuncie seu imóvel
           </Link>
           <Link
-            to="/faq"
+            to={prefixLink("/faq")}
             className="rounded-full px-4 py-2 font-body text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
             Ajuda
@@ -98,7 +100,7 @@ export function Navbar() {
               {/* Mobile pill toggle */}
               <div className="flex items-center rounded-full bg-secondary p-1 gap-0.5 self-start">
                 <Link
-                  to="/busca?finalidade=venda"
+                  to={prefixLink("/busca?finalidade=venda")}
                   onClick={() => setMobileOpen(false)}
                   className={`rounded-full px-4 py-2 text-sm font-semibold transition-all ${
                     isSearchPage && !modoIA
@@ -109,7 +111,7 @@ export function Navbar() {
                   Comprar
                 </Link>
                 <Link
-                  to="/busca?modo=ia"
+                  to={prefixLink("/busca?modo=ia")}
                   onClick={() => setMobileOpen(false)}
                   className={`rounded-full px-4 py-2 text-sm font-semibold transition-all flex items-center gap-1.5 ${
                     isSearchPage && modoIA
@@ -123,42 +125,42 @@ export function Navbar() {
               </div>
 
               <Link
-                to="/onboarding"
+                to={prefixLink("/onboarding")}
                 onClick={() => setMobileOpen(false)}
                 className="font-body text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
                 Busca guiada
               </Link>
               <Link
-                to="/avaliar-imovel"
+                to={prefixLink("/avaliar-imovel")}
                 onClick={() => setMobileOpen(false)}
                 className="font-body text-sm font-semibold text-primary transition-colors hover:text-foreground"
               >
                 Quanto vale meu imóvel?
               </Link>
               <Link
-                to="/condominios"
+                to={prefixLink("/condominios")}
                 onClick={() => setMobileOpen(false)}
                 className="font-body text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
                 Condomínios
               </Link>
               <Link
-                to="/bairros"
+                to={prefixLink("/bairros")}
                 onClick={() => setMobileOpen(false)}
                 className="font-body text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
                 Bairros
               </Link>
               <Link
-                to="/faq"
+                to={prefixLink("/faq")}
                 onClick={() => setMobileOpen(false)}
                 className="font-body text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
                 Ajuda
               </Link>
               <Link
-                to="/anunciar"
+                to={prefixLink("/anunciar")}
                 onClick={() => setMobileOpen(false)}
                 className="mt-2 inline-block rounded-full border-[1.5px] border-primary px-5 py-2.5 text-center font-body text-base font-semibold text-primary"
               >

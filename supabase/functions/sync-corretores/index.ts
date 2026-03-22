@@ -23,7 +23,7 @@ Deno.serve(async (req) => {
   // 1. Buscar corretores ativos no CRM
   const { data: corretoresCRM, error: fetchError } = await supabaseCRM
     .from('profiles')
-    .select('id, nome, email, telefone, foto_url, creci')
+    .select('id, nome, email, telefone, avatar_url, creci')
     .eq('role', 'corretor')
     .eq('ativo', true)
 
@@ -55,7 +55,7 @@ Deno.serve(async (req) => {
         nome: corretor.nome,
         email: corretor.email,
         telefone: corretor.telefone,
-        foto_url: corretor.foto_url,
+        foto_url: corretor.avatar_url ?? null,
         creci: corretor.creci,
         role: 'corretor',
         ativo: true,

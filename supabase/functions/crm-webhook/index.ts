@@ -81,6 +81,10 @@ Deno.serve(async (req) => {
         break
       }
 
+      case 'test':
+        console.log('[crm-webhook] Teste de conectividade OK')
+        break
+
       default:
         throw new Error(`Tipo desconhecido: ${tipo}`)
     }

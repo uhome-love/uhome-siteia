@@ -133,14 +133,22 @@ const PropertyDetail = () => {
     (imovel.vagas ?? 0) > 0 ? { icon: Car, value: String(imovel.vagas), label: "Vagas" } : null,
   ].filter(Boolean) as { icon: any; value: string; label: string }[];
 
+  const handleShare = () => {
+    navigator.clipboard.writeText(window.location.href);
+    import("sonner").then(({ toast }) => toast.success("Link copiado!"));
+  };
+
+  const scrollToMap = () => {
+    mapRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      {/* Gallery */}
-      <div className="mt-16 px-6 pt-4">
-        {/* Desktop grid */}
-        <div className="mx-auto hidden max-w-7xl gap-2 sm:grid sm:grid-cols-4 sm:grid-rows-2" style={{ height: 480 }}>
+      {/* Desktop Gallery */}
+      <div className="mt-16 px-6 pt-4 hidden sm:block">
+        <div className="mx-auto max-w-7xl gap-2 grid grid-cols-4 grid-rows-2" style={{ height: 480 }}>
           <button
             onClick={() => { setCurrentImage(0); setGalleryOpen(true); }}
             className="group relative col-span-2 row-span-2 overflow-hidden rounded-l-2xl"
@@ -164,10 +172,8 @@ const PropertyDetail = () => {
             </button>
           ))}
         </div>
-
-        {/* "Ver todas" button */}
         {images.length > 1 && (
-          <div className="mx-auto mt-3 hidden max-w-7xl justify-end sm:flex">
+          <div className="mx-auto mt-3 max-w-7xl flex justify-end">
             <button
               onClick={() => { setCurrentImage(0); setGalleryOpen(true); }}
               className="flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 font-body text-[13px] font-semibold text-foreground transition-colors hover:bg-secondary active:scale-[0.97]"
@@ -177,19 +183,87 @@ const PropertyDetail = () => {
             </button>
           </div>
         )}
+      </div>
 
-        {/* Mobile carousel */}
-        <div className="relative aspect-[4/3] overflow-hidden rounded-2xl sm:hidden">
+      {/* Mobile hero — QuintoAndar style */}
+      <div className="relative sm:hidden mt-16">
+        <div className="relative aspect-[4/3] overflow-hidden">
           <img src={images[currentImage]} alt={imovel.titulo} className="h-full w-full object-cover" />
-          <button onClick={prevImage} className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-2 shadow active:scale-95">
-            <ChevronLeft className="h-5 w-5 text-foreground" />
-          </button>
-          <button onClick={nextImage} className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-2 shadow active:scale-95">
-            <ChevronRight className="h-5 w-5 text-foreground" />
-          </button>
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-black/50 px-3 py-1">
-            <span className="font-body text-xs text-white">{currentImage + 1} / {images.length}</span>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60 pointer-events-none" />
+
+          {/* Top action bar */}
+          <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 pt-4">
+            <button
+              onClick={() => navigate(-1)}
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-md active:scale-95"
+            >
+              <ArrowLeft className="h-5 w-5 text-white" />
+            </button>
+            <div className="flex items-center gap-2.5">
+              <button
+                onClick={handleShare}
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-md active:scale-95"
+              >
+                <Share2 className="h-[18px] w-[18px] text-white" />
+              </button>
+              <button
+                onClick={() => setLiked(!liked)}
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-md active:scale-95"
+              >
+                <Heart className={`h-[18px] w-[18px] ${liked ? "fill-red-500 text-red-500" : "text-white"}`} />
+              </button>
+            </div>
           </div>
+
+          {/* Title overlay */}
+          <div className="absolute bottom-16 left-0 right-0 px-5">
+            <h1 className="font-body text-xl font-bold text-white leading-snug drop-shadow-lg" style={{ textWrap: "balance" as any }}>
+              {imovel.titulo}
+            </h1>
+          </div>
+
+          {/* Bottom pills */}
+          <div className="absolute bottom-4 left-0 right-0 flex items-center justify-center gap-2 px-5">
+            <button
+              onClick={() => { setCurrentImage(0); setGalleryOpen(true); }}
+              className="flex items-center gap-1.5 rounded-full bg-white/20 backdrop-blur-md px-4 py-2 active:scale-95"
+            >
+              <Camera className="h-3.5 w-3.5 text-white" />
+              <span className="font-body text-[13px] font-semibold text-white">{images.length} Fotos</span>
+            </button>
+            {imovel.video_url && (
+              <a
+                href={imovel.video_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 rounded-full bg-white/20 backdrop-blur-md px-4 py-2 active:scale-95"
+              >
+                <Play className="h-3.5 w-3.5 text-white" />
+                <span className="font-body text-[13px] font-semibold text-white">Vídeo</span>
+              </a>
+            )}
+            {imovel.latitude && imovel.longitude && (
+              <button
+                onClick={scrollToMap}
+                className="flex items-center gap-1.5 rounded-full bg-white/20 backdrop-blur-md px-4 py-2 active:scale-95"
+              >
+                <MapIcon className="h-3.5 w-3.5 text-white" />
+                <span className="font-body text-[13px] font-semibold text-white">Mapa</span>
+              </button>
+            )}
+          </div>
+
+          {/* Swipe arrows */}
+          {images.length > 1 && (
+            <>
+              <button onClick={prevImage} className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 active:scale-95">
+                <ChevronLeft className="h-6 w-6 text-white drop-shadow-lg" />
+              </button>
+              <button onClick={nextImage} className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 active:scale-95">
+                <ChevronRight className="h-6 w-6 text-white drop-shadow-lg" />
+              </button>
+            </>
+          )}
         </div>
       </div>
 

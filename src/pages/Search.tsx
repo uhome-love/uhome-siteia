@@ -192,19 +192,26 @@ const Search = () => {
     }
   }, [filters, modoIA, aiResult, buildFilters]);
 
-  // Lazy load pins by viewport bounds — only fetches what's visible on the map
+  // FIX 4 — AbortController to cancel stale pin requests
   const pinLoadTimerRef = React.useRef<number | null>(null);
+  const pinAbortRef = React.useRef<AbortController | null>(null);
 
   const handleMapBoundsChange = useCallback((bounds: MapBounds) => {
     setMapViewBounds(bounds);
     // Debounce pin fetching to avoid rapid re-fetches during pan/zoom
     if (pinLoadTimerRef.current) clearTimeout(pinLoadTimerRef.current);
     pinLoadTimerRef.current = window.setTimeout(() => {
+      // Cancel previous in-flight request
+      pinAbortRef.current?.abort();
+      pinAbortRef.current = new AbortController();
+      
       setMapLoading(true);
       const baseFilters = buildFilters();
-      fetchMapPins({ ...baseFilters, bounds })
+      fetchMapPins({ ...baseFilters, bounds }, pinAbortRef.current.signal)
         .then(setMapPins)
-        .catch((err) => console.error("Erro ao buscar pins:", err))
+        .catch((err) => {
+          if (err?.name !== "AbortError") console.error("Erro ao buscar pins:", err);
+        })
         .finally(() => setMapLoading(false));
     }, 300);
   }, [buildFilters]);
@@ -212,12 +219,20 @@ const Search = () => {
   // Reload pins when filters change (using current map viewport)
   useEffect(() => {
     if (!mapViewBounds) return;
+    // Cancel previous request
+    pinAbortRef.current?.abort();
+    pinAbortRef.current = new AbortController();
+    
     setMapLoading(true);
     const baseFilters = buildFilters();
-    fetchMapPins({ ...baseFilters, bounds: mapViewBounds })
+    fetchMapPins({ ...baseFilters, bounds: mapViewBounds }, pinAbortRef.current.signal)
       .then(setMapPins)
-      .catch((err) => console.error("Erro ao buscar pins:", err))
+      .catch((err) => {
+        if (err?.name !== "AbortError") console.error("Erro ao buscar pins:", err);
+      })
       .finally(() => setMapLoading(false));
+    
+    return () => { pinAbortRef.current?.abort(); };
   }, [filters.tipo, filters.bairro, filters.precoMin, filters.precoMax, filters.quartos, filters.areaMin, filters.areaMax, filters.vagas, filters.banheiros]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadMore = useCallback(async () => {

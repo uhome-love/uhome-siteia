@@ -581,6 +581,67 @@ export default function IntegracaoDiagnostico() {
           </p>
         </div>
       )}
+
+      {/* Histórico de diagnósticos automáticos */}
+      {historico.length > 0 && (
+        <div className="mt-10 overflow-hidden rounded-xl border border-border bg-card">
+          <div className="border-b border-border bg-muted/30 px-5 py-3 flex items-center justify-between">
+            <h3 className="font-body text-sm font-bold text-foreground">
+              ⏰ Histórico de diagnósticos automáticos
+            </h3>
+            <span className="font-body text-xs text-muted-foreground">Roda diariamente às 07h BRT</span>
+          </div>
+          <div className="divide-y divide-border">
+            {historico.map((log) => (
+              <div key={log.id}>
+                <button
+                  onClick={() => setHistoricoAberto(historicoAberto === log.id ? null : log.id)}
+                  className="flex w-full items-center gap-3 px-5 py-3 text-left transition-colors hover:bg-muted/30"
+                >
+                  <span className="text-lg">
+                    {log.erros > 0 ? "❌" : log.avisos > 0 ? "⚠️" : "✅"}
+                  </span>
+                  <div className="flex-1">
+                    <span className="font-body text-sm font-semibold text-foreground">
+                      {new Date(log.created_at).toLocaleString("pt-BR")}
+                    </span>
+                    <span className="ml-2 font-body text-xs text-muted-foreground">
+                      ({log.origem})
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="rounded-full bg-emerald-50 px-2 py-0.5 font-body text-[11px] font-semibold text-emerald-700">
+                      {log.ok} ok
+                    </span>
+                    {log.avisos > 0 && (
+                      <span className="rounded-full bg-amber-50 px-2 py-0.5 font-body text-[11px] font-semibold text-amber-700">
+                        {log.avisos} avisos
+                      </span>
+                    )}
+                    {log.erros > 0 && (
+                      <span className="rounded-full bg-destructive/10 px-2 py-0.5 font-body text-[11px] font-semibold text-destructive">
+                        {log.erros} erros
+                      </span>
+                    )}
+                  </div>
+                </button>
+                {historicoAberto === log.id && (
+                  <div className="border-t border-border bg-muted/20 px-5 py-3 space-y-1">
+                    {(log.resultados ?? []).map((r: TestResult, i: number) => (
+                      <div key={i} className="flex items-center gap-2 font-body text-xs">
+                        <span>{r.status === "ok" ? "✅" : r.status === "erro" ? "❌" : "⚠️"}</span>
+                        <span className="font-semibold text-foreground">{r.mensagem}</span>
+                        {r.detalhe && <span className="text-muted-foreground">— {r.detalhe}</span>}
+                        {r.duracao && <span className="text-muted-foreground">({r.duracao}ms)</span>}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

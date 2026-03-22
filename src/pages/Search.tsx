@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, lazy } from "react";
+const PerformanceDebug = lazy(() => import("@/components/PerformanceDebug").then(m => ({ default: m.PerformanceDebug })));
 import { AuthModal } from "@/components/AuthModal";
 import { useAuth } from "@/hooks/useAuth";
 import { useSearchParams } from "react-router-dom";
@@ -759,6 +760,7 @@ const Search = () => {
       {/* Auth modal triggered after alert preferences */}
       <AuthModal open={showAuthAfterAlert} onClose={() => setShowAuthAfterAlert(false)} />
       <MobileFiltersSheet open={mobileFilters} onClose={() => setMobileFilters(false)} total={total} />
+      <PerformanceDebug />
     </div>
   );
 };

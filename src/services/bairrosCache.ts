@@ -10,6 +10,7 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 export async function getBairrosDisponiveis(): Promise<BairroCount[]> {
   if (cache && Date.now() - cache.ts < CACHE_TTL) {
+    emitCacheHit();
     return cache.data;
   }
 
@@ -18,4 +19,11 @@ export async function getBairrosDisponiveis(): Promise<BairroCount[]> {
 
   cache = { data: result, ts: Date.now() };
   return result;
+}
+
+/** Emit a cache-hit perf event (call when returning cached data) */
+function emitCacheHit() {
+  if (import.meta.env.DEV) {
+    window.dispatchEvent(new CustomEvent("perf:update", { detail: { cacheHit: true } }));
+  }
 }

@@ -5,10 +5,14 @@ import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { ExitIntentModal } from "@/components/ExitIntentModal";
-import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
 import { AuthProvider } from "@/hooks/useAuth";
-import Index from "./pages/Index.tsx";
+
+// Lazy load non-critical global components
+const ExitIntentModal = lazy(() => import("@/components/ExitIntentModal").then(m => ({ default: m.ExitIntentModal })));
+const FloatingWhatsApp = lazy(() => import("@/components/FloatingWhatsApp").then(m => ({ default: m.FloatingWhatsApp })));
+
+// Eager load homepage for fast FCP
+const Index = lazy(() => import("./pages/Index.tsx"));
 
 // Lazy load non-critical pages
 const Search = lazy(() => import("./pages/Search.tsx"));

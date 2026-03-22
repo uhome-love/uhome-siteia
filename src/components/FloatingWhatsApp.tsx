@@ -1,4 +1,3 @@
-import { forwardRef } from "react";
 import { MessageCircle } from "lucide-react";
 import { whatsappLink } from "@/lib/whatsapp";
 import { trackWhatsAppClick } from "@/services/whatsappTracker";
@@ -9,7 +8,7 @@ import { useLocation } from "react-router-dom";
  * Persistent WhatsApp floating button — always visible, not dismissable.
  * Hidden on mobile in property detail pages (which have their own fixed CTA bar).
  */
-export const FloatingWhatsApp = forwardRef<HTMLButtonElement>(function FloatingWhatsApp(_props, ref) {
+export function FloatingWhatsApp() {
   const location = useLocation();
   const isPropertyDetail = location.pathname.startsWith("/imovel/");
 
@@ -23,7 +22,6 @@ export const FloatingWhatsApp = forwardRef<HTMLButtonElement>(function FloatingW
 
   return (
     <motion.button
-      ref={ref}
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.4, delay: 1.5, ease: [0.16, 1, 0.3, 1] }}
@@ -37,4 +35,4 @@ export const FloatingWhatsApp = forwardRef<HTMLButtonElement>(function FloatingW
       <MessageCircle className="h-6 w-6 text-white" fill="white" />
     </motion.button>
   );
-});
+}

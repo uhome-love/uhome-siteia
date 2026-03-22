@@ -355,7 +355,7 @@ const Search = () => {
       </AnimatePresence>
 
       {/* Subheader: counter + bounds badge + sort + alert */}
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-background px-4 py-3 sm:px-6 sm:py-4">
+      <div className="relative z-0 flex flex-wrap items-center justify-between gap-2 border-b border-border bg-background px-4 py-3 sm:px-6 sm:py-4">
         <div className="flex items-center gap-2">
           <div>
             <div className="font-body text-lg font-extrabold leading-tight text-foreground sm:text-[22px]">

@@ -184,8 +184,8 @@ const CondominioDetail = () => {
       const jsonLd = {
         "@context": "https://schema.org",
         "@type": "Residence",
-        name,
-        description: `Empreendimento ${name} com ${matched.length} unidades à venda.`,
+        name: matchedName,
+        description: `Empreendimento ${matchedName} com ${matched.length} unidades à venda.`,
         address: {
           "@type": "PostalAddress",
           addressLocality: "Porto Alegre",

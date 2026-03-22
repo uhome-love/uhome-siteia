@@ -127,22 +127,22 @@ const Search = () => {
   // Normal mode: fetch list first (fast), then map pins in background
   // Also loads when in IA mode without a query (shows default results)
   const loadImoveis = useCallback(async () => {
-    if (modoIA && !aiResult && queryIA.trim()) return; // only skip if IA mode WITH a typed query but no result yet
+    if (modoIA && !aiResult && queryIA.trim()) return;
     setLoading(true);
+    setPage(0);
     try {
       const baseFilters = buildFilters();
-      // Load list immediately — don't wait for map pins
       const result = await fetchImoveis({
         ...baseFilters,
         ordem: filters.ordem as any,
         bounds: filters.bounds || undefined,
-        limit: 40,
+        limit: PAGE_SIZE,
+        offset: 0,
       });
       setImoveis(result.data);
       setTotal(result.count);
       setLoading(false);
 
-      // Load map pins in background (13k+ rows, slower)
       setMapLoading(true);
       fetchMapPins(baseFilters)
         .then(setMapPins)
@@ -153,6 +153,30 @@ const Search = () => {
       setLoading(false);
     }
   }, [filters, modoIA, aiResult, buildFilters]);
+
+  const loadMore = useCallback(async () => {
+    if (loadingMore || loading) return;
+    const nextPage = page + 1;
+    const offset = nextPage * PAGE_SIZE;
+    if (offset >= total) return;
+    setLoadingMore(true);
+    try {
+      const baseFilters = buildFilters();
+      const result = await fetchImoveis({
+        ...baseFilters,
+        ordem: filters.ordem as any,
+        bounds: filters.bounds || undefined,
+        limit: PAGE_SIZE,
+        offset,
+      });
+      setImoveis((prev) => [...prev, ...result.data]);
+      setPage(nextPage);
+    } catch (err) {
+      console.error("Erro ao carregar mais:", err);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [page, total, loadingMore, loading, buildFilters, filters]);
 
   useEffect(() => {
     loadImoveis();

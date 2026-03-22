@@ -190,85 +190,78 @@ export interface MapPin {
   tipo?: string;
 }
 
-/** Fetch lightweight pin data for the map — filtered by viewport bounds for performance */
-export async function fetchMapPins(filters: BuscaFilters = {}): Promise<MapPin[]> {
-  function buildPinQuery() {
-    let query = supabase
-      .from("imoveis")
-      .select("id,slug,preco,latitude,longitude,bairro,titulo,tipo,quartos,finalidade,fotos,area_total")
-      .eq("status", "disponivel");
+// Lightweight columns for map pins — NO fotos JSONB
+const PIN_COLUMNS = "id,slug,preco,latitude,longitude,bairro,titulo,tipo,quartos,finalidade,area_total,foto_principal";
 
-    if (filters.cidade) {
-      query = query.eq("cidade", filters.cidade);
-    } else {
-      query = query.in("cidade", CIDADES_PERMITIDAS);
-    }
+/** Fetch lightweight pin data for the map — single query, max 2000 pins, no fotos payload */
+export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSignal): Promise<MapPin[]> {
+  let query = supabase
+    .from("imoveis")
+    .select(PIN_COLUMNS)
+    .eq("status", "disponivel")
+    .not("latitude", "is", null)
+    .not("longitude", "is", null);
 
-    if (filters.finalidade) query = query.eq("finalidade", filters.finalidade);
-    if (filters.tipo) query = query.eq("tipo", filters.tipo);
-    if (filters.bairros?.length) {
-      const bairroFilter = filters.bairros.map(b => `bairro.ilike.%${b}%`).join(",");
-      query = query.or(bairroFilter);
-    } else if (filters.bairro) {
-      query = query.ilike("bairro", `%${filters.bairro}%`);
-    }
-    if (filters.precoMin) query = query.gte("preco", filters.precoMin);
-    if (filters.precoMax) query = query.lte("preco", filters.precoMax);
-    if (filters.areaMin) query = query.gte("area_total", filters.areaMin);
-    if (filters.areaMax) query = query.lte("area_total", filters.areaMax);
-    if (filters.quartos) query = query.gte("quartos", filters.quartos);
-    if (filters.banheiros) query = query.gte("banheiros", filters.banheiros);
-    if (filters.vagas) query = query.gte("vagas", filters.vagas);
-    if (filters.diferenciais?.length) query = query.contains("diferenciais", filters.diferenciais);
-    if (filters.q) query = query.or(`titulo.ilike.%${filters.q}%,bairro.ilike.%${filters.q}%,tipo.ilike.%${filters.q}%`);
-
-    // Only properties with coordinates
-    query = query.not("latitude", "is", null).not("longitude", "is", null);
-
-    // Viewport bounds filter
-    if (filters.bounds) {
-      query = query
-        .gte("latitude", filters.bounds.lat_min)
-        .lte("latitude", filters.bounds.lat_max)
-        .gte("longitude", filters.bounds.lng_min)
-        .lte("longitude", filters.bounds.lng_max);
-    }
-
-    return query;
+  // City filter
+  if (filters.cidade) {
+    query = query.eq("cidade", filters.cidade);
+  } else {
+    query = query.in("cidade", CIDADES_PERMITIDAS);
   }
 
-  // Fetch in pages (Supabase default limit is 1000)
-  const allPins: MapPin[] = [];
-  let offset = 0;
-  const PAGE = 1000;
+  if (filters.finalidade) query = query.eq("finalidade", filters.finalidade);
+  if (filters.tipo) query = query.eq("tipo", filters.tipo);
+  if (filters.bairros?.length) {
+    const bairroFilter = filters.bairros.map(b => `bairro.ilike.%${b}%`).join(",");
+    query = query.or(bairroFilter);
+  } else if (filters.bairro) {
+    query = query.ilike("bairro", `%${filters.bairro}%`);
+  }
+  if (filters.precoMin) query = query.gte("preco", filters.precoMin);
+  if (filters.precoMax) query = query.lte("preco", filters.precoMax);
+  if (filters.areaMin) query = query.gte("area_total", filters.areaMin);
+  if (filters.areaMax) query = query.lte("area_total", filters.areaMax);
+  if (filters.quartos) query = query.gte("quartos", filters.quartos);
+  if (filters.banheiros) query = query.gte("banheiros", filters.banheiros);
+  if (filters.vagas) query = query.gte("vagas", filters.vagas);
+  if (filters.diferenciais?.length) query = query.contains("diferenciais", filters.diferenciais);
+  if (filters.q) query = query.or(`titulo.ilike.%${filters.q}%,bairro.ilike.%${filters.q}%,tipo.ilike.%${filters.q}%`);
 
-  while (true) {
-    const { data, error } = await buildPinQuery().range(offset, offset + PAGE - 1);
-    if (error) throw error;
-    if (!data || data.length === 0) break;
-
-    for (const row of data) {
-      const fotos = parseFotos(row.fotos);
-      allPins.push({
-        id: row.id,
-        slug: row.slug,
-        preco: row.preco,
-        latitude: row.latitude!,
-        longitude: row.longitude!,
-        bairro: row.bairro,
-        titulo: tituloLimpo(row),
-        foto: fotos.length > 0 ? (fotos.find((f: any) => f.principal) ?? fotos[0])?.url : undefined,
-        quartos: row.quartos ?? undefined,
-        area_total: row.area_total ?? undefined,
-        tipo: row.tipo ?? undefined,
-      });
-    }
-
-    if (data.length < PAGE) break;
-    offset += PAGE;
+  // Viewport bounds filter
+  if (filters.bounds) {
+    query = query
+      .gte("latitude", filters.bounds.lat_min)
+      .lte("latitude", filters.bounds.lat_max)
+      .gte("longitude", filters.bounds.lng_min)
+      .lte("longitude", filters.bounds.lng_max);
   }
 
-  return allPins;
+  query = query.order("preco", { ascending: false }).limit(2000);
+
+  // Support AbortSignal
+  if (signal) {
+    query = query.abortSignal(signal);
+  }
+
+  const { data, error } = await query;
+  if (error) {
+    if (error.message?.includes("aborted")) return [];
+    throw error;
+  }
+
+  return (data || []).map((row: any) => ({
+    id: row.id,
+    slug: row.slug,
+    preco: row.preco,
+    latitude: row.latitude!,
+    longitude: row.longitude!,
+    bairro: row.bairro,
+    titulo: tituloLimpo(row),
+    foto: row.foto_principal ?? undefined,
+    quartos: row.quartos ?? undefined,
+    area_total: row.area_total ?? undefined,
+    tipo: row.tipo ?? undefined,
+  }));
 }
 
 export async function fetchImovelBySlug(slug: string): Promise<Imovel | null> {
@@ -286,7 +279,7 @@ export async function fetchImovelBySlug(slug: string): Promise<Imovel | null> {
 export async function fetchImoveisDestaque(limit = 6): Promise<Imovel[]> {
   const { data, error } = await supabase
     .from("imoveis")
-    .select("*")
+    .select(LISTING_COLUMNS)
     .eq("destaque", true)
     .eq("status", "disponivel")
     .in("cidade", CIDADES_PERMITIDAS)
@@ -300,7 +293,7 @@ export async function fetchImoveisDestaque(limit = 6): Promise<Imovel[]> {
   if (result.length === 0) {
     const { data: fallback } = await supabase
       .from("imoveis")
-      .select("*")
+      .select(LISTING_COLUMNS)
       .eq("status", "disponivel")
       .in("cidade", CIDADES_PERMITIDAS)
       .order("publicado_em", { ascending: false })

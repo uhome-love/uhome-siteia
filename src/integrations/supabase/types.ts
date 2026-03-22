@@ -302,6 +302,7 @@ export type Database = {
           diferenciais: string[] | null
           endereco_completo: string | null
           finalidade: string
+          foto_principal: string | null
           fotos: Json | null
           id: string
           jetimob_id: string | null
@@ -340,6 +341,7 @@ export type Database = {
           diferenciais?: string[] | null
           endereco_completo?: string | null
           finalidade: string
+          foto_principal?: string | null
           fotos?: Json | null
           id?: string
           jetimob_id?: string | null
@@ -378,6 +380,7 @@ export type Database = {
           diferenciais?: string[] | null
           endereco_completo?: string | null
           finalidade?: string
+          foto_principal?: string | null
           fotos?: Json | null
           id?: string
           jetimob_id?: string | null

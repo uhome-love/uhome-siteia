@@ -118,7 +118,8 @@ const LISTING_COLUMNS = "id,slug,tipo,finalidade,status,destaque,preco,preco_con
 export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: Imovel[]; count: number }> {
   let query = supabase
     .from("imoveis")
-    .select(LISTING_COLUMNS, { count: "exact" });
+    .select(LISTING_COLUMNS, { count: "exact" })
+    .eq("status", "disponivel");
 
   // City filter: specific city or all allowed
   if (filters.cidade) {

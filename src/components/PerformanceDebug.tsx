@@ -21,8 +21,6 @@ const initial: PerfMetrics = {
 };
 
 export function PerformanceDebug() {
-  if (import.meta.env.PROD) return null;
-
   const [metrics, setMetrics] = useState<PerfMetrics>(initial);
   const [collapsed, setCollapsed] = useState(false);
 
@@ -36,13 +34,14 @@ export function PerformanceDebug() {
           detail.mapaLoadMs !== undefined
             ? prev.mapaRequests + 1
             : prev.mapaRequests,
-        cacheHits:
-          detail.cacheHit ? prev.cacheHits + 1 : prev.cacheHits,
+        cacheHits: detail.cacheHit ? prev.cacheHits + 1 : prev.cacheHits,
       }));
     };
     window.addEventListener("perf:update", handler);
     return () => window.removeEventListener("perf:update", handler);
   }, []);
+
+  if (import.meta.env.PROD) return null;
 
   if (collapsed) {
     return (
@@ -86,54 +85,22 @@ export function PerformanceDebug() {
         lineHeight: 1.7,
       }}
     >
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 6,
-        }}
-      >
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
         <span style={{ fontWeight: 700, color: "white" }}>⚡ Performance</span>
         <button
           onClick={() => setCollapsed(true)}
-          style={{
-            background: "none",
-            border: "none",
-            color: "#666",
-            cursor: "pointer",
-            fontSize: 14,
-            lineHeight: 1,
-          }}
+          style={{ background: "none", border: "none", color: "#666", cursor: "pointer", fontSize: 14, lineHeight: 1 }}
         >
           ×
         </button>
       </div>
-      <div>
-        Mapa requests: <b>{metrics.mapaRequests}</b>
-      </div>
-      <div>
-        Payload (pins): <b>{metrics.mapaPayloadKB} KB</b>
-      </div>
-      <div>
-        Load time (pins):{" "}
-        <b style={{ color: metrics.mapaLoadMs > 1000 ? "#ff4444" : "#00ff88" }}>
-          {metrics.mapaLoadMs}ms
-        </b>
-      </div>
-      <div>
-        Pins: <b>{metrics.pinsCarregados}</b>
-      </div>
-      <div>
-        Payload (lista): <b>{metrics.listaPayloadKB} KB</b>
-      </div>
-      <div>
-        Load time (lista): <b>{metrics.listaLoadMs}ms</b>
-      </div>
-      <div>
-        Cache hits:{" "}
-        <b style={{ color: "#00ff88" }}>{metrics.cacheHits}</b>
-      </div>
+      <div>Mapa requests: <b>{metrics.mapaRequests}</b></div>
+      <div>Payload (pins): <b>{metrics.mapaPayloadKB} KB</b></div>
+      <div>Load time (pins): <b style={{ color: metrics.mapaLoadMs > 1000 ? "#ff4444" : "#00ff88" }}>{metrics.mapaLoadMs}ms</b></div>
+      <div>Pins: <b>{metrics.pinsCarregados}</b></div>
+      <div>Payload (lista): <b>{metrics.listaPayloadKB} KB</b></div>
+      <div>Load time (lista): <b>{metrics.listaLoadMs}ms</b></div>
+      <div>Cache hits: <b style={{ color: "#00ff88" }}>{metrics.cacheHits}</b></div>
     </div>
   );
 }

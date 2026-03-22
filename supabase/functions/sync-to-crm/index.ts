@@ -87,8 +87,11 @@ async function syncLead(lead: any) {
       utm_source:          lead.utm_source ?? null,
       utm_medium:          lead.utm_medium ?? null,
       utm_campaign:        lead.utm_campaign ?? null,
+      corretor_ref_id:     lead.corretor_ref_id ?? null,
+      corretor_ref_slug:   lead.corretor_ref_slug ?? null,
+      origem_ref:          lead.origem_ref ?? 'organico',
       status:              'novo',
-      atribuido_para:      plantao?.id ?? null,
+      atribuido_para:      lead.corretor_ref_id ?? plantao?.id ?? null,
       created_at:          lead.created_at
     })
     .select()

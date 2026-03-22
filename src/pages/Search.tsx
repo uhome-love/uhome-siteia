@@ -454,21 +454,42 @@ const Search = () => {
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-4 pb-16 sm:grid-cols-2 sm:gap-6 sm:pb-4 xl:grid-cols-3">
-              {imoveis.map((imovel, i) => (
-                <React.Fragment key={imovel.id}>
-                  <SearchPropertyCard
-                    imovel={imovel}
-                    index={i}
-                    highlighted={hoveredId === imovel.id}
-                    onHover={setHoveredId}
-                  />
-                  {i === 5 && (
-                    <SearchCTACard onClickCTA={() => setShowAlertModal(true)} />
-                  )}
-                </React.Fragment>
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
+                {imoveis.map((imovel, i) => (
+                  <React.Fragment key={imovel.id}>
+                    <SearchPropertyCard
+                      imovel={imovel}
+                      index={i}
+                      highlighted={hoveredId === imovel.id}
+                      onHover={setHoveredId}
+                    />
+                    {i === 5 && (
+                      <SearchCTACard onClickCTA={() => setShowAlertModal(true)} />
+                    )}
+                  </React.Fragment>
+                ))}
+              </div>
+              {/* Load more */}
+              {imoveis.length < total && (
+                <div className="flex justify-center pb-16 pt-6 sm:pb-4">
+                  <button
+                    onClick={loadMore}
+                    disabled={loadingMore}
+                    className="rounded-full border-[1.5px] border-border px-8 py-3 font-body text-sm font-semibold text-foreground transition-all hover:border-foreground active:scale-[0.97] disabled:opacity-50"
+                  >
+                    {loadingMore ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Carregando...
+                      </span>
+                    ) : (
+                      `Ver mais imóveis (${imoveis.length} de ${total.toLocaleString("pt-BR")})`
+                    )}
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
 

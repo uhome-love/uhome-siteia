@@ -360,25 +360,46 @@ export type Database = {
           ativo: boolean | null
           avatar_url: string | null
           created_at: string
+          creci: string | null
+          email: string | null
+          foto_url: string | null
           id: string
           nome: string | null
+          role: string | null
+          sincronizado_em: string | null
           slug_ref: string | null
+          telefone: string | null
+          uhomesales_id: string | null
         }
         Insert: {
           ativo?: boolean | null
           avatar_url?: string | null
           created_at?: string
+          creci?: string | null
+          email?: string | null
+          foto_url?: string | null
           id: string
           nome?: string | null
+          role?: string | null
+          sincronizado_em?: string | null
           slug_ref?: string | null
+          telefone?: string | null
+          uhomesales_id?: string | null
         }
         Update: {
           ativo?: boolean | null
           avatar_url?: string | null
           created_at?: string
+          creci?: string | null
+          email?: string | null
+          foto_url?: string | null
           id?: string
           nome?: string | null
+          role?: string | null
+          sincronizado_em?: string | null
           slug_ref?: string | null
+          telefone?: string | null
+          uhomesales_id?: string | null
         }
         Relationships: []
       }
@@ -477,6 +498,36 @@ export type Database = {
           key?: string
           updated_at?: string | null
           value?: string | null
+        }
+        Relationships: []
+      }
+      sync_log: {
+        Row: {
+          created_at: string | null
+          direcao: string
+          erro: string | null
+          id: string
+          payload: Json | null
+          sucesso: boolean | null
+          tipo: string
+        }
+        Insert: {
+          created_at?: string | null
+          direcao: string
+          erro?: string | null
+          id?: string
+          payload?: Json | null
+          sucesso?: boolean | null
+          tipo: string
+        }
+        Update: {
+          created_at?: string | null
+          direcao?: string
+          erro?: string | null
+          id?: string
+          payload?: Json | null
+          sucesso?: boolean | null
+          tipo?: string
         }
         Relationships: []
       }

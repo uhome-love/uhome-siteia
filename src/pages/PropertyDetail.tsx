@@ -273,7 +273,7 @@ const PropertyDetail = () => {
           </div>
         </div>
       </div>
-      </div>
+
 
       {/* Fullscreen lightbox */}
       {galleryOpen && (

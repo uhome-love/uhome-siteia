@@ -319,11 +319,11 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       map.on("mouseenter", "imoveis-pins", (e) => {
         map.getCanvas().style.cursor = "pointer";
         const id = e.features?.[0]?.properties?.id;
-        if (id) onPinHover?.(id);
+        if (id) onPinHoverRef.current?.(id);
       });
       map.on("mouseleave", "imoveis-pins", () => {
         map.getCanvas().style.cursor = "";
-        onPinHover?.(null);
+        onPinHoverRef.current?.(null);
       });
 
       mapReadyRef.current = true;

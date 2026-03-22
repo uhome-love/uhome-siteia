@@ -54,8 +54,14 @@ function PageFallback() {
   );
 }
 
+function RefCapture() {
+  useEffect(() => { captureCorretorRef(); }, []);
+  return null;
+}
+
 const App = () => (
   <BrowserRouter>
+    <RefCapture />
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <TooltipProvider>

@@ -374,7 +374,7 @@ const Search = () => {
           )}
         </div>
       ) : (
-        <SearchFiltersBar />
+        <SearchFiltersBar onOpenMobileFilters={() => setMobileFilters(true)} />
       )}
 
       {/* AI resumo badge */}

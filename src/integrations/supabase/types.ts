@@ -82,12 +82,16 @@ export type Database = {
       }
       captacao_imoveis: {
         Row: {
+          area: number | null
           atribuido_a: string | null
           bairro: string | null
           created_at: string | null
+          dados_imovel: Json | null
           id: string
           mensagem: string | null
           nome: string
+          origem: string | null
+          quartos: number | null
           status: string | null
           telefone: string
           tipo_imovel: string | null
@@ -96,12 +100,16 @@ export type Database = {
           valor_pretendido: string | null
         }
         Insert: {
+          area?: number | null
           atribuido_a?: string | null
           bairro?: string | null
           created_at?: string | null
+          dados_imovel?: Json | null
           id?: string
           mensagem?: string | null
           nome: string
+          origem?: string | null
+          quartos?: number | null
           status?: string | null
           telefone: string
           tipo_imovel?: string | null
@@ -110,12 +118,16 @@ export type Database = {
           valor_pretendido?: string | null
         }
         Update: {
+          area?: number | null
           atribuido_a?: string | null
           bairro?: string | null
           created_at?: string | null
+          dados_imovel?: Json | null
           id?: string
           mensagem?: string | null
           nome?: string
+          origem?: string | null
+          quartos?: number | null
           status?: string | null
           telefone?: string
           tipo_imovel?: string | null

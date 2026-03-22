@@ -302,5 +302,6 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
         </div>
       </div>
     </motion.div>
+    </>
   );
 }

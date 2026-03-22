@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 const systemPrompt = `Você é um assistente imobiliário especializado em Porto Alegre/RS. Interprete buscas em linguagem natural e retorne APENAS um JSON válido com esta estrutura:
@@ -264,13 +264,40 @@ serve(async (req) => {
     const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
 
     if (!toolCall) {
-      return new Response(JSON.stringify({ error: "Não foi possível interpretar a busca" }), {
+      // Fallback: try to parse from message content (some models return JSON directly)
+      const content = data.choices?.[0]?.message?.content;
+      if (content) {
+        try {
+          const parsed = JSON.parse(content);
+          return new Response(JSON.stringify({ filtros: parsed.filtros || parsed }), {
+            status: 200,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        } catch {
+          // ignore parse error
+        }
+      }
+      return new Response(JSON.stringify({ error: "Não foi possível interpretar a busca. Tente reformular." }), {
         status: 422,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const filtros = JSON.parse(toolCall.function.arguments);
+    let filtros: any;
+    try {
+      filtros = JSON.parse(toolCall.function.arguments);
+    } catch {
+      return new Response(JSON.stringify({ error: "Erro ao processar resposta da IA. Tente novamente." }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Default finalidade to "venda" if not specified
+    if (!filtros.finalidade) {
+      filtros.finalidade = "venda";
+    }
+
     console.log("AI filtros extraídos:", JSON.stringify(filtros));
 
     return new Response(JSON.stringify({ filtros }), {

@@ -110,6 +110,16 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
   const autoSearchRef = useRef(false);
   const autoSearchTimerRef = useRef<number | null>(null);
 
+  // Stable callback refs — prevent map re-initialization when parent re-renders
+  const onPinHoverRef = useRef(onPinHover);
+  const onBoundsSearchRef = useRef(onBoundsSearch);
+  const onBoundsChangeRef = useRef(onBoundsChange);
+  const onDrawFilterRef = useRef(onDrawFilter);
+  useEffect(() => { onPinHoverRef.current = onPinHover; }, [onPinHover]);
+  useEffect(() => { onBoundsSearchRef.current = onBoundsSearch; }, [onBoundsSearch]);
+  useEffect(() => { onBoundsChangeRef.current = onBoundsChange; }, [onBoundsChange]);
+  useEffect(() => { onDrawFilterRef.current = onDrawFilter; }, [onDrawFilter]);
+
   // Preview popup state
   const [previewPin, setPreviewPin] = useState<MapPinData | null>(null);
   const [previewPos, setPreviewPos] = useState<{ x: number; y: number } | null>(null);
@@ -309,11 +319,11 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       map.on("mouseenter", "imoveis-pins", (e) => {
         map.getCanvas().style.cursor = "pointer";
         const id = e.features?.[0]?.properties?.id;
-        if (id) onPinHover?.(id);
+        if (id) onPinHoverRef.current?.(id);
       });
       map.on("mouseleave", "imoveis-pins", () => {
         map.getCanvas().style.cursor = "";
-        onPinHover?.(null);
+        onPinHoverRef.current?.(null);
       });
 
       mapReadyRef.current = true;
@@ -321,10 +331,10 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       // Report initial viewport bounds so pins can be loaded for this area
       const initialBounds = map.getBounds();
       boundsRef.current = initialBounds;
-      if (onBoundsChange) {
+      if (onBoundsChangeRef.current) {
         const sw = initialBounds.getSouthWest();
         const ne = initialBounds.getNorthEast();
-        onBoundsChange({ lat_min: sw.lat, lat_max: ne.lat, lng_min: sw.lng, lng_max: ne.lng });
+        onBoundsChangeRef.current({ lat_min: sw.lat, lat_max: ne.lat, lng_min: sw.lng, lng_max: ne.lng });
       }
 
       // Set initial data if pins already available
@@ -345,13 +355,13 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       const currentBounds = { lat_min: sw.lat, lat_max: ne.lat, lng_min: sw.lng, lng_max: ne.lng };
 
       // Always report bounds change for lazy pin loading
-      onBoundsChange?.(currentBounds);
+      onBoundsChangeRef.current?.(currentBounds);
 
       // Auto-search on move (debounced) — updates the listing, not just pins
-      if (autoSearchRef.current && onBoundsSearch) {
+      if (autoSearchRef.current && onBoundsSearchRef.current) {
         if (autoSearchTimerRef.current) clearTimeout(autoSearchTimerRef.current);
         autoSearchTimerRef.current = window.setTimeout(() => {
-          onBoundsSearch(currentBounds);
+          onBoundsSearchRef.current?.(currentBounds);
         }, 400);
       } else {
         setMapMoved(true);
@@ -367,7 +377,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       mapRef.current = null;
       initRef.current = false;
     };
-  }, [navigate, onPinHover, onBoundsSearch, onBoundsChange]);
+  }, [navigate]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Draw mode
   useEffect(() => {
@@ -396,20 +406,20 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
           setHasDrawn(true);
           map.getCanvas().style.cursor = "";
 
-          if (onDrawFilter) {
+          if (onDrawFilterRef.current) {
             const inside = pinsRef.current.filter(pin => {
               const lat = Number(pin.latitude);
               const lng = Number(pin.longitude);
               if (!lat || !lng) return false;
               return pointInPolygon([lng, lat], finalPoints);
             });
-            onDrawFilter(inside);
+            onDrawFilterRef.current(inside);
           }
 
-          if (onBoundsSearch && finalPoints.length >= 3) {
+          if (onBoundsSearchRef.current && finalPoints.length >= 3) {
             const lngs = finalPoints.map(p => p[0]);
             const lats = finalPoints.map(p => p[1]);
-            onBoundsSearch({
+            onBoundsSearchRef.current({
               lng_min: Math.min(...lngs),
               lng_max: Math.max(...lngs),
               lat_min: Math.min(...lats),
@@ -432,7 +442,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
     } else {
       map.getCanvas().style.cursor = "";
     }
-  }, [drawMode, onDrawFilter, onBoundsSearch]);
+  }, [drawMode]);
 
   function updateDrawSources(map: mapboxgl.Map, pts: [number, number][], closed: boolean) {
     const pointsSource = map.getSource("draw-points") as mapboxgl.GeoJSONSource | undefined;
@@ -482,10 +492,10 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       if (pointsSource) pointsSource.setData({ type: "FeatureCollection", features: [] });
       if (polySource) polySource.setData({ type: "FeatureCollection", features: [] });
     }
-    if (onBoundsSearch) {
+    if (onBoundsSearchRef.current) {
       setMapMoved(false);
     }
-  }, [onBoundsSearch]);
+  }, []);
 
   // Update data — pins are already viewport-filtered, just set them on the source
   useEffect(() => {

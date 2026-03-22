@@ -118,18 +118,27 @@ export default function AdminIntegracao() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="font-body text-2xl font-extrabold tracking-tight text-foreground">
           Integração UhomeSales CRM
         </h1>
-        <button
-          onClick={sincronizarAgora}
-          disabled={syncing}
-          className="flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 font-body text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90 active:scale-[0.97] disabled:opacity-60"
-        >
-          <RefreshCw className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
-          {syncing ? "Sincronizando..." : "Sincronizar agora"}
-        </button>
+        <div className="flex items-center gap-2">
+          <Link
+            to="/admin/integracao/diagnostico"
+            className="flex items-center gap-2 rounded-full border border-border bg-card px-5 py-2.5 font-body text-sm font-semibold text-foreground transition-colors hover:bg-muted active:scale-[0.97]"
+          >
+            <Stethoscope className="h-4 w-4" />
+            Diagnóstico
+          </Link>
+          <button
+            onClick={sincronizarAgora}
+            disabled={syncing}
+            className="flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 font-body text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90 active:scale-[0.97] disabled:opacity-60"
+          >
+            <RefreshCw className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
+            {syncing ? "Sincronizando..." : "Sincronizar agora"}
+          </button>
+        </div>
       </div>
 
       {/* KPIs */}

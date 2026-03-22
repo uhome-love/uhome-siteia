@@ -21,39 +21,29 @@ export function useFavoritos() {
           setLoading(false);
         });
     } else {
-      // Load from localStorage for anonymous
-      const raw = localStorage.getItem("favoritos_anonimos");
-      setFavoritos(new Set(raw ? JSON.parse(raw) : []));
+      setFavoritos(new Set());
     }
   }, [user]);
 
   const toggleFavorito = useCallback(
-    async (imovelId: string) => {
+    async (imovelId: string): Promise<"needs_auth" | void> => {
+      if (!user) {
+        return "needs_auth";
+      }
+
       const isFav = favoritos.has(imovelId);
 
-      if (user) {
-        if (isFav) {
-          await supabase
-            .from("favoritos")
-            .delete()
-            .eq("user_id", user.id)
-            .eq("imovel_id", imovelId);
-        } else {
-          await supabase
-            .from("favoritos")
-            .insert({ user_id: user.id, imovel_id: imovelId });
-          // Fire-and-forget sync to CRM
-          syncToCRM("favorito", { user_id: user.id, imovel_id: imovelId, created_at: new Date().toISOString() });
-        }
+      if (isFav) {
+        await supabase
+          .from("favoritos")
+          .delete()
+          .eq("user_id", user.id)
+          .eq("imovel_id", imovelId);
       } else {
-        // Anonymous: localStorage
-        const stored: string[] = JSON.parse(
-          localStorage.getItem("favoritos_anonimos") || "[]"
-        );
-        const updated = isFav
-          ? stored.filter((id) => id !== imovelId)
-          : [...stored, imovelId];
-        localStorage.setItem("favoritos_anonimos", JSON.stringify(updated));
+        await supabase
+          .from("favoritos")
+          .insert({ user_id: user.id, imovel_id: imovelId });
+        syncToCRM("favorito", { user_id: user.id, imovel_id: imovelId, created_at: new Date().toISOString() });
       }
 
       setFavoritos((prev) => {

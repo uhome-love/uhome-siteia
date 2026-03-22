@@ -1,15 +1,17 @@
-import { useEffect } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useParams, Outlet } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 
-export function CorretorRef() {
-  const { slug, '*': restPath } = useParams();
-  const navigate = useNavigate();
-  const location = useLocation();
+export function CorretorRefLayout() {
+  const slug = useParams().corretorSlug;
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     async function registrar() {
-      if (!slug) { navigate('/'); return; }
+      if (!slug) { setReady(true); return; }
+
+      // Evita registrar visita duplicada na mesma sessão
+      const jaRegistrado = sessionStorage.getItem('corretor_ref_registrado');
 
       const { data: corretor } = await supabase
         .from('profiles')
@@ -24,28 +26,33 @@ export function CorretorRef() {
         localStorage.setItem('corretor_ref_nome', corretor.nome || '');
         localStorage.setItem('corretor_ref_ts', Date.now().toString());
 
-        await supabase.from('corretor_visitas').insert({
-          corretor_id: corretor.id,
-          corretor_slug: slug,
-          user_agent: navigator.userAgent,
-          referrer: document.referrer,
-        });
+        if (jaRegistrado !== slug) {
+          await supabase.from('corretor_visitas').insert({
+            corretor_id: corretor.id,
+            corretor_slug: slug,
+            user_agent: navigator.userAgent,
+            referrer: document.referrer,
+          });
+          sessionStorage.setItem('corretor_ref_registrado', slug);
+        }
       }
 
-      // Use the rest of the path as destination, or default to home
-      const destino = restPath ? `/${restPath}${location.search}` : '/';
-      navigate(destino, { replace: true });
+      setReady(true);
     }
 
     registrar();
-  }, [slug, restPath, navigate, location.search]);
+  }, [slug]);
 
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="flex flex-col items-center gap-4">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-        <p className="font-body text-sm text-muted-foreground">Carregando...</p>
+  if (!ready) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <p className="font-body text-sm text-muted-foreground">Carregando...</p>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  return <Outlet />;
 }

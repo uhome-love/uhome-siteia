@@ -93,7 +93,7 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Prop
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: Math.min(index * 0.03, 0.15) }}
-      className={`relative cursor-pointer outline-none [-webkit-tap-highlight-color:transparent] ${highlighted ? "ring-2 ring-primary rounded-xl" : ""}`}
+      className={`relative cursor-pointer select-none outline-none [&_*]:outline-none [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] ${highlighted ? "ring-2 ring-primary rounded-xl" : ""}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={() => navigate(`/imovel/${imovel.slug}`)}

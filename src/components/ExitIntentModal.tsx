@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Loader2, Check } from "lucide-react";
 import { submitLead } from "@/services/leads";
 import { toast } from "sonner";
+import { formatPhone } from "@/lib/phoneMask";
 
 export function ExitIntentModal() {
   const [show, setShow] = useState(false);

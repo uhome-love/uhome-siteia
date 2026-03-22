@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { submitLead } from "@/services/leads";
 import { syncToCRM } from "@/services/syncCRM";
 import { toast } from "sonner";
+import { formatPhone } from "@/lib/phoneMask";
 
 interface Props {
   imovelId: string;

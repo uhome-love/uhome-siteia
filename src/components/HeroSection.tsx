@@ -375,7 +375,7 @@ export function HeroSection() {
 
                 {[
                   { label: "Seu nome", value: nome, set: setNome, ph: "João Silva", type: "text" },
-                  { label: "WhatsApp", value: telefone, set: setTelefone, ph: "(51) 99999-9999", type: "tel" },
+                  { label: "WhatsApp", value: telefone, set: (v: string) => setTelefone(formatPhone(v)), ph: "(51) 99999-9999", type: "tel" },
                   { label: "Bairro do imóvel", value: bairroAnuncio, set: setBairroAnuncio, ph: "Ex: Moinhos de Vento", type: "text" },
                 ].map((f) => (
                   <label

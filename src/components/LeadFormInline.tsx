@@ -88,6 +88,14 @@ export function LeadFormInline({ isOpen, imovelId, imovelTitulo, imovelBairro, i
                   className="w-full rounded-lg bg-input px-3 py-2.5 font-body text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                   maxLength={16}
                 />
+                <input
+                  type="email"
+                  placeholder="E-mail (opcional)"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full rounded-lg bg-input px-3 py-2.5 font-body text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                  maxLength={255}
+                />
                 <button
                   type="submit"
                   disabled={loading}

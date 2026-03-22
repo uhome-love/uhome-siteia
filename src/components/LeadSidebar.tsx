@@ -103,6 +103,17 @@ export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, 
               maxLength={16}
             />
           </div>
+          <div>
+            <label className="mb-1 block font-body text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">E-mail <span className="normal-case font-normal tracking-normal">(opcional)</span></label>
+            <input
+              type="email"
+              placeholder="seu@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full rounded-lg border-[1.5px] border-border bg-background px-4 py-3 font-body text-sm text-foreground outline-none transition-colors focus:border-primary"
+              maxLength={255}
+            />
+          </div>
           <button
             type="submit"
             disabled={loading}

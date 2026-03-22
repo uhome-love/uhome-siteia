@@ -17,6 +17,7 @@ import { useCanonical } from "@/hooks/useCanonical";
 
 const PropertyDetail = () => {
   const { slug } = useParams();
+  const navigate = useNavigate();
   useCanonical(slug ? `/imovel/${slug}` : undefined);
   const [currentImage, setCurrentImage] = useState(0);
   const [viewCount, setViewCount] = useState(0);
@@ -24,6 +25,7 @@ const PropertyDetail = () => {
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [imovel, setImovel] = useState<Imovel | null>(null);
   const [loading, setLoading] = useState(true);
+  const mapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!slug) return;

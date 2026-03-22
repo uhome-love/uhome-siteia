@@ -44,7 +44,8 @@ const TIPO_CONFIG: Record<string, { tipo: string; label: string; plural: string;
 };
 
 const TipoImovel = () => {
-  const { slug } = useParams<{ slug: string }>();
+  const location = useLocation();
+  const slug = location.pathname.replace(/^\//, "");
   const navigate = useNavigate();
   const config = slug ? TIPO_CONFIG[slug] : null;
   useCanonical();

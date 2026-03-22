@@ -43,6 +43,12 @@ export function Navbar() {
             <Sparkles className="h-3.5 w-3.5" />
             Busca IA
           </Link>
+          <Link
+            to="/onboarding"
+            className="rounded-full px-[18px] py-[7px] text-[14px] font-semibold transition-all whitespace-nowrap text-muted-foreground hover:text-foreground"
+          >
+            Busca guiada
+          </Link>
         </div>
 
         <div className="hidden items-center gap-2 md:flex flex-shrink-0">

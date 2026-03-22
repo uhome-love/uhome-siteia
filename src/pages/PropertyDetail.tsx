@@ -5,6 +5,7 @@ import { Footer } from "@/components/Footer";
 import { LeadSidebar } from "@/components/LeadSidebar";
 import { FinancingSimulator } from "@/components/FinancingSimulator";
 import { AgendamentoVisita } from "@/components/AgendamentoVisita";
+import { SimilarProperties } from "@/components/SimilarProperties";
 import { PropertyMap } from "@/components/PropertyMap";
 import { FotoImovel } from "@/components/FotoImovel";
 import { Bed, Car, Maximize, Bath, MapPin, Share2, Heart, ChevronLeft, ChevronRight, Loader2, Camera } from "lucide-react";
@@ -437,6 +438,16 @@ const PropertyDetail = () => {
             </div>
           </motion.div>
         </div>
+      </div>
+
+      {/* Similar properties */}
+      <div className="mx-auto max-w-7xl px-6 pb-12">
+        <SimilarProperties
+          currentId={imovel.id}
+          bairro={imovel.bairro}
+          tipo={imovel.tipo}
+          preco={imovel.preco}
+        />
       </div>
 
       <Footer />

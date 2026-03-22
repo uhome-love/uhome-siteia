@@ -62,7 +62,10 @@ const Search = () => {
   const [mapPins, setMapPins] = useState<MapPinData[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [mapLoading, setMapLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const PAGE_SIZE = 40;
 
   // AI mode state
   const [queryIA, setQueryIA] = useState(searchParams.get("q") || "");
@@ -124,22 +127,22 @@ const Search = () => {
   // Normal mode: fetch list first (fast), then map pins in background
   // Also loads when in IA mode without a query (shows default results)
   const loadImoveis = useCallback(async () => {
-    if (modoIA && !aiResult && queryIA.trim()) return; // only skip if IA mode WITH a typed query but no result yet
+    if (modoIA && !aiResult && queryIA.trim()) return;
     setLoading(true);
+    setPage(0);
     try {
       const baseFilters = buildFilters();
-      // Load list immediately — don't wait for map pins
       const result = await fetchImoveis({
         ...baseFilters,
         ordem: filters.ordem as any,
         bounds: filters.bounds || undefined,
-        limit: 40,
+        limit: PAGE_SIZE,
+        offset: 0,
       });
       setImoveis(result.data);
       setTotal(result.count);
       setLoading(false);
 
-      // Load map pins in background (13k+ rows, slower)
       setMapLoading(true);
       fetchMapPins(baseFilters)
         .then(setMapPins)
@@ -150,6 +153,30 @@ const Search = () => {
       setLoading(false);
     }
   }, [filters, modoIA, aiResult, buildFilters]);
+
+  const loadMore = useCallback(async () => {
+    if (loadingMore || loading) return;
+    const nextPage = page + 1;
+    const offset = nextPage * PAGE_SIZE;
+    if (offset >= total) return;
+    setLoadingMore(true);
+    try {
+      const baseFilters = buildFilters();
+      const result = await fetchImoveis({
+        ...baseFilters,
+        ordem: filters.ordem as any,
+        bounds: filters.bounds || undefined,
+        limit: PAGE_SIZE,
+        offset,
+      });
+      setImoveis((prev) => [...prev, ...result.data]);
+      setPage(nextPage);
+    } catch (err) {
+      console.error("Erro ao carregar mais:", err);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [page, total, loadingMore, loading, buildFilters, filters]);
 
   useEffect(() => {
     loadImoveis();
@@ -427,21 +454,42 @@ const Search = () => {
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-4 pb-16 sm:grid-cols-2 sm:gap-6 sm:pb-4 xl:grid-cols-3">
-              {imoveis.map((imovel, i) => (
-                <React.Fragment key={imovel.id}>
-                  <SearchPropertyCard
-                    imovel={imovel}
-                    index={i}
-                    highlighted={hoveredId === imovel.id}
-                    onHover={setHoveredId}
-                  />
-                  {i === 5 && (
-                    <SearchCTACard onClickCTA={() => setShowAlertModal(true)} />
-                  )}
-                </React.Fragment>
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
+                {imoveis.map((imovel, i) => (
+                  <React.Fragment key={imovel.id}>
+                    <SearchPropertyCard
+                      imovel={imovel}
+                      index={i}
+                      highlighted={hoveredId === imovel.id}
+                      onHover={setHoveredId}
+                    />
+                    {i === 5 && (
+                      <SearchCTACard onClickCTA={() => setShowAlertModal(true)} />
+                    )}
+                  </React.Fragment>
+                ))}
+              </div>
+              {/* Load more */}
+              {imoveis.length < total && (
+                <div className="flex justify-center pb-16 pt-6 sm:pb-4">
+                  <button
+                    onClick={loadMore}
+                    disabled={loadingMore}
+                    className="rounded-full border-[1.5px] border-border px-8 py-3 font-body text-sm font-semibold text-foreground transition-all hover:border-foreground active:scale-[0.97] disabled:opacity-50"
+                  >
+                    {loadingMore ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Carregando...
+                      </span>
+                    ) : (
+                      `Ver mais imóveis (${imoveis.length} de ${total.toLocaleString("pt-BR")})`
+                    )}
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
 

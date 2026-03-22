@@ -1,7 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { getSessionId, getUtmParams, getCorretorRef } from "@/lib/session";
 import { syncToCRM } from "./syncCRM";
-import { supabase as sb } from "@/integrations/supabase/client";
 
 interface LeadData {
   nome: string;

@@ -36,6 +36,7 @@ const AdminLeads = lazy(() => import("./pages/admin/AdminLeads.tsx"));
 const AdminCaptacoes = lazy(() => import("./pages/admin/AdminCaptacoes.tsx"));
 const AdminSync = lazy(() => import("./pages/admin/AdminSync.tsx"));
 const AdminConfig = lazy(() => import("./pages/admin/AdminConfig.tsx"));
+const AdminIntegracao = lazy(() => import("./pages/admin/AdminIntegracao.tsx"));
 
 const queryClient = new QueryClient({
   defaultOptions: {

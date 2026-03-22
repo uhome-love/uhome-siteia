@@ -134,7 +134,14 @@ const CondominioDetail = () => {
 
       const name = (matched[0] as any).condominio_nome?.trim() || "";
       setCondoName(name);
-      setImoveis(matched.map(parseImovel));
+      setImoveis(matched.map((row: any) => ({
+        ...row,
+        fotos: Array.isArray(row.fotos) ? row.fotos : [],
+        diferenciais: row.diferenciais || [],
+        destaque: row.destaque ?? false,
+        cidade: row.cidade ?? "Porto Alegre",
+        uf: row.uf ?? "RS",
+      })));
       setLoading(false);
 
       // SEO

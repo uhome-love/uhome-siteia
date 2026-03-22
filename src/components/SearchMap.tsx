@@ -377,7 +377,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       mapRef.current = null;
       initRef.current = false;
     };
-  }, [navigate, onPinHover, onBoundsSearch, onBoundsChange]);
+  }, [navigate]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Draw mode
   useEffect(() => {

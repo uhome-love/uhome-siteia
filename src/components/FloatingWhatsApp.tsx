@@ -1,6 +1,7 @@
 import { forwardRef } from "react";
 import { MessageCircle } from "lucide-react";
 import { whatsappLink } from "@/lib/whatsapp";
+import { trackWhatsAppClick } from "@/services/whatsappTracker";
 import { motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
 
@@ -13,6 +14,7 @@ export const FloatingWhatsApp = forwardRef<HTMLButtonElement>(function FloatingW
   const isPropertyDetail = location.pathname.startsWith("/imovel/");
 
   const handleClick = () => {
+    trackWhatsAppClick({ origem_pagina: location.pathname });
     window.open(
       whatsappLink("Olá! Vim pelo site da Uhome e gostaria de saber mais sobre os imóveis disponíveis."),
       "_blank"

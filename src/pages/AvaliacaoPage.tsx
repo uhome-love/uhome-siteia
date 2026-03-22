@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatPhone, rawPhone } from "@/lib/phoneMask";
 import { whatsappLink } from "@/lib/whatsapp";
 import { avaliarImovel, precoM2Fallback, formatPreco } from "@/services/avaliacao";
+import { getCorretorRef, getCorretorRefId } from "@/lib/session";
 import type { DadosImovel, ResultadoAvaliacao } from "@/services/avaliacao";
 
 const TIPOS = [
@@ -62,12 +63,17 @@ export default function AvaliacaoPage() {
   async function finalizar() {
     setCalculando(true);
     try {
+      const refSlug = getCorretorRef();
+      const refId = getCorretorRefId();
       await supabase.from("captacao_imoveis").insert({
         nome,
         telefone: rawPhone(telefone),
         bairro: dados.bairro,
         tipo_imovel: dados.tipo,
         utm_source: "calculadora_avaliacao",
+        corretor_ref_id: refId || null,
+        corretor_ref_slug: refSlug || null,
+        origem_ref: refSlug ? 'link_corretor' : 'organico',
       } as any);
 
       const res = await avaliarImovel(dados);

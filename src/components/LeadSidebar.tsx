@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Send, Loader2, Check, MessageCircle } from "lucide-react";
 import { formatPhone } from "@/lib/phoneMask";
 import { submitLead } from "@/services/leads";
+import { trackWhatsAppClick } from "@/services/whatsappTracker";
 import { toast } from "sonner";
 import { formatPreco } from "@/services/imoveis";
 import { whatsappLink } from "@/lib/whatsapp";
@@ -51,6 +52,11 @@ export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, 
   };
 
   const handleWhatsApp = () => {
+    trackWhatsAppClick({
+      imovel_id: imovelId,
+      imovel_titulo: imovelTitulo,
+      imovel_slug: imovelSlug,
+    });
     window.open(whatsappLink(`Olá! Tenho interesse no imóvel: ${imovelTitulo || ""}. Vi no site da Uhome.`), "_blank");
   };
 

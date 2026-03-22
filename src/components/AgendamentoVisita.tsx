@@ -2,8 +2,8 @@ import { useState } from "react";
 import { CalendarDays, Check, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { submitLead } from "@/services/leads";
-import { syncToCRM } from "@/services/syncCRM";
 import { toast } from "sonner";
+import { getCorretorRef, getCorretorRefId } from "@/lib/session";
 import { formatPhone } from "@/lib/phoneMask";
 
 interface Props {
@@ -40,6 +40,8 @@ export function AgendamentoVisita({ imovelId, imovelSlug, imovelTitulo, imovelBa
     if (!dataEscolhida || !horario) return;
     setLoading(true);
     try {
+      const refSlug = getCorretorRef();
+      const refId = getCorretorRefId();
       const agendamentoPayload = {
         nome: nome.trim(),
         telefone: telefone.trim(),
@@ -49,11 +51,11 @@ export function AgendamentoVisita({ imovelId, imovelSlug, imovelTitulo, imovelBa
         data_visita: dataEscolhida.toISOString().split("T")[0],
         horario,
         status: "confirmado",
+        corretor_ref_id: refId || null,
+        corretor_ref_slug: refSlug || null,
+        origem_ref: refSlug ? 'link_corretor' : 'organico',
       };
       await supabase.from("agendamentos" as any).insert(agendamentoPayload);
-
-      // Fire-and-forget sync to CRM
-      syncToCRM("agendamento", agendamentoPayload);
       await submitLead({
         nome: nome.trim(),
         telefone: telefone.trim(),

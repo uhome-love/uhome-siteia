@@ -16,6 +16,8 @@ export type Database = {
     Tables: {
       agendamentos: {
         Row: {
+          corretor_ref_id: string | null
+          corretor_ref_slug: string | null
           created_at: string | null
           data_visita: string | null
           horario: string | null
@@ -24,10 +26,13 @@ export type Database = {
           imovel_slug: string | null
           imovel_titulo: string | null
           nome: string
+          origem_ref: string | null
           status: string | null
           telefone: string
         }
         Insert: {
+          corretor_ref_id?: string | null
+          corretor_ref_slug?: string | null
           created_at?: string | null
           data_visita?: string | null
           horario?: string | null
@@ -36,10 +41,13 @@ export type Database = {
           imovel_slug?: string | null
           imovel_titulo?: string | null
           nome: string
+          origem_ref?: string | null
           status?: string | null
           telefone: string
         }
         Update: {
+          corretor_ref_id?: string | null
+          corretor_ref_slug?: string | null
           created_at?: string | null
           data_visita?: string | null
           horario?: string | null
@@ -48,10 +56,19 @@ export type Database = {
           imovel_slug?: string | null
           imovel_titulo?: string | null
           nome?: string
+          origem_ref?: string | null
           status?: string | null
           telefone?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "agendamentos_corretor_ref_id_fkey"
+            columns: ["corretor_ref_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       buscas_salvas: {
         Row: {
@@ -85,12 +102,15 @@ export type Database = {
           area: number | null
           atribuido_a: string | null
           bairro: string | null
+          corretor_ref_id: string | null
+          corretor_ref_slug: string | null
           created_at: string | null
           dados_imovel: Json | null
           id: string
           mensagem: string | null
           nome: string
           origem: string | null
+          origem_ref: string | null
           quartos: number | null
           status: string | null
           telefone: string
@@ -103,12 +123,15 @@ export type Database = {
           area?: number | null
           atribuido_a?: string | null
           bairro?: string | null
+          corretor_ref_id?: string | null
+          corretor_ref_slug?: string | null
           created_at?: string | null
           dados_imovel?: Json | null
           id?: string
           mensagem?: string | null
           nome: string
           origem?: string | null
+          origem_ref?: string | null
           quartos?: number | null
           status?: string | null
           telefone: string
@@ -121,12 +144,15 @@ export type Database = {
           area?: number | null
           atribuido_a?: string | null
           bairro?: string | null
+          corretor_ref_id?: string | null
+          corretor_ref_slug?: string | null
           created_at?: string | null
           dados_imovel?: Json | null
           id?: string
           mensagem?: string | null
           nome?: string
           origem?: string | null
+          origem_ref?: string | null
           quartos?: number | null
           status?: string | null
           telefone?: string
@@ -135,7 +161,15 @@ export type Database = {
           utm_source?: string | null
           valor_pretendido?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "captacao_imoveis_corretor_ref_id_fkey"
+            columns: ["corretor_ref_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       condominio_descricoes: {
         Row: {
@@ -587,6 +621,53 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      whatsapp_clicks: {
+        Row: {
+          corretor_ref_id: string | null
+          corretor_ref_slug: string | null
+          created_at: string | null
+          id: string
+          imovel_id: string | null
+          imovel_slug: string | null
+          imovel_titulo: string | null
+          origem_pagina: string | null
+          origem_ref: string | null
+          session_id: string | null
+        }
+        Insert: {
+          corretor_ref_id?: string | null
+          corretor_ref_slug?: string | null
+          created_at?: string | null
+          id?: string
+          imovel_id?: string | null
+          imovel_slug?: string | null
+          imovel_titulo?: string | null
+          origem_pagina?: string | null
+          origem_ref?: string | null
+          session_id?: string | null
+        }
+        Update: {
+          corretor_ref_id?: string | null
+          corretor_ref_slug?: string | null
+          created_at?: string | null
+          id?: string
+          imovel_id?: string | null
+          imovel_slug?: string | null
+          imovel_titulo?: string | null
+          origem_pagina?: string | null
+          origem_ref?: string | null
+          session_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_clicks_corretor_ref_id_fkey"
+            columns: ["corretor_ref_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

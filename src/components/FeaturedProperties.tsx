@@ -126,7 +126,7 @@ const PropertyCard = forwardRef<HTMLDivElement, { imovel: Imovel; index: number 
       </div>
     </motion.div>
   );
-}
+});
 
 export function FeaturedProperties() {
   const [imoveis, setImoveis] = useState<Imovel[]>([]);

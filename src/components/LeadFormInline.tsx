@@ -111,4 +111,4 @@ export const LeadFormInline = forwardRef<HTMLDivElement, LeadFormInlineProps>(fu
       )}
     </AnimatePresence>
   );
-}
+});

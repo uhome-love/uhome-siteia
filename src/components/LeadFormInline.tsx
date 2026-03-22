@@ -45,6 +45,7 @@ export function LeadFormInline({ isOpen, imovelId, imovelTitulo, imovelBairro, i
         setSuccess(false);
         setNome("");
         setTelefone("");
+        setEmail("");
         onClose();
       }, 2500);
     } catch {

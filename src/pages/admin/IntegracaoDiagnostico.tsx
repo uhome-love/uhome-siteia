@@ -254,9 +254,18 @@ export default function IntegracaoDiagnostico() {
     await timed("fn_sync_corretores", async () => {
       const res = await supabase.functions.invoke("sync-corretores", { body: {} });
       const ok = !res.error && res.data?.ok;
+      const isSecretsIssue = !ok && (
+        res.error?.message?.includes("non-2xx") ||
+        res.error?.message?.includes("500") ||
+        JSON.stringify(res.data)?.includes("UHOMESALES")
+      );
       return {
-        status: ok ? "ok" : "erro",
-        detalhe: ok ? `Executou OK — ${res.data?.sincronizados ?? 0} corretores sincronizados` : `Erro: ${res.error?.message ?? JSON.stringify(res.data)}`,
+        status: ok ? "ok" : isSecretsIssue ? "aviso" : "erro",
+        detalhe: ok
+          ? `Executou OK — ${res.data?.sincronizados ?? 0} corretores sincronizados`
+          : isSecretsIssue
+            ? "Secrets do CRM não configurados (UHOMESALES_SUPABASE_URL / UHOMESALES_SERVICE_ROLE_KEY)"
+            : `Erro: ${res.error?.message ?? JSON.stringify(res.data)}`,
       };
     });
 

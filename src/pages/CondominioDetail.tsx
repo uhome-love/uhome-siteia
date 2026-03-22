@@ -291,6 +291,28 @@ const CondominioDetail = () => {
             </div>
           </section>
 
+          {/* AI Description */}
+          {(descricao || descLoading) && (
+            <section className="border-b border-border">
+              <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+                <h2 className="font-body text-base font-bold text-foreground mb-3">
+                  Sobre o {condoName}
+                </h2>
+                {descLoading ? (
+                  <div className="space-y-2">
+                    <div className="h-4 w-full animate-pulse rounded bg-muted" />
+                    <div className="h-4 w-4/5 animate-pulse rounded bg-muted" />
+                    <div className="h-4 w-3/5 animate-pulse rounded bg-muted" />
+                  </div>
+                ) : (
+                  <div className="font-body text-sm leading-relaxed text-muted-foreground whitespace-pre-line">
+                    {descricao}
+                  </div>
+                )}
+              </div>
+            </section>
+          )}
+
           {/* Property grid */}
           <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
             <h2 className="font-body text-lg font-extrabold text-foreground sm:text-xl mb-6">

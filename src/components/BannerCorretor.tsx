@@ -104,5 +104,6 @@ export function BannerCorretor() {
         </button>
       </div>
     </div>
+    </>
   );
 }

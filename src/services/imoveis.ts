@@ -296,7 +296,11 @@ export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSig
     rpcParams.p_cidades = CIDADES_PERMITIDAS;
   }
 
-  if (filters.tipo && !filters.tipo.includes(",")) rpcParams.p_tipo = filters.tipo;
+  if (filters.tipo) {
+    const tipos = filters.tipo.split(",").map(s => s.trim()).filter(Boolean);
+    if (tipos.length === 1) rpcParams.p_tipo = tipos[0];
+    // Note: get_map_pins doesn't support p_tipos yet; single tipo only for pins
+  }
   if (filters.bairros?.length) {
     rpcParams.p_bairros = filters.bairros;
   } else if (filters.bairro) {

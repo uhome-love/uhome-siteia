@@ -684,6 +684,38 @@ export type Database = {
           count: number
         }[]
       }
+      get_map_pins: {
+        Args: {
+          lat_max?: number
+          lat_min?: number
+          lng_max?: number
+          lng_min?: number
+          p_area_max?: number
+          p_area_min?: number
+          p_bairro?: string
+          p_bairros?: string[]
+          p_banheiros?: number
+          p_cidade?: string
+          p_cidades?: string[]
+          p_limite?: number
+          p_preco_max?: number
+          p_preco_min?: number
+          p_quartos?: number
+          p_tipo?: string
+          p_vagas?: number
+        }
+        Returns: {
+          area_total: number
+          bairro: string
+          id: string
+          latitude: number
+          longitude: number
+          preco: number
+          quartos: number
+          slug: string
+          tipo: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

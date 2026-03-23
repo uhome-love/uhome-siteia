@@ -120,6 +120,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
   const [autoSearch, setAutoSearch] = useState(false);
   const autoSearchRef = useRef(false);
   const autoSearchTimerRef = useRef<number | null>(null);
+  const userMarkerRef = useRef<mapboxgl.Marker | null>(null);
 
   // FIX 3 — Flag to prevent double initial load
   const initialBoundsReportedRef = useRef(false);

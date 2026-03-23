@@ -359,8 +359,7 @@ const Search = () => {
     setResumoIA(null);
     setAiResult(null);
     setQueryIA("");
-    setImoveis([]);
-    setTotal(0);
+    setAiOverrideData(null);
     resetFilters();
   };
 

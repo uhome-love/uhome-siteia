@@ -157,4 +157,4 @@ export const SearchCTACard = forwardRef<HTMLDivElement>(function SearchCTACard(_
       </AnimatePresence>
     </div>
   );
-}
+});

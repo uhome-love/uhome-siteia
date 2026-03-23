@@ -131,7 +131,14 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
     query = query.in("cidade", CIDADES_PERMITIDAS);
   }
 
-  if (filters.tipo) query = query.eq("tipo", filters.tipo);
+  if (filters.tipo) {
+    const tipos = filters.tipo.split(",").map(s => s.trim()).filter(Boolean);
+    if (tipos.length === 1) {
+      query = query.eq("tipo", tipos[0]);
+    } else if (tipos.length > 1) {
+      query = query.in("tipo", tipos);
+    }
+  }
   if (filters.bairros?.length) {
     const bairroFilter = filters.bairros.map(b => `bairro.ilike.%${b}%`).join(",");
     query = query.or(bairroFilter);

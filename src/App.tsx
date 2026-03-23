@@ -8,7 +8,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
 import { CorretorProvider } from "@/contexts/CorretorContext";
 
-import { ExitIntentModal } from "@/components/ExitIntentModal";
+const ExitIntentModal = lazy(() => import("@/components/ExitIntentModal").then(m => ({ default: m.ExitIntentModal })));
 import { BannerCorretor } from "@/components/BannerCorretor";
 
 // Eager load homepage

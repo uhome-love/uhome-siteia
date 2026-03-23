@@ -425,6 +425,87 @@ export type Database = {
         }
         Relationships: []
       }
+      lead_events: {
+        Row: {
+          busca_filtros: Json | null
+          busca_query: string | null
+          corretor_id: string | null
+          corretor_slug: string | null
+          created_at: string
+          id: string
+          imovel_slug: string | null
+          imovel_titulo: string | null
+          pagina: string | null
+          session_id: string | null
+          tipo: string
+          visitor_id: string
+        }
+        Insert: {
+          busca_filtros?: Json | null
+          busca_query?: string | null
+          corretor_id?: string | null
+          corretor_slug?: string | null
+          created_at?: string
+          id?: string
+          imovel_slug?: string | null
+          imovel_titulo?: string | null
+          pagina?: string | null
+          session_id?: string | null
+          tipo: string
+          visitor_id: string
+        }
+        Update: {
+          busca_filtros?: Json | null
+          busca_query?: string | null
+          corretor_id?: string | null
+          corretor_slug?: string | null
+          created_at?: string
+          id?: string
+          imovel_slug?: string | null
+          imovel_titulo?: string | null
+          pagina?: string | null
+          session_id?: string | null
+          tipo?: string
+          visitor_id?: string
+        }
+        Relationships: []
+      }
+      notificacoes: {
+        Row: {
+          created_at: string
+          id: string
+          imovel_slug: string | null
+          lead_id: string | null
+          lida: boolean
+          mensagem: string | null
+          tipo: string
+          titulo: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          imovel_slug?: string | null
+          lead_id?: string | null
+          lida?: boolean
+          mensagem?: string | null
+          tipo: string
+          titulo: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          imovel_slug?: string | null
+          lead_id?: string | null
+          lida?: boolean
+          mensagem?: string | null
+          tipo?: string
+          titulo?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           ativo: boolean | null

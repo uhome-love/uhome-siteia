@@ -196,9 +196,9 @@ const Search = () => {
     ...buildFilters(),
     ordem: filters.ordem as any,
     bounds: filters.bounds || undefined,
-    limit: PAGE_SIZE,
+    limit: PAGE_SIZE * (page + 1),
     offset: 0,
-  }), [buildFilters, filters.ordem, filters.bounds]);
+  }), [buildFilters, filters.ordem, filters.bounds, page]);
 
   // AI mode can override listing data
   const [aiOverrideData, setAiOverrideData] = useState<{ imoveis: Imovel[]; total: number } | null>(null);

@@ -21,7 +21,7 @@ export const bairrosData: BairroData[] = [
   {
     nome: "Petrópolis",
     slug: "petropolis",
-    foto: "/images/petropolis.png?v=2",
+    foto: "/images/petropolis.webp",
     descricao:
       "Petrópolis é um bairro residencial de alto padrão, próximo ao Parque Germânia e ao Colégio Rosário. Combina tranquilidade com acesso fácil ao comércio da Avenida Protásio Alves e às principais vias da cidade. Ideal para famílias que buscam segurança e espaço.",
     lat: -30.04,

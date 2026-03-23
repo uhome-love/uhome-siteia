@@ -34,7 +34,7 @@ function getStrength(pw: string): { level: number; label: string; color: string 
   return { level: 3, label: "Forte", color: "bg-green-500" };
 }
 
-export function AuthModal({ open, onClose }: Props) {
+export const AuthModal = forwardRef<HTMLDivElement, Props>(function AuthModal({ open, onClose }, ref) {
   const [tab, setTab] = useState<Tab>("login");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");

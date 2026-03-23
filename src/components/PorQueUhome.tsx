@@ -75,7 +75,6 @@ export function PorQueUhome() {
   const stats = [
     { numero: totalImoveis, suffix: "+", label: "Imóveis disponíveis" },
     { numero: 34, suffix: "", label: "Corretores especializados" },
-    { numero: 15, suffix: "", label: "Bairros com cobertura total" },
     { numero: 100, suffix: "%", label: "Foco em Porto Alegre" },
   ];
 
@@ -134,7 +133,7 @@ export function PorQueUhome() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.6, delay: 0.2, ease }}
-          className="mt-14 grid grid-cols-2 gap-6 sm:grid-cols-4"
+          className="mt-14 grid grid-cols-3 gap-6"
         >
           {stats.map((stat) => (
             <div key={stat.label} className="text-center">

@@ -101,7 +101,13 @@ const Search = () => {
   const [aiResult, setAiResult] = useState<AISearchResult | null>(null);
 
   useEffect(() => {
-    if (!modoIA) {
+    if (modoIA) {
+      // Reset filters when entering IA mode so stale filters don't show 0 results
+      resetFilters();
+      setResumoIA(null);
+      setAiResult(null);
+      setAiOverrideData(null);
+    } else {
       const f: Record<string, string | number> = {};
       const urlTipo = searchParams.get("tipo");
       const urlQ = searchParams.get("q");
@@ -352,7 +358,9 @@ const Search = () => {
       };
 
       const { data, count } = await fetchImoveis({ ...aiFilters, limit: 40 });
-      setAiOverrideData({ imoveis: data, total: count });
+      // Use count from RPC, but fallback to data.length if count is 0 but data exists (mismatch safeguard)
+      const finalCount = count > 0 ? count : data.length;
+      setAiOverrideData({ imoveis: data, total: finalCount });
     } catch (e: any) {
       toast.error(e?.message || "Erro ao interpretar busca");
     } finally {

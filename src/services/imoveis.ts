@@ -306,7 +306,7 @@ export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSig
     rpcParams.lng_max = filters.bounds.lng_max;
   }
 
-  let query = supabase.rpc("get_map_pins", rpcParams).range(0, 1999);
+  let query = supabase.rpc("get_map_pins", rpcParams).returns<any[]>();
 
   if (signal) {
     query = query.abortSignal(signal);

@@ -29,6 +29,7 @@ function HeroPropertyCount() {
 export function HeroSection() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { prefixLink } = useCorretor();
   const [modo, setModo] = useState<"comprar" | "anunciar">("comprar");
 
   // Search state

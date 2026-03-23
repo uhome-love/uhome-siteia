@@ -68,6 +68,9 @@ export function FeaturedNeighborhoods() {
                     src={b.foto}
                     alt={`Imóveis à venda em ${b.nome}, Porto Alegre`}
                     loading="lazy"
+                    decoding="async"
+                    width={400}
+                    height={533}
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 </div>

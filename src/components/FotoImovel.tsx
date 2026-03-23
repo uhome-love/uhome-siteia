@@ -8,9 +8,12 @@ interface FotoImovelProps {
   style?: React.CSSProperties;
   loading?: "eager" | "lazy";
   decoding?: "async" | "auto" | "sync";
+  width?: number;
+  height?: number;
+  sizes?: string;
 }
 
-export function FotoImovel({ src, alt, className = "", style, loading, decoding }: FotoImovelProps) {
+export function FotoImovel({ src, alt, className = "", style, loading, decoding, width, height, sizes }: FotoImovelProps) {
   const [erro, setErro] = useState(false);
 
   if (erro) {
@@ -32,6 +35,9 @@ export function FotoImovel({ src, alt, className = "", style, loading, decoding 
       decoding={decoding}
       className={className}
       style={style}
+      width={width}
+      height={height}
+      sizes={sizes}
       onError={() => setErro(true)}
     />
   );

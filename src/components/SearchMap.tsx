@@ -2,8 +2,7 @@ import { useRef, useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, X, Bed, Maximize, ToggleLeft, ToggleRight, PenTool, Navigation, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
+import type mapboxgl from "mapbox-gl";
 import { type MapPin as MapPinData } from "@/services/imoveis";
 
 

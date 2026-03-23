@@ -23,13 +23,14 @@ export default defineConfig(({ mode }) => ({
     cssCodeSplit: true,
     rollupOptions: {
       output: {
-        manualChunks: {
-          "vendor-react": ["react", "react-dom"],
-          "vendor-router": ["react-router-dom"],
-          "vendor-query": ["@tanstack/react-query"],
-          "vendor-motion": ["framer-motion"],
-          "vendor-supabase": ["@supabase/supabase-js"],
-          "vendor-mapbox": ["mapbox-gl"],
+        manualChunks(id) {
+          // Keep mapbox in the Search chunk (lazy loaded) — do NOT separate it
+          if (id.includes("mapbox-gl")) return undefined;
+          if (id.includes("node_modules/react-dom") || id.includes("node_modules/react/")) return "vendor-react";
+          if (id.includes("react-router-dom")) return "vendor-router";
+          if (id.includes("@tanstack/react-query")) return "vendor-query";
+          if (id.includes("framer-motion")) return "vendor-motion";
+          if (id.includes("@supabase/supabase-js")) return "vendor-supabase";
         },
         assetFileNames: "assets/[name]-[hash][extname]",
         chunkFileNames: "assets/[name]-[hash].js",

@@ -116,6 +116,24 @@ Deno.serve(async (req) => {
     await createCRMNotification(supabaseCRM, corretorCRMId, tipo, record)
   }
 
+  // Send notification to site's notificacoes table for corretor
+  const siteCorretorId = record.corretor_ref_id as string | null
+  if (result.ok && siteCorretorId && tipo === 'lead') {
+    try {
+      await supabaseSite.from('notificacoes').insert({
+        user_id: siteCorretorId,
+        tipo: 'lead_recebido',
+        titulo: 'Novo lead pelo seu link!',
+        mensagem: `${record.nome} tem interesse em ${record.imovel_titulo || 'imóveis'}.`,
+        lead_id: record.id ?? null,
+        imovel_slug: record.imovel_slug ?? null,
+        lida: false,
+      })
+    } catch {
+      console.error('[sync-to-crm] Failed to insert site notification')
+    }
+  }
+
   return new Response(JSON.stringify(result), {
     headers: { ...corsHeaders, 'Content-Type': 'application/json' }
   })

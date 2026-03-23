@@ -174,8 +174,18 @@ const PropertyDetail = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      {/* Desktop Gallery */}
-      <div className="mt-16 px-6 pt-4 hidden sm:block">
+      {/* Desktop Back + Gallery */}
+      <div className="mt-16 hidden sm:block">
+        <div className="mx-auto max-w-7xl px-6 pt-4 pb-2">
+          <button
+            onClick={() => window.history.length > 1 ? navigate(-1) : navigate("/")}
+            className="flex items-center gap-1.5 rounded-full px-3 py-1.5 font-body text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Voltar
+          </button>
+        </div>
+        <div className="px-6">
         <div className="mx-auto max-w-7xl gap-2 grid grid-cols-4 grid-rows-2" style={{ height: 480 }}>
           <button
             onClick={() => { setCurrentImage(0); setGalleryOpen(true); }}
@@ -199,6 +209,7 @@ const PropertyDetail = () => {
               )}
             </button>
           ))}
+        </div>
         </div>
         {images.length > 1 && (
           <div className="mx-auto mt-3 max-w-7xl flex justify-end">

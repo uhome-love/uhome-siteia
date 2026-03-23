@@ -62,7 +62,7 @@ export function Footer() {
           <p className="font-body text-xs text-muted-foreground">
             © {new Date().getFullYear()} Uhome Imóveis LTDA · CRECI-RS 25682J · Porto Alegre, RS
           </p>
-          <Link to="/politica-de-privacidade" className="font-body text-xs text-muted-foreground transition-colors hover:text-foreground">
+          <Link to={prefixLink("/politica-de-privacidade")} className="font-body text-xs text-muted-foreground transition-colors hover:text-foreground">
             Política de Privacidade
           </Link>
         </div>

@@ -173,7 +173,7 @@ export function Navbar() {
                 onClick={() => setMobileOpen(false)}
               />
               <MobileNavLink
-                to="/faq"
+                to={prefixLink("/faq")}
                 icon={<HelpCircle className="h-4 w-4" />}
                 label="Ajuda"
                 onClick={() => setMobileOpen(false)}

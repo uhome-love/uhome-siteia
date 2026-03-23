@@ -29,6 +29,7 @@ export const FotoImovel = forwardRef<HTMLImageElement, FotoImovelProps>(function
 
   return (
     <img
+      ref={ref}
       src={src}
       alt={alt}
       loading={loading}
@@ -41,4 +42,4 @@ export const FotoImovel = forwardRef<HTMLImageElement, FotoImovelProps>(function
       onError={() => setErro(true)}
     />
   );
-}
+});

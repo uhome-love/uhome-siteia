@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, lazy } from "react";
+import React, { useState, useEffect, useCallback, useMemo, lazy } from "react";
 const PerformanceDebug = lazy(() => import("@/components/PerformanceDebug").then(m => ({ default: m.PerformanceDebug })));
 import { AuthModal } from "@/components/AuthModal";
 import { useAuth } from "@/hooks/useAuth";
@@ -13,6 +13,7 @@ import { SearchCTACard } from "@/components/SearchCTACard";
 import { MobileFiltersSheet } from "@/components/MobileFiltersSheet";
 import { useSearchStore, type MapBounds } from "@/stores/searchStore";
 import { fetchImoveis, fetchMapPins, type Imovel, type MapPin as MapPinData, type BuscaFilters } from "@/services/imoveis";
+import { useImoveisQuery } from "@/hooks/useImoveisQuery";
 import { interpretarBusca, type AISearchResult } from "@/services/aiSearch";
 import { supabase } from "@/integrations/supabase/client";
 import { syncToCRM } from "@/services/syncCRM";
@@ -86,11 +87,8 @@ const Search = () => {
     }
   }, [user, pendingAlert]);
 
-  const [imoveis, setImoveis] = useState<Imovel[]>([]);
   const [mapPins, setMapPins] = useState<MapPinData[]>([]);
   const [mapViewBounds, setMapViewBounds] = useState<MapBounds | null>(null);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [mapLoading, setMapLoading] = useState(true);
   const [page, setPage] = useState(0);
@@ -187,28 +185,30 @@ const Search = () => {
     };
   }, [filters]);
 
-  // Normal mode: fetch list only (pins loaded separately by viewport)
-  const loadImoveis = useCallback(async () => {
-    if (modoIA && !aiResult && queryIA.trim()) return;
-    setLoading(true);
-    setPage(0);
-    try {
-      const baseFilters = buildFilters();
-      const result = await fetchImoveis({
-        ...baseFilters,
-        ordem: filters.ordem as any,
-        bounds: filters.bounds || undefined,
-        limit: PAGE_SIZE,
-        offset: 0,
-      });
-      setImoveis(result.data);
-      setTotal(result.count);
-      setLoading(false);
-    } catch (err) {
-      console.error("Erro ao buscar imóveis:", err);
-      setLoading(false);
-    }
-  }, [filters, modoIA, aiResult, buildFilters]);
+  // React Query — cached listing with 3 min staleTime
+  const queryFilters = useMemo<BuscaFilters>(() => ({
+    ...buildFilters(),
+    ordem: filters.ordem as any,
+    bounds: filters.bounds || undefined,
+    limit: PAGE_SIZE,
+    offset: 0,
+  }), [buildFilters, filters.ordem, filters.bounds]);
+
+  // AI mode can override listing data
+  const [aiOverrideData, setAiOverrideData] = useState<{ imoveis: Imovel[]; total: number } | null>(null);
+
+  const enableQuery = !(modoIA && !aiResult && queryIA.trim() !== "");
+  const { imoveis: queryImoveis, total: queryTotal, isLoading: queryLoading, fetchNextPage } = useImoveisQuery({
+    filters: queryFilters,
+    enabled: enableQuery && !aiOverrideData,
+  });
+  
+  const imoveis = aiOverrideData?.imoveis ?? queryImoveis;
+  const total = aiOverrideData?.total ?? queryTotal;
+  const loading = aiOverrideData ? false : queryLoading;
+
+  // Reset page when filters change
+  useEffect(() => { setPage(0); }, [queryFilters]);
 
   // FIX 4 — AbortController to cancel stale pin requests
   const pinLoadTimerRef = React.useRef<number | null>(null);
@@ -216,10 +216,8 @@ const Search = () => {
 
   const handleMapBoundsChange = useCallback((bounds: MapBounds) => {
     setMapViewBounds(bounds);
-    // Debounce pin fetching to avoid rapid re-fetches during pan/zoom
     if (pinLoadTimerRef.current) clearTimeout(pinLoadTimerRef.current);
     pinLoadTimerRef.current = window.setTimeout(() => {
-      // Cancel previous in-flight request
       pinAbortRef.current?.abort();
       pinAbortRef.current = new AbortController();
       
@@ -234,10 +232,9 @@ const Search = () => {
     }, 300);
   }, [buildFilters]);
 
-  // Reload pins when filters change (using current map viewport)
+  // Reload pins when filters change
   useEffect(() => {
     if (!mapViewBounds) return;
-    // Cancel previous request
     pinAbortRef.current?.abort();
     pinAbortRef.current = new AbortController();
     
@@ -260,26 +257,14 @@ const Search = () => {
     if (offset >= total) return;
     setLoadingMore(true);
     try {
-      const baseFilters = buildFilters();
-      const result = await fetchImoveis({
-        ...baseFilters,
-        ordem: filters.ordem as any,
-        bounds: filters.bounds || undefined,
-        limit: PAGE_SIZE,
-        offset,
-      });
-      setImoveis((prev) => [...prev, ...result.data]);
-      setPage(nextPage);
+      const loaded = await fetchNextPage(page, PAGE_SIZE);
+      if (loaded > 0) setPage(nextPage);
     } catch (err) {
       console.error("Erro ao carregar mais:", err);
     } finally {
       setLoadingMore(false);
     }
-  }, [page, total, loadingMore, loading, buildFilters, filters]);
-
-  useEffect(() => {
-    loadImoveis();
-  }, [loadImoveis]);
+  }, [page, total, loadingMore, loading, fetchNextPage]);
 
   // Sort dropdown click-outside
   useEffect(() => {
@@ -325,7 +310,6 @@ const Search = () => {
     ultimaBuscaIA.current = agora;
 
     setBuscandoIA(true);
-    setLoading(true);
     try {
       const res = await interpretarBusca(q.trim());
       setAiResult(res);
@@ -354,13 +338,11 @@ const Search = () => {
         diferenciais: f.diferenciais?.length ? f.diferenciais : undefined,
       };
       const { data, count } = await fetchImoveis({ ...aiFilters, limit: 40 });
-      setImoveis(data);
-      setTotal(count);
+      setAiOverrideData({ imoveis: data, total: count });
     } catch (e: any) {
       toast.error(e?.message || "Erro ao interpretar busca");
     } finally {
       setBuscandoIA(false);
-      setLoading(false);
     }
   }, [queryIA, setFilters]);
 
@@ -377,8 +359,7 @@ const Search = () => {
     setResumoIA(null);
     setAiResult(null);
     setQueryIA("");
-    setImoveis([]);
-    setTotal(0);
+    setAiOverrideData(null);
     resetFilters();
   };
 

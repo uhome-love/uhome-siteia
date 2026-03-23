@@ -16,7 +16,7 @@ export function Navbar() {
   const modoIA = searchParams.get("modo") === "ia";
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border/50">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border/50" style={{ top: document.querySelector('[data-testid="banner-corretor"]') ? '40px' : '0px' }}>
       <div className="relative flex h-16 w-full items-center justify-between px-5 sm:px-10">
         <Link to={prefixLink("/")} className="flex items-center flex-shrink-0">
           <UhomeLogo variant="full" height={32} />

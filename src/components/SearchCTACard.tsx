@@ -1,8 +1,9 @@
 import React, { useState, forwardRef } from "react";
 import { MessageCircle, Send, Check, Loader2, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { buildWhatsAppUrl } from "@/lib/whatsapp";
+import { buildWhatsAppUrl, buildCorretorWhatsAppUrl } from "@/lib/whatsapp";
 import { trackWhatsAppClick } from "@/services/whatsappTracker";
+import { useCorretor } from "@/contexts/CorretorContext";
 import { submitLead } from "@/services/leads";
 import { formatPhone } from "@/lib/phoneMask";
 import { toast } from "sonner";

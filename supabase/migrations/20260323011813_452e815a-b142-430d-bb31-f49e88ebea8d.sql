@@ -1,0 +1,2 @@
+-- Drop the OLD overload (p_cidade before p_cidades before p_q)
+DROP FUNCTION IF EXISTS public.count_imoveis(text, text, text[], numeric, numeric, integer, integer, integer, numeric, numeric, text, text[], text, numeric, numeric, numeric, numeric);

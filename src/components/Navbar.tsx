@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { Menu, X, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -11,12 +11,21 @@ export function Navbar() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const { prefixLink } = useCorretor();
+  const [bannerVisible, setBannerVisible] = useState(false);
+
+  useEffect(() => {
+    const check = () => setBannerVisible(!!document.getElementById('banner-corretor-spacer'));
+    check();
+    window.addEventListener('corretor-ref-ready', check);
+    const t = setTimeout(check, 2000);
+    return () => { window.removeEventListener('corretor-ref-ready', check); clearTimeout(t); };
+  }, [location.pathname]);
 
   const isSearchPage = location.pathname === "/busca" || location.pathname.endsWith("/busca");
   const modoIA = searchParams.get("modo") === "ia";
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border/50" style={{ top: document.querySelector('[data-testid="banner-corretor"]') ? '40px' : '0px' }}>
+    <nav className={`fixed left-0 right-0 z-50 bg-background border-b border-border/50 ${bannerVisible ? 'top-10' : 'top-0'}`}>
       <div className="relative flex h-16 w-full items-center justify-between px-5 sm:px-10">
         <Link to={prefixLink("/")} className="flex items-center flex-shrink-0">
           <UhomeLogo variant="full" height={32} />

@@ -82,6 +82,7 @@ export const ExitIntentModal = forwardRef<HTMLDivElement>(function ExitIntentMod
   };
 
   return (
+    <span ref={ref}>
     <AnimatePresence>
       {show && (
         <motion.div

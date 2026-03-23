@@ -210,7 +210,7 @@ export function HeroSection() {
                   className={`rounded-full border-[1.5px] px-5 py-2 font-body text-sm transition-all active:scale-[0.97] ${
                     modo === m
                       ? "border-primary bg-primary/5 font-bold text-primary"
-                      : "border-border font-normal text-muted-foreground hover:border-foreground/30"
+                      : "border-border font-normal text-foreground/70 hover:border-foreground/30"
                   }`}
                 >
                   {m === "comprar" ? "Buscar imóveis" : "Anunciar imóvel"}

@@ -12,7 +12,7 @@ export const bairrosData: BairroData[] = [
   {
     nome: "Moinhos de Vento",
     slug: "moinhos-de-vento",
-    foto: "/images/moinhos-de-vento.png?v=2",
+    foto: "/images/moinhos-de-vento.webp",
     descricao:
       "Moinhos de Vento é o bairro mais nobre de Porto Alegre. Com ruas arborizadas, gastronomia sofisticada na Rua Padre Chagas e o icônico Parcão, reúne edifícios de alto padrão, boutiques e vida noturna refinada. Um endereço de prestígio para quem valoriza conveniência e qualidade de vida.",
     lat: -30.025,
@@ -21,7 +21,7 @@ export const bairrosData: BairroData[] = [
   {
     nome: "Petrópolis",
     slug: "petropolis",
-    foto: "/images/petropolis.png?v=2",
+    foto: "/images/petropolis.webp",
     descricao:
       "Petrópolis é um bairro residencial de alto padrão, próximo ao Parque Germânia e ao Colégio Rosário. Combina tranquilidade com acesso fácil ao comércio da Avenida Protásio Alves e às principais vias da cidade. Ideal para famílias que buscam segurança e espaço.",
     lat: -30.04,
@@ -30,7 +30,7 @@ export const bairrosData: BairroData[] = [
   {
     nome: "Bela Vista",
     slug: "bela-vista",
-    foto: "/images/bela-vista.png",
+    foto: "/images/bela-vista.webp",
     descricao:
       "Bela Vista alia localização privilegiada a uma infraestrutura completa. Com o Colégio Farroupilha e a PUCRS nas proximidades, o bairro concentra condomínios modernos, parques e fácil acesso às principais avenidas de Porto Alegre.",
     lat: -30.045,
@@ -39,7 +39,7 @@ export const bairrosData: BairroData[] = [
   {
     nome: "Auxiliadora",
     slug: "auxiliadora",
-    foto: "/images/auxiliadora.png",
+    foto: "/images/auxiliadora.webp",
     descricao:
       "Auxiliadora é sinônimo de sofisticação e praticidade. A poucos minutos do Shopping Iguatemi, concentra edifícios de alto padrão, clínicas, escolas e o melhor do comércio da Zona Norte. Perfeito para quem busca viver bem sem abrir mão da centralidade.",
     lat: -30.02,
@@ -48,7 +48,7 @@ export const bairrosData: BairroData[] = [
   {
     nome: "Três Figueiras",
     slug: "tres-figueiras",
-    foto: "/images/tres-figueiras.png",
+    foto: "/images/tres-figueiras.webp",
     descricao:
       "Três Figueiras é um dos bairros mais exclusivos de Porto Alegre. Ruas tranquilas, residências luxuosas e a proximidade com o Parque Germânia e o Shopping Iguatemi fazem deste endereço uma referência em qualidade de vida e valorização imobiliária.",
     lat: -30.035,
@@ -57,7 +57,7 @@ export const bairrosData: BairroData[] = [
   {
     nome: "Menino Deus",
     slug: "menino-deus",
-    foto: "/images/menino-deus.png",
+    foto: "/images/menino-deus.webp",
     descricao:
       "Menino Deus encanta pela vista para o Guaíba e pela proximidade com o Parque Marinha do Brasil. Com excelente infraestrutura, ciclovias e acesso à Orla, é ideal para quem curte vida ao ar livre sem abrir mão da conveniência urbana.",
     lat: -30.05,

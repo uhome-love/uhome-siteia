@@ -200,7 +200,7 @@ const Search = () => {
   const enableQuery = !(modoIA && !aiResult && queryIA.trim() !== "");
   const { imoveis: queryImoveis, total: queryTotal, isLoading: queryLoading, fetchNextPage } = useImoveisQuery({
     filters: queryFilters,
-    enabled: enableQuery && !aiOverrideData,
+    enabled: enableQuery && !aiOverrideData && !buscandoIA,
   });
   
   const imoveis = aiOverrideData?.imoveis ?? queryImoveis;

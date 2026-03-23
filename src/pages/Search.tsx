@@ -390,6 +390,25 @@ const Search = () => {
     setFilter("bounds", null);
   }, [setFilter]);
 
+  const handlePertoDeVoce = useCallback(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const delta = 0.015;
+          setFilter("bounds", {
+            lat_min: pos.coords.latitude - delta,
+            lat_max: pos.coords.latitude + delta,
+            lng_min: pos.coords.longitude - delta,
+            lng_max: pos.coords.longitude + delta,
+          });
+        },
+        () => {
+          import("sonner").then(({ toast }) => toast.error("Não foi possível obter sua localização"));
+        }
+      );
+    }
+  }, [setFilter]);
+
   const handleCreateAlert = async () => {
     const email = user?.email || alertEmail;
     setAlertLoading(true);
@@ -648,7 +667,7 @@ const Search = () => {
         {/* Map — desktop */}
         <div className="relative hidden w-[45%] shrink-0 border-l border-border lg:block" style={{ overflow: "visible" }}>
           <div className="h-full w-full overflow-hidden rounded-none">
-            <SearchMap pins={mapPins} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} onBoundsChange={handleMapBoundsChange} />
+            <SearchMap pins={mapPins} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} onBoundsChange={handleMapBoundsChange} onPertoDeVoce={handlePertoDeVoce} />
           </div>
         </div>
       </div>
@@ -687,7 +706,7 @@ const Search = () => {
               <X className="h-4 w-4" />
               Voltar à lista
             </button>
-            <SearchMap pins={mapPins} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} onBoundsChange={handleMapBoundsChange} />
+            <SearchMap pins={mapPins} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} onBoundsChange={handleMapBoundsChange} onPertoDeVoce={handlePertoDeVoce} />
           </motion.div>
         )}
       </AnimatePresence>

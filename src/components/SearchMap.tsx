@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, X, Bed, Maximize, ToggleLeft, ToggleRight } from "lucide-react";
+import { Search, X, Bed, Maximize, ToggleLeft, ToggleRight, PenTool, Navigation } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -105,9 +105,10 @@ interface SearchMapProps {
   onBoundsSearch?: (bounds: { lat_min: number; lat_max: number; lng_min: number; lng_max: number }) => void;
   onBoundsChange?: (bounds: { lat_min: number; lat_max: number; lng_min: number; lng_max: number }) => void;
   onDrawFilter?: (filteredPins: MapPinData[]) => void;
+  onPertoDeVoce?: () => void;
 }
 
-export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, onBoundsChange, onDrawFilter }: SearchMapProps) {
+export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, onBoundsChange, onDrawFilter, onPertoDeVoce }: SearchMapProps) {
   const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
@@ -628,12 +629,28 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         )}
       </AnimatePresence>
 
-      {/* Auto-search toggle */}
+      {/* Map toolbar — draw, nearby, auto-search */}
       {onBoundsSearch && !drawMode && !hasDrawn && (
-        <div className="absolute bottom-4 right-4 z-20">
+        <div className="absolute bottom-4 left-4 right-4 z-20 flex items-center gap-2 justify-end">
+          <button
+            onClick={() => window.dispatchEvent(new CustomEvent("uhome:draw-area"))}
+            className="flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-2 font-body text-[12px] font-semibold text-muted-foreground shadow-lg transition-all hover:border-foreground/30 active:scale-[0.97]"
+          >
+            <PenTool className="h-3.5 w-3.5" />
+            Desenhar área
+          </button>
+          {onPertoDeVoce && (
+            <button
+              onClick={onPertoDeVoce}
+              className="flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-2 font-body text-[12px] font-semibold text-muted-foreground shadow-lg transition-all hover:border-foreground/30 active:scale-[0.97]"
+            >
+              <Navigation className="h-3.5 w-3.5" />
+              Perto de você
+            </button>
+          )}
           <button
             onClick={() => setAutoSearch(prev => !prev)}
-            className={`flex items-center gap-2 rounded-full px-3.5 py-2 font-body text-[12px] font-semibold shadow-lg transition-all active:scale-[0.97] ${
+            className={`flex items-center gap-1.5 rounded-full px-3 py-2 font-body text-[12px] font-semibold shadow-lg transition-all active:scale-[0.97] ${
               autoSearch
                 ? "border border-primary bg-primary/10 text-primary"
                 : "border border-border bg-card text-muted-foreground"

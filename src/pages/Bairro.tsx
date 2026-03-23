@@ -234,7 +234,7 @@ const Bairro = () => {
           {total > 40 && (
             <div className="mt-10 text-center">
               <button
-                onClick={() => navigate(`/busca?bairros=${encodeURIComponent(bairro.nome)}`)}
+                onClick={() => navigate(prefixLink(`/busca?bairros=${encodeURIComponent(bairro.nome)}`))}
                 className="inline-flex items-center gap-2 rounded-full border border-primary px-6 py-2.5 font-body text-sm font-semibold text-primary transition-colors hover:bg-primary/5 active:scale-[0.97]"
               >
                 Ver todos os {total} imóveis <ArrowRight className="h-4 w-4" />

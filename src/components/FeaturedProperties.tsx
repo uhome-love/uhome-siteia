@@ -35,7 +35,7 @@ export function FeaturedProperties() {
               Imóveis em destaque
             </h2>
           </div>
-          <Link to="/busca" className="hidden font-body text-sm font-medium text-primary transition-colors hover:text-primary/80 sm:block">
+          <Link to={prefixLink("/busca")} className="hidden font-body text-sm font-medium text-primary transition-colors hover:text-primary/80 sm:block">
             Ver todos →
           </Link>
         </motion.div>

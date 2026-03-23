@@ -61,7 +61,7 @@ export function FeaturedNeighborhoods() {
               transition={{ duration: 0.5, delay: i * 0.08 }}
             >
               <Link
-                to={`/bairros/${b.slug}`}
+                to={prefixLink(`/bairros/${b.slug}`)}
                 className="group relative block overflow-hidden rounded-2xl hover-lift"
               >
                 <div className="aspect-video w-full">

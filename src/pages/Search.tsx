@@ -92,7 +92,6 @@ const Search = () => {
   const [mapViewBounds, setMapViewBounds] = useState<MapBounds | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
   const [mapLoading, setMapLoading] = useState(true);
-  const [page, setPage] = useState(0);
   const PAGE_SIZE = 40;
 
   // AI mode state

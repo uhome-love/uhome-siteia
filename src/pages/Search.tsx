@@ -310,6 +310,24 @@ const Search = () => {
     }
   }, [page, total, loadingMore, loading, imoveis.length, aiOverrideData, buildFilters, filters.ordem]);
 
+  // Infinite scroll sentinel for mobile
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!isMobile) return;
+    const el = sentinelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMore();
+        }
+      },
+      { rootMargin: "400px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [isMobile, loadMore]);
+
   // Sort dropdown click-outside
   useEffect(() => {
     if (!sortOpen) return;

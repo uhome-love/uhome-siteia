@@ -213,8 +213,13 @@ const Search = () => {
   const total = aiOverrideData?.total ?? queryTotal;
   const loading = aiOverrideData ? false : queryLoading;
 
-  // Reset page when filters change
-  useEffect(() => { setPage(0); }, [queryFilters]);
+  // Save scroll position on unmount & restore on mount
+  useEffect(() => {
+    if (scrollY > 0 && !loading && imoveis.length > 0) {
+      window.scrollTo(0, scrollY);
+    }
+    return () => { setScrollY(window.scrollY); };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Track busca_realizada (debounced — fires once per filter set)
   const buscaTrackRef = useRef<ReturnType<typeof setTimeout>>();

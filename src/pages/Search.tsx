@@ -512,7 +512,12 @@ const Search = () => {
               {animatedTotal.toLocaleString("pt-BR")} imóveis
             </div>
             <div className="mt-0.5 font-body text-xs text-muted-foreground sm:text-sm">
-              à venda em Porto Alegre{filters.bairro ? `, ${filters.bairro}` : ""}
+              à venda em {filters.cidade || "Porto Alegre"}
+              {filters.bairro ? (() => {
+                const bairros = filters.bairro.split(",").map(s => s.trim()).filter(Boolean);
+                if (bairros.length <= 3) return `, ${bairros.join(", ")}`;
+                return `, ${bairros.slice(0, 3).join(", ")} +${bairros.length - 3}`;
+              })() : ""}
             </div>
           </div>
 

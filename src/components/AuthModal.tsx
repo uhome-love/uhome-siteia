@@ -173,7 +173,7 @@ export function AuthModal({ open, onClose }: Props) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4"
+          className="fixed inset-0 z-[60] flex items-center justify-center overflow-y-auto bg-black/40 backdrop-blur-sm px-4 py-6"
           onClick={onClose}
         >
           <motion.div
@@ -181,7 +181,7 @@ export function AuthModal({ open, onClose }: Props) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 12 }}
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="w-full max-w-[420px] rounded-2xl bg-card p-6 shadow-2xl sm:p-8"
+            className="w-full max-w-[420px] my-auto rounded-2xl bg-card p-6 shadow-2xl sm:p-8"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}

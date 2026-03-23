@@ -217,7 +217,7 @@ const Bairro = () => {
                 Nenhum imóvel disponível neste bairro no momento.
               </p>
               <button
-                onClick={() => navigate("/busca")}
+                onClick={() => navigate(prefixLink("/busca"))}
                 className="mt-4 rounded-full bg-primary px-6 py-2.5 font-body text-sm font-semibold text-primary-foreground hover:bg-primary/90"
               >
                 Ver todos os imóveis

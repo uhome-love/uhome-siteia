@@ -194,14 +194,14 @@ const Search = () => {
     offset: 0,
   }), [buildFilters, filters.ordem, filters.bounds]);
 
+  // AI mode can override listing data
+  const [aiOverrideData, setAiOverrideData] = useState<{ imoveis: Imovel[]; total: number } | null>(null);
+
   const enableQuery = !(modoIA && !aiResult && queryIA.trim() !== "");
   const { imoveis: queryImoveis, total: queryTotal, isLoading: queryLoading, fetchNextPage } = useImoveisQuery({
     filters: queryFilters,
     enabled: enableQuery && !aiOverrideData,
   });
-
-  // AI mode can override listing data
-  const [aiOverrideData, setAiOverrideData] = useState<{ imoveis: Imovel[]; total: number } | null>(null);
   
   const imoveis = aiOverrideData?.imoveis ?? queryImoveis;
   const total = aiOverrideData?.total ?? queryTotal;

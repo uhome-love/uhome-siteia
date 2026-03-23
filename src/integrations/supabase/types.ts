@@ -707,6 +707,7 @@ export type Database = {
         Returns: {
           area_total: number
           bairro: string
+          foto_principal: string
           id: string
           latitude: number
           longitude: number

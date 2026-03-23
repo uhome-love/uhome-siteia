@@ -17,6 +17,10 @@ export function ExitIntentModal() {
 
     const pageLoadTime = Date.now();
 
+    let lastMouseX = 0;
+    const trackMouse = (e: MouseEvent) => { lastMouseX = e.clientX; };
+    document.addEventListener("mousemove", trackMouse);
+
     const canShow = () => {
       // Don't show if a dropdown/popover/select is open
       const openEl = document.querySelector(
@@ -26,6 +30,12 @@ export function ExitIntentModal() {
       // Require at least 60s on page
       if (Date.now() - pageLoadTime < 60000) return false;
       if (sessionStorage.getItem("uhome_exit_shown")) return false;
+      // Don't show if mouse was over the map area (right side)
+      const mapEl = document.querySelector("[data-testid='search-map']");
+      if (mapEl) {
+        const rect = mapEl.getBoundingClientRect();
+        if (lastMouseX > rect.left) return false;
+      }
       return true;
     };
 
@@ -46,6 +56,7 @@ export function ExitIntentModal() {
     document.addEventListener("mouseleave", handleMouseLeave);
     return () => {
       document.removeEventListener("mouseleave", handleMouseLeave);
+      document.removeEventListener("mousemove", trackMouse);
       clearTimeout(timer);
     };
   }, []);

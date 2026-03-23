@@ -55,7 +55,14 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavo
   const isFavorito = isFavoritoProp ?? (() => false);
   const toggleFavorito = toggleFavoritoProp ?? (async () => undefined as "needs_auth" | void);
   const liked = isFavorito(imovel.id);
-  const baseFotos = imovel.fotos && imovel.fotos.length > 0 ? imovel.fotos.map((f) => f.url) : [fotoPrincipal(imovel)];
+  const baseFotos = (() => {
+    if (imovel.fotos && imovel.fotos.length > 0) {
+      const urls = imovel.fotos.map((f) => f.url).filter(Boolean);
+      if (urls.length > 0) return urls;
+    }
+    const fp = fotoPrincipal(imovel);
+    return fp ? [fp] : [];
+  })();
   const fotos = lazyFotos && lazyFotos.length > 0 ? lazyFotos : baseFotos;
   const price = formatPreco(imovel.preco);
   const area = imovel.area_total ?? imovel.area_util ?? 0;
@@ -128,6 +135,7 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavo
       <div className="sm:hidden">
         {/* Native scroll-snap carousel */}
         <div className="relative overflow-hidden rounded-xl">
+          {fotos.length > 0 ? (
           <div
             ref={scrollRef}
             onScroll={handleScroll}
@@ -152,6 +160,14 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavo
               </div>
             ))}
           </div>
+          ) : (
+            <div className="flex items-center justify-center bg-muted" style={{ aspectRatio: "4/3" }}>
+              <div className="flex flex-col items-center gap-1 opacity-40">
+                <span className="text-3xl">🏠</span>
+                <span className="font-body text-[11px] text-muted-foreground">Foto em breve</span>
+              </div>
+            </div>
+          )}
 
           {/* Badges */}
           <div className="pointer-events-none absolute left-3 top-3 z-10 flex gap-1.5">
@@ -247,6 +263,7 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavo
       <div className="hidden sm:block">
         {/* Photo */}
         <div className="relative w-full overflow-hidden rounded-xl" style={{ aspectRatio: "4/3" }}>
+          {fotos.length > 0 ? (
           <FotoImovel
             src={fotos[fotoAtiva]}
             alt={imovel.titulo}
@@ -255,6 +272,14 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavo
             className="h-full w-full object-cover transition-transform duration-500"
             style={{ transform: hovering ? "scale(1.03)" : "scale(1)" }}
           />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-muted">
+              <div className="flex flex-col items-center gap-1 opacity-40">
+                <span className="text-3xl">🏠</span>
+                <span className="font-body text-[11px] text-muted-foreground">Foto em breve</span>
+              </div>
+            </div>
+          )}
 
           {/* Badge */}
           {badge && (

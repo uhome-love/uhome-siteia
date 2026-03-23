@@ -15,6 +15,7 @@ interface Props {
 
 export function SimilarProperties({ currentId, bairro, tipo, preco }: Props) {
   const [imoveis, setImoveis] = useState<Imovel[]>([]);
+  const { prefixLink } = useCorretor();
 
   useEffect(() => {
     async function load() {

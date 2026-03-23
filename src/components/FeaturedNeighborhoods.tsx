@@ -10,6 +10,7 @@ const bairrosConfig = bairrosData.slice(0, 6);
 
 export function FeaturedNeighborhoods() {
   const [contagens, setContagens] = useState<number[]>(bairrosConfig.map(() => 0));
+  const { prefixLink } = useCorretor();
 
   useEffect(() => {
     async function buscarContagens() {

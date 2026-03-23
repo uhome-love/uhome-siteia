@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { SearchPropertyCard } from "@/components/SearchPropertyCard";
 import { fetchImoveisDestaque, type Imovel } from "@/services/imoveis";
 import { useFavoritos } from "@/hooks/useFavoritos";
+import { useCorretor } from "@/contexts/CorretorContext";
 
 export function FeaturedProperties() {
   const [imoveis, setImoveis] = useState<Imovel[]>([]);

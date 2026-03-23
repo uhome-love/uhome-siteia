@@ -30,7 +30,7 @@ export const bairrosData: BairroData[] = [
   {
     nome: "Bela Vista",
     slug: "bela-vista",
-    foto: "/images/bela-vista.png",
+    foto: "/images/bela-vista.webp",
     descricao:
       "Bela Vista alia localização privilegiada a uma infraestrutura completa. Com o Colégio Farroupilha e a PUCRS nas proximidades, o bairro concentra condomínios modernos, parques e fácil acesso às principais avenidas de Porto Alegre.",
     lat: -30.045,

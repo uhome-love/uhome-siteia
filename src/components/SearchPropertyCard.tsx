@@ -299,6 +299,13 @@ export const SearchPropertyCard = forwardRef<HTMLDivElement, Props>(function Sea
             </button>
           </div>
 
+          {/* Financing estimate */}
+          {parcelaEstimada && (
+            <p className="mt-0.5 font-body text-[12px] text-muted-foreground">
+              A partir de <span className="font-semibold text-foreground/80">R$ {parcelaEstimada.toLocaleString("pt-BR")}</span>/mês
+            </p>
+          )}
+
           {/* Monthly costs */}
           {(imovel.preco_condominio ?? 0) > 0 && (
             <p className="mt-0.5 font-body text-[12px] text-muted-foreground">

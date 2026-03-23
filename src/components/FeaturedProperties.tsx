@@ -139,7 +139,7 @@ export function FeaturedProperties() {
   if (imoveis.length === 0) return null;
 
   return (
-    <section className="pt-10 pb-24">
+    <section className="py-20 sm:py-24">
       <div className="container-uhome">
         <motion.div
           initial={{ opacity: 0, y: 16 }}

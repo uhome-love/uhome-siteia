@@ -217,6 +217,21 @@ const Search = () => {
   // Reset page when filters change
   useEffect(() => { setPage(0); }, [queryFilters]);
 
+  // Track busca_realizada (debounced — fires once per filter set)
+  const buscaTrackRef = useRef<ReturnType<typeof setTimeout>>();
+  useEffect(() => {
+    if (loading || total === 0) return;
+    clearTimeout(buscaTrackRef.current);
+    buscaTrackRef.current = setTimeout(() => {
+      trackEvent({
+        tipo: "busca_realizada",
+        busca_query: filters.q || queryIA || null,
+        busca_filtros: queryFilters as Record<string, unknown>,
+      });
+    }, 2000);
+    return () => clearTimeout(buscaTrackRef.current);
+  }, [queryFilters, total, loading]);
+
   // FIX 4 — AbortController to cancel stale pin requests
   const pinLoadTimerRef = React.useRef<number | null>(null);
   const pinAbortRef = React.useRef<AbortController | null>(null);

@@ -54,6 +54,7 @@ function describeFilters(filters: Record<string, any>): string {
 }
 
 const Search = () => {
+  const isMobile = useIsMobile();
   const { user } = useAuth();
   const { isFavorito, toggleFavorito } = useFavoritos();
   useCanonical();

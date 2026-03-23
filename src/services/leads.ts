@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { getSessionId, getUtmParams, getCorretorRef, getCorretorRefId } from "@/lib/session";
+import { trackEvent } from "@/lib/trackEvent";
 
 interface LeadData {
   nome: string;

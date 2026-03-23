@@ -10,15 +10,18 @@ import { SimilarProperties } from "@/components/SimilarProperties";
 import { PropertyMap } from "@/components/PropertyMap";
 import { FotoImovel } from "@/components/FotoImovel";
 import { CardUhomePreco } from "@/components/CardUhomePreco";
+import { AuthModal } from "@/components/AuthModal";
 import { Bed, Car, Maximize, Bath, MapPin, Share2, Heart, ChevronLeft, ChevronRight, Loader2, Camera, ArrowLeft, MoreVertical, Map as MapIcon, Play, MessageCircle, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { whatsappLink } from "@/lib/whatsapp";
+import { buildWhatsAppUrl } from "@/lib/whatsapp";
 import { submitLead } from "@/services/leads";
 import { motion } from "framer-motion";
 import { trackView, getViewCount } from "@/services/leads";
 import { fetchImovelBySlug, type Imovel, formatPreco, fotoPrincipal } from "@/services/imoveis";
 import { setJsonLd, removeJsonLd, buildImovelJsonLd, buildImovelBreadcrumbJsonLd } from "@/lib/jsonld";
 import { useCanonical } from "@/hooks/useCanonical";
+import { useFavoritos } from "@/hooks/useFavoritos";
+import { trackWhatsAppClick } from "@/services/whatsappTracker";
 
 const PropertyDetail = () => {
   const { slug } = useParams();
@@ -26,7 +29,8 @@ const PropertyDetail = () => {
   useCanonical(slug ? `/imovel/${slug}` : undefined);
   const [currentImage, setCurrentImage] = useState(0);
   const [viewCount, setViewCount] = useState(0);
-  const [liked, setLiked] = useState(false);
+  const { isFavorito, toggleFavorito } = useFavoritos();
+  const [showAuth, setShowAuth] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [imovel, setImovel] = useState<Imovel | null>(null);
   const [loading, setLoading] = useState(true);
@@ -237,10 +241,14 @@ const PropertyDetail = () => {
                 <Share2 className="h-[18px] w-[18px] text-white" />
               </button>
               <button
-                onClick={() => setLiked(!liked)}
+                onClick={async () => {
+                  if (!imovel) return;
+                  const result = await toggleFavorito(imovel.id);
+                  if (result === "needs_auth") setShowAuth(true);
+                }}
                 className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-md active:scale-95"
               >
-                <Heart className={`h-[18px] w-[18px] ${liked ? "fill-red-500 text-red-500" : "text-white"}`} />
+                <Heart className={`h-[18px] w-[18px] ${imovel && isFavorito(imovel.id) ? "fill-red-500 text-red-500" : "text-white"}`} />
               </button>
             </div>
           </div>
@@ -530,10 +538,14 @@ const PropertyDetail = () => {
             {/* Secondary actions below sidebar — desktop only */}
             <div className="mt-4 hidden gap-3 sm:flex">
               <button
-                onClick={() => setLiked(!liked)}
+                onClick={async () => {
+                  if (!imovel) return;
+                  const result = await toggleFavorito(imovel.id);
+                  if (result === "needs_auth") setShowAuth(true);
+                }}
                 className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-border bg-card py-3 font-body text-sm text-muted-foreground transition-colors hover:border-foreground hover:text-foreground active:scale-[0.97]"
               >
-                <Heart className={`h-4 w-4 ${liked ? "fill-red-500 text-red-500" : ""}`} />
+                <Heart className={`h-4 w-4 ${imovel && isFavorito(imovel.id) ? "fill-red-500 text-red-500" : ""}`} />
                 Salvar
               </button>
               <button
@@ -582,18 +594,32 @@ const PropertyDetail = () => {
             variant="whatsapp"
             size="sm"
             className="shrink-0 text-[13px] px-4 py-2.5 h-auto"
-            onClick={() => {
-              const msg = `Olá! Tenho interesse no imóvel: ${imovel.titulo} — ${priceFormatted}. Link: https://uhome.com.br/imovel/${imovel.slug}`;
-              window.open(whatsappLink(msg), '_blank');
-            }}
+            asChild
           >
-            <MessageCircle className="h-4 w-4 mr-1.5" />
-            WhatsApp
+            <a
+              href={buildWhatsAppUrl(undefined, {
+                titulo: imovel.titulo,
+                bairro: imovel.bairro,
+                slug: imovel.slug,
+              })}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackWhatsAppClick({
+                imovel_id: imovel.id,
+                imovel_titulo: imovel.titulo,
+                imovel_slug: imovel.slug,
+                origem_pagina: window.location.pathname,
+              })}
+            >
+              <MessageCircle className="h-4 w-4 mr-1.5" />
+              WhatsApp
+            </a>
           </Button>
         </div>
       </div>
       {/* Spacer for fixed bottom bar */}
       <div className="h-16 sm:hidden" />
+      <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
     </div>
   );
 };

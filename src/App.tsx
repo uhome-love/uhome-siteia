@@ -31,6 +31,7 @@ const TipoImovel = lazy(() => import("./pages/TipoImovel.tsx"));
 const Condominios = lazy(() => import("./pages/Condominios.tsx"));
 const CondominioDetail = lazy(() => import("./pages/CondominioDetail.tsx"));
 const AvaliacaoPage = lazy(() => import("./pages/AvaliacaoPage.tsx"));
+const Privacidade = lazy(() => import("./pages/Privacidade.tsx"));
 
 // Admin
 const AdminLayout = lazy(() => import("./pages/admin/AdminLayout.tsx"));
@@ -99,6 +100,7 @@ const App = () => (
                 <Route path="/condominios" element={<Condominios />} />
                 <Route path="/condominios/:slug" element={<CondominioDetail />} />
                 <Route path="/avaliar-imovel" element={<AvaliacaoPage />} />
+                <Route path="/politica-de-privacidade" element={<Privacidade />} />
                 <Route path="/casas-porto-alegre" element={<TipoImovel />} />
                 <Route path="/coberturas-porto-alegre" element={<TipoImovel />} />
                 <Route path="/studios-porto-alegre" element={<TipoImovel />} />

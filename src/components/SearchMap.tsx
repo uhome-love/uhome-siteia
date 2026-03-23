@@ -537,7 +537,50 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
     }
   }, []);
 
-  // FIX 6 — Update data using requestIdleCallback to avoid jank
+  // Finalize draw — called by button or dblclick
+  const finalizarDesenho = useCallback(() => {
+    const map = mapRef.current;
+    const finalPoints = drawPointsRef.current;
+    if (!map || finalPoints.length < 3) return;
+
+    const closed = [...finalPoints, finalPoints[0]];
+    updateDrawSources(map, closed, true);
+    setDrawMode(false);
+    setHasDrawn(true);
+    map.getCanvas().style.cursor = "";
+
+    if (onDrawFilterRef.current) {
+      const inside = pinsRef.current.filter(pin => {
+        const lat = Number(pin.latitude);
+        const lng = Number(pin.longitude);
+        if (!lat || !lng) return false;
+        return pointInPolygon([lng, lat], finalPoints);
+      });
+      onDrawFilterRef.current(inside);
+    }
+
+    if (finalPoints.length >= 3 && onBoundsSearchRef.current) {
+      const lngs = finalPoints.map(p => p[0]);
+      const lats = finalPoints.map(p => p[1]);
+      onBoundsSearchRef.current({
+        lng_min: Math.min(...lngs),
+        lng_max: Math.max(...lngs),
+        lat_min: Math.min(...lats),
+        lat_max: Math.max(...lats),
+      });
+    }
+  }, []);
+
+  // ESC to cancel draw mode
+  useEffect(() => {
+    if (!drawMode) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") clearDraw();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [drawMode, clearDraw]);
+
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReadyRef.current) return;

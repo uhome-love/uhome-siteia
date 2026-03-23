@@ -51,6 +51,7 @@ export function UserMenu() {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setMenuOpen(!menuOpen)}
+        aria-label="Menu do usuário"
         className="flex items-center gap-2 rounded-full border border-border px-2 py-1.5 transition-colors hover:bg-secondary active:scale-[0.97]"
       >
         {avatarUrl ? (

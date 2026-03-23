@@ -339,7 +339,7 @@ export function HeroSection() {
                       value={preco}
                       onChange={(e) => setPreco(e.target.value)}
                       className={`w-full appearance-none bg-transparent font-body text-sm focus:outline-none ${
-                        preco ? "text-foreground" : "text-muted-foreground/50"
+                        preco ? "text-foreground" : "text-muted-foreground"
                       }`}
                     >
                       <option value="">Qualquer</option>

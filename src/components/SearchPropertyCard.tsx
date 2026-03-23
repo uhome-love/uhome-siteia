@@ -85,8 +85,9 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavo
   // Load full photo set when card becomes visible (mobile) or on hover (desktop)
   useEffect(() => {
     if (!isVisible || fotosLoadedRef.current || baseFotos.length > 1) return;
-    if (!isMobile) return; // desktop loads on hover
+    if (!isMobile) return;
     fotosLoadedRef.current = true;
+    setLoadingFotos(true);
     supabase
       .from("imoveis")
       .select("fotos")
@@ -101,6 +102,7 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavo
             .slice(0, 8);
           if (urls.length > 0) setLazyFotos(urls);
         }
+        setLoadingFotos(false);
       });
   }, [isVisible, isMobile, imovel.id, baseFotos.length]);
   const price = formatPreco(imovel.preco);

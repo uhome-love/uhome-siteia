@@ -37,10 +37,10 @@ export function Footer() {
             <ul className="mt-3 space-y-2">
               <li><Link to={prefixLink("/busca?modo=ia")} className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Busca IA</Link></li>
               <li><Link to={prefixLink("/avaliar-imovel")} className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Avaliar imóvel</Link></li>
-              <li><Link to="/faq" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Perguntas frequentes</Link></li>
-              <li><Link to="/carreiras" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Trabalhe conosco</Link></li>
-              <li><Link to="/blog" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Blog</Link></li>
-              <li><Link to="/politica-de-privacidade" className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Política de Privacidade</Link></li>
+              <li><Link to={prefixLink("/faq")} className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Perguntas frequentes</Link></li>
+              <li><Link to={prefixLink("/carreiras")} className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Trabalhe conosco</Link></li>
+              <li><Link to={prefixLink("/blog")} className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Blog</Link></li>
+              <li><Link to={prefixLink("/politica-de-privacidade")} className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Política de Privacidade</Link></li>
             </ul>
           </div>
 
@@ -62,7 +62,7 @@ export function Footer() {
           <p className="font-body text-xs text-muted-foreground">
             © {new Date().getFullYear()} Uhome Imóveis LTDA · CRECI-RS 25682J · Porto Alegre, RS
           </p>
-          <Link to="/politica-de-privacidade" className="font-body text-xs text-muted-foreground transition-colors hover:text-foreground">
+          <Link to={prefixLink("/politica-de-privacidade")} className="font-body text-xs text-muted-foreground transition-colors hover:text-foreground">
             Política de Privacidade
           </Link>
         </div>

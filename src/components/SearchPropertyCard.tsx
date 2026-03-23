@@ -44,7 +44,7 @@ const badgeClasses: Record<BadgeStyle, string> = {
   visto: "bg-white/90 text-primary font-semibold shadow-sm backdrop-blur-sm",
 };
 
-export const SearchPropertyCard = forwardRef<HTMLDivElement, Props>(function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavorito: isFavoritoProp, toggleFavorito: toggleFavoritoProp }, _ref) {
+export const SearchPropertyCard = forwardRef<HTMLDivElement, Props>(function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavorito: isFavoritoProp, toggleFavorito: toggleFavoritoProp }, ref) {
   const [hovering, setHovering] = useState(false);
   const [fotoAtiva, setFotoAtiva] = useState(0);
   const [showAuth, setShowAuth] = useState(false);
@@ -81,6 +81,13 @@ export const SearchPropertyCard = forwardRef<HTMLDivElement, Props>(function Sea
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
+
+  // Merge forwarded ref with internal cardRef
+  const mergedRef = useCallback((node: HTMLDivElement | null) => {
+    cardRef.current = node;
+    if (typeof ref === "function") ref(node);
+    else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+  }, [ref]);
 
   // Load full photo set when card becomes visible (mobile) or on hover (desktop)
   useEffect(() => {
@@ -164,7 +171,7 @@ export const SearchPropertyCard = forwardRef<HTMLDivElement, Props>(function Sea
     <>
     <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
     <motion.div
-      ref={cardRef}
+      ref={mergedRef}
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: Math.min(index * 0.03, 0.15) }}

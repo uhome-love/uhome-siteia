@@ -81,7 +81,7 @@ export function Navbar() {
             Quanto vale meu imóvel?
           </Link>
           <Link
-            to="/faq"
+            to={prefixLink("/faq")}
             className="rounded-full px-3.5 py-[6px] font-body text-[13px] font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
             Ajuda
@@ -173,7 +173,7 @@ export function Navbar() {
                 onClick={() => setMobileOpen(false)}
               />
               <MobileNavLink
-                to="/faq"
+                to={prefixLink("/faq")}
                 icon={<HelpCircle className="h-4 w-4" />}
                 label="Ajuda"
                 onClick={() => setMobileOpen(false)}

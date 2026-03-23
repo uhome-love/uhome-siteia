@@ -17,6 +17,7 @@ import { useImoveisQuery } from "@/hooks/useImoveisQuery";
 import { interpretarBusca, type AISearchResult } from "@/services/aiSearch";
 import { supabase } from "@/integrations/supabase/client";
 import { syncToCRM } from "@/services/syncCRM";
+import { trackEvent } from "@/lib/trackEvent";
 import { ArrowUpDown, Bell, Loader2, Map as MapIcon, MapPin, Sparkles, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";

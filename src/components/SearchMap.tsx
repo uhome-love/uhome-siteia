@@ -640,7 +640,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
 
   return (
     <div className="relative h-full w-full">
-      <div ref={containerRef} style={{ width: "100%", height: "100%", borderRadius: "12px" }} />
+      <div ref={containerRef} data-testid="search-map" style={{ width: "100%", height: "100%", borderRadius: "12px" }} />
 
       {/* Property preview popup — Airbnb style */}
       <AnimatePresence>

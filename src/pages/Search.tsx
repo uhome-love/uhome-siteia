@@ -357,6 +357,7 @@ const Search = () => {
         quartos: f.quartos || undefined,
       };
 
+      const { data, count } = await fetchImoveis({ ...aiFilters, limit: 40 });
       // Use count from RPC, but fallback to data.length if count is 0 but data exists (mismatch safeguard)
       const finalCount = count > 0 ? count : data.length;
       setAiOverrideData({ imoveis: data, total: finalCount });

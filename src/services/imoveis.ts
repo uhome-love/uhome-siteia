@@ -194,10 +194,11 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
   }
 
   const t0 = performance.now();
-  // Run data + count in parallel for speed
+  // Skip count on paginated "load more" requests — caller already has total
+  const skipCount = (filters.offset ?? 0) > 0;
   const [dataResult, countResult] = await Promise.all([
     query,
-    supabase.rpc("count_imoveis", countParams),
+    skipCount ? Promise.resolve({ data: -1 }) : supabase.rpc("count_imoveis", countParams),
   ]);
   const loadMs = Math.round(performance.now() - t0);
 

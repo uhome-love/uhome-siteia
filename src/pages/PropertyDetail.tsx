@@ -29,7 +29,8 @@ const PropertyDetail = () => {
   useCanonical(slug ? `/imovel/${slug}` : undefined);
   const [currentImage, setCurrentImage] = useState(0);
   const [viewCount, setViewCount] = useState(0);
-  const [liked, setLiked] = useState(false);
+  const { isFavorito, toggleFavorito } = useFavoritos();
+  const [showAuth, setShowAuth] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [imovel, setImovel] = useState<Imovel | null>(null);
   const [loading, setLoading] = useState(true);

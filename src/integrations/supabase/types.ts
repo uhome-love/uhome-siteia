@@ -677,6 +677,28 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      count_imoveis: {
+        Args: {
+          lat_max?: number
+          lat_min?: number
+          lng_max?: number
+          lng_min?: number
+          p_area_max?: number
+          p_area_min?: number
+          p_bairro?: string
+          p_bairros?: string[]
+          p_banheiros?: number
+          p_cidade?: string
+          p_cidades?: string[]
+          p_preco_max?: number
+          p_preco_min?: number
+          p_q?: string
+          p_quartos?: number
+          p_tipo?: string
+          p_vagas?: number
+        }
+        Returns: number
+      }
       get_bairros_disponiveis: {
         Args: never
         Returns: {

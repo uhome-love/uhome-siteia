@@ -42,7 +42,7 @@ const benefits = [
 ];
 
 const stats = [
-  { numero: "4.800+", label: "compradores ativos" },
+  { numero: "14.600+", label: "imóveis na vitrine" },
   { numero: "15 dias", label: "tempo médio de venda" },
   { numero: "100%", label: "digital e sem burocracia" },
   { numero: "0%", label: "custo para anunciar" },

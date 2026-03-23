@@ -13,7 +13,8 @@ import { CardUhomePreco } from "@/components/CardUhomePreco";
 import { AuthModal } from "@/components/AuthModal";
 import { Bed, Car, Maximize, Bath, MapPin, Share2, Heart, ChevronLeft, ChevronRight, Loader2, Camera, ArrowLeft, MoreVertical, Map as MapIcon, Play, MessageCircle, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { buildWhatsAppUrl } from "@/lib/whatsapp";
+import { buildWhatsAppUrl, buildCorretorWhatsAppUrl } from "@/lib/whatsapp";
+import { useCorretor } from "@/contexts/CorretorContext";
 import { submitLead } from "@/services/leads";
 import { motion } from "framer-motion";
 import { trackView, getViewCount } from "@/services/leads";
@@ -30,6 +31,7 @@ const PropertyDetail = () => {
   const [currentImage, setCurrentImage] = useState(0);
   const [viewCount, setViewCount] = useState(0);
   const { isFavorito, toggleFavorito } = useFavoritos();
+  const { corretor } = useCorretor();
   const [showAuth, setShowAuth] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [imovel, setImovel] = useState<Imovel | null>(null);
@@ -597,11 +599,18 @@ const PropertyDetail = () => {
             asChild
           >
             <a
-              href={buildWhatsAppUrl(undefined, {
-                titulo: imovel.titulo,
-                bairro: imovel.bairro,
-                slug: imovel.slug,
-              })}
+              href={corretor
+                ? buildCorretorWhatsAppUrl(corretor.nome, corretor.telefone, {
+                    titulo: imovel.titulo,
+                    bairro: imovel.bairro,
+                    slug: imovel.slug,
+                  })
+                : buildWhatsAppUrl(undefined, {
+                    titulo: imovel.titulo,
+                    bairro: imovel.bairro,
+                    slug: imovel.slug,
+                  })
+              }
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => trackWhatsAppClick({

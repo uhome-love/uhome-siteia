@@ -292,22 +292,6 @@ export function SearchFiltersBar({ onOpenMobileFilters }: { onOpenMobileFilters?
                   <Sparkles className="h-4 w-4 text-primary" />
                   Busca por IA
                 </button>
-                <button
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={handleDesenharArea}
-                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 font-body text-sm text-foreground transition-colors hover:bg-accent/50 active:scale-[0.98]"
-                >
-                  <PenTool className="h-4 w-4 text-muted-foreground" />
-                  Desenhe a área no mapa
-                </button>
-                <button
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={handlePertoDeVoce}
-                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 font-body text-sm text-foreground transition-colors hover:bg-accent/50 active:scale-[0.98]"
-                >
-                  <Navigation className="h-4 w-4 text-muted-foreground" />
-                  Perto de você
-                </button>
               </div>
             )}
 

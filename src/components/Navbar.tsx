@@ -36,63 +36,65 @@ export function Navbar() {
 
   return (
     <nav className={`fixed left-0 right-0 z-50 border-b border-border/40 bg-background/97 backdrop-blur-lg ${bannerVisible ? 'top-10' : 'top-0'}`}>
-      <div className="relative mx-auto flex h-[60px] w-full max-w-[1440px] items-center px-5 sm:px-8">
+      <div className="relative mx-auto flex h-14 w-full max-w-[1440px] items-center justify-between px-6 sm:px-8">
         {/* LEFT — Logo */}
-        <Link to={prefixLink("/")} className="flex flex-shrink-0 items-center mr-8">
-          <UhomeLogo variant="full" height={26} />
+        <Link to={prefixLink("/")} className="flex flex-shrink-0 items-center">
+          <UhomeLogo variant="full" height={24} />
         </Link>
 
-        {/* CENTER — Navigation (truly centered using absolute positioning) */}
-        <div className="hidden flex-1 items-center justify-center lg:flex">
-          {/* Mode pills */}
-          <div className="flex items-center gap-0.5 rounded-full bg-secondary/60 p-[3px]">
+        {/* CENTER — Navigation */}
+        <div className="absolute inset-x-0 hidden items-center justify-center lg:flex pointer-events-none">
+          <div className="flex items-center gap-1 pointer-events-auto">
+            {/* Mode pills */}
+            <div className="flex items-center rounded-full border border-border/60 bg-secondary/50 p-[3px]">
+              <Link
+                to={prefixLink("/busca?finalidade=venda")}
+                onMouseEnter={handlePrefetchBusca}
+                className={`rounded-full px-4 py-1.5 font-body text-[13px] font-semibold transition-all ${
+                  isSearchPage && !modoIA
+                    ? "bg-foreground text-background shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Comprar
+              </Link>
+              <Link
+                to={prefixLink("/busca?modo=ia")}
+                className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 font-body text-[13px] font-semibold transition-all ${
+                  isSearchPage && modoIA
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Sparkles className="h-3 w-3" />
+                Busca IA
+              </Link>
+            </div>
+
+            {/* Divider */}
+            <div className="mx-2 h-4 w-px bg-border" />
+
+            {/* Value links */}
             <Link
-              to={prefixLink("/busca?finalidade=venda")}
-              onMouseEnter={handlePrefetchBusca}
-              className={`rounded-full px-4 py-[5px] font-body text-[13px] font-semibold transition-all ${
-                isSearchPage && !modoIA
-                  ? "bg-foreground text-background shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
+              to={prefixLink("/avaliar-imovel")}
+              className="rounded-full px-3 py-1.5 font-body text-[13px] font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
             >
-              Comprar
+              Quanto vale meu imóvel?
             </Link>
             <Link
-              to={prefixLink("/busca?modo=ia")}
-              className={`flex items-center gap-1.5 rounded-full px-4 py-[5px] font-body text-[13px] font-semibold transition-all ${
-                isSearchPage && modoIA
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
+              to={prefixLink("/faq")}
+              className="rounded-full px-3 py-1.5 font-body text-[13px] font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
             >
-              <Sparkles className="h-3 w-3" />
-              Busca IA
+              Ajuda
             </Link>
           </div>
-
-          {/* Divider */}
-          <div className="mx-4 h-4 w-px bg-border/80" />
-
-          {/* Value links */}
-          <Link
-            to={prefixLink("/avaliar-imovel")}
-            className="px-3 py-1.5 font-body text-[13px] font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Quanto vale meu imóvel?
-          </Link>
-          <Link
-            to={prefixLink("/faq")}
-            className="px-3 py-1.5 font-body text-[13px] font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Ajuda
-          </Link>
         </div>
 
         {/* RIGHT — CTAs + Auth */}
-        <div className="hidden items-center gap-2.5 lg:flex flex-shrink-0 ml-8">
+        <div className="hidden items-center gap-2 lg:flex flex-shrink-0">
           <Link
             to={prefixLink("/anunciar")}
-            className="rounded-full border border-border bg-background px-4 py-[6px] font-body text-[13px] font-semibold text-foreground transition-all hover:border-primary hover:text-primary active:scale-[0.97]"
+            className="rounded-full border border-border px-4 py-1.5 font-body text-[13px] font-semibold text-foreground transition-all hover:border-foreground active:scale-[0.97]"
           >
             Anuncie seu imóvel
           </Link>

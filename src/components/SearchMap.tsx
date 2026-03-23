@@ -417,7 +417,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
     };
   }, [navigate]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Draw mode — FIX 11: use all loaded pins + bounds-based server search
+  // Draw mode — click to add points, dblclick or button to finalize
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -436,37 +436,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
 
       const onDblClick = (e: mapboxgl.MapMouseEvent) => {
         e.preventDefault();
-        const finalPoints = drawPointsRef.current;
-        if (finalPoints.length >= 3) {
-          const closed = [...finalPoints, finalPoints[0]];
-          updateDrawSources(map, closed, true);
-          setDrawMode(false);
-          setHasDrawn(true);
-          map.getCanvas().style.cursor = "";
-
-          // FIX 11 — Filter loaded pins client-side AND trigger bounds search for full results
-          if (onDrawFilterRef.current) {
-            const inside = pinsRef.current.filter(pin => {
-              const lat = Number(pin.latitude);
-              const lng = Number(pin.longitude);
-              if (!lat || !lng) return false;
-              return pointInPolygon([lng, lat], finalPoints);
-            });
-            onDrawFilterRef.current(inside);
-          }
-
-          // Also trigger bounds-based search to get server-side results
-          if (onBoundsSearchRef.current && finalPoints.length >= 3) {
-            const lngs = finalPoints.map(p => p[0]);
-            const lats = finalPoints.map(p => p[1]);
-            onBoundsSearchRef.current({
-              lng_min: Math.min(...lngs),
-              lng_max: Math.max(...lngs),
-              lat_min: Math.min(...lats),
-              lat_max: Math.max(...lats),
-            });
-          }
-        }
+        finalizarDesenho();
       };
 
       map.on("click", onClick);
@@ -482,7 +452,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
     } else {
       map.getCanvas().style.cursor = "";
     }
-  }, [drawMode]);
+  }, [drawMode, finalizarDesenho]);
 
   function updateDrawSources(map: mapboxgl.Map, pts: [number, number][], closed: boolean) {
     const pointsSource = map.getSource("draw-points") as mapboxgl.GeoJSONSource | undefined;

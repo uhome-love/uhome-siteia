@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { fetchImoveis, type Imovel, fotoPrincipal, formatPreco } from "@/services/imoveis";
 import { FotoImovel } from "@/components/FotoImovel";
 import { Bed, Car, Maximize } from "lucide-react";
+import { useCorretor } from "@/contexts/CorretorContext";
 
 interface Props {
   currentId: string;

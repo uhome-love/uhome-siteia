@@ -211,7 +211,7 @@ serve(async (req) => {
 
     // Accept start_page, max_pages, and auto_chain from body
     let startPage = 1;
-    let maxPagesToProcess = 15;
+    let maxPagesToProcess = 5;
     let autoChain = false;
     try {
       const body = await req.json();

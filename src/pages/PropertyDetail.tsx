@@ -17,6 +17,7 @@ import { buildWhatsAppUrl, buildCorretorWhatsAppUrl } from "@/lib/whatsapp";
 import { useCorretor } from "@/contexts/CorretorContext";
 import { submitLead } from "@/services/leads";
 import { motion } from "framer-motion";
+import { trackEvent } from "@/lib/trackEvent";
 import { trackView, getViewCount } from "@/services/leads";
 import { fetchImovelBySlug, type Imovel, formatPreco, fotoPrincipal } from "@/services/imoveis";
 import { setJsonLd, removeJsonLd, buildImovelJsonLd, buildImovelBreadcrumbJsonLd } from "@/lib/jsonld";

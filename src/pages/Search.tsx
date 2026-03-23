@@ -667,7 +667,7 @@ const Search = () => {
         {/* Map — desktop */}
         <div className="relative hidden w-[45%] shrink-0 border-l border-border lg:block" style={{ overflow: "visible" }}>
           <div className="h-full w-full overflow-hidden rounded-none">
-            <SearchMap pins={mapPins} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} onBoundsChange={handleMapBoundsChange} />
+            <SearchMap pins={mapPins} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} onBoundsChange={handleMapBoundsChange} onPertoDeVoce={handlePertoDeVoce} />
           </div>
         </div>
       </div>

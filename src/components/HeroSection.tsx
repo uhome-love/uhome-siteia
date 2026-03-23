@@ -11,7 +11,7 @@ import { CIDADES_PERMITIDAS } from "@/services/imoveis";
 import { useQueryClient } from "@tanstack/react-query";
 import { prefetchBusca } from "@/lib/prefetch";
 
-const ease = [0.16, 1, 0.3, 1] as [number, number, number, number];
+
 
 function HeroPropertyCount() {
   const [total, setTotal] = useState(14600);

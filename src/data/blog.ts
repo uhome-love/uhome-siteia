@@ -71,7 +71,7 @@ Bairro residencial com forte identidade local, bons restaurantes e acesso ao Gua
 
 Considere três critérios: proximidade do trabalho ou escola dos filhos, perfil de vida (agitado vs. tranquilo) e orçamento real. Na Uhome, você pode filtrar imóveis por bairro e comparar opções lado a lado.`,
     categoria: "Cidade",
-    imagem: "https://images.unsplash.com/photo-1598971861713-54ad09c93b3e?w=800&h=450&fit=crop",
+    imagem: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=450&fit=crop",
     autor: "Equipe Uhome",
     publicadoEm: "2026-03-20",
     tempoLeitura: 9,

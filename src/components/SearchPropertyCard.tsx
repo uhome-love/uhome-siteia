@@ -49,6 +49,7 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavo
   const [fotoAtiva, setFotoAtiva] = useState(0);
   const [showAuth, setShowAuth] = useState(false);
   const [lazyFotos, setLazyFotos] = useState<string[] | null>(null);
+  const [loadingFotos, setLoadingFotos] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const fotosLoadedRef = useRef(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -84,8 +85,9 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavo
   // Load full photo set when card becomes visible (mobile) or on hover (desktop)
   useEffect(() => {
     if (!isVisible || fotosLoadedRef.current || baseFotos.length > 1) return;
-    if (!isMobile) return; // desktop loads on hover
+    if (!isMobile) return;
     fotosLoadedRef.current = true;
+    setLoadingFotos(true);
     supabase
       .from("imoveis")
       .select("fotos")
@@ -100,6 +102,7 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavo
             .slice(0, 8);
           if (urls.length > 0) setLazyFotos(urls);
         }
+        setLoadingFotos(false);
       });
   }, [isVisible, isMobile, imovel.id, baseFotos.length]);
   const price = formatPreco(imovel.preco);
@@ -231,7 +234,7 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavo
           </button>
 
           {/* Dots */}
-          {fotos.length > 1 && (
+          {fotos.length > 1 ? (
             <div className="pointer-events-none absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
               {fotos.slice(0, 7).map((_, i) => (
                 <div
@@ -246,7 +249,17 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavo
                 />
               ))}
             </div>
-          )}
+          ) : loadingFotos ? (
+            <div className="pointer-events-none absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
+              {[0, 1, 2, 3].map(i => (
+                <div
+                  key={i}
+                  className="h-1.5 w-1.5 rounded-full bg-white/40 animate-pulse"
+                  style={{ animationDelay: `${i * 150}ms` }}
+                />
+              ))}
+            </div>
+          ) : null}
         </div>
 
         {/* Text content — QuintoAndar style */}

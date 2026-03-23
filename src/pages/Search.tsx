@@ -736,7 +736,7 @@ const Search = () => {
           >
             <button
               onClick={() => setMobileMap(false)}
-              className="absolute left-4 top-4 z-10 flex items-center gap-1.5 rounded-full bg-card px-4 py-2 font-body text-sm font-medium text-foreground shadow-lg active:scale-95"
+              className="absolute left-4 top-4 z-30 flex items-center gap-1.5 rounded-full bg-card px-4 py-2 font-body text-sm font-medium text-foreground shadow-lg active:scale-95"
             >
               <X className="h-4 w-4" />
               Voltar à lista

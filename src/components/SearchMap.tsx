@@ -798,7 +798,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       {/* Buscar nessa região — only show when NOT auto-searching */}
       <AnimatePresence>
         {mapMoved && onBoundsSearch && !drawMode && !hasDrawn && !autoSearch && (
-          <div className="pointer-events-none absolute left-0 right-0 top-4 z-20 flex justify-center">
+          <div className="pointer-events-none absolute left-0 right-0 top-14 z-20 flex justify-center sm:top-4">
             <motion.button
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}

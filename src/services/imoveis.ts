@@ -113,8 +113,8 @@ export interface BuscaFilters {
 
 export const CIDADES_PERMITIDAS = ["Porto Alegre", "Canoas", "Cachoeirinha", "Gravataí", "Guaíba"];
 
-// Only select columns needed for listing — skip heavy jetimob_raw, descricao, etc.
-const LISTING_COLUMNS = "id,slug,tipo,finalidade,status,destaque,preco,preco_condominio,preco_iptu,area_total,area_util,quartos,banheiros,vagas,andar,bairro,cidade,uf,latitude,longitude,titulo,diferenciais,video_url,condominio_nome,publicado_em,foto_principal";
+// Minimal columns for listing cards — no fotos/descricao/jetimob_raw/diferenciais
+const LISTING_COLUMNS = "id,slug,tipo,finalidade,status,destaque,preco,preco_condominio,area_total,quartos,banheiros,vagas,bairro,cidade,uf,publicado_em,foto_principal";
 
 export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: Imovel[]; count: number }> {
   // Build data query — NO count (much faster)
@@ -194,10 +194,11 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
   }
 
   const t0 = performance.now();
-  // Run data + count in parallel for speed
+  // Skip count on paginated "load more" requests — caller already has total
+  const skipCount = (filters.offset ?? 0) > 0;
   const [dataResult, countResult] = await Promise.all([
     query,
-    supabase.rpc("count_imoveis", countParams),
+    skipCount ? Promise.resolve({ data: -1 }) : supabase.rpc("count_imoveis", countParams),
   ]);
   const loadMs = Math.round(performance.now() - t0);
 

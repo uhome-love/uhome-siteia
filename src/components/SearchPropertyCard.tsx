@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import React, { useState, useRef, useCallback, useEffect, forwardRef } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { AuthModal } from "@/components/AuthModal";
 import { useNavigate } from "react-router-dom";
@@ -44,7 +44,7 @@ const badgeClasses: Record<BadgeStyle, string> = {
   visto: "bg-white/90 text-primary font-semibold shadow-sm backdrop-blur-sm",
 };
 
-export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavorito: isFavoritoProp, toggleFavorito: toggleFavoritoProp }: Props) {
+export const SearchPropertyCard = forwardRef<HTMLDivElement, Props>(function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavorito: isFavoritoProp, toggleFavorito: toggleFavoritoProp }, _ref) {
   const [hovering, setHovering] = useState(false);
   const [fotoAtiva, setFotoAtiva] = useState(0);
   const [showAuth, setShowAuth] = useState(false);
@@ -411,4 +411,4 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavo
     </motion.div>
     </>
   );
-}
+});

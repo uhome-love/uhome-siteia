@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, forwardRef } from "react";
 import { MessageCircle, Send, Check, Loader2, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
@@ -7,7 +7,7 @@ import { submitLead } from "@/services/leads";
 import { formatPhone } from "@/lib/phoneMask";
 import { toast } from "sonner";
 
-export function SearchCTACard() {
+export const SearchCTACard = forwardRef<HTMLDivElement>(function SearchCTACard(_props, ref) {
   const [formOpen, setFormOpen] = useState(false);
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
@@ -55,7 +55,7 @@ export function SearchCTACard() {
   };
 
   return (
-    <div className="col-span-full rounded-2xl border-2 border-dashed border-primary/30 bg-primary/[0.03] overflow-hidden">
+    <div ref={ref} className="col-span-full rounded-2xl border-2 border-dashed border-primary/30 bg-primary/[0.03] overflow-hidden">
       {/* Header row */}
       <div className="flex items-center justify-between gap-4 px-6 py-5">
         <div>
@@ -157,4 +157,4 @@ export function SearchCTACard() {
       </AnimatePresence>
     </div>
   );
-}
+});

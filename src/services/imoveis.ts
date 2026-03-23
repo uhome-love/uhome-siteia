@@ -436,7 +436,7 @@ export async function syncFromJetimob(): Promise<{
     totalFetched += data.total ?? 0;
 
     // If no next page or we've fetched everything
-    if (!data.next_start_page || (data.total_esperado && totalFetched >= data.total_esperado) || (data.total ?? 0) === 0) {
+    if (!data.more_pages || (data.total_esperado && totalFetched >= data.total_esperado) || (data.total ?? 0) === 0) {
       break;
     }
     startPage = data.next_start_page;

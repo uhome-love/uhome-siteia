@@ -49,6 +49,7 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavo
   const [fotoAtiva, setFotoAtiva] = useState(0);
   const [showAuth, setShowAuth] = useState(false);
   const [lazyFotos, setLazyFotos] = useState<string[] | null>(null);
+  const [loadingFotos, setLoadingFotos] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const fotosLoadedRef = useRef(false);
   const scrollRef = useRef<HTMLDivElement>(null);

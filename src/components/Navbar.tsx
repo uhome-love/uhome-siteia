@@ -14,6 +14,11 @@ export function Navbar() {
   const [searchParams] = useSearchParams();
   const { prefixLink } = useCorretor();
   const [bannerVisible, setBannerVisible] = useState(false);
+  const queryClient = useQueryClient();
+
+  const handlePrefetchBusca = useCallback(() => {
+    prefetchBusca(queryClient);
+  }, [queryClient]);
 
   useEffect(() => {
     const check = () => setBannerVisible(!!document.getElementById('banner-corretor-spacer'));

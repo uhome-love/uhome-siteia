@@ -13,6 +13,18 @@ import { prefetchBusca } from "@/lib/prefetch";
 
 const ease = [0.16, 1, 0.3, 1] as [number, number, number, number];
 
+function HeroPropertyCount() {
+  const [total, setTotal] = useState(14600);
+  useEffect(() => {
+    supabase
+      .from("imoveis")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "disponivel")
+      .then(({ count }) => { if (count && count > 0) setTotal(count); });
+  }, []);
+  return <>{total.toLocaleString("pt-BR")}+</>;
+}
+
 export function HeroSection() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();

@@ -8,6 +8,7 @@ import { useCanonical } from "@/hooks/useCanonical";
 // Lazy load below-fold sections
 const FeaturedNeighborhoods = lazy(() => import("@/components/FeaturedNeighborhoods").then(m => ({ default: m.FeaturedNeighborhoods })));
 const FeaturedProperties = lazy(() => import("@/components/FeaturedProperties").then(m => ({ default: m.FeaturedProperties })));
+const PorQueUhome = lazy(() => import("@/components/PorQueUhome").then(m => ({ default: m.PorQueUhome })));
 
 const Index = () => {
   useCanonical("/");
@@ -24,6 +25,7 @@ const Index = () => {
       <Suspense fallback={null}>
         <FeaturedNeighborhoods />
         <FeaturedProperties />
+        <PorQueUhome />
       </Suspense>
       <Footer />
     </div>

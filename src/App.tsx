@@ -100,6 +100,7 @@ const App = () => (
                 <Route path="/condominios" element={<Condominios />} />
                 <Route path="/condominios/:slug" element={<CondominioDetail />} />
                 <Route path="/avaliar-imovel" element={<AvaliacaoPage />} />
+                <Route path="/politica-de-privacidade" element={<Privacidade />} />
                 <Route path="/casas-porto-alegre" element={<TipoImovel />} />
                 <Route path="/coberturas-porto-alegre" element={<TipoImovel />} />
                 <Route path="/studios-porto-alegre" element={<TipoImovel />} />

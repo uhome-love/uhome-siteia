@@ -619,6 +619,7 @@ const PropertyDetail = () => {
       </div>
       {/* Spacer for fixed bottom bar */}
       <div className="h-16 sm:hidden" />
+      <AuthModal open={showAuth} onOpenChange={setShowAuth} />
     </div>
   );
 };

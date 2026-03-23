@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { MapPin, Sparkles, X } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { getBairrosDisponiveis } from "@/services/bairrosCache";
 import { toast } from "sonner";
@@ -11,7 +11,7 @@ import { CIDADES_PERMITIDAS } from "@/services/imoveis";
 import { useQueryClient } from "@tanstack/react-query";
 import { prefetchBusca } from "@/lib/prefetch";
 
-const ease = [0.16, 1, 0.3, 1] as [number, number, number, number];
+
 
 function HeroPropertyCount() {
   const [total, setTotal] = useState(14600);
@@ -163,22 +163,16 @@ export function HeroSection() {
 
       <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 sm:py-16 lg:px-8">
         <div className="flex flex-col items-start gap-6 lg:flex-row lg:items-center lg:gap-16">
-          {/* Left — headline */}
-          <motion.div
-            initial={{ opacity: 0, x: -24 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, ease }}
-            className="max-w-lg"
+          {/* Left — headline (CSS animation for instant LCP) */}
+          <div
+            className="max-w-lg animate-[heroSlideIn_0.7s_cubic-bezier(0.16,1,0.3,1)_both]"
           >
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5, duration: 0.5 }}
-              className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 font-body text-xs font-semibold text-white/90 backdrop-blur-sm"
+            <p
+              className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 font-body text-xs font-semibold text-white/90 backdrop-blur-sm animate-[heroFadeIn_0.5s_0.5s_both]"
             >
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
               <HeroPropertyCount /> imóveis disponíveis
-            </motion.p>
+            </p>
             <p className="mb-4 font-body text-xs font-semibold uppercase tracking-[0.2em] text-white/70">
               Porto Alegre & Região
             </p>
@@ -192,14 +186,11 @@ export function HeroSection() {
             <p className="mt-4 max-w-md font-body text-base leading-relaxed text-white/70">
               Apartamentos, casas e coberturas com curadoria especializada e busca inteligente por IA.
             </p>
-          </motion.div>
+          </div>
 
-          {/* Right — card */}
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2, ease }}
-            className="w-full max-w-md rounded-2xl bg-card p-5 shadow-2xl sm:p-7 lg:ml-auto"
+          {/* Right — card (CSS animation for instant LCP) */}
+          <div
+            className="w-full max-w-md rounded-2xl bg-card p-5 shadow-2xl sm:p-7 lg:ml-auto animate-[heroCardIn_0.6s_0.2s_cubic-bezier(0.16,1,0.3,1)_both]"
           >
             {/* Toggle */}
             <div className="mb-4 flex gap-2 sm:mb-6">
@@ -449,7 +440,7 @@ export function HeroSection() {
               </>
 
             )}
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

@@ -158,11 +158,54 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       setDrawMode(true);
       setDrawPoints([]);
       setHasDrawn(false);
-      import("sonner").then(({ toast }) => toast.info("Clique no mapa para desenhar a área de busca. Clique duplo para finalizar."));
     };
     window.addEventListener("uhome:draw-area", handler);
     return () => window.removeEventListener("uhome:draw-area", handler);
   }, []);
+
+  // Finalize draw — called by button or dblclick
+  const finalizarDesenho = useCallback(() => {
+    const map = mapRef.current;
+    const finalPoints = drawPointsRef.current;
+    if (!map || finalPoints.length < 3) return;
+
+    const closed = [...finalPoints, finalPoints[0]];
+    updateDrawSources(map, closed, true);
+    setDrawMode(false);
+    setHasDrawn(true);
+    map.getCanvas().style.cursor = "";
+
+    if (onDrawFilterRef.current) {
+      const inside = pinsRef.current.filter(pin => {
+        const lat = Number(pin.latitude);
+        const lng = Number(pin.longitude);
+        if (!lat || !lng) return false;
+        return pointInPolygon([lng, lat], finalPoints);
+      });
+      onDrawFilterRef.current(inside);
+    }
+
+    if (onBoundsSearchRef.current && finalPoints.length >= 3) {
+      const lngs = finalPoints.map(p => p[0]);
+      const lats = finalPoints.map(p => p[1]);
+      onBoundsSearchRef.current({
+        lng_min: Math.min(...lngs),
+        lng_max: Math.max(...lngs),
+        lat_min: Math.min(...lats),
+        lat_max: Math.max(...lats),
+      });
+    }
+  }, []);
+
+  // ESC to cancel draw mode
+  useEffect(() => {
+    if (!drawMode) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") clearDraw();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [drawMode, clearDraw]);
 
   // Init map once
   useEffect(() => {

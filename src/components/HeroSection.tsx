@@ -319,7 +319,7 @@ export function HeroSection() {
                       value={tipo}
                       onChange={(e) => setTipo(e.target.value)}
                       className={`w-full appearance-none bg-transparent font-body text-sm focus:outline-none ${
-                        tipo ? "text-foreground" : "text-muted-foreground/50"
+                        tipo ? "text-foreground" : "text-muted-foreground"
                       }`}
                     >
                       <option value="">Todos</option>

@@ -26,9 +26,13 @@ export interface SearchFilters {
 
 interface SearchState {
   filters: SearchFilters;
+  page: number;
+  scrollY: number;
   setFilter: <K extends keyof SearchFilters>(key: K, value: SearchFilters[K]) => void;
   resetFilters: () => void;
   setFilters: (f: Partial<SearchFilters>) => void;
+  setPage: (p: number) => void;
+  setScrollY: (y: number) => void;
 }
 
 const defaultFilters: SearchFilters = {
@@ -50,8 +54,12 @@ const defaultFilters: SearchFilters = {
 
 export const useSearchStore = create<SearchState>((set) => ({
   filters: { ...defaultFilters },
+  page: 0,
+  scrollY: 0,
   setFilter: (key, value) =>
-    set((s) => ({ filters: { ...s.filters, [key]: value } })),
-  resetFilters: () => set({ filters: { ...defaultFilters } }),
-  setFilters: (f) => set((s) => ({ filters: { ...s.filters, ...f } })),
+    set((s) => ({ filters: { ...s.filters, [key]: value }, page: 0 })),
+  resetFilters: () => set({ filters: { ...defaultFilters }, page: 0 }),
+  setFilters: (f) => set((s) => ({ filters: { ...s.filters, ...f }, page: 0 })),
+  setPage: (p) => set({ page: p }),
+  setScrollY: (y) => set({ scrollY: y }),
 }));

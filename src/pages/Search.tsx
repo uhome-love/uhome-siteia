@@ -58,7 +58,7 @@ const Search = () => {
   useCanonical();
   const [searchParams, setSearchParams] = useSearchParams();
   const modoIA = searchParams.get("modo") === "ia";
-  const { filters, setFilter, setFilters, resetFilters } = useSearchStore();
+  const { filters, setFilter, setFilters, resetFilters, page, setPage, scrollY, setScrollY } = useSearchStore();
   const [sortOpen, setSortOpen] = useState(false);
   const sortRef = React.useRef<HTMLDivElement>(null);
   const ultimaBuscaIA = React.useRef(0);
@@ -92,7 +92,6 @@ const Search = () => {
   const [mapViewBounds, setMapViewBounds] = useState<MapBounds | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
   const [mapLoading, setMapLoading] = useState(true);
-  const [page, setPage] = useState(0);
   const PAGE_SIZE = 40;
 
   // AI mode state
@@ -197,9 +196,9 @@ const Search = () => {
     ...buildFilters(),
     ordem: filters.ordem as any,
     bounds: filters.bounds || undefined,
-    limit: PAGE_SIZE,
+    limit: PAGE_SIZE * (page + 1),
     offset: 0,
-  }), [buildFilters, filters.ordem, filters.bounds]);
+  }), [buildFilters, filters.ordem, filters.bounds, page]);
 
   // AI mode can override listing data
   const [aiOverrideData, setAiOverrideData] = useState<{ imoveis: Imovel[]; total: number } | null>(null);
@@ -214,8 +213,13 @@ const Search = () => {
   const total = aiOverrideData?.total ?? queryTotal;
   const loading = aiOverrideData ? false : queryLoading;
 
-  // Reset page when filters change
-  useEffect(() => { setPage(0); }, [queryFilters]);
+  // Save scroll position on unmount & restore on mount
+  useEffect(() => {
+    if (scrollY > 0 && !loading && imoveis.length > 0) {
+      window.scrollTo(0, scrollY);
+    }
+    return () => { setScrollY(window.scrollY); };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Track busca_realizada (debounced — fires once per filter set)
   const buscaTrackRef = useRef<ReturnType<typeof setTimeout>>();

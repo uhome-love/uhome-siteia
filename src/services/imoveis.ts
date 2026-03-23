@@ -423,10 +423,10 @@ export async function syncFromJetimob(): Promise<{
   let totalErros = 0;
   let totalFetched = 0;
   let startPage = 1;
-  const PAGES_PER_CHUNK = 15;
+  const PAGES_PER_CHUNK = 5;
 
   // Call in chunks to avoid edge function timeout
-  for (let chunk = 0; chunk < 10; chunk++) {
+  for (let chunk = 0; chunk < 50; chunk++) {
     const { data, error } = await supabase.functions.invoke("sync-jetimob", {
       body: { start_page: startPage, max_pages: PAGES_PER_CHUNK },
     });

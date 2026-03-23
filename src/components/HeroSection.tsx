@@ -100,7 +100,7 @@ export function HeroSection() {
     if (cidade && cidade !== "Porto Alegre") params.set("cidade", cidade);
     // Prefetch data before navigation so cache is warm
     prefetchBusca(queryClient, params);
-    navigate(`/busca?${params.toString()}`);
+    navigate(prefixLink(`/busca?${params.toString()}`));
   };
 
   const handleAnunciar = async () => {

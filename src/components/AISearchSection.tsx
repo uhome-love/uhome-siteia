@@ -60,7 +60,7 @@ export function AISearchSection() {
               {examples.map((ex) => (
                 <button
                   key={ex}
-                  onClick={() => navigate(`/busca?modo=ia&q=${encodeURIComponent(ex)}`)}
+                  onClick={() => navigate(prefixLink(`/busca?modo=ia&q=${encodeURIComponent(ex)}`))}
                   className="rounded-full border border-border px-3 py-1.5 font-body text-xs text-muted-foreground transition-colors hover:border-accent/40 hover:text-foreground"
                 >
                   "{ex}"

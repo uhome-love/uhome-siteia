@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Sparkles, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useCorretor } from "@/contexts/CorretorContext";
 
 const examples = [
   "Apartamento 2 quartos perto do Parcão até R$3.000",
@@ -11,6 +12,7 @@ const examples = [
 
 export function AISearchSection() {
   const navigate = useNavigate();
+  const { prefixLink } = useCorretor();
 
   return (
     <section className="py-24">
@@ -42,12 +44,12 @@ export function AISearchSection() {
                 className="flex-1 bg-transparent font-body text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
-                    navigate(`/busca?modo=ia&q=${encodeURIComponent((e.target as HTMLInputElement).value)}`);
+                    navigate(prefixLink(`/busca?modo=ia&q=${encodeURIComponent((e.target as HTMLInputElement).value)}`));
                   }
                 }}
               />
               <button
-                onClick={() => navigate("/busca?modo=ia")}
+                onClick={() => navigate(prefixLink("/busca?modo=ia"))}
                 className="flex items-center gap-2 rounded-lg bg-accent px-4 py-2 font-body text-sm font-semibold text-accent-foreground transition-all hover:brightness-110 active:scale-[0.97]"
               >
                 <ArrowRight className="h-4 w-4" />
@@ -58,7 +60,7 @@ export function AISearchSection() {
               {examples.map((ex) => (
                 <button
                   key={ex}
-                  onClick={() => navigate(`/busca?modo=ia&q=${encodeURIComponent(ex)}`)}
+                  onClick={() => navigate(prefixLink(`/busca?modo=ia&q=${encodeURIComponent(ex)}`))}
                   className="rounded-full border border-border px-3 py-1.5 font-body text-xs text-muted-foreground transition-colors hover:border-accent/40 hover:text-foreground"
                 >
                   "{ex}"

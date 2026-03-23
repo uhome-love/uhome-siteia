@@ -4,10 +4,12 @@ import { Link } from "react-router-dom";
 import { SearchPropertyCard } from "@/components/SearchPropertyCard";
 import { fetchImoveisDestaque, type Imovel } from "@/services/imoveis";
 import { useFavoritos } from "@/hooks/useFavoritos";
+import { useCorretor } from "@/contexts/CorretorContext";
 
 export function FeaturedProperties() {
   const [imoveis, setImoveis] = useState<Imovel[]>([]);
   const { isFavorito, toggleFavorito } = useFavoritos();
+  const { prefixLink } = useCorretor();
 
   useEffect(() => {
     fetchImoveisDestaque(6).then(setImoveis).catch(console.error);
@@ -33,7 +35,7 @@ export function FeaturedProperties() {
               Imóveis em destaque
             </h2>
           </div>
-          <Link to="/busca" className="hidden font-body text-sm font-medium text-primary transition-colors hover:text-primary/80 sm:block">
+          <Link to={prefixLink("/busca")} className="hidden font-body text-sm font-medium text-primary transition-colors hover:text-primary/80 sm:block">
             Ver todos →
           </Link>
         </motion.div>

@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { Search, RotateCcw, MapPin, PenTool, Navigation, Sparkles, X, SlidersHorizontal } from "lucide-react";
 import { useSearchStore } from "@/stores/searchStore";
+import { useCorretor } from "@/contexts/CorretorContext";
 import { FilterPill, PillOption } from "@/components/FilterPill";
 import { propertyTypes } from "@/data/properties";
 import { CIDADES_PERMITIDAS } from "@/services/imoveis";
@@ -47,6 +48,7 @@ function formatAreaLabel(min: number, max: number): string {
 export function SearchFiltersBar({ onOpenMobileFilters }: { onOpenMobileFilters?: () => void }) {
   const { filters, setFilter, resetFilters } = useSearchStore();
   const navigate = useNavigate();
+  const { prefixLink } = useCorretor();
   const isMobile = useIsMobile();
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -124,7 +126,7 @@ export function SearchFiltersBar({ onOpenMobileFilters }: { onOpenMobileFilters?
 
   const handleSearchIA = () => {
     setShowDropdown(false);
-    navigate("/busca?modo=ia");
+    navigate(prefixLink("/busca?modo=ia"));
   };
 
   const handlePertoDeVoce = () => {

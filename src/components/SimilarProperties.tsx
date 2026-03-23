@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { fetchImoveis, type Imovel, fotoPrincipal, formatPreco } from "@/services/imoveis";
 import { FotoImovel } from "@/components/FotoImovel";
 import { Bed, Car, Maximize } from "lucide-react";
+import { useCorretor } from "@/contexts/CorretorContext";
 
 interface Props {
   currentId: string;
@@ -14,6 +15,7 @@ interface Props {
 
 export function SimilarProperties({ currentId, bairro, tipo, preco }: Props) {
   const [imoveis, setImoveis] = useState<Imovel[]>([]);
+  const { prefixLink } = useCorretor();
 
   useEffect(() => {
     async function load() {
@@ -78,7 +80,7 @@ export function SimilarProperties({ currentId, bairro, tipo, preco }: Props) {
               transition={{ duration: 0.4, delay: i * 0.06 }}
             >
               <Link
-                to={`/imovel/${imovel.slug}`}
+                to={prefixLink(`/imovel/${imovel.slug}`)}
                 className="group block w-[260px] flex-shrink-0 sm:w-auto"
               >
                 <div className="overflow-hidden rounded-xl">

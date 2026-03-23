@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { type MapPin as MapPinData } from "@/services/imoveis";
+import { useCorretor } from "@/contexts/CorretorContext";
 
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || "pk.eyJ1IjoibHVjYXN1aG9tZSIsImEiOiJjbW16c2l2dmUwYmxsMnJwdDI2bGxrazBkIn0.B4dp727gJlQQIWTci7GpFQ";
@@ -110,6 +111,7 @@ interface SearchMapProps {
 
 export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, onBoundsChange, onDrawFilter, onPertoDeVoce }: SearchMapProps) {
   const navigate = useNavigate();
+  const { prefixLink } = useCorretor();
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const initRef = useRef(false);
@@ -656,7 +658,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
               top: previewPos.y - 10,
               transform: "translateY(-100%)",
             }}
-            onClick={() => navigate(`/imovel/${previewPin.slug}`)}
+            onClick={() => navigate(prefixLink(`/imovel/${previewPin.slug}`))}
           >
             <div className="overflow-hidden rounded-xl border border-border bg-card shadow-xl">
               {previewPin.foto ? (

@@ -8,6 +8,7 @@ import { getBairroBySlug, bairrosData } from "@/data/bairros";
 import { fetchImoveis, formatPreco, type Imovel } from "@/services/imoveis";
 import { motion } from "framer-motion";
 import { MapPin, Home, ArrowRight, Loader2, ChevronRight } from "lucide-react";
+import { useCorretor } from "@/contexts/CorretorContext";
 import { setJsonLd, removeJsonLd, buildBairroJsonLd, buildBairroBreadcrumbJsonLd } from "@/lib/jsonld";
 import { useCanonical } from "@/hooks/useCanonical";
 
@@ -25,6 +26,7 @@ function setMeta(attr: string, key: string, content: string) {
 const Bairro = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const { prefixLink } = useCorretor();
   const bairro = getBairroBySlug(slug || "");
   useCanonical();
 
@@ -215,7 +217,7 @@ const Bairro = () => {
                 Nenhum imóvel disponível neste bairro no momento.
               </p>
               <button
-                onClick={() => navigate("/busca")}
+                onClick={() => navigate(prefixLink("/busca"))}
                 className="mt-4 rounded-full bg-primary px-6 py-2.5 font-body text-sm font-semibold text-primary-foreground hover:bg-primary/90"
               >
                 Ver todos os imóveis
@@ -232,7 +234,7 @@ const Bairro = () => {
           {total > 40 && (
             <div className="mt-10 text-center">
               <button
-                onClick={() => navigate(`/busca?bairros=${encodeURIComponent(bairro.nome)}`)}
+                onClick={() => navigate(prefixLink(`/busca?bairros=${encodeURIComponent(bairro.nome)}`))}
                 className="inline-flex items-center gap-2 rounded-full border border-primary px-6 py-2.5 font-body text-sm font-semibold text-primary transition-colors hover:bg-primary/5 active:scale-[0.97]"
               >
                 Ver todos os {total} imóveis <ArrowRight className="h-4 w-4" />

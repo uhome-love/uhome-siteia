@@ -10,6 +10,7 @@ import { bairrosData } from "@/data/bairros";
 import { CIDADES_PERMITIDAS } from "@/services/imoveis";
 import { useQueryClient } from "@tanstack/react-query";
 import { prefetchBusca } from "@/lib/prefetch";
+import { useCorretor } from "@/contexts/CorretorContext";
 
 
 
@@ -28,6 +29,7 @@ function HeroPropertyCount() {
 export function HeroSection() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { prefixLink } = useCorretor();
   const [modo, setModo] = useState<"comprar" | "anunciar">("comprar");
 
   // Search state
@@ -98,7 +100,7 @@ export function HeroSection() {
     if (cidade && cidade !== "Porto Alegre") params.set("cidade", cidade);
     // Prefetch data before navigation so cache is warm
     prefetchBusca(queryClient, params);
-    navigate(`/busca?${params.toString()}`);
+    navigate(prefixLink(`/busca?${params.toString()}`));
   };
 
   const handleAnunciar = async () => {

@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useCorretor } from "@/contexts/CorretorContext";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -74,6 +75,7 @@ function StepIcon({ step }: { step: number }) {
 /* ─── Main Component ─── */
 const Onboarding = () => {
   const navigate = useNavigate();
+  const { prefixLink } = useCorretor();
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
   const [totalEncontrados, setTotalEncontrados] = useState<number | null>(null);
@@ -131,7 +133,7 @@ const Onboarding = () => {
 
   const pular = () => {
     localStorage.setItem("uhome_onboarding_done", "1");
-    navigate("/");
+    navigate(prefixLink("/"));
   };
 
   /* ─── Toggle helpers ─── */
@@ -180,7 +182,7 @@ const Onboarding = () => {
       if (filters.quartos) params.set("quartos", String(filters.quartos));
       if (filters.preco_max) params.set("preco_max", String(filters.preco_max));
 
-      navigate(`/busca?${params.toString()}`);
+      navigate(prefixLink(`/busca?${params.toString()}`));
     } catch {
       toast.error("Erro ao salvar. Tente novamente.");
     } finally {

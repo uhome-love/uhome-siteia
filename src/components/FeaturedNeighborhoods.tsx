@@ -4,11 +4,13 @@ import { MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getBairrosDisponiveis } from "@/services/bairrosCache";
 import { bairrosData } from "@/data/bairros";
+import { useCorretor } from "@/contexts/CorretorContext";
 
 const bairrosConfig = bairrosData.slice(0, 6);
 
 export function FeaturedNeighborhoods() {
   const [contagens, setContagens] = useState<number[]>(bairrosConfig.map(() => 0));
+  const { prefixLink } = useCorretor();
 
   useEffect(() => {
     async function buscarContagens() {
@@ -60,7 +62,7 @@ export function FeaturedNeighborhoods() {
               transition={{ duration: 0.5, delay: i * 0.08 }}
             >
               <Link
-                to={`/bairros/${b.slug}`}
+                to={prefixLink(`/bairros/${b.slug}`)}
                 className="group relative block overflow-hidden rounded-2xl hover-lift"
               >
                 <div className="aspect-video w-full">

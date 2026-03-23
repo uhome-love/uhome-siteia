@@ -151,6 +151,15 @@ export function HeroSection() {
             transition={{ duration: 0.7, ease }}
             className="max-w-lg"
           >
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5, duration: 0.5 }}
+              className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 font-body text-xs font-semibold text-white/90 backdrop-blur-sm"
+            >
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
+              <HeroPropertyCount /> imóveis disponíveis
+            </motion.p>
             <p className="mb-4 font-body text-xs font-semibold uppercase tracking-[0.2em] text-white/70">
               Porto Alegre & Região
             </p>

@@ -62,6 +62,7 @@ const PropertyDetail = () => {
         setImovel(data);
         if (data) {
           trackView(data.id);
+          trackEvent({ tipo: "imovel_visualizado", imovel_slug: data.slug, imovel_titulo: data.titulo });
           getViewCount(data.id).then(setViewCount);
           const vistos: string[] = JSON.parse(localStorage.getItem("imoveis_vistos") || "[]");
           if (!vistos.includes(data.id)) {

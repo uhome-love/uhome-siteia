@@ -61,7 +61,12 @@ export async function submitLead(data: LeadData) {
 
   if (error) throw error;
 
-  // Sync to CRM is handled automatically by DB trigger (on_lead_created)
+  // Track in lead_events
+  trackEvent({
+    tipo: "formulario_enviado",
+    imovel_slug: data.imovel_slug,
+    imovel_titulo: data.imovel_titulo,
+  });
 
   return true;
 }

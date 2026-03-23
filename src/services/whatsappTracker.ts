@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { getSessionId, getCorretorRef, getCorretorRefId } from "@/lib/session";
+import { trackEvent } from "@/lib/trackEvent";
 
 interface WhatsAppClickData {
   imovel_id?: string;
@@ -26,6 +27,13 @@ export async function trackWhatsAppClick(data: WhatsAppClickData = {}) {
       corretor_ref_id: refId || null,
       corretor_ref_slug: refSlug || null,
       origem_ref: refSlug ? 'link_corretor' : 'organico',
+    });
+
+    // Also track in lead_events + notify corretor
+    trackEvent({
+      tipo: "whatsapp_click",
+      imovel_slug: data.imovel_slug,
+      imovel_titulo: data.imovel_titulo,
     });
   } catch {
     // silent — never block user flow

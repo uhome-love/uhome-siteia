@@ -5,7 +5,6 @@ import { Heart } from "lucide-react";
 import { motion } from "framer-motion";
 import { type Imovel, fotoPrincipal, formatPreco } from "@/services/imoveis";
 import { FotoImovel } from "@/components/FotoImovel";
-import { useFavoritos } from "@/hooks/useFavoritos";
 import { useCorretor } from "@/contexts/CorretorContext";
 
 interface Props {
@@ -13,6 +12,8 @@ interface Props {
   index: number;
   highlighted?: boolean;
   onHover?: (id: string | null) => void;
+  isFavorito?: (id: string) => boolean;
+  toggleFavorito?: (id: string) => Promise<"needs_auth" | void>;
 }
 
 type BadgeStyle = "novo" | "exclusivo" | "visto";
@@ -41,14 +42,15 @@ const badgeClasses: Record<BadgeStyle, string> = {
   visto: "bg-white/90 text-primary font-semibold shadow-sm backdrop-blur-sm",
 };
 
-export function SearchPropertyCard({ imovel, index, highlighted, onHover }: Props) {
-  const { isFavorito, toggleFavorito } = useFavoritos();
+export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavorito: isFavoritoProp, toggleFavorito: toggleFavoritoProp }: Props) {
   const [hovering, setHovering] = useState(false);
   const [fotoAtiva, setFotoAtiva] = useState(0);
   const [showAuth, setShowAuth] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { prefixLink } = useCorretor();
+  const isFavorito = isFavoritoProp ?? (() => false);
+  const toggleFavorito = toggleFavoritoProp ?? (async () => undefined as "needs_auth" | void);
   const liked = isFavorito(imovel.id);
   const fotos = imovel.fotos && imovel.fotos.length > 0 ? imovel.fotos.map((f) => f.url) : [fotoPrincipal(imovel)];
   const price = formatPreco(imovel.preco);

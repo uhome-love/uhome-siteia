@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, lazy } from "react";
 const PerformanceDebug = lazy(() => import("@/components/PerformanceDebug").then(m => ({ default: m.PerformanceDebug })));
 import { AuthModal } from "@/components/AuthModal";
 import { useAuth } from "@/hooks/useAuth";
+import { useFavoritos } from "@/hooks/useFavoritos";
 import { useSearchParams } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { SearchFiltersBar } from "@/components/SearchFiltersBar";
@@ -51,6 +52,7 @@ function describeFilters(filters: Record<string, any>): string {
 
 const Search = () => {
   const { user } = useAuth();
+  const { isFavorito, toggleFavorito } = useFavoritos();
   useCanonical();
   const [searchParams, setSearchParams] = useSearchParams();
   const modoIA = searchParams.get("modo") === "ia";
@@ -611,6 +613,8 @@ const Search = () => {
                       index={i}
                       highlighted={hoveredId === imovel.id}
                       onHover={setHoveredId}
+                      isFavorito={isFavorito}
+                      toggleFavorito={toggleFavorito}
                     />
                     {i === 5 && (
                       <SearchCTACard onClickCTA={() => setShowAlertModal(true)} />

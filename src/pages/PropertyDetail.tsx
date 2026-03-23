@@ -31,6 +31,7 @@ const PropertyDetail = () => {
   const [currentImage, setCurrentImage] = useState(0);
   const [viewCount, setViewCount] = useState(0);
   const { isFavorito, toggleFavorito } = useFavoritos();
+  const { corretor } = useCorretor();
   const [showAuth, setShowAuth] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [imovel, setImovel] = useState<Imovel | null>(null);

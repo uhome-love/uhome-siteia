@@ -104,7 +104,7 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavo
     }
   }, [imovel.id, onHover, baseFotos.length]);
 
-  // Track active dot via native scroll position
+  const handleMouseLeave = useCallback(() => { setHovering(false); onHover?.(null); }, [onHover]);
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;

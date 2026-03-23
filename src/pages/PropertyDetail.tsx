@@ -594,13 +594,26 @@ const PropertyDetail = () => {
             variant="whatsapp"
             size="sm"
             className="shrink-0 text-[13px] px-4 py-2.5 h-auto"
-            onClick={() => {
-              const msg = `Olá! Tenho interesse no imóvel: ${imovel.titulo} — ${priceFormatted}. Link: https://uhome.com.br/imovel/${imovel.slug}`;
-              window.open(whatsappLink(msg), '_blank');
-            }}
+            asChild
           >
-            <MessageCircle className="h-4 w-4 mr-1.5" />
-            WhatsApp
+            <a
+              href={buildWhatsAppUrl(undefined, {
+                titulo: imovel.titulo,
+                bairro: imovel.bairro,
+                slug: imovel.slug,
+              })}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackWhatsAppClick({
+                imovel_id: imovel.id,
+                imovel_titulo: imovel.titulo,
+                imovel_slug: imovel.slug,
+                origem_pagina: window.location.pathname,
+              })}
+            >
+              <MessageCircle className="h-4 w-4 mr-1.5" />
+              WhatsApp
+            </a>
           </Button>
         </div>
       </div>

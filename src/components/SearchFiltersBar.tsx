@@ -126,7 +126,7 @@ export function SearchFiltersBar({ onOpenMobileFilters }: { onOpenMobileFilters?
 
   const handleSearchIA = () => {
     setShowDropdown(false);
-    navigate("/busca?modo=ia");
+    navigate(prefixLink("/busca?modo=ia"));
   };
 
   const handlePertoDeVoce = () => {

@@ -8,6 +8,7 @@ import { getBairroBySlug, bairrosData } from "@/data/bairros";
 import { fetchImoveis, formatPreco, type Imovel } from "@/services/imoveis";
 import { motion } from "framer-motion";
 import { MapPin, Home, ArrowRight, Loader2, ChevronRight } from "lucide-react";
+import { useCorretor } from "@/contexts/CorretorContext";
 import { setJsonLd, removeJsonLd, buildBairroJsonLd, buildBairroBreadcrumbJsonLd } from "@/lib/jsonld";
 import { useCanonical } from "@/hooks/useCanonical";
 

@@ -26,6 +26,7 @@ function setMeta(attr: string, key: string, content: string) {
 const Bairro = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const { prefixLink } = useCorretor();
   const bairro = getBairroBySlug(slug || "");
   useCanonical();
 

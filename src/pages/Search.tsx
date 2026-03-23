@@ -732,24 +732,36 @@ const Search = () => {
                   </React.Fragment>
                 ))}
               </div>
-              {/* Load more */}
+              {/* Load more — button on desktop, infinite scroll on mobile */}
               {imoveis.length < total && (
-                <div className="flex justify-center pb-16 pt-6 sm:pb-4">
-                  <button
-                    onClick={loadMore}
-                    disabled={loadingMore}
-                    className="rounded-full border-[1.5px] border-border px-8 py-3 font-body text-sm font-semibold text-foreground transition-all hover:border-foreground active:scale-[0.97] disabled:opacity-50"
-                  >
-                    {loadingMore ? (
-                      <span className="flex items-center gap-2">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Carregando...
-                      </span>
-                    ) : (
-                      `Ver mais imóveis (${imoveis.length} de ${total.toLocaleString("pt-BR")})`
+                <>
+                  {/* Desktop: manual button */}
+                  <div className="hidden sm:flex justify-center pb-4 pt-6">
+                    <button
+                      onClick={loadMore}
+                      disabled={loadingMore}
+                      className="rounded-full border-[1.5px] border-border px-8 py-3 font-body text-sm font-semibold text-foreground transition-all hover:border-foreground active:scale-[0.97] disabled:opacity-50"
+                    >
+                      {loadingMore ? (
+                        <span className="flex items-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Carregando...
+                        </span>
+                      ) : (
+                        `Ver mais imóveis (${imoveis.length} de ${total.toLocaleString("pt-BR")})`
+                      )}
+                    </button>
+                  </div>
+                  {/* Mobile: infinite scroll sentinel + loading indicator */}
+                  <div className="sm:hidden">
+                    <div ref={sentinelRef} className="h-1" />
+                    {loadingMore && (
+                      <div className="flex justify-center py-6">
+                        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                      </div>
                     )}
-                  </button>
-                </div>
+                  </div>
+                </>
               )}
             </>
           )}

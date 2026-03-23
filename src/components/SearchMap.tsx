@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, X, Bed, Maximize, ToggleLeft, ToggleRight, PenTool, Navigation } from "lucide-react";
+import { Search, X, Bed, Maximize, ToggleLeft, ToggleRight, PenTool, Navigation, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -158,7 +158,6 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       setDrawMode(true);
       setDrawPoints([]);
       setHasDrawn(false);
-      import("sonner").then(({ toast }) => toast.info("Clique no mapa para desenhar a área de busca. Clique duplo para finalizar."));
     };
     window.addEventListener("uhome:draw-area", handler);
     return () => window.removeEventListener("uhome:draw-area", handler);
@@ -418,73 +417,6 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
     };
   }, [navigate]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Draw mode — FIX 11: use all loaded pins + bounds-based server search
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map) return;
-
-    if (drawMode) {
-      map.getCanvas().style.cursor = "crosshair";
-
-      const onClick = (e: mapboxgl.MapMouseEvent) => {
-        const point: [number, number] = [e.lngLat.lng, e.lngLat.lat];
-        setDrawPoints(prev => {
-          const next = [...prev, point];
-          updateDrawSources(map, next, false);
-          return next;
-        });
-      };
-
-      const onDblClick = (e: mapboxgl.MapMouseEvent) => {
-        e.preventDefault();
-        const finalPoints = drawPointsRef.current;
-        if (finalPoints.length >= 3) {
-          const closed = [...finalPoints, finalPoints[0]];
-          updateDrawSources(map, closed, true);
-          setDrawMode(false);
-          setHasDrawn(true);
-          map.getCanvas().style.cursor = "";
-
-          // FIX 11 — Filter loaded pins client-side AND trigger bounds search for full results
-          if (onDrawFilterRef.current) {
-            const inside = pinsRef.current.filter(pin => {
-              const lat = Number(pin.latitude);
-              const lng = Number(pin.longitude);
-              if (!lat || !lng) return false;
-              return pointInPolygon([lng, lat], finalPoints);
-            });
-            onDrawFilterRef.current(inside);
-          }
-
-          // Also trigger bounds-based search to get server-side results
-          if (onBoundsSearchRef.current && finalPoints.length >= 3) {
-            const lngs = finalPoints.map(p => p[0]);
-            const lats = finalPoints.map(p => p[1]);
-            onBoundsSearchRef.current({
-              lng_min: Math.min(...lngs),
-              lng_max: Math.max(...lngs),
-              lat_min: Math.min(...lats),
-              lat_max: Math.max(...lats),
-            });
-          }
-        }
-      };
-
-      map.on("click", onClick);
-      map.on("dblclick", onDblClick);
-      map.doubleClickZoom.disable();
-
-      return () => {
-        map.off("click", onClick);
-        map.off("dblclick", onDblClick);
-        map.doubleClickZoom.enable();
-        if (!drawMode) map.getCanvas().style.cursor = "";
-      };
-    } else {
-      map.getCanvas().style.cursor = "";
-    }
-  }, [drawMode]);
-
   function updateDrawSources(map: mapboxgl.Map, pts: [number, number][], closed: boolean) {
     const pointsSource = map.getSource("draw-points") as mapboxgl.GeoJSONSource | undefined;
     const polySource = map.getSource("draw-polygon") as mapboxgl.GeoJSONSource | undefined;
@@ -538,7 +470,89 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
     }
   }, []);
 
-  // FIX 6 — Update data using requestIdleCallback to avoid jank
+  const finalizarDesenho = useCallback(() => {
+    const map = mapRef.current;
+    const finalPoints = drawPointsRef.current;
+    if (!map || finalPoints.length < 3) return;
+
+    const closed = [...finalPoints, finalPoints[0]];
+    updateDrawSources(map, closed, true);
+    setDrawMode(false);
+    setHasDrawn(true);
+    map.getCanvas().style.cursor = "";
+
+    if (onDrawFilterRef.current) {
+      const inside = pinsRef.current.filter(pin => {
+        const lat = Number(pin.latitude);
+        const lng = Number(pin.longitude);
+        if (!lat || !lng) return false;
+        return pointInPolygon([lng, lat], finalPoints);
+      });
+      onDrawFilterRef.current(inside);
+    }
+
+    if (finalPoints.length >= 3 && onBoundsSearchRef.current) {
+      const lngs = finalPoints.map(p => p[0]);
+      const lats = finalPoints.map(p => p[1]);
+      onBoundsSearchRef.current({
+        lng_min: Math.min(...lngs),
+        lng_max: Math.max(...lngs),
+        lat_min: Math.min(...lats),
+        lat_max: Math.max(...lats),
+      });
+    }
+  }, []);
+
+  // ESC to cancel draw mode
+  useEffect(() => {
+    if (!drawMode) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") clearDraw();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [drawMode, clearDraw]);
+
+  // Draw mode — click to add points, dblclick or button to finalize
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    if (drawMode) {
+      map.getCanvas().style.cursor = "crosshair";
+
+      const onClick = (e: mapboxgl.MapMouseEvent) => {
+        const point: [number, number] = [e.lngLat.lng, e.lngLat.lat];
+        setDrawPoints(prev => {
+          const next = [...prev, point];
+          updateDrawSources(map, next, false);
+          return next;
+        });
+      };
+
+      const onDblClick = (e: mapboxgl.MapMouseEvent) => {
+        e.preventDefault();
+        finalizarDesenho();
+      };
+
+      map.on("click", onClick);
+      map.on("dblclick", onDblClick);
+      map.doubleClickZoom.disable();
+
+      return () => {
+        map.off("click", onClick);
+        map.off("dblclick", onDblClick);
+        map.doubleClickZoom.enable();
+        if (!drawMode) map.getCanvas().style.cursor = "";
+      };
+    } else {
+      map.getCanvas().style.cursor = "";
+    }
+  }, [drawMode, finalizarDesenho]);
+
+
+
+
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReadyRef.current) return;
@@ -666,10 +680,10 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         </div>
       )}
 
-      {/* Draw mode indicator */}
+      {/* Draw mode indicator + confirm button */}
       <AnimatePresence>
         {drawMode && (
-          <div className="absolute left-4 top-4 z-20">
+          <div className="absolute left-3 right-3 top-4 z-20 flex flex-wrap items-center gap-2 sm:left-4 sm:right-auto">
             <motion.div
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
@@ -677,14 +691,30 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
               className="flex items-center gap-2 rounded-full bg-primary px-4 py-2 font-body text-[13px] font-semibold text-primary-foreground shadow-lg"
             >
               <span className="h-2 w-2 animate-pulse rounded-full bg-white" />
-              Desenhando área ({drawPoints.length} pontos)
+              {drawPoints.length < 3
+                ? `Clique no mapa para marcar pontos (${drawPoints.length}/3)`
+                : `Área com ${drawPoints.length} pontos`
+              }
               <button
-                onClick={() => { setDrawMode(false); clearDraw(); }}
+                onClick={clearDraw}
                 className="ml-1 rounded-full p-0.5 hover:bg-white/20"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
             </motion.div>
+
+            {drawPoints.length >= 3 && (
+              <motion.button
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                onClick={finalizarDesenho}
+                className="flex items-center gap-1.5 rounded-full bg-card border-2 border-primary px-4 py-2 font-body text-[13px] font-bold text-primary shadow-lg transition-all hover:bg-primary hover:text-primary-foreground active:scale-[0.96]"
+              >
+                <Check className="h-4 w-4" />
+                Buscar nessa área
+              </motion.button>
+            )}
           </div>
         )}
       </AnimatePresence>

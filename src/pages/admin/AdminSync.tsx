@@ -28,10 +28,11 @@ export default function AdminSync() {
     let totalInseridos = 0;
     let totalErros = 0;
     let startPage = 1;
-    const PAGES_PER_CHUNK = 15;
+    const PAGES_PER_CHUNK = 5;
+    const MAX_CHUNKS = 50; // 50 chunks * 5 pages * 100 items = 25k max
 
     try {
-      for (let chunk = 0; chunk < 10; chunk++) {
+      for (let chunk = 0; chunk < MAX_CHUNKS; chunk++) {
         setLog((prev) => [...prev, `📄 Processando páginas ${startPage}-${startPage + PAGES_PER_CHUNK - 1}...`]);
 
         const { data, error } = await supabase.functions.invoke("sync-jetimob", {
@@ -48,7 +49,7 @@ export default function AdminSync() {
           `  ✅ ${data.inseridos ?? 0} inseridos, ${data.erros ?? 0} erros (${data.total ?? 0} processados)`,
         ]);
 
-        if (!data.next_start_page || (data.total ?? 0) === 0) {
+        if (!data.more_pages || (data.total ?? 0) === 0) {
           break;
         }
         startPage = data.next_start_page;

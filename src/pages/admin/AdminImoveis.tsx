@@ -72,7 +72,7 @@ export default function AdminImoveis() {
     setSyncing(true);
     try {
       const { data, error } = await supabase.functions.invoke("sync-jetimob", {
-        body: { start_page: 1, max_pages: 15 },
+        body: { start_page: 1, max_pages: 5 },
       });
       if (error) throw error;
       toast.success(`Sync concluída: ${data.inseridos} inseridos, ${data.erros} erros`);

@@ -9,6 +9,7 @@ import { useCorretor } from "@/contexts/CorretorContext";
 export function FeaturedProperties() {
   const [imoveis, setImoveis] = useState<Imovel[]>([]);
   const { isFavorito, toggleFavorito } = useFavoritos();
+  const { prefixLink } = useCorretor();
 
   useEffect(() => {
     fetchImoveisDestaque(6).then(setImoveis).catch(console.error);

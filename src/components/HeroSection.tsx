@@ -15,6 +15,7 @@ const ease = [0.16, 1, 0.3, 1] as [number, number, number, number];
 
 export function HeroSection() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [modo, setModo] = useState<"comprar" | "anunciar">("comprar");
 
   // Search state

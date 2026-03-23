@@ -35,21 +35,21 @@ export function Navbar() {
   const modoIA = searchParams.get("modo") === "ia";
 
   return (
-    <nav className={`fixed left-0 right-0 z-50 border-b border-border/60 bg-background/95 backdrop-blur-md ${bannerVisible ? 'top-10' : 'top-0'}`}>
-      <div className="relative mx-auto flex h-16 w-full max-w-[1440px] items-center px-5 sm:px-8">
+    <nav className={`fixed left-0 right-0 z-50 border-b border-border/40 bg-background/97 backdrop-blur-lg ${bannerVisible ? 'top-10' : 'top-0'}`}>
+      <div className="relative mx-auto flex h-[60px] w-full max-w-[1440px] items-center px-5 sm:px-8">
         {/* LEFT — Logo */}
-        <Link to={prefixLink("/")} className="flex flex-shrink-0 items-center">
-          <UhomeLogo variant="full" height={28} />
+        <Link to={prefixLink("/")} className="flex flex-shrink-0 items-center mr-8">
+          <UhomeLogo variant="full" height={26} />
         </Link>
 
-        {/* CENTER — Navigation */}
-        <div className="hidden flex-1 items-center justify-center gap-1 lg:flex">
+        {/* CENTER — Navigation (truly centered using absolute positioning) */}
+        <div className="hidden flex-1 items-center justify-center lg:flex">
           {/* Mode pills */}
-          <div className="flex items-center gap-0.5 rounded-full bg-secondary/80 p-[3px]">
+          <div className="flex items-center gap-0.5 rounded-full bg-secondary/60 p-[3px]">
             <Link
               to={prefixLink("/busca?finalidade=venda")}
               onMouseEnter={handlePrefetchBusca}
-              className={`rounded-full px-4 py-[6px] font-body text-[13px] font-semibold transition-all ${
+              className={`rounded-full px-4 py-[5px] font-body text-[13px] font-semibold transition-all ${
                 isSearchPage && !modoIA
                   ? "bg-foreground text-background shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
@@ -59,7 +59,7 @@ export function Navbar() {
             </Link>
             <Link
               to={prefixLink("/busca?modo=ia")}
-              className={`flex items-center gap-1.5 rounded-full px-4 py-[6px] font-body text-[13px] font-semibold transition-all ${
+              className={`flex items-center gap-1.5 rounded-full px-4 py-[5px] font-body text-[13px] font-semibold transition-all ${
                 isSearchPage && modoIA
                   ? "bg-primary text-primary-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
@@ -71,28 +71,28 @@ export function Navbar() {
           </div>
 
           {/* Divider */}
-          <div className="mx-3 h-5 w-px bg-border" />
+          <div className="mx-4 h-4 w-px bg-border/80" />
 
           {/* Value links */}
           <Link
             to={prefixLink("/avaliar-imovel")}
-            className="rounded-full px-3.5 py-[6px] font-body text-[13px] font-medium text-primary transition-colors hover:bg-primary/5 active:scale-[0.97]"
+            className="px-3 py-1.5 font-body text-[13px] font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
             Quanto vale meu imóvel?
           </Link>
           <Link
             to={prefixLink("/faq")}
-            className="rounded-full px-3.5 py-[6px] font-body text-[13px] font-medium text-muted-foreground transition-colors hover:text-foreground"
+            className="px-3 py-1.5 font-body text-[13px] font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
             Ajuda
           </Link>
         </div>
 
         {/* RIGHT — CTAs + Auth */}
-        <div className="hidden items-center gap-2 lg:flex flex-shrink-0">
+        <div className="hidden items-center gap-2.5 lg:flex flex-shrink-0 ml-8">
           <Link
             to={prefixLink("/anunciar")}
-            className="rounded-full border border-primary/30 bg-primary/5 px-4 py-[7px] font-body text-[13px] font-semibold text-primary transition-all hover:border-primary hover:bg-primary hover:text-primary-foreground active:scale-[0.97]"
+            className="rounded-full border border-border bg-background px-4 py-[6px] font-body text-[13px] font-semibold text-foreground transition-all hover:border-primary hover:text-primary active:scale-[0.97]"
           >
             Anuncie seu imóvel
           </Link>

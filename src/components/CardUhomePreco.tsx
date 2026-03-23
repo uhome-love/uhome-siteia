@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { TrendingDown, TrendingUp, Minus, ChevronDown, ChevronUp } from "lucide-react";
-import { useAnalisePreco } from "@/hooks/useAnalisePreco";
+import { TrendingDown, TrendingUp, Minus, ChevronDown, ChevronUp, ShieldCheck, ShieldAlert, Shield } from "lucide-react";
+import { useAnalisePreco, type SimilarComparable } from "@/hooks/useAnalisePreco";
 import { formatPreco, type Imovel } from "@/services/imoveis";
 
 export function CardUhomePreco({ imovel }: { imovel: Imovel }) {
@@ -13,41 +13,53 @@ export function CardUhomePreco({ imovel }: { imovel: Imovel }) {
   const config = {
     abaixo: {
       label: "Preço abaixo do mercado",
-      sublabel: `${Math.abs(analise.percentual)}% abaixo do preço médio do bairro`,
+      sublabel: `${Math.abs(analise.percentual)}% abaixo de imóveis similares`,
       Icon: TrendingDown,
       badgeBg: "bg-green-100",
       badgeText: "text-green-800",
       iconBg: "bg-green-600",
-      needle: 16,
+      needle: Math.max(5, 50 + analise.percentual * 0.5),
     },
     justo: {
       label: "Preço dentro do mercado",
-      sublabel: "Alinhado com o valor médio do bairro",
+      sublabel: "Alinhado com imóveis similares na região",
       Icon: Minus,
       badgeBg: "bg-primary/10",
       badgeText: "text-primary",
       iconBg: "bg-primary",
-      needle: 50,
+      needle: 50 + analise.percentual * 0.5,
     },
     acima: {
       label: "Preço acima do mercado",
-      sublabel: `${Math.abs(analise.percentual)}% acima do preço médio do bairro`,
+      sublabel: `${Math.abs(analise.percentual)}% acima de imóveis similares`,
       Icon: TrendingUp,
       badgeBg: "bg-red-100",
       badgeText: "text-red-800",
       iconBg: "bg-red-600",
-      needle: 84,
+      needle: Math.min(95, 50 + analise.percentual * 0.5),
     },
   }[analise.status];
 
   const { Icon } = config;
 
+  const confiancaConfig = {
+    alta: { label: "Alta confiança", Icon: ShieldCheck, color: "text-green-700", bg: "bg-green-50" },
+    media: { label: "Confiança moderada", Icon: Shield, color: "text-amber-700", bg: "bg-amber-50" },
+    baixa: { label: "Poucos dados", Icon: ShieldAlert, color: "text-muted-foreground", bg: "bg-secondary" },
+  }[analise.confianca];
+
   return (
     <div className="rounded-2xl border border-border bg-card p-5">
       {/* Badge */}
-      <span className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-border bg-secondary px-3 py-1 font-body text-[11px] font-semibold text-muted-foreground">
-        ◎ Análise UhomePreço
-      </span>
+      <div className="mb-3 flex items-center justify-between">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-secondary px-3 py-1 font-body text-[11px] font-semibold text-muted-foreground">
+          ◎ Análise UhomePreço
+        </span>
+        <span className={`inline-flex items-center gap-1 rounded-full ${confiancaConfig.bg} px-2.5 py-1 font-body text-[10px] font-semibold ${confiancaConfig.color}`}>
+          <confiancaConfig.Icon className="h-3 w-3" />
+          {confiancaConfig.label}
+        </span>
+      </div>
 
       {/* Title */}
       <p className="font-body text-sm font-bold text-foreground">{config.label}</p>
@@ -55,7 +67,7 @@ export function CardUhomePreco({ imovel }: { imovel: Imovel }) {
         Baseado em {analise.totalSimilares} imóveis similares em {imovel.bairro}
       </p>
 
-      {/* Gauge bar */}
+      {/* Gauge bar — continuous needle position */}
       <div className="relative mt-4 mb-1">
         <div className="flex h-2 overflow-hidden rounded-full">
           <div className="flex-1 bg-green-400" />
@@ -92,8 +104,29 @@ export function CardUhomePreco({ imovel }: { imovel: Imovel }) {
 
         {expandido && (
           <>
-            <Row label="Média/m² no bairro" value={`R$ ${analise.precoM2Bairro.toLocaleString("pt-BR")}/m²`} />
-            <Row label="Preço médio similar" value={formatPreco(analise.mediaPreco)} border={false} />
+            <Row label="Média/m² similares" value={`R$ ${analise.precoM2Bairro.toLocaleString("pt-BR")}/m²`} />
+            <Row label="Preço médio similar" value={formatPreco(analise.mediaPreco)} />
+            {analise.custoTotalMensal && (
+              <Row
+                label="Custo mensal (cond. + IPTU)"
+                value={`R$ ${analise.custoTotalMensal.toLocaleString("pt-BR")}`}
+              />
+            )}
+            <Row label="Similaridade mínima" value="Score ≥ 30%" border={false} />
+
+            {/* Comparáveis top 5 */}
+            {analise.comparaveis.length > 0 && (
+              <div className="mt-3 pt-3 border-t border-border">
+                <p className="font-body text-xs font-semibold text-foreground mb-2">
+                  Imóveis mais similares comparados
+                </p>
+                <div className="space-y-2">
+                  {analise.comparaveis.map((c, i) => (
+                    <ComparableRow key={i} comp={c} rank={i + 1} />
+                  ))}
+                </div>
+              </div>
+            )}
           </>
         )}
       </div>
@@ -123,6 +156,33 @@ function Row({ label, value, border = true }: { label: string; value: string; bo
     <div className={`flex items-center justify-between py-2 ${border ? "border-b border-border" : ""}`}>
       <span className="text-muted-foreground">{label}</span>
       <span className="font-semibold text-foreground">{value}</span>
+    </div>
+  );
+}
+
+function ComparableRow({ comp, rank }: { comp: SimilarComparable; rank: number }) {
+  const similarityPct = Math.round(comp.score * 100);
+  return (
+    <div className="flex items-center justify-between rounded-lg bg-secondary/50 px-3 py-2">
+      <div className="flex items-center gap-2">
+        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-muted font-body text-[10px] font-bold text-muted-foreground">
+          {rank}
+        </span>
+        <div>
+          <span className="font-body text-xs font-medium text-foreground">
+            {comp.area_total}m² · {comp.quartos}q · {comp.vagas}v
+          </span>
+          {comp.andar != null && (
+            <span className="font-body text-[10px] text-muted-foreground"> · {comp.andar}º andar</span>
+          )}
+        </div>
+      </div>
+      <div className="text-right">
+        <span className="font-body text-xs font-bold text-foreground">
+          R$ {comp.precoM2.toLocaleString("pt-BR")}/m²
+        </span>
+        <div className="font-body text-[10px] text-muted-foreground">{similarityPct}% similar</div>
+      </div>
     </div>
   );
 }

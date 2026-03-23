@@ -16,7 +16,7 @@ export function BannerCorretor() {
   } | null>(null);
   const [fechado, setFechado] = useState(false);
 
-  // Re-checar a cada navegação + polling para capturar dados async do CorretorRefLayout
+  // Re-checar a cada navegação + listen for corretor-ref-ready event
   useEffect(() => {
     function check() {
       const slug = getCorretorRef();
@@ -35,14 +35,21 @@ export function BannerCorretor() {
 
     if (check()) return;
 
-    // Retry a few times — CorretorRefLayout sets localStorage async
+    // Listen for the event from CorretorRefLayout
+    const handler = () => check();
+    window.addEventListener('corretor-ref-ready', handler);
+
+    // Also poll as fallback
     let attempts = 0;
     const interval = setInterval(() => {
       attempts++;
-      if (check() || attempts >= 10) clearInterval(interval);
-    }, 300);
+      if (check() || attempts >= 20) clearInterval(interval);
+    }, 500);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('corretor-ref-ready', handler);
+    };
   }, [location.pathname]);
 
   if (!dados || fechado) return null;
@@ -53,9 +60,12 @@ export function BannerCorretor() {
   )}`;
 
   return (
+    <>
+    {/* Spacer for fixed banner + navbar offset */}
+    <div className="h-10" id="banner-corretor-spacer" />
     <div
       data-testid="banner-corretor"
-      className="flex items-center justify-between gap-3 bg-primary/5 border-b border-primary/10 px-4 py-2 sm:px-6"
+      className="fixed top-0 left-0 right-0 z-[60] flex h-10 items-center justify-between gap-3 border-b border-primary/10 bg-card px-4 sm:px-6"
     >
       <div className="flex items-center gap-2 min-w-0">
         {dados.foto ? (
@@ -94,5 +104,6 @@ export function BannerCorretor() {
         </button>
       </div>
     </div>
+    </>
   );
 }

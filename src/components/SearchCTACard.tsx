@@ -6,8 +6,8 @@ interface Props {
 
 export function SearchCTACard({ onClickCTA }: Props) {
   return (
-    <div className="flex flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed border-primary/30 bg-primary/[0.03] p-6 text-center sm:flex-row sm:text-left">
-      <div className="flex-1">
+    <div className="col-span-full flex items-center justify-between gap-4 rounded-2xl border-2 border-dashed border-primary/30 bg-primary/[0.03] px-6 py-5">
+      <div>
         <p className="font-body text-base font-bold text-foreground">
           Gostou de algum imóvel?
         </p>

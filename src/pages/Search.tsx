@@ -617,7 +617,7 @@ const Search = () => {
                       toggleFavorito={toggleFavorito}
                     />
                     {i === 5 && (
-                      <SearchCTACard onClickCTA={() => setShowAlertModal(true)} />
+                      <SearchCTACard />
                     )}
                   </React.Fragment>
                 ))}

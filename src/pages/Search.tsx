@@ -58,7 +58,7 @@ const Search = () => {
   useCanonical();
   const [searchParams, setSearchParams] = useSearchParams();
   const modoIA = searchParams.get("modo") === "ia";
-  const { filters, setFilter, setFilters, resetFilters } = useSearchStore();
+  const { filters, setFilter, setFilters, resetFilters, page, setPage, scrollY, setScrollY } = useSearchStore();
   const [sortOpen, setSortOpen] = useState(false);
   const sortRef = React.useRef<HTMLDivElement>(null);
   const ultimaBuscaIA = React.useRef(0);

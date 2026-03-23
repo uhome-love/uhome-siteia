@@ -241,10 +241,14 @@ const PropertyDetail = () => {
                 <Share2 className="h-[18px] w-[18px] text-white" />
               </button>
               <button
-                onClick={() => setLiked(!liked)}
+                onClick={async () => {
+                  if (!imovel) return;
+                  const result = await toggleFavorito(imovel.id);
+                  if (result === "needs_auth") setShowAuth(true);
+                }}
                 className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-md active:scale-95"
               >
-                <Heart className={`h-[18px] w-[18px] ${liked ? "fill-red-500 text-red-500" : "text-white"}`} />
+                <Heart className={`h-[18px] w-[18px] ${imovel && isFavorito(imovel.id) ? "fill-red-500 text-red-500" : "text-white"}`} />
               </button>
             </div>
           </div>

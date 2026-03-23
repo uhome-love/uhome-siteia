@@ -310,33 +310,47 @@ const Search = () => {
     ultimaBuscaIA.current = agora;
 
     setBuscandoIA(true);
+    setAiOverrideData(null);
+
     try {
       const res = await interpretarBusca(q.trim());
       setAiResult(res);
       setResumoIA(res.resumo);
 
       const f = res.filtros;
-      
-      const storeUpdate: Record<string, any> = {};
-      if (f.tipo) storeUpdate.tipo = f.tipo;
-      if (f.bairros?.length) storeUpdate.bairro = f.bairros.join(",");
-      if (f.preco_max) storeUpdate.precoMax = f.preco_max;
-      if (f.preco_min) storeUpdate.precoMin = f.preco_min;
-      if (f.area_min) storeUpdate.areaMin = f.area_min;
-      if (f.quartos) storeUpdate.quartos = f.quartos;
-      if (f.diferenciais?.length) storeUpdate.diferenciais = f.diferenciais;
+
+      // Reset hard filters on every AI search to avoid stale criteria leaking from previous searches.
+      // Diferenciais extraídos pela IA não entram como filtro rígido aqui porque a base atual
+      // não possui metadados confiáveis o suficiente para esse recorte e isso zerava a listagem.
+      const storeUpdate = {
+        tipo: f.tipo || "",
+        bairro: f.bairros?.length ? f.bairros.join(",") : "",
+        cidade: "Porto Alegre",
+        precoMin: f.preco_min || 0,
+        precoMax: f.preco_max || 0,
+        areaMin: f.area_min || 0,
+        areaMax: 0,
+        quartos: f.quartos || 0,
+        banheiros: 0,
+        vagas: 0,
+        diferenciais: [],
+        q: "",
+        bounds: null,
+        ordem: filters.ordem,
+      };
       setFilters(storeUpdate);
 
       const aiFilters: BuscaFilters = {
         finalidade: "venda",
         tipo: f.tipo || undefined,
         bairros: f.bairros?.length ? f.bairros : undefined,
+        cidade: "Porto Alegre",
         precoMin: f.preco_min || undefined,
         precoMax: f.preco_max || undefined,
         areaMin: f.area_min || undefined,
         quartos: f.quartos || undefined,
-        diferenciais: f.diferenciais?.length ? f.diferenciais : undefined,
       };
+
       const { data, count } = await fetchImoveis({ ...aiFilters, limit: 40 });
       setAiOverrideData({ imoveis: data, total: count });
     } catch (e: any) {
@@ -344,7 +358,7 @@ const Search = () => {
     } finally {
       setBuscandoIA(false);
     }
-  }, [queryIA, setFilters]);
+  }, [filters.ordem, queryIA, setFilters]);
 
   // Auto-search if arriving with ?modo=ia&q=...
   useEffect(() => {

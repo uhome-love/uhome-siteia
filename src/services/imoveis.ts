@@ -196,7 +196,7 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
   if (filters.vagas) countParams.p_vagas = filters.vagas;
   if (filters.areaMin) countParams.p_area_min = filters.areaMin;
   if (filters.areaMax) countParams.p_area_max = filters.areaMax;
-  if (filters.q) countParams.p_q = filters.q;
+
   if (filters.bounds) {
     countParams.lat_min = filters.bounds.lat_min;
     countParams.lat_max = filters.bounds.lat_max;

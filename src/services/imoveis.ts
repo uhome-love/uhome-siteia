@@ -292,7 +292,7 @@ export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSig
     rpcParams.p_cidades = CIDADES_PERMITIDAS;
   }
 
-  if (filters.tipo) rpcParams.p_tipo = filters.tipo;
+  if (filters.tipo && !filters.tipo.includes(",")) rpcParams.p_tipo = filters.tipo;
   if (filters.bairros?.length) {
     rpcParams.p_bairros = filters.bairros;
   } else if (filters.bairro) {

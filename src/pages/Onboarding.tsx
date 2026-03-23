@@ -75,6 +75,7 @@ function StepIcon({ step }: { step: number }) {
 /* ─── Main Component ─── */
 const Onboarding = () => {
   const navigate = useNavigate();
+  const { prefixLink } = useCorretor();
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
   const [totalEncontrados, setTotalEncontrados] = useState<number | null>(null);

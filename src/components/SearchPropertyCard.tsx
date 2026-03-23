@@ -55,7 +55,14 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavo
   const isFavorito = isFavoritoProp ?? (() => false);
   const toggleFavorito = toggleFavoritoProp ?? (async () => undefined as "needs_auth" | void);
   const liked = isFavorito(imovel.id);
-  const baseFotos = imovel.fotos && imovel.fotos.length > 0 ? imovel.fotos.map((f) => f.url) : [fotoPrincipal(imovel)];
+  const baseFotos = (() => {
+    if (imovel.fotos && imovel.fotos.length > 0) {
+      const urls = imovel.fotos.map((f) => f.url).filter(Boolean);
+      if (urls.length > 0) return urls;
+    }
+    const fp = fotoPrincipal(imovel);
+    return fp ? [fp] : [];
+  })();
   const fotos = lazyFotos && lazyFotos.length > 0 ? lazyFotos : baseFotos;
   const price = formatPreco(imovel.preco);
   const area = imovel.area_total ?? imovel.area_util ?? 0;

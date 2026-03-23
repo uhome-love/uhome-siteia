@@ -367,7 +367,7 @@ export function HeroSection() {
               <>
                 <h3 className="font-body text-lg font-extrabold text-foreground">Venda mais rápido</h3>
                 <p className="mb-5 mt-1 font-body text-xs text-muted-foreground">
-                  4.800+ compradores ativos em Porto Alegre
+                  14.600+ imóveis na vitrine em Porto Alegre
                 </p>
 
                 {[

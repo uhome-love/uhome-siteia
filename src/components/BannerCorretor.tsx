@@ -16,18 +16,33 @@ export function BannerCorretor() {
   } | null>(null);
   const [fechado, setFechado] = useState(false);
 
-  // Re-checar a cada navegação
+  // Re-checar a cada navegação + polling para capturar dados async do CorretorRefLayout
   useEffect(() => {
-    const slug = getCorretorRef();
-    const nome = getCorretorRefNome();
-    const id = getCorretorRefId();
-    const foto = localStorage.getItem("corretor_ref_foto") || null;
+    function check() {
+      const slug = getCorretorRef();
+      const nome = getCorretorRefNome();
+      const id = getCorretorRefId();
+      const foto = localStorage.getItem("corretor_ref_foto") || null;
 
-    if (slug && nome && id) {
-      setDados({ nome, slug, foto });
-    } else {
-      setDados(null);
+      if (slug && nome && id) {
+        setDados({ nome, slug, foto });
+        return true;
+      } else {
+        setDados(null);
+        return false;
+      }
     }
+
+    if (check()) return;
+
+    // Retry a few times — CorretorRefLayout sets localStorage async
+    let attempts = 0;
+    const interval = setInterval(() => {
+      attempts++;
+      if (check() || attempts >= 10) clearInterval(interval);
+    }, 300);
+
+    return () => clearInterval(interval);
   }, [location.pathname]);
 
   if (!dados || fechado) return null;

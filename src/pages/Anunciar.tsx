@@ -33,7 +33,7 @@ const steps = [
 ];
 
 const benefits = [
-  { titulo: "Maior vitrine de POA", descricao: "Mais de 4.800 imóveis e milhares de compradores ativos buscando todos os dias.", destaque: "4.800+ compradores" },
+  { titulo: "Maior vitrine de POA", descricao: "Mais de 14.600 imóveis e milhares de compradores ativos buscando todos os dias.", destaque: "14.600+ imóveis" },
   { titulo: "Busca por IA", descricao: "Nosso motor de busca com IA conecta seu imóvel exatamente com quem procura ele.", destaque: "Matching inteligente" },
   { titulo: "Zero custo para anunciar", descricao: "Anunciar é gratuito. Nossa comissão só acontece quando você vende.", destaque: "R$ 0 para começar" },
   { titulo: "Equipe especializada em POA", descricao: "Corretores com profundo conhecimento dos bairros e preços de Porto Alegre.", destaque: "Time local" },
@@ -42,7 +42,7 @@ const benefits = [
 ];
 
 const stats = [
-  { numero: "4.800+", label: "compradores ativos" },
+  { numero: "14.600+", label: "imóveis na vitrine" },
   { numero: "15 dias", label: "tempo médio de venda" },
   { numero: "100%", label: "digital e sem burocracia" },
   { numero: "0%", label: "custo para anunciar" },
@@ -143,7 +143,7 @@ const Anunciar = () => {
             custom={2} variants={fadeUp}
             className="mx-auto mt-5 max-w-lg font-body text-lg leading-relaxed text-muted-foreground"
           >
-            Mais de 4.800 compradores ativos buscando imóveis em Porto Alegre agora mesmo. Seu imóvel na vitrine certa.
+            Mais de 14.600 imóveis na vitrine e milhares de compradores ativos buscando em Porto Alegre agora mesmo. Seu imóvel na vitrine certa.
           </motion.p>
 
           <motion.div custom={3} variants={fadeUp} className="mt-10 flex flex-wrap items-center justify-center gap-3">

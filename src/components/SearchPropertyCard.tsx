@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { type Imovel, fotoPrincipal, formatPreco } from "@/services/imoveis";
 import { FotoImovel } from "@/components/FotoImovel";
 import { useCorretor } from "@/contexts/CorretorContext";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Props {
   imovel: Imovel;
@@ -46,13 +47,16 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavo
   const [hovering, setHovering] = useState(false);
   const [fotoAtiva, setFotoAtiva] = useState(0);
   const [showAuth, setShowAuth] = useState(false);
+  const [lazyFotos, setLazyFotos] = useState<string[] | null>(null);
+  const fotosLoadedRef = useRef(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { prefixLink } = useCorretor();
   const isFavorito = isFavoritoProp ?? (() => false);
   const toggleFavorito = toggleFavoritoProp ?? (async () => undefined as "needs_auth" | void);
   const liked = isFavorito(imovel.id);
-  const fotos = imovel.fotos && imovel.fotos.length > 0 ? imovel.fotos.map((f) => f.url) : [fotoPrincipal(imovel)];
+  const baseFotos = imovel.fotos && imovel.fotos.length > 0 ? imovel.fotos.map((f) => f.url) : [fotoPrincipal(imovel)];
+  const fotos = lazyFotos && lazyFotos.length > 0 ? lazyFotos : baseFotos;
   const price = formatPreco(imovel.preco);
   const area = imovel.area_total ?? imovel.area_util ?? 0;
 

@@ -131,7 +131,14 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
     query = query.in("cidade", CIDADES_PERMITIDAS);
   }
 
-  if (filters.tipo) query = query.eq("tipo", filters.tipo);
+  if (filters.tipo) {
+    const tipos = filters.tipo.split(",").map(s => s.trim()).filter(Boolean);
+    if (tipos.length === 1) {
+      query = query.eq("tipo", tipos[0]);
+    } else if (tipos.length > 1) {
+      query = query.in("tipo", tipos);
+    }
+  }
   if (filters.bairros?.length) {
     const bairroFilter = filters.bairros.map(b => `bairro.ilike.%${b}%`).join(",");
     query = query.or(bairroFilter);
@@ -175,7 +182,7 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
   const countParams: Record<string, any> = {};
   if (filters.cidade) countParams.p_cidade = filters.cidade;
   else countParams.p_cidades = CIDADES_PERMITIDAS;
-  if (filters.tipo) countParams.p_tipo = filters.tipo;
+  if (filters.tipo && !filters.tipo.includes(",")) countParams.p_tipo = filters.tipo;
   if (bairrosArr) countParams.p_bairros = bairrosArr;
   else if (bairroStr) countParams.p_bairro = bairroStr;
   if (filters.precoMin) countParams.p_preco_min = filters.precoMin;
@@ -285,7 +292,7 @@ export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSig
     rpcParams.p_cidades = CIDADES_PERMITIDAS;
   }
 
-  if (filters.tipo) rpcParams.p_tipo = filters.tipo;
+  if (filters.tipo && !filters.tipo.includes(",")) rpcParams.p_tipo = filters.tipo;
   if (filters.bairros?.length) {
     rpcParams.p_bairros = filters.bairros;
   } else if (filters.bairro) {

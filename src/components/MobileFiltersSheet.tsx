@@ -253,28 +253,38 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
               <section className="mt-8">
                 <p className="font-body text-base font-bold text-foreground">Tipos de imóvel</p>
                 <div className="mt-3 space-y-1">
-                  {propertyTypes.map((t) => (
-                    <label
-                      key={t.value}
-                      className="flex items-center gap-3 py-3 cursor-pointer"
-                      onClick={() => setFilter("tipo", filters.tipo === t.value ? "" : t.value)}
-                    >
-                      <div
-                        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 transition-colors ${
-                          filters.tipo === t.value
-                            ? "border-primary bg-primary"
-                            : "border-border"
-                        }`}
+                  {propertyTypes.map((t) => {
+                    const selectedTipos = filters.tipo ? filters.tipo.split(",").map(s => s.trim()).filter(Boolean) : [];
+                    const isSelected = selectedTipos.includes(t.value);
+                    const toggleTipo = () => {
+                      const next = isSelected
+                        ? selectedTipos.filter(v => v !== t.value)
+                        : [...selectedTipos, t.value];
+                      setFilter("tipo", next.join(","));
+                    };
+                    return (
+                      <label
+                        key={t.value}
+                        className="flex items-center gap-3 py-3 cursor-pointer"
+                        onClick={toggleTipo}
                       >
-                        {filters.tipo === t.value && (
-                          <svg className="h-3.5 w-3.5 text-primary-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="20 6 9 17 4 12" />
-                          </svg>
-                        )}
-                      </div>
-                      <span className="font-body text-sm text-foreground">{t.label}</span>
-                    </label>
-                  ))}
+                        <div
+                          className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 transition-colors ${
+                            isSelected
+                              ? "border-primary bg-primary"
+                              : "border-border"
+                          }`}
+                        >
+                          {isSelected && (
+                            <svg className="h-3.5 w-3.5 text-primary-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+                              <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                          )}
+                        </div>
+                        <span className="font-body text-sm text-foreground">{t.label}</span>
+                      </label>
+                    );
+                  })}
                 </div>
               </section>
 

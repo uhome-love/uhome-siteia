@@ -182,7 +182,11 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
   const countParams: Record<string, any> = {};
   if (filters.cidade) countParams.p_cidade = filters.cidade;
   else countParams.p_cidades = CIDADES_PERMITIDAS;
-  if (filters.tipo && !filters.tipo.includes(",")) countParams.p_tipo = filters.tipo;
+  if (filters.tipo) {
+    const tipos = filters.tipo.split(",").map(s => s.trim()).filter(Boolean);
+    if (tipos.length === 1) countParams.p_tipo = tipos[0];
+    else if (tipos.length > 1) countParams.p_tipos = tipos;
+  }
   if (bairrosArr) countParams.p_bairros = bairrosArr;
   else if (bairroStr) countParams.p_bairro = bairroStr;
   if (filters.precoMin) countParams.p_preco_min = filters.precoMin;
@@ -292,7 +296,11 @@ export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSig
     rpcParams.p_cidades = CIDADES_PERMITIDAS;
   }
 
-  if (filters.tipo && !filters.tipo.includes(",")) rpcParams.p_tipo = filters.tipo;
+  if (filters.tipo) {
+    const tipos = filters.tipo.split(",").map(s => s.trim()).filter(Boolean);
+    if (tipos.length === 1) rpcParams.p_tipo = tipos[0];
+    // Note: get_map_pins doesn't support p_tipos yet; single tipo only for pins
+  }
   if (filters.bairros?.length) {
     rpcParams.p_bairros = filters.bairros;
   } else if (filters.bairro) {

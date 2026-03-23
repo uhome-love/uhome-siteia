@@ -133,7 +133,7 @@ const Onboarding = () => {
 
   const pular = () => {
     localStorage.setItem("uhome_onboarding_done", "1");
-    navigate("/");
+    navigate(prefixLink("/"));
   };
 
   /* ─── Toggle helpers ─── */

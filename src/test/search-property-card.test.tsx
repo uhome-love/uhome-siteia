@@ -58,8 +58,9 @@ function renderCard(props?: Partial<React.ComponentProps<typeof SearchPropertyCa
 describe("SearchPropertyCard", () => {
   it("renders property info", () => {
     renderCard();
-    expect(screen.getByText(/Moinhos de Vento/)).toBeInTheDocument();
-    expect(screen.getByText(/350/)).toBeInTheDocument();
+    const bairroElements = screen.getAllByText(/Moinhos de Vento/);
+    expect(bairroElements.length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/350/).length).toBeGreaterThan(0);
   });
 
   it("renders stats with area, quartos, vagas", () => {

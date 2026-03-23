@@ -423,10 +423,16 @@ const PropertyDetail = () => {
               <h1 className="mt-3 font-body text-[clamp(1.5rem,4vw,2rem)] font-extrabold leading-tight tracking-tight text-foreground" style={{ textWrap: "balance" }}>
                 {imovel.titulo}
               </h1>
-              <p className="mt-2 flex items-center gap-1.5 font-body text-sm text-muted-foreground">
-                <MapPin className="h-4 w-4" />
-                {imovel.bairro}, {imovel.cidade}
-              </p>
+              <div className="mt-2 flex items-center gap-3 font-body text-sm text-muted-foreground">
+                <span className="flex items-center gap-1.5">
+                  <MapPin className="h-4 w-4" />
+                  {imovel.bairro}, {imovel.cidade}
+                </span>
+                <span className="text-border">|</span>
+                <span className="font-mono text-xs text-muted-foreground/70">
+                  Cód. {imovel.slug.split("-").pop()?.toUpperCase() || imovel.id.slice(0, 8).toUpperCase()}
+                </span>
+              </div>
               {imovel.condominio_nome && (
                 <Link
                   to={`/condominios/${imovel.condominio_nome.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`}

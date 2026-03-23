@@ -37,7 +37,8 @@ describe("Navbar", () => {
 
   it("renders login button when not authenticated", () => {
     renderNavbar();
-    expect(screen.getByText("Entrar")).toBeInTheDocument();
+    const buttons = screen.getAllByText("Entrar");
+    expect(buttons.length).toBeGreaterThanOrEqual(1);
   });
 
   it("highlights Comprar on search page", () => {

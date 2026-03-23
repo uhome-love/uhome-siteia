@@ -28,6 +28,7 @@ export function UserMenu() {
       <>
         <button
           onClick={() => setShowModal(true)}
+          aria-label="Entrar na conta"
           className="flex items-center gap-1.5 rounded-full border border-border px-3 py-2 font-body text-sm font-medium text-foreground transition-colors hover:bg-secondary active:scale-[0.97]"
         >
           <User className="h-4 w-4" />
@@ -50,6 +51,7 @@ export function UserMenu() {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setMenuOpen(!menuOpen)}
+        aria-label="Menu do usuário"
         className="flex items-center gap-2 rounded-full border border-border px-2 py-1.5 transition-colors hover:bg-secondary active:scale-[0.97]"
       >
         {avatarUrl ? (

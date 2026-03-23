@@ -145,6 +145,7 @@ export function HeroSection() {
             alt=""
             fetchPriority="high"
             decoding="async"
+            sizes="100vw"
             width={1920}
             height={1280}
             className="absolute inset-0 h-full w-full object-cover"
@@ -239,6 +240,7 @@ export function HeroSection() {
                                 <button
                                   type="button"
                                   onClick={() => removeBairro(nome)}
+                                  aria-label={`Remover ${nome}`}
                                   className="rounded-full p-0.5 transition-colors hover:bg-primary/20"
                                 >
                                   <X className="h-3 w-3" />
@@ -317,7 +319,7 @@ export function HeroSection() {
                       value={tipo}
                       onChange={(e) => setTipo(e.target.value)}
                       className={`w-full appearance-none bg-transparent font-body text-sm focus:outline-none ${
-                        tipo ? "text-foreground" : "text-muted-foreground/50"
+                        tipo ? "text-foreground" : "text-muted-foreground"
                       }`}
                     >
                       <option value="">Todos</option>
@@ -337,7 +339,7 @@ export function HeroSection() {
                       value={preco}
                       onChange={(e) => setPreco(e.target.value)}
                       className={`w-full appearance-none bg-transparent font-body text-sm focus:outline-none ${
-                        preco ? "text-foreground" : "text-muted-foreground/50"
+                        preco ? "text-foreground" : "text-muted-foreground"
                       }`}
                     >
                       <option value="">Qualquer</option>

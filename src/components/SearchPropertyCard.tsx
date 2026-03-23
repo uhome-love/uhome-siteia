@@ -223,6 +223,7 @@ export const SearchPropertyCard = forwardRef<HTMLDivElement, Props>(function Sea
           {/* Heart */}
           <button
             onClick={async (e) => { e.stopPropagation(); const r = await toggleFavorito(imovel.id); if (r === "needs_auth") setShowAuth(true); }}
+            aria-label={liked ? "Remover dos favoritos" : "Adicionar aos favoritos"}
             className="absolute right-3 top-3 z-10"
           >
             <Heart
@@ -276,6 +277,7 @@ export const SearchPropertyCard = forwardRef<HTMLDivElement, Props>(function Sea
             </div>
             <button
               onClick={async (e) => { e.stopPropagation(); const r = await toggleFavorito(imovel.id); if (r === "needs_auth") setShowAuth(true); }}
+              aria-label={liked ? "Remover dos favoritos" : "Adicionar aos favoritos"}
               className="p-1"
             >
               <Heart
@@ -348,6 +350,7 @@ export const SearchPropertyCard = forwardRef<HTMLDivElement, Props>(function Sea
               {fotoAtiva > 0 && (
                 <button
                   onClick={(e) => { e.stopPropagation(); setFotoAtiva((i) => i - 1); }}
+                  aria-label="Foto anterior"
                   className="absolute left-2 top-1/2 z-10 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-sm shadow transition-transform hover:scale-105 active:scale-95"
                 >
                   ‹
@@ -356,6 +359,7 @@ export const SearchPropertyCard = forwardRef<HTMLDivElement, Props>(function Sea
               {fotoAtiva < fotos.length - 1 && (
                 <button
                   onClick={(e) => { e.stopPropagation(); setFotoAtiva((i) => i + 1); }}
+                  aria-label="Próxima foto"
                   className="absolute right-2 top-1/2 z-10 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-sm shadow transition-transform hover:scale-105 active:scale-95"
                 >
                   ›
@@ -367,6 +371,7 @@ export const SearchPropertyCard = forwardRef<HTMLDivElement, Props>(function Sea
           {/* Heart */}
           <button
             onClick={async (e) => { e.stopPropagation(); const r = await toggleFavorito(imovel.id); if (r === "needs_auth") setShowAuth(true); }}
+            aria-label={liked ? "Remover dos favoritos" : "Adicionar aos favoritos"}
             className="absolute right-3 top-3 z-10"
           >
             <Heart

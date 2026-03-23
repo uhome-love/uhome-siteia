@@ -12,6 +12,7 @@ const examples = [
 
 export function AISearchSection() {
   const navigate = useNavigate();
+  const { prefixLink } = useCorretor();
 
   return (
     <section className="py-24">

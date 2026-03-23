@@ -182,7 +182,11 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
   const countParams: Record<string, any> = {};
   if (filters.cidade) countParams.p_cidade = filters.cidade;
   else countParams.p_cidades = CIDADES_PERMITIDAS;
-  if (filters.tipo && !filters.tipo.includes(",")) countParams.p_tipo = filters.tipo;
+  if (filters.tipo) {
+    const tipos = filters.tipo.split(",").map(s => s.trim()).filter(Boolean);
+    if (tipos.length === 1) countParams.p_tipo = tipos[0];
+    else if (tipos.length > 1) countParams.p_tipos = tipos;
+  }
   if (bairrosArr) countParams.p_bairros = bairrosArr;
   else if (bairroStr) countParams.p_bairro = bairroStr;
   if (filters.precoMin) countParams.p_preco_min = filters.precoMin;

@@ -477,12 +477,12 @@ const PropertyDetail = () => {
             {/* Mobile CTA moved to fixed bottom bar */}
 
             {/* Description */}
-            {imovel.descricao && (
+            {imovel.descricao && imovel.descricao.trim().length > 0 && (
               <div>
                 <h2 className="font-body text-lg font-bold text-foreground">Sobre o imóvel</h2>
-                <p className="mt-3 font-body text-sm leading-[1.8] text-muted-foreground" style={{ maxWidth: "65ch" }}>
+                <div className="mt-3 font-body text-sm leading-[1.8] text-muted-foreground whitespace-pre-line" style={{ maxWidth: "65ch" }}>
                   {imovel.descricao}
-                </p>
+                </div>
               </div>
             )}
 

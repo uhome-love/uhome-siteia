@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Sparkles, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useCorretor } from "@/contexts/CorretorContext";
 
 const examples = [
   "Apartamento 2 quartos perto do Parcão até R$3.000",

@@ -495,25 +495,52 @@ const Search = () => {
         <SearchFiltersBar onOpenMobileFilters={() => setMobileFilters(true)} />
       )}
 
-      {/* AI resumo badge */}
+      {/* AI resumo badge + interpreted filters */}
       <AnimatePresence>
         {modoIA && resumoIA && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="flex items-center justify-between border-b border-primary/20 bg-primary/[0.05] px-4 py-2 sm:px-6"
+            className="border-b border-primary/20 bg-primary/[0.03] px-4 py-2.5 sm:px-6"
           >
-            <span className="font-body text-xs font-medium text-primary sm:text-[13px]">
-              <Sparkles className="mr-1.5 inline h-3 w-3" />
-              {resumoIA}
-            </span>
-            <button
-              onClick={limparIA}
-              className="font-body text-xs font-semibold text-primary hover:text-primary/70"
-            >
-              Limpar ×
-            </button>
+            <div className="flex items-center justify-between">
+              <span className="font-body text-xs font-medium text-primary sm:text-[13px]">
+                <Sparkles className="mr-1.5 inline h-3 w-3" />
+                {resumoIA}
+              </span>
+              <button
+                onClick={limparIA}
+                className="font-body text-xs font-semibold text-primary hover:text-primary/70"
+              >
+                Limpar ×
+              </button>
+            </div>
+            {/* Interpreted filter pills */}
+            {aiResult?.filtros && (() => {
+              const f = aiResult.filtros;
+              const pills: { label: string; value: string }[] = [];
+              if (f.tipo) pills.push({ label: "Tipo", value: f.tipo.charAt(0).toUpperCase() + f.tipo.slice(1) });
+              if (f.bairros && f.bairros.length > 0) pills.push({ label: "Bairros", value: f.bairros.join(", ") });
+              if (f.preco_min && f.preco_max) pills.push({ label: "Preço", value: `R$ ${(f.preco_min / 1000).toFixed(0)}k – ${(f.preco_max / 1000).toFixed(0)}k` });
+              else if (f.preco_max) pills.push({ label: "Preço", value: `até R$ ${(f.preco_max / 1000).toFixed(0)}k` });
+              else if (f.preco_min) pills.push({ label: "Preço", value: `a partir de R$ ${(f.preco_min / 1000).toFixed(0)}k` });
+              if (f.quartos) pills.push({ label: "Quartos", value: `${f.quartos}+` });
+              if (f.area_min) pills.push({ label: "Área", value: `${f.area_min}+ m²` });
+              if (!pills.length) return null;
+              return (
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {pills.map((p) => (
+                    <span
+                      key={p.label}
+                      className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 font-body text-[11px] font-semibold text-primary"
+                    >
+                      <span className="text-primary/60">{p.label}:</span> {p.value}
+                    </span>
+                  ))}
+                </div>
+              );
+            })()}
           </motion.div>
         )}
       </AnimatePresence>

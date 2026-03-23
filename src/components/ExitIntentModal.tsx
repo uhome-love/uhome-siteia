@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, forwardRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Loader2, Check } from "lucide-react";
 import { submitLead } from "@/services/leads";
 import { toast } from "sonner";
 import { formatPhone } from "@/lib/phoneMask";
 
-export function ExitIntentModal() {
+export const ExitIntentModal = forwardRef<HTMLDivElement>(function ExitIntentModal(_props, ref) {
   const [show, setShow] = useState(false);
   const [telefone, setTelefone] = useState("");
   const [loading, setLoading] = useState(false);

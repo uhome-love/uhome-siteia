@@ -96,13 +96,31 @@ export function SearchFiltersBar({ onOpenMobileFilters }: { onOpenMobileFilters?
   // Close dropdown on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      if (
+        dropdownRef.current && !dropdownRef.current.contains(target) &&
+        portalDropdownRef.current && !portalDropdownRef.current.contains(target)
+      ) {
         setShowDropdown(false);
       }
     }
     if (showDropdown) document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, [showDropdown]);
+
+  // Position the portal dropdown below the input
+  const positionDropdown = useCallback(() => {
+    if (!portalDropdownRef.current || !dropdownRef.current) return;
+    const anchor = dropdownRef.current.getBoundingClientRect();
+    const dd = portalDropdownRef.current;
+    dd.style.position = "fixed";
+    dd.style.top = `${anchor.bottom + 8}px`;
+    dd.style.left = `${anchor.left}px`;
+  }, []);
+
+  useEffect(() => {
+    if (showDropdown) requestAnimationFrame(positionDropdown);
+  }, [showDropdown, positionDropdown]);
 
   const handleSearchIA = () => {
     setShowDropdown(false);

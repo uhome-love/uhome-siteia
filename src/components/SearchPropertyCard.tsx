@@ -411,4 +411,4 @@ export const SearchPropertyCard = forwardRef<HTMLDivElement, Props>(function Sea
     </motion.div>
     </>
   );
-}
+});

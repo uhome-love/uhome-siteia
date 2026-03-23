@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef, lazy } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 const PerformanceDebug = lazy(() => import("@/components/PerformanceDebug").then(m => ({ default: m.PerformanceDebug })));
 import { AuthModal } from "@/components/AuthModal";
 import { useAuth } from "@/hooks/useAuth";
@@ -53,6 +54,7 @@ function describeFilters(filters: Record<string, any>): string {
 }
 
 const Search = () => {
+  const isMobile = useIsMobile();
   const { user } = useAuth();
   const { isFavorito, toggleFavorito } = useFavoritos();
   useCanonical();
@@ -307,6 +309,24 @@ const Search = () => {
       setLoadingMore(false);
     }
   }, [page, total, loadingMore, loading, imoveis.length, aiOverrideData, buildFilters, filters.ordem]);
+
+  // Infinite scroll sentinel for mobile
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!isMobile) return;
+    const el = sentinelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMore();
+        }
+      },
+      { rootMargin: "400px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [isMobile, loadMore]);
 
   // Sort dropdown click-outside
   useEffect(() => {
@@ -712,24 +732,36 @@ const Search = () => {
                   </React.Fragment>
                 ))}
               </div>
-              {/* Load more */}
+              {/* Load more — button on desktop, infinite scroll on mobile */}
               {imoveis.length < total && (
-                <div className="flex justify-center pb-16 pt-6 sm:pb-4">
-                  <button
-                    onClick={loadMore}
-                    disabled={loadingMore}
-                    className="rounded-full border-[1.5px] border-border px-8 py-3 font-body text-sm font-semibold text-foreground transition-all hover:border-foreground active:scale-[0.97] disabled:opacity-50"
-                  >
-                    {loadingMore ? (
-                      <span className="flex items-center gap-2">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Carregando...
-                      </span>
-                    ) : (
-                      `Ver mais imóveis (${imoveis.length} de ${total.toLocaleString("pt-BR")})`
+                <>
+                  {/* Desktop: manual button */}
+                  <div className="hidden sm:flex justify-center pb-4 pt-6">
+                    <button
+                      onClick={loadMore}
+                      disabled={loadingMore}
+                      className="rounded-full border-[1.5px] border-border px-8 py-3 font-body text-sm font-semibold text-foreground transition-all hover:border-foreground active:scale-[0.97] disabled:opacity-50"
+                    >
+                      {loadingMore ? (
+                        <span className="flex items-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Carregando...
+                        </span>
+                      ) : (
+                        `Ver mais imóveis (${imoveis.length} de ${total.toLocaleString("pt-BR")})`
+                      )}
+                    </button>
+                  </div>
+                  {/* Mobile: infinite scroll sentinel + loading indicator */}
+                  <div className="sm:hidden">
+                    <div ref={sentinelRef} className="h-1" />
+                    {loadingMore && (
+                      <div className="flex justify-center py-6">
+                        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                      </div>
                     )}
-                  </button>
-                </div>
+                  </div>
+                </>
               )}
             </>
           )}

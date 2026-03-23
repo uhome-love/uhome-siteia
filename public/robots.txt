@@ -13,4 +13,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://huigglwvvzuwwyqvpmec.supabase.co/functions/v1/dynamic-sitemap
+Sitemap: https://uhome.com.br/sitemap.xml

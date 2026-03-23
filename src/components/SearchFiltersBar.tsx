@@ -255,77 +255,83 @@ export function SearchFiltersBar({ onOpenMobileFilters }: { onOpenMobileFilters?
           />
         </div>
 
-        {/* Dropdown: autocomplete suggestions */}
-        {showDropdown && hasInput && suggestions.length > 0 && (
-          <div className="absolute left-0 top-full z-50 mt-2 max-h-64 w-80 overflow-y-auto rounded-xl border border-border bg-card p-2 shadow-lg">
-            <p className="px-3 py-1.5 font-body text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Bairros
-            </p>
-            {suggestions.map(b => (
-              <button
-                key={b}
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => addBairro(b)}
-                className="flex w-full items-center gap-3 rounded-lg px-3 py-2 font-body text-sm text-foreground transition-colors hover:bg-accent/50 active:scale-[0.98]"
-              >
-                <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-                {b}
-              </button>
-            ))}
-          </div>
-        )}
+        {/* Portal-rendered dropdowns to escape overflow-x-auto clipping */}
+        {showDropdown && createPortal(
+          <div ref={portalDropdownRef} className="z-50" style={{ position: "fixed" }}>
+            {/* Autocomplete suggestions */}
+            {hasInput && suggestions.length > 0 && (
+              <div className="max-h-64 w-80 overflow-y-auto rounded-xl border border-border bg-card p-2 shadow-lg">
+                <p className="px-3 py-1.5 font-body text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  Bairros
+                </p>
+                {suggestions.map(b => (
+                  <button
+                    key={b}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => addBairro(b)}
+                    className="flex w-full items-center gap-3 rounded-lg px-3 py-2 font-body text-sm text-foreground transition-colors hover:bg-accent/50 active:scale-[0.98]"
+                  >
+                    <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+                    {b}
+                  </button>
+                ))}
+              </div>
+            )}
 
-        {/* Dropdown: "more ways to search" when empty + no chips */}
-        {showDropdown && !hasInput && !hasChips && (
-          <div className="absolute left-0 top-full z-50 mt-2 w-72 rounded-xl border border-border bg-card p-2 shadow-lg">
-            <p className="px-3 py-2 font-body text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Mais jeitos de buscar
-            </p>
-            <button
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={handleSearchIA}
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 font-body text-sm text-foreground transition-colors hover:bg-accent/50 active:scale-[0.98]"
-            >
-              <Sparkles className="h-4 w-4 text-primary" />
-              Busca por IA
-            </button>
-            <button
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={handleDesenharArea}
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 font-body text-sm text-foreground transition-colors hover:bg-accent/50 active:scale-[0.98]"
-            >
-              <PenTool className="h-4 w-4 text-muted-foreground" />
-              Desenhe a área no mapa
-            </button>
-            <button
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={handlePertoDeVoce}
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 font-body text-sm text-foreground transition-colors hover:bg-accent/50 active:scale-[0.98]"
-            >
-              <Navigation className="h-4 w-4 text-muted-foreground" />
-              Perto de você
-            </button>
-          </div>
-        )}
+            {/* "More ways to search" when empty + no chips */}
+            {!hasInput && !hasChips && (
+              <div className="w-72 rounded-xl border border-border bg-card p-2 shadow-lg">
+                <p className="px-3 py-2 font-body text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  Mais jeitos de buscar
+                </p>
+                <button
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={handleSearchIA}
+                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 font-body text-sm text-foreground transition-colors hover:bg-accent/50 active:scale-[0.98]"
+                >
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  Busca por IA
+                </button>
+                <button
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={handleDesenharArea}
+                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 font-body text-sm text-foreground transition-colors hover:bg-accent/50 active:scale-[0.98]"
+                >
+                  <PenTool className="h-4 w-4 text-muted-foreground" />
+                  Desenhe a área no mapa
+                </button>
+                <button
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={handlePertoDeVoce}
+                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 font-body text-sm text-foreground transition-colors hover:bg-accent/50 active:scale-[0.98]"
+                >
+                  <Navigation className="h-4 w-4 text-muted-foreground" />
+                  Perto de você
+                </button>
+              </div>
+            )}
 
-        {/* Dropdown: suggestions when chips exist but input empty */}
-        {showDropdown && !hasInput && hasChips && (
-          <div className="absolute left-0 top-full z-50 mt-2 max-h-64 w-80 overflow-y-auto rounded-xl border border-border bg-card p-2 shadow-lg">
-            <p className="px-3 py-1.5 font-body text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Adicionar bairro
-            </p>
-            {suggestions.slice(0, 8).map(b => (
-              <button
-                key={b}
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => addBairro(b)}
-                className="flex w-full items-center gap-3 rounded-lg px-3 py-2 font-body text-sm text-foreground transition-colors hover:bg-accent/50 active:scale-[0.98]"
-              >
-                <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-                {b}
-              </button>
-            ))}
-          </div>
+            {/* Suggestions when chips exist but input empty */}
+            {!hasInput && hasChips && (
+              <div className="max-h-64 w-80 overflow-y-auto rounded-xl border border-border bg-card p-2 shadow-lg">
+                <p className="px-3 py-1.5 font-body text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  Adicionar bairro
+                </p>
+                {suggestions.slice(0, 8).map(b => (
+                  <button
+                    key={b}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => addBairro(b)}
+                    className="flex w-full items-center gap-3 rounded-lg px-3 py-2 font-body text-sm text-foreground transition-colors hover:bg-accent/50 active:scale-[0.98]"
+                  >
+                    <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+                    {b}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>,
+          document.body
         )}
       </div>
 

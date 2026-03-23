@@ -239,6 +239,7 @@ export function HeroSection() {
                                 <button
                                   type="button"
                                   onClick={() => removeBairro(nome)}
+                                  aria-label={`Remover ${nome}`}
                                   className="rounded-full p-0.5 transition-colors hover:bg-primary/20"
                                 >
                                   <X className="h-3 w-3" />

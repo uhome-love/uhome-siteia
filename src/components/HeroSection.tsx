@@ -111,14 +111,21 @@ export function HeroSection() {
 
   return (
     <section className="relative flex min-h-[auto] items-center overflow-hidden pt-16 lg:min-h-[92vh]">
-      {/* Background image */}
+      {/* Background image with inline LQIP for instant render */}
       <div className="absolute inset-0">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: "url('data:image/webp;base64,UklGRpwAAABXRUJQVlA4IJAAAABQBQCdASogABUAPzmIvVYvKKYjsBgIAeAnCUAXqwZRln/gIEt8srGbZB7cNRSBPXCDzIAA/u1hdlpwC0fcoCPWgz2rrrMvizytVPvWNnsA0ALTZmbIgCJJp04T2g2T9ofXib9J7XB8dQHqh3RPLcMTTlLDWD/+e/hipRG3YVd/uyD8m9zkYCarAYijkbIGYAA=')",
+          }}
+          aria-hidden="true"
+        />
         <img
           src="/hero-bg.webp"
           alt=""
           fetchPriority="high"
-          decoding="sync"
-          className="h-full w-full object-cover"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover"
           style={{ objectPosition: "center center" }}
         />
         <div

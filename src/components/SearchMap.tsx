@@ -699,7 +699,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
           </button>
           {onPertoDeVoce && (
             <button
-              onClick={onPertoDeVoce}
+              onClick={handlePertoDeVoceInternal}
               className="flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-2 font-body text-[12px] font-semibold text-muted-foreground shadow-lg transition-all hover:border-foreground/30 active:scale-[0.97]"
             >
               <Navigation className="h-3.5 w-3.5" />

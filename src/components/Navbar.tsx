@@ -35,7 +35,7 @@ export function Navbar() {
   const modoIA = searchParams.get("modo") === "ia";
 
   return (
-    <nav className={`fixed left-0 right-0 z-50 border-b border-border/40 bg-background/97 backdrop-blur-lg ${bannerVisible ? 'top-10' : 'top-0'}`}>
+    <nav className={`fixed left-0 right-0 z-50 border-b border-border/40 bg-background backdrop-blur-lg ${bannerVisible ? 'top-10' : 'top-0'}`}>
       <div className="relative mx-auto flex h-14 w-full max-w-[1440px] items-center justify-between px-6 sm:px-8">
         {/* LEFT — Logo */}
         <Link to={prefixLink("/")} className="flex flex-shrink-0 items-center">

@@ -188,12 +188,9 @@ export function HeroSection() {
             </p>
           </div>
 
-          {/* Right — card */}
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2, ease }}
-            className="w-full max-w-md rounded-2xl bg-card p-5 shadow-2xl sm:p-7 lg:ml-auto"
+          {/* Right — card (CSS animation for instant LCP) */}
+          <div
+            className="w-full max-w-md rounded-2xl bg-card p-5 shadow-2xl sm:p-7 lg:ml-auto animate-[heroCardIn_0.6s_0.2s_cubic-bezier(0.16,1,0.3,1)_both]"
           >
             {/* Toggle */}
             <div className="mb-4 flex gap-2 sm:mb-6">

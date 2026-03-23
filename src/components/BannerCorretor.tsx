@@ -61,11 +61,11 @@ export function BannerCorretor() {
 
   return (
     <>
-    {/* Spacer to push content below fixed banner */}
-    <div className="h-10" />
+    {/* Spacer for fixed banner + navbar offset */}
+    <div className="h-10" id="banner-corretor-spacer" />
     <div
       data-testid="banner-corretor"
-      className="fixed top-0 left-0 right-0 z-[60] flex items-center justify-between gap-3 bg-primary/5 border-b border-primary/10 px-4 py-2 sm:px-6"
+      className="fixed top-0 left-0 right-0 z-[60] flex h-10 items-center justify-between gap-3 border-b border-primary/10 bg-card px-4 sm:px-6"
     >
       <div className="flex items-center gap-2 min-w-0">
         {dados.foto ? (

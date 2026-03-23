@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, forwardRef } from "react";
 import { X, Loader2, ArrowLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -34,7 +34,7 @@ function getStrength(pw: string): { level: number; label: string; color: string 
   return { level: 3, label: "Forte", color: "bg-green-500" };
 }
 
-export function AuthModal({ open, onClose }: Props) {
+export const AuthModal = forwardRef<HTMLDivElement, Props>(function AuthModal({ open, onClose }, ref) {
   const [tab, setTab] = useState<Tab>("login");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -167,6 +167,7 @@ export function AuthModal({ open, onClose }: Props) {
     "w-full rounded-lg border-[1.5px] border-border bg-background px-4 py-3 font-body text-sm text-foreground outline-none transition-colors focus:border-primary";
 
   return (
+    <span ref={ref}>
     <AnimatePresence>
       {open && (
         <motion.div
@@ -364,5 +365,6 @@ export function AuthModal({ open, onClose }: Props) {
         </motion.div>
       )}
     </AnimatePresence>
+    </span>
   );
-}
+});

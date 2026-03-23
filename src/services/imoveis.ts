@@ -286,7 +286,7 @@ export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSig
   }
 
   const rpcParams: Record<string, any> = {
-    p_limite: 2000,
+    p_limite: 1000,
   };
 
   // City filter

@@ -1,18 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <sitemap>
-    <loc>https://huigglwvvzuwwyqvpmec.supabase.co/functions/v1/dynamic-sitemap?type=pages</loc>
-  </sitemap>
-  <sitemap>
-    <loc>https://huigglwvvzuwwyqvpmec.supabase.co/functions/v1/dynamic-sitemap?type=imoveis</loc>
-  </sitemap>
-  <sitemap>
-    <loc>https://huigglwvvzuwwyqvpmec.supabase.co/functions/v1/dynamic-sitemap?type=bairros</loc>
-  </sitemap>
-  <sitemap>
-    <loc>https://huigglwvvzuwwyqvpmec.supabase.co/functions/v1/dynamic-sitemap?type=blog</loc>
-  </sitemap>
-  <sitemap>
-    <loc>https://huigglwvvzuwwyqvpmec.supabase.co/functions/v1/dynamic-sitemap?type=condominios</loc>
-  </sitemap>
-</sitemapindex>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Páginas principais -->
+  <url><loc>https://uhome.com.br/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
+  <url><loc>https://uhome.com.br/busca</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://uhome.com.br/bairros</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://uhome.com.br/condominios</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://uhome.com.br/avaliar-imovel</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://uhome.com.br/faq</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://uhome.com.br/anunciar</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://uhome.com.br/carreiras</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://uhome.com.br/politica-de-privacidade</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://uhome.com.br/favoritos</loc><changefreq>weekly</changefreq><priority>0.3</priority></url>
+
+  <!-- Bairros -->
+  <url><loc>https://uhome.com.br/bairros/moinhos-de-vento</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://uhome.com.br/bairros/petropolis</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://uhome.com.br/bairros/bela-vista</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://uhome.com.br/bairros/mont-serrat</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://uhome.com.br/bairros/rio-branco</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://uhome.com.br/bairros/auxiliadora</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://uhome.com.br/bairros/tres-figueiras</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://uhome.com.br/bairros/boa-vista</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://uhome.com.br/bairros/higienopolis</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://uhome.com.br/bairros/independencia</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://uhome.com.br/bairros/floresta</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://uhome.com.br/bairros/cidade-baixa</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://uhome.com.br/bairros/menino-deus</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://uhome.com.br/bairros/centro-historico</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://uhome.com.br/bairros/jardim-botanico</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://uhome.com.br/bairros/tristeza</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://uhome.com.br/bairros/ipanema</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://uhome.com.br/bairros/bom-fim</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://uhome.com.br/bairros/cristal</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://uhome.com.br/bairros/sarandi</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://uhome.com.br/bairros/partenon</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+
+  <!-- Tipos de imóvel -->
+  <url><loc>https://uhome.com.br/apartamentos-porto-alegre</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://uhome.com.br/casas-porto-alegre</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://uhome.com.br/coberturas-porto-alegre</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+
+  <!-- Blog -->
+  <url><loc>https://uhome.com.br/blog</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://uhome.com.br/blog/melhores-bairros-porto-alegre-2025</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://uhome.com.br/blog/preco-metro-quadrado-bairros-porto-alegre</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://uhome.com.br/blog/como-comprar-apartamento-porto-alegre</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://uhome.com.br/blog/financiamento-caixa-2026</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://uhome.com.br/blog/mercado-imobiliario-porto-alegre-2026</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+</urlset>

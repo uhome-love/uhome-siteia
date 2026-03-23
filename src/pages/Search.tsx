@@ -390,6 +390,25 @@ const Search = () => {
     setFilter("bounds", null);
   }, [setFilter]);
 
+  const handlePertoDeVoce = useCallback(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const delta = 0.015;
+          setFilter("bounds", {
+            lat_min: pos.coords.latitude - delta,
+            lat_max: pos.coords.latitude + delta,
+            lng_min: pos.coords.longitude - delta,
+            lng_max: pos.coords.longitude + delta,
+          });
+        },
+        () => {
+          import("sonner").then(({ toast }) => toast.error("Não foi possível obter sua localização"));
+        }
+      );
+    }
+  }, [setFilter]);
+
   const handleCreateAlert = async () => {
     const email = user?.email || alertEmail;
     setAlertLoading(true);

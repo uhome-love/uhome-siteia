@@ -55,7 +55,7 @@ export const SearchCTACard = forwardRef<HTMLDivElement>(function SearchCTACard(_
   };
 
   return (
-    <div className="col-span-full rounded-2xl border-2 border-dashed border-primary/30 bg-primary/[0.03] overflow-hidden">
+    <div ref={ref} className="col-span-full rounded-2xl border-2 border-dashed border-primary/30 bg-primary/[0.03] overflow-hidden">
       {/* Header row */}
       <div className="flex items-center justify-between gap-4 px-6 py-5">
         <div>

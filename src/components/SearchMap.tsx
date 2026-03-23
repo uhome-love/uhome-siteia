@@ -105,6 +105,7 @@ interface SearchMapProps {
   onBoundsSearch?: (bounds: { lat_min: number; lat_max: number; lng_min: number; lng_max: number }) => void;
   onBoundsChange?: (bounds: { lat_min: number; lat_max: number; lng_min: number; lng_max: number }) => void;
   onDrawFilter?: (filteredPins: MapPinData[]) => void;
+  onPertoDeVoce?: () => void;
 }
 
 export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, onBoundsChange, onDrawFilter }: SearchMapProps) {

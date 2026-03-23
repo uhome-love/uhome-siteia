@@ -171,7 +171,7 @@ export const SearchPropertyCard = forwardRef<HTMLDivElement, Props>(function Sea
     <>
     <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
     <motion.div
-      ref={cardRef}
+      ref={mergedRef}
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: Math.min(index * 0.03, 0.15) }}

@@ -2,6 +2,11 @@ import { useEffect, useState } from 'react';
 import { useParams, Outlet } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 
+/**
+ * Layout for /c/:corretorSlug routes.
+ * Registers visit in Supabase, then renders child routes.
+ * Corretor data fetching/persistence is handled by CorretorContext.
+ */
 export function CorretorRefLayout() {
   const slug = useParams().corretorSlug;
   const [ready, setReady] = useState(false);
@@ -10,27 +15,18 @@ export function CorretorRefLayout() {
     async function registrar() {
       if (!slug) { setReady(true); return; }
 
-      // Evita registrar visita duplicada na mesma sessão
       const jaRegistrado = sessionStorage.getItem('corretor_ref_registrado');
 
-      const { data: corretor } = await supabase
-        .from('profiles')
-        .select('id, nome, foto_url')
-        .eq('slug_ref', slug)
-        .eq('ativo', true)
-        .maybeSingle();
+      // If not yet registered this session, record the visit
+      if (jaRegistrado !== slug) {
+        const { data: corretor } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('slug_ref', slug)
+          .eq('ativo', true)
+          .maybeSingle();
 
-      if (corretor) {
-        localStorage.setItem('corretor_ref_id', corretor.id);
-        localStorage.setItem('corretor_ref_slug', slug);
-        localStorage.setItem('uhome_corretor_ref', slug);
-        localStorage.setItem('corretor_ref_nome', corretor.nome || '');
-        localStorage.setItem('corretor_ref_foto', corretor.foto_url || '');
-        localStorage.setItem('corretor_ref_ts', Date.now().toString());
-        // Notify BannerCorretor that ref data is ready
-        window.dispatchEvent(new Event('corretor-ref-ready'));
-
-        if (jaRegistrado !== slug) {
+        if (corretor) {
           await supabase.from('corretor_visitas').insert({
             corretor_id: corretor.id,
             corretor_slug: slug,

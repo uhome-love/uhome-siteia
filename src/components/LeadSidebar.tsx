@@ -5,7 +5,8 @@ import { submitLead } from "@/services/leads";
 import { trackWhatsAppClick } from "@/services/whatsappTracker";
 import { toast } from "sonner";
 import { formatPreco } from "@/services/imoveis";
-import { buildWhatsAppUrl } from "@/lib/whatsapp";
+import { buildWhatsAppUrl, buildCorretorWhatsAppUrl } from "@/lib/whatsapp";
+import { useCorretor } from "@/contexts/CorretorContext";
 
 interface LeadSidebarProps {
   imovelId?: string;
@@ -22,6 +23,9 @@ export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, 
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const { corretor } = useCorretor();
+
+  const imovelData = { titulo: imovelTitulo, bairro: imovelBairro, slug: imovelSlug };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,19 +61,71 @@ export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, 
       imovel_titulo: imovelTitulo,
       imovel_slug: imovelSlug,
     });
-    window.open(
-      buildWhatsAppUrl(undefined, {
-        titulo: imovelTitulo,
-        bairro: imovelBairro,
-        slug: imovelSlug,
-      }),
-      "_blank"
-    );
+    const url = corretor
+      ? buildCorretorWhatsAppUrl(corretor.nome, corretor.telefone, imovelData)
+      : buildWhatsAppUrl(undefined, imovelData);
+    window.open(url, "_blank");
   };
 
   const priceLabel = imovelPreco ? formatPreco(imovelPreco) : null;
   const viewsText = viewCount === 1 ? "1 pessoa viu hoje" : `${viewCount > 0 ? viewCount : 5} pessoas viram hoje`;
 
+  // When corretor is active, show a simplified WhatsApp-first sidebar
+  if (corretor) {
+    const primeiroNome = corretor.nome.split(" ")[0];
+    return (
+      <div data-lead-sidebar className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+        {priceLabel && (
+          <p className="font-body text-2xl font-extrabold text-foreground">{priceLabel}</p>
+        )}
+        {imovelBairro && (
+          <p className="mt-1 font-body text-xs text-muted-foreground">{imovelBairro}</p>
+        )}
+
+        <div className="my-5 h-px bg-border" />
+
+        {/* Corretor info */}
+        <div className="flex items-center gap-3">
+          {corretor.foto_url ? (
+            <img src={corretor.foto_url} alt={corretor.nome} className="h-12 w-12 rounded-full object-cover" />
+          ) : (
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 font-body text-lg font-bold text-primary">
+              {corretor.nome.charAt(0).toUpperCase()}
+            </div>
+          )}
+          <div>
+            <p className="font-body text-sm font-bold text-foreground">{corretor.nome}</p>
+            {corretor.creci && (
+              <p className="font-body text-xs text-muted-foreground">CRECI {corretor.creci}</p>
+            )}
+            <p className="font-body text-xs text-muted-foreground">Corretor Uhome</p>
+          </div>
+        </div>
+
+        <button
+          onClick={handleWhatsApp}
+          className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg py-3.5 font-body text-sm font-semibold text-white transition-all hover:brightness-110 active:scale-[0.97]"
+          style={{ backgroundColor: "#25D366" }}
+        >
+          <MessageCircle className="h-5 w-5" />
+          Falar com {primeiroNome} no WhatsApp
+        </button>
+
+        <div className="mt-5 space-y-2">
+          <p className="flex items-center gap-2 font-body text-xs text-muted-foreground">
+            <span>⚡</span>
+            <span>{viewsText}</span>
+          </p>
+          <p className="flex items-center gap-2 font-body text-xs text-muted-foreground">
+            <span>✅</span>
+            <span>Corretor disponível agora</span>
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Default: form-based sidebar
   return (
     <div data-lead-sidebar className="rounded-2xl border border-border bg-card p-6 shadow-sm">
       {priceLabel && (

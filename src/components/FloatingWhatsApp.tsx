@@ -1,20 +1,25 @@
 import { MessageCircle } from "lucide-react";
-import { buildWhatsAppUrl } from "@/lib/whatsapp";
+import { buildWhatsAppUrl, buildCorretorWhatsAppUrl } from "@/lib/whatsapp";
 import { trackWhatsAppClick } from "@/services/whatsappTracker";
 import { motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
+import { useCorretor } from "@/contexts/CorretorContext";
 
 /**
  * Persistent WhatsApp floating button — always visible, not dismissable.
- * Hidden on mobile in property detail pages (which have their own fixed CTA bar).
+ * Uses corretor's WhatsApp when a corretor ref is active.
  */
 export function FloatingWhatsApp() {
   const location = useLocation();
-  const isPropertyDetail = location.pathname.startsWith("/imovel/");
+  const { corretor } = useCorretor();
+  const isPropertyDetail = location.pathname.startsWith("/imovel/") || location.pathname.match(/\/c\/[^/]+\/imovel\//);
 
   const handleClick = () => {
     trackWhatsAppClick({ origem_pagina: location.pathname });
-    window.open(buildWhatsAppUrl(), "_blank");
+    const url = corretor
+      ? buildCorretorWhatsAppUrl(corretor.nome, corretor.telefone)
+      : buildWhatsAppUrl();
+    window.open(url, "_blank");
   };
 
   return (

@@ -46,3 +46,28 @@ export function buildWhatsAppUrl(
 
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
 }
+
+/**
+ * Gera URL do WhatsApp direto para o corretor ativo.
+ * Se não houver telefone do corretor, fallback para Uhome.
+ */
+export function buildCorretorWhatsAppUrl(
+  corretorNome: string,
+  corretorTelefone: string | null,
+  imovel?: { titulo?: string; bairro?: string; slug?: string }
+): string {
+  const tel = corretorTelefone?.replace(/\D/g, "") || "";
+  const numero = tel ? `55${tel}` : WHATSAPP_NUMBER;
+
+  let msg = "";
+  if (imovel?.titulo) {
+    msg = `Olá ${corretorNome}, vi o imóvel ${imovel.titulo}`;
+    if (imovel.bairro) msg += ` em ${imovel.bairro}`;
+    msg += ` no site Uhome e tenho interesse. Pode me ajudar?`;
+    if (imovel.slug) msg += `\nLink: https://uhome.com.br/imovel/${imovel.slug}`;
+  } else {
+    msg = `Olá ${corretorNome}, vim pelo site Uhome e gostaria de informações sobre imóveis.`;
+  }
+
+  return `https://wa.me/${numero}?text=${encodeURIComponent(msg)}`;
+}

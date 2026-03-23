@@ -87,11 +87,8 @@ const Search = () => {
     }
   }, [user, pendingAlert]);
 
-  const [imoveis, setImoveis] = useState<Imovel[]>([]);
   const [mapPins, setMapPins] = useState<MapPinData[]>([]);
   const [mapViewBounds, setMapViewBounds] = useState<MapBounds | null>(null);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [mapLoading, setMapLoading] = useState(true);
   const [page, setPage] = useState(0);

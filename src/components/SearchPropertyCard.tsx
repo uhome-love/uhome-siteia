@@ -44,7 +44,7 @@ const badgeClasses: Record<BadgeStyle, string> = {
   visto: "bg-white/90 text-primary font-semibold shadow-sm backdrop-blur-sm",
 };
 
-export const SearchPropertyCard = forwardRef<HTMLDivElement, Props>(function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavorito: isFavoritoProp, toggleFavorito: toggleFavoritoProp }, ref) {
+export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavorito: isFavoritoProp, toggleFavorito: toggleFavoritoProp }, ref) {
   const [hovering, setHovering] = useState(false);
   const [fotoAtiva, setFotoAtiva] = useState(0);
   const [showAuth, setShowAuth] = useState(false);
@@ -53,7 +53,7 @@ export const SearchPropertyCard = forwardRef<HTMLDivElement, Props>(function Sea
   const [isVisible, setIsVisible] = useState(false);
   const fotosLoadedRef = useRef(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLElement>(null);
   const navigate = useNavigate();
   const { prefixLink } = useCorretor();
   const isMobile = useIsMobile();
@@ -83,10 +83,10 @@ export const SearchPropertyCard = forwardRef<HTMLDivElement, Props>(function Sea
   }, []);
 
   // Merge forwarded ref with internal cardRef
-  const mergedRef = useCallback((node: HTMLDivElement | null) => {
-    cardRef.current = node;
+  const mergedRef = useCallback((node: HTMLAnchorElement | null) => {
+    (cardRef as React.MutableRefObject<HTMLElement | null>).current = node;
     if (typeof ref === "function") ref(node);
-    else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+    else if (ref) (ref as React.MutableRefObject<HTMLAnchorElement | null>).current = node;
   }, [ref]);
 
   // Load full photo set when card becomes visible (mobile) or on hover (desktop)
@@ -170,15 +170,17 @@ export const SearchPropertyCard = forwardRef<HTMLDivElement, Props>(function Sea
   return (
     <>
     <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
-    <motion.div
+    <motion.a
       ref={mergedRef}
+      href={prefixLink(`/imovel/${imovel.slug}`)}
+      target="_blank"
+      rel="noopener"
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: Math.min(index * 0.03, 0.15) }}
-      className={`relative cursor-pointer select-none outline-none [&_*]:outline-none [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] ${highlighted ? "sm:ring-2 sm:ring-primary sm:rounded-xl" : ""}`}
+      className={`relative block cursor-pointer select-none outline-none [&_*]:outline-none [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] no-underline text-inherit ${highlighted ? "sm:ring-2 sm:ring-primary sm:rounded-xl" : ""}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      onClick={() => window.open(prefixLink(`/imovel/${imovel.slug}`), "_blank", "noopener")}
     >
       {/* ===== MOBILE: QuintoAndar-style full-width vertical card ===== */}
       <div className="sm:hidden">
@@ -196,7 +198,6 @@ export const SearchPropertyCard = forwardRef<HTMLDivElement, Props>(function Sea
               <div
                 key={i}
                 className="w-full shrink-0 snap-center"
-                onClick={() => window.open(prefixLink(`/imovel/${imovel.slug}`), "_blank", "noopener")}
               >
                 <FotoImovel
                   src={foto}
@@ -420,7 +421,7 @@ export const SearchPropertyCard = forwardRef<HTMLDivElement, Props>(function Sea
           <p className="mt-1 font-body text-sm font-bold text-foreground">{price}</p>
         </div>
       </div>
-    </motion.div>
+    </motion.a>
     </>
   );
 });

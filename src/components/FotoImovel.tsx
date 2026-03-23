@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, forwardRef } from "react";
 import { Home } from "lucide-react";
 
 interface FotoImovelProps {
@@ -13,7 +13,7 @@ interface FotoImovelProps {
   sizes?: string;
 }
 
-export function FotoImovel({ src, alt, className = "", style, loading, decoding, width, height, sizes }: FotoImovelProps) {
+export const FotoImovel = forwardRef<HTMLImageElement, FotoImovelProps>(function FotoImovel({ src, alt, className = "", style, loading, decoding, width, height, sizes }, ref) {
   const [erro, setErro] = useState(false);
 
   if (erro) {

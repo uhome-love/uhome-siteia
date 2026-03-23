@@ -163,22 +163,16 @@ export function HeroSection() {
 
       <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 sm:py-16 lg:px-8">
         <div className="flex flex-col items-start gap-6 lg:flex-row lg:items-center lg:gap-16">
-          {/* Left — headline */}
-          <motion.div
-            initial={{ opacity: 0, x: -24 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, ease }}
-            className="max-w-lg"
+          {/* Left — headline (CSS animation for instant LCP) */}
+          <div
+            className="max-w-lg animate-[heroSlideIn_0.7s_cubic-bezier(0.16,1,0.3,1)_both]"
           >
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5, duration: 0.5 }}
-              className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 font-body text-xs font-semibold text-white/90 backdrop-blur-sm"
+            <p
+              className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 font-body text-xs font-semibold text-white/90 backdrop-blur-sm animate-[heroFadeIn_0.5s_0.5s_both]"
             >
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
               <HeroPropertyCount /> imóveis disponíveis
-            </motion.p>
+            </p>
             <p className="mb-4 font-body text-xs font-semibold uppercase tracking-[0.2em] text-white/70">
               Porto Alegre & Região
             </p>
@@ -192,7 +186,7 @@ export function HeroSection() {
             <p className="mt-4 max-w-md font-body text-base leading-relaxed text-white/70">
               Apartamentos, casas e coberturas com curadoria especializada e busca inteligente por IA.
             </p>
-          </motion.div>
+          </div>
 
           {/* Right — card */}
           <motion.div

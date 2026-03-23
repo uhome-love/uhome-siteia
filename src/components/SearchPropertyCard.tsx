@@ -249,7 +249,7 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavo
                 />
               ))}
             </div>
-          ) : isVisible && !lazyFotos && baseFotos.length <= 1 && !fotosLoadedRef.current ? null : isVisible && !lazyFotos && fotosLoadedRef.current && baseFotos.length <= 1 ? (
+          ) : loadingFotos ? (
             <div className="pointer-events-none absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
               {[0, 1, 2, 3].map(i => (
                 <div

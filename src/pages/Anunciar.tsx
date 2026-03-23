@@ -33,7 +33,7 @@ const steps = [
 ];
 
 const benefits = [
-  { titulo: "Maior vitrine de POA", descricao: "Mais de 4.800 imóveis e milhares de compradores ativos buscando todos os dias.", destaque: "4.800+ compradores" },
+  { titulo: "Maior vitrine de POA", descricao: "Mais de 14.600 imóveis e milhares de compradores ativos buscando todos os dias.", destaque: "14.600+ imóveis" },
   { titulo: "Busca por IA", descricao: "Nosso motor de busca com IA conecta seu imóvel exatamente com quem procura ele.", destaque: "Matching inteligente" },
   { titulo: "Zero custo para anunciar", descricao: "Anunciar é gratuito. Nossa comissão só acontece quando você vende.", destaque: "R$ 0 para começar" },
   { titulo: "Equipe especializada em POA", descricao: "Corretores com profundo conhecimento dos bairros e preços de Porto Alegre.", destaque: "Time local" },

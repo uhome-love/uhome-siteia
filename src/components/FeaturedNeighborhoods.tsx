@@ -50,7 +50,7 @@ export function FeaturedNeighborhoods() {
           </p>
         </motion.div>
 
-        <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+        <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {bairrosConfig.map((b, i) => (
             <motion.div
               key={b.nome}
@@ -63,22 +63,22 @@ export function FeaturedNeighborhoods() {
                 to={`/bairros/${b.slug}`}
                 className="group relative block overflow-hidden rounded-2xl hover-lift"
               >
-                <div className="aspect-[3/4] w-full">
+                <div className="aspect-video w-full">
                   <img
                     src={b.foto}
                     alt={`Imóveis à venda em ${b.nome}, Porto Alegre`}
                     loading="lazy"
                     decoding="async"
-                    width={400}
-                    height={533}
+                    width={600}
+                    height={338}
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-4">
-                  <p className="font-body text-sm font-semibold text-white">{b.nome}</p>
-                  <p className="mt-0.5 flex items-center gap-1 font-body text-xs text-white/70">
-                    <MapPin className="h-3 w-3" />
+                  <p className="font-body text-base font-semibold text-white">{b.nome}</p>
+                  <p className="mt-0.5 flex items-center gap-1 font-body text-sm text-white/70">
+                    <MapPin className="h-3.5 w-3.5" />
                     {contagens[i]} imóveis
                   </p>
                 </div>

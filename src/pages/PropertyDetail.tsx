@@ -10,15 +10,18 @@ import { SimilarProperties } from "@/components/SimilarProperties";
 import { PropertyMap } from "@/components/PropertyMap";
 import { FotoImovel } from "@/components/FotoImovel";
 import { CardUhomePreco } from "@/components/CardUhomePreco";
+import { AuthModal } from "@/components/AuthModal";
 import { Bed, Car, Maximize, Bath, MapPin, Share2, Heart, ChevronLeft, ChevronRight, Loader2, Camera, ArrowLeft, MoreVertical, Map as MapIcon, Play, MessageCircle, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { whatsappLink } from "@/lib/whatsapp";
+import { buildWhatsAppUrl } from "@/lib/whatsapp";
 import { submitLead } from "@/services/leads";
 import { motion } from "framer-motion";
 import { trackView, getViewCount } from "@/services/leads";
 import { fetchImovelBySlug, type Imovel, formatPreco, fotoPrincipal } from "@/services/imoveis";
 import { setJsonLd, removeJsonLd, buildImovelJsonLd, buildImovelBreadcrumbJsonLd } from "@/lib/jsonld";
 import { useCanonical } from "@/hooks/useCanonical";
+import { useFavoritos } from "@/hooks/useFavoritos";
+import { trackWhatsAppClick } from "@/services/whatsappTracker";
 
 const PropertyDetail = () => {
   const { slug } = useParams();

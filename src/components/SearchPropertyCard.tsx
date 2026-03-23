@@ -108,6 +108,16 @@ export const SearchPropertyCard = forwardRef<HTMLDivElement, Props>(function Sea
   const price = formatPreco(imovel.preco);
   const area = imovel.area_total ?? imovel.area_util ?? 0;
 
+  // Estimated monthly financing (SAC table, 80% financed, 30yr, ~10.5% annual)
+  const parcelaEstimada = (() => {
+    if (imovel.preco < 50000) return null;
+    const financiado = imovel.preco * 0.8;
+    const taxaMensal = 0.105 / 12; // ~10.5% a.a.
+    const meses = 360;
+    const parcela = financiado * (taxaMensal * Math.pow(1 + taxaMensal, meses)) / (Math.pow(1 + taxaMensal, meses) - 1);
+    return Math.round(parcela);
+  })();
+
   const statsArr = [
     area > 0 ? `${area} m²` : null,
     (imovel.quartos ?? 0) > 0 ? `${imovel.quartos} quarto${imovel.quartos! > 1 ? "s" : ""}` : null,

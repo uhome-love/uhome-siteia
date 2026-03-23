@@ -366,7 +366,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
               )}
               {fotoAtiva < fotos.length - 1 && (
                 <button
-                  onClick={(e) => { e.stopPropagation(); setFotoAtiva((i) => i + 1); }}
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); setFotoAtiva((i) => i + 1); }}
                   aria-label="Próxima foto"
                   className="absolute right-2 top-1/2 z-10 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-sm shadow transition-transform hover:scale-105 active:scale-95"
                 >

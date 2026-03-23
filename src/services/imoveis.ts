@@ -226,7 +226,7 @@ function pinsCacheKey(filters: BuscaFilters): string {
   });
 }
 
-/** Fetch lightweight pin data for the map — single query, max 2000 pins, no fotos payload */
+/** Fetch lightweight pin data for the map via RPC — bypasses PostgREST 1000 row limit */
 export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSignal): Promise<MapPin[]> {
   // Check cache first
   const cacheKey = pinsCacheKey(filters);
@@ -238,47 +238,39 @@ export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSig
     return cached.data;
   }
 
-  let query = supabase
-    .from("imoveis")
-    .select(PIN_COLUMNS)
-    .eq("status", "disponivel")
-    .eq("finalidade", "venda")
-    .not("latitude", "is", null)
-    .not("longitude", "is", null);
+  const rpcParams: Record<string, any> = {
+    p_limite: 2000,
+  };
 
   // City filter
   if (filters.cidade) {
-    query = query.eq("cidade", filters.cidade);
+    rpcParams.p_cidade = filters.cidade;
   } else {
-    query = query.in("cidade", CIDADES_PERMITIDAS);
+    rpcParams.p_cidades = CIDADES_PERMITIDAS;
   }
 
-  if (filters.tipo) query = query.eq("tipo", filters.tipo);
+  if (filters.tipo) rpcParams.p_tipo = filters.tipo;
   if (filters.bairros?.length) {
-    const bairroFilter = filters.bairros.map(b => `bairro.ilike.%${b}%`).join(",");
-    query = query.or(bairroFilter);
+    rpcParams.p_bairros = filters.bairros;
   } else if (filters.bairro) {
-    query = query.ilike("bairro", `%${filters.bairro}%`);
+    rpcParams.p_bairro = filters.bairro;
   }
-  if (filters.precoMin) query = query.gte("preco", filters.precoMin);
-  if (filters.precoMax) query = query.lte("preco", filters.precoMax);
-  if (filters.areaMin) query = query.gte("area_total", filters.areaMin);
-  if (filters.areaMax) query = query.lte("area_total", filters.areaMax);
-  if (filters.quartos) query = query.gte("quartos", filters.quartos);
-  if (filters.banheiros) query = query.gte("banheiros", filters.banheiros);
-  if (filters.vagas) query = query.gte("vagas", filters.vagas);
-  if (filters.diferenciais?.length) query = query.contains("diferenciais", filters.diferenciais);
-  if (filters.q) query = query.or(`titulo.ilike.%${filters.q}%,bairro.ilike.%${filters.q}%,tipo.ilike.%${filters.q}%`);
+  if (filters.precoMin) rpcParams.p_preco_min = filters.precoMin;
+  if (filters.precoMax) rpcParams.p_preco_max = filters.precoMax;
+  if (filters.areaMin) rpcParams.p_area_min = filters.areaMin;
+  if (filters.areaMax) rpcParams.p_area_max = filters.areaMax;
+  if (filters.quartos) rpcParams.p_quartos = filters.quartos;
+  if (filters.banheiros) rpcParams.p_banheiros = filters.banheiros;
+  if (filters.vagas) rpcParams.p_vagas = filters.vagas;
 
   if (filters.bounds) {
-    query = query
-      .gte("latitude", filters.bounds.lat_min)
-      .lte("latitude", filters.bounds.lat_max)
-      .gte("longitude", filters.bounds.lng_min)
-      .lte("longitude", filters.bounds.lng_max);
+    rpcParams.lat_min = filters.bounds.lat_min;
+    rpcParams.lat_max = filters.bounds.lat_max;
+    rpcParams.lng_min = filters.bounds.lng_min;
+    rpcParams.lng_max = filters.bounds.lng_max;
   }
 
-  query = query.limit(2000);
+  let query = supabase.rpc("get_map_pins", rpcParams);
 
   if (signal) {
     query = query.abortSignal(signal);

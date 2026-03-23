@@ -231,7 +231,7 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavo
           </button>
 
           {/* Dots */}
-          {fotos.length > 1 && (
+          {fotos.length > 1 ? (
             <div className="pointer-events-none absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
               {fotos.slice(0, 7).map((_, i) => (
                 <div
@@ -246,7 +246,17 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavo
                 />
               ))}
             </div>
-          )}
+          ) : isVisible && !lazyFotos && baseFotos.length <= 1 && !fotosLoadedRef.current ? null : isVisible && !lazyFotos && fotosLoadedRef.current && baseFotos.length <= 1 ? (
+            <div className="pointer-events-none absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
+              {[0, 1, 2, 3].map(i => (
+                <div
+                  key={i}
+                  className="h-1.5 w-1.5 rounded-full bg-white/40 animate-pulse"
+                  style={{ animationDelay: `${i * 150}ms` }}
+                />
+              ))}
+            </div>
+          ) : null}
         </div>
 
         {/* Text content — QuintoAndar style */}

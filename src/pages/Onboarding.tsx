@@ -182,7 +182,7 @@ const Onboarding = () => {
       if (filters.quartos) params.set("quartos", String(filters.quartos));
       if (filters.preco_max) params.set("preco_max", String(filters.preco_max));
 
-      navigate(`/busca?${params.toString()}`);
+      navigate(prefixLink(`/busca?${params.toString()}`));
     } catch {
       toast.error("Erro ao salvar. Tente novamente.");
     } finally {

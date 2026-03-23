@@ -143,7 +143,7 @@ const Anunciar = () => {
             custom={2} variants={fadeUp}
             className="mx-auto mt-5 max-w-lg font-body text-lg leading-relaxed text-muted-foreground"
           >
-            Mais de 4.800 compradores ativos buscando imóveis em Porto Alegre agora mesmo. Seu imóvel na vitrine certa.
+            Mais de 14.600 imóveis na vitrine e milhares de compradores ativos buscando em Porto Alegre agora mesmo. Seu imóvel na vitrine certa.
           </motion.p>
 
           <motion.div custom={3} variants={fadeUp} className="mt-10 flex flex-wrap items-center justify-center gap-3">

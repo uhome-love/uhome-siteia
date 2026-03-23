@@ -3,7 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { Search, X, Bed, Maximize, ToggleLeft, ToggleRight, PenTool, Navigation, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
+
+// Load CSS dynamically to avoid blocking render
+if (typeof document !== "undefined" && !document.getElementById("mapbox-css")) {
+  const link = document.createElement("link");
+  link.id = "mapbox-css";
+  link.rel = "stylesheet";
+  link.href = "https://api.mapbox.com/mapbox-gl-js/v3.20.0/mapbox-gl.css";
+  document.head.appendChild(link);
+}
 import { type MapPin as MapPinData } from "@/services/imoveis";
 import { useCorretor } from "@/contexts/CorretorContext";
 

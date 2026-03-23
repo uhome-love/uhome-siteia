@@ -75,7 +75,6 @@ export function PorQueUhome() {
   const stats = [
     { numero: totalImoveis, suffix: "+", label: "Imóveis disponíveis" },
     { numero: 34, suffix: "", label: "Corretores especializados" },
-    { numero: 15, suffix: "", label: "Bairros com cobertura total" },
     { numero: 100, suffix: "%", label: "Foco em Porto Alegre" },
   ];
 

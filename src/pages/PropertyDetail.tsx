@@ -210,6 +210,7 @@ const PropertyDetail = () => {
             </button>
           ))}
         </div>
+        </div>
         {images.length > 1 && (
           <div className="mx-auto mt-3 max-w-7xl flex justify-end">
             <button

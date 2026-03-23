@@ -310,7 +310,6 @@ const Search = () => {
     ultimaBuscaIA.current = agora;
 
     setBuscandoIA(true);
-    setLoading(true);
     try {
       const res = await interpretarBusca(q.trim());
       setAiResult(res);
@@ -339,13 +338,11 @@ const Search = () => {
         diferenciais: f.diferenciais?.length ? f.diferenciais : undefined,
       };
       const { data, count } = await fetchImoveis({ ...aiFilters, limit: 40 });
-      setImoveis(data);
-      setTotal(count);
+      setAiOverrideData({ imoveis: data, total: count });
     } catch (e: any) {
       toast.error(e?.message || "Erro ao interpretar busca");
     } finally {
       setBuscandoIA(false);
-      setLoading(false);
     }
   }, [queryIA, setFilters]);
 

@@ -15,11 +15,12 @@ export const SearchCTACard = forwardRef<HTMLDivElement>(function SearchCTACard(_
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const { corretor } = useCorretor();
 
   const handleWhatsApp = () => {
-    const url = buildWhatsAppUrl(
-      "Olá! Estou buscando imóveis no site da Uhome e gostaria de receber uma lista personalizada."
-    );
+    const url = corretor
+      ? buildCorretorWhatsAppUrl(corretor.nome, corretor.telefone)
+      : buildWhatsAppUrl("Olá! Estou buscando imóveis no site da Uhome e gostaria de receber uma lista personalizada.");
     trackWhatsAppClick({ origem_pagina: "/busca" });
     window.open(url, "_blank", "noopener");
   };

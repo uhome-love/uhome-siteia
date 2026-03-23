@@ -658,7 +658,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
               top: previewPos.y - 10,
               transform: "translateY(-100%)",
             }}
-            onClick={() => navigate(`/imovel/${previewPin.slug}`)}
+            onClick={() => navigate(prefixLink(`/imovel/${previewPin.slug}`))}
           >
             <div className="overflow-hidden rounded-xl border border-border bg-card shadow-xl">
               {previewPin.foto ? (

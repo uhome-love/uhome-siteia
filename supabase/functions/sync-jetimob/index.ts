@@ -220,9 +220,9 @@ serve(async (req) => {
       if (body?.auto_chain) autoChain = true;
     } catch { /* no body is fine */ }
 
-    const PAGE_SIZE = 200;
+    const PAGE_SIZE = 100;
     const MAX_RETRIES = 3;
-    const RATE_LIMIT_MS = 100;
+    const RATE_LIMIT_MS = 50;
 
     let totalInserted = 0;
     let totalErrors = 0;

@@ -49,7 +49,7 @@ export default function AdminSync() {
           `  ✅ ${data.inseridos ?? 0} inseridos, ${data.erros ?? 0} erros (${data.total ?? 0} processados)`,
         ]);
 
-        if (!data.next_start_page || (data.total ?? 0) === 0) {
+        if (!data.more_pages || (data.total ?? 0) === 0) {
           break;
         }
         startPage = data.next_start_page;

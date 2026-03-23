@@ -36,7 +36,7 @@ export function Navbar() {
 
   return (
     <nav className={`fixed left-0 right-0 z-50 border-b border-border/40 bg-background backdrop-blur-lg ${bannerVisible ? 'top-10' : 'top-0'}`}>
-      <div className="relative mx-auto flex h-14 w-full max-w-[1440px] items-center justify-between px-6 sm:px-8">
+      <div className="relative flex h-14 w-full items-center justify-between px-6 sm:px-8 lg:px-10">
         {/* LEFT — Logo */}
         <Link to={prefixLink("/")} className="flex flex-shrink-0 items-center">
           <UhomeLogo variant="full" height={24} />

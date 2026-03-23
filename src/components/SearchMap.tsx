@@ -680,10 +680,10 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         </div>
       )}
 
-      {/* Draw mode indicator */}
+      {/* Draw mode indicator + confirm button */}
       <AnimatePresence>
         {drawMode && (
-          <div className="absolute left-4 top-4 z-20">
+          <div className="absolute left-3 right-3 top-4 z-20 flex flex-wrap items-center gap-2 sm:left-4 sm:right-auto">
             <motion.div
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
@@ -691,14 +691,30 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
               className="flex items-center gap-2 rounded-full bg-primary px-4 py-2 font-body text-[13px] font-semibold text-primary-foreground shadow-lg"
             >
               <span className="h-2 w-2 animate-pulse rounded-full bg-white" />
-              Desenhando área ({drawPoints.length} pontos)
+              {drawPoints.length < 3
+                ? `Clique no mapa para marcar pontos (${drawPoints.length}/3)`
+                : `Área com ${drawPoints.length} pontos`
+              }
               <button
-                onClick={() => { setDrawMode(false); clearDraw(); }}
+                onClick={clearDraw}
                 className="ml-1 rounded-full p-0.5 hover:bg-white/20"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
             </motion.div>
+
+            {drawPoints.length >= 3 && (
+              <motion.button
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                onClick={finalizarDesenho}
+                className="flex items-center gap-1.5 rounded-full bg-card border-2 border-primary px-4 py-2 font-body text-[13px] font-bold text-primary shadow-lg transition-all hover:bg-primary hover:text-primary-foreground active:scale-[0.96]"
+              >
+                <Check className="h-4 w-4" />
+                Buscar nessa área
+              </motion.button>
+            )}
           </div>
         )}
       </AnimatePresence>

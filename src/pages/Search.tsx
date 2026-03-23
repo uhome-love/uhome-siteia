@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo, lazy } from "react";
+import React, { useState, useEffect, useCallback, useMemo, useRef, lazy } from "react";
 const PerformanceDebug = lazy(() => import("@/components/PerformanceDebug").then(m => ({ default: m.PerformanceDebug })));
 import { AuthModal } from "@/components/AuthModal";
 import { useAuth } from "@/hooks/useAuth";
@@ -17,6 +17,7 @@ import { useImoveisQuery } from "@/hooks/useImoveisQuery";
 import { interpretarBusca, type AISearchResult } from "@/services/aiSearch";
 import { supabase } from "@/integrations/supabase/client";
 import { syncToCRM } from "@/services/syncCRM";
+import { trackEvent } from "@/lib/trackEvent";
 import { ArrowUpDown, Bell, Loader2, Map as MapIcon, MapPin, Sparkles, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -215,6 +216,21 @@ const Search = () => {
 
   // Reset page when filters change
   useEffect(() => { setPage(0); }, [queryFilters]);
+
+  // Track busca_realizada (debounced — fires once per filter set)
+  const buscaTrackRef = useRef<ReturnType<typeof setTimeout>>();
+  useEffect(() => {
+    if (loading || total === 0) return;
+    clearTimeout(buscaTrackRef.current);
+    buscaTrackRef.current = setTimeout(() => {
+      trackEvent({
+        tipo: "busca_realizada",
+        busca_query: filters.q || queryIA || null,
+        busca_filtros: queryFilters as Record<string, unknown>,
+      });
+    }, 2000);
+    return () => clearTimeout(buscaTrackRef.current);
+  }, [queryFilters, total, loading]);
 
   // FIX 4 — AbortController to cancel stale pin requests
   const pinLoadTimerRef = React.useRef<number | null>(null);

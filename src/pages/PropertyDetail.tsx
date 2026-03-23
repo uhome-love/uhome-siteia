@@ -17,6 +17,7 @@ import { buildWhatsAppUrl, buildCorretorWhatsAppUrl } from "@/lib/whatsapp";
 import { useCorretor } from "@/contexts/CorretorContext";
 import { submitLead } from "@/services/leads";
 import { motion } from "framer-motion";
+import { trackEvent } from "@/lib/trackEvent";
 import { trackView, getViewCount } from "@/services/leads";
 import { fetchImovelBySlug, type Imovel, formatPreco, fotoPrincipal } from "@/services/imoveis";
 import { setJsonLd, removeJsonLd, buildImovelJsonLd, buildImovelBreadcrumbJsonLd } from "@/lib/jsonld";
@@ -61,6 +62,7 @@ const PropertyDetail = () => {
         setImovel(data);
         if (data) {
           trackView(data.id);
+          trackEvent({ tipo: "imovel_visualizado", imovel_slug: data.slug, imovel_titulo: data.titulo });
           getViewCount(data.id).then(setViewCount);
           const vistos: string[] = JSON.parse(localStorage.getItem("imoveis_vistos") || "[]");
           if (!vistos.includes(data.id)) {

@@ -284,7 +284,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
               <span className="font-body text-lg font-extrabold text-foreground">{price}</span>
             </div>
             <button
-              onClick={async (e) => { e.stopPropagation(); const r = await toggleFavorito(imovel.id); if (r === "needs_auth") setShowAuth(true); }}
+              onClick={async (e) => { e.preventDefault(); e.stopPropagation(); const r = await toggleFavorito(imovel.id); if (r === "needs_auth") setShowAuth(true); }}
               aria-label={liked ? "Remover dos favoritos" : "Adicionar aos favoritos"}
               className="p-1"
             >

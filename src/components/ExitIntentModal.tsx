@@ -155,5 +155,6 @@ export const ExitIntentModal = forwardRef<HTMLDivElement>(function ExitIntentMod
         </motion.div>
       )}
     </AnimatePresence>
+    </span>
   );
-}
+});

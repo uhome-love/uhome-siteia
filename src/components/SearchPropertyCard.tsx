@@ -178,7 +178,7 @@ export const SearchPropertyCard = forwardRef<HTMLDivElement, Props>(function Sea
       className={`relative cursor-pointer select-none outline-none [&_*]:outline-none [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] ${highlighted ? "sm:ring-2 sm:ring-primary sm:rounded-xl" : ""}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      onClick={() => navigate(prefixLink(`/imovel/${imovel.slug}`))}
+      onClick={() => window.open(prefixLink(`/imovel/${imovel.slug}`), "_blank", "noopener")}
     >
       {/* ===== MOBILE: QuintoAndar-style full-width vertical card ===== */}
       <div className="sm:hidden">

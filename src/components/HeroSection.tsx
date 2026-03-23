@@ -137,14 +137,20 @@ export function HeroSection() {
           }}
           aria-hidden="true"
         />
-        <img
-          src="/hero-bg.webp"
-          alt=""
-          fetchPriority="high"
-          decoding="async"
-          className="absolute inset-0 h-full w-full object-cover"
-          style={{ objectPosition: "center center" }}
-        />
+        <picture>
+          <source media="(max-width: 640px)" srcSet="/hero-bg-mobile.webp" type="image/webp" />
+          <source media="(max-width: 1024px)" srcSet="/hero-bg-tablet.webp" type="image/webp" />
+          <img
+            src="/hero-bg.webp"
+            alt=""
+            fetchPriority="high"
+            decoding="async"
+            width={1920}
+            height={1280}
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ objectPosition: "center center" }}
+          />
+        </picture>
         <div
           className="absolute inset-0"
           style={{

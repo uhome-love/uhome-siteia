@@ -178,7 +178,7 @@ const PropertyDetail = () => {
       <div className="mt-16 hidden sm:block">
         <div className="mx-auto max-w-7xl px-6 pt-4 pb-2">
           <button
-            onClick={() => window.history.length > 1 ? navigate(-1) : navigate("/")}
+            onClick={() => window.history.length > 2 ? navigate(-1) : navigate("/busca")}
             className="flex items-center gap-1.5 rounded-full px-3 py-1.5 font-body text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />

@@ -79,7 +79,7 @@ export function PorQueUhome() {
   ];
 
   return (
-    <section className="bg-secondary/50 py-20 sm:py-28">
+    <section className="bg-secondary/50 pt-10 pb-20 sm:pt-14 sm:pb-28">
       <div className="mx-auto max-w-7xl px-6">
         {/* Header */}
         <motion.div

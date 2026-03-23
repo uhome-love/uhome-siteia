@@ -42,6 +42,7 @@ export function Navbar() {
         <div className="hidden xl:flex items-center absolute left-1/2 -translate-x-1/2 rounded-full bg-secondary p-1 gap-0.5">
           <Link
             to={prefixLink("/busca?finalidade=venda")}
+            onMouseEnter={handlePrefetchBusca}
             className={`rounded-full px-[18px] py-[7px] text-[14px] font-semibold transition-all whitespace-nowrap ${
               isSearchPage && !modoIA
                 ? "bg-background text-foreground shadow-[0_1px_4px_rgba(0,0,0,0.1)]"

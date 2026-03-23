@@ -121,8 +121,6 @@ export function FinancingSimulator({ propertyPrice }: FinancingSimulatorProps) {
         {[
           { icon: DollarSign, label: "1ª parcela", value: formatCurrency(simulation.firstInstallment), accent: true },
           { icon: TrendingUp, label: "Última parcela", value: formatCurrency(simulation.lastInstallment), accent: false },
-          { icon: Calendar, label: "Total pago", value: formatCurrency(simulation.totalPaid), accent: false },
-          { icon: Calculator, label: "Juros totais", value: formatCurrency(simulation.totalInterest), accent: false },
         ].map(({ icon: Icon, label, value, accent }) => (
           <div
             key={label}

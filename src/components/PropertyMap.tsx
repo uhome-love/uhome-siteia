@@ -40,6 +40,16 @@ export function PropertyMap({ neighborhood, city, lat = -30.0277, lng = -51.2287
         center: [lng, lat],
         zoom: 15,
         attributionControl: false,
+        scrollZoom: false,
+      });
+
+      // Enable scroll zoom only after clicking the map
+      mapContainer.current!.addEventListener("click", () => {
+        map.scrollZoom.enable();
+      });
+      // Disable again when mouse leaves
+      mapContainer.current!.addEventListener("mouseleave", () => {
+        map.scrollZoom.disable();
       });
 
       map.addControl(new mapboxgl.default.NavigationControl({ showCompass: false }), "top-right");

@@ -278,19 +278,35 @@ const Search = () => {
 
   const loadMore = useCallback(async () => {
     if (loadingMore || loading) return;
-    const nextPage = page + 1;
-    const offset = nextPage * PAGE_SIZE;
-    if (offset >= total) return;
+    const currentCount = imoveis.length;
+    if (currentCount >= total) return;
     setLoadingMore(true);
     try {
-      const loaded = await fetchNextPage(page, PAGE_SIZE);
-      if (loaded > 0) setPage(nextPage);
+      if (aiOverrideData) {
+        // AI mode: fetch next batch and append to override data
+        const aiFilters: BuscaFilters = {
+          ...buildFilters(),
+          ordem: filters.ordem as any,
+          limit: PAGE_SIZE,
+          offset: currentCount,
+        };
+        const { data } = await fetchImoveis(aiFilters);
+        if (data.length > 0) {
+          setAiOverrideData(prev => prev ? {
+            ...prev,
+            imoveis: [...prev.imoveis, ...data],
+          } : null);
+        }
+      } else {
+        // Normal mode: just bump page — queryFilters recalculates limit automatically
+        setPage(page + 1);
+      }
     } catch (err) {
       console.error("Erro ao carregar mais:", err);
     } finally {
       setLoadingMore(false);
     }
-  }, [page, total, loadingMore, loading, fetchNextPage]);
+  }, [page, total, loadingMore, loading, imoveis.length, aiOverrideData, buildFilters, filters.ordem]);
 
   // Sort dropdown click-outside
   useEffect(() => {

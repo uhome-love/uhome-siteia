@@ -167,6 +167,7 @@ export const AuthModal = forwardRef<HTMLDivElement, Props>(function AuthModal({ 
     "w-full rounded-lg border-[1.5px] border-border bg-background px-4 py-3 font-body text-sm text-foreground outline-none transition-colors focus:border-primary";
 
   return (
+    <span ref={ref}>
     <AnimatePresence>
       {open && (
         <motion.div

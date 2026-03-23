@@ -1,4 +1,5 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { AuthModal } from "@/components/AuthModal";
 import { useNavigate } from "react-router-dom";
 import { Heart } from "lucide-react";
@@ -52,6 +53,7 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavo
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { prefixLink } = useCorretor();
+  const isMobile = useIsMobile();
   const isFavorito = isFavoritoProp ?? (() => false);
   const toggleFavorito = toggleFavoritoProp ?? (async () => undefined as "needs_auth" | void);
   const liked = isFavorito(imovel.id);
@@ -64,6 +66,27 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavo
     return fp ? [fp] : [];
   })();
   const fotos = lazyFotos && lazyFotos.length > 0 ? lazyFotos : baseFotos;
+
+  // On mobile, eagerly load full photo set for swipe carousel
+  useEffect(() => {
+    if (!isMobile || fotosLoadedRef.current || baseFotos.length > 1) return;
+    fotosLoadedRef.current = true;
+    supabase
+      .from("imoveis")
+      .select("fotos")
+      .eq("id", imovel.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.fotos && Array.isArray(data.fotos) && data.fotos.length > 0) {
+          const urls = (data.fotos as any[])
+            .sort((a: any, b: any) => (a.ordem ?? 0) - (b.ordem ?? 0))
+            .map((f: any) => f?.url || f?.src || f)
+            .filter(Boolean)
+            .slice(0, 8);
+          if (urls.length > 0) setLazyFotos(urls);
+        }
+      });
+  }, [isMobile, imovel.id, baseFotos.length]);
   const price = formatPreco(imovel.preco);
   const area = imovel.area_total ?? imovel.area_util ?? 0;
 

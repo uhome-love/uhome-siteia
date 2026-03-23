@@ -185,28 +185,30 @@ const Search = () => {
     };
   }, [filters]);
 
-  // Normal mode: fetch list only (pins loaded separately by viewport)
-  const loadImoveis = useCallback(async () => {
-    if (modoIA && !aiResult && queryIA.trim()) return;
-    setLoading(true);
-    setPage(0);
-    try {
-      const baseFilters = buildFilters();
-      const result = await fetchImoveis({
-        ...baseFilters,
-        ordem: filters.ordem as any,
-        bounds: filters.bounds || undefined,
-        limit: PAGE_SIZE,
-        offset: 0,
-      });
-      setImoveis(result.data);
-      setTotal(result.count);
-      setLoading(false);
-    } catch (err) {
-      console.error("Erro ao buscar imóveis:", err);
-      setLoading(false);
-    }
-  }, [filters, modoIA, aiResult, buildFilters]);
+  // React Query — cached listing with 3 min staleTime
+  const queryFilters = useMemo<BuscaFilters>(() => ({
+    ...buildFilters(),
+    ordem: filters.ordem as any,
+    bounds: filters.bounds || undefined,
+    limit: PAGE_SIZE,
+    offset: 0,
+  }), [buildFilters, filters.ordem, filters.bounds]);
+
+  const enableQuery = !(modoIA && !aiResult && queryIA.trim() !== "");
+  const { imoveis: queryImoveis, total: queryTotal, isLoading: queryLoading, fetchNextPage } = useImoveisQuery({
+    filters: queryFilters,
+    enabled: enableQuery && !aiOverrideData,
+  });
+
+  // AI mode can override listing data
+  const [aiOverrideData, setAiOverrideData] = useState<{ imoveis: Imovel[]; total: number } | null>(null);
+  
+  const imoveis = aiOverrideData?.imoveis ?? queryImoveis;
+  const total = aiOverrideData?.total ?? queryTotal;
+  const loading = aiOverrideData ? false : queryLoading;
+
+  // Reset page when filters change
+  useEffect(() => { setPage(0); }, [queryFilters]);
 
   // FIX 4 — AbortController to cancel stale pin requests
   const pinLoadTimerRef = React.useRef<number | null>(null);
@@ -214,10 +216,8 @@ const Search = () => {
 
   const handleMapBoundsChange = useCallback((bounds: MapBounds) => {
     setMapViewBounds(bounds);
-    // Debounce pin fetching to avoid rapid re-fetches during pan/zoom
     if (pinLoadTimerRef.current) clearTimeout(pinLoadTimerRef.current);
     pinLoadTimerRef.current = window.setTimeout(() => {
-      // Cancel previous in-flight request
       pinAbortRef.current?.abort();
       pinAbortRef.current = new AbortController();
       
@@ -232,10 +232,9 @@ const Search = () => {
     }, 300);
   }, [buildFilters]);
 
-  // Reload pins when filters change (using current map viewport)
+  // Reload pins when filters change
   useEffect(() => {
     if (!mapViewBounds) return;
-    // Cancel previous request
     pinAbortRef.current?.abort();
     pinAbortRef.current = new AbortController();
     
@@ -258,26 +257,14 @@ const Search = () => {
     if (offset >= total) return;
     setLoadingMore(true);
     try {
-      const baseFilters = buildFilters();
-      const result = await fetchImoveis({
-        ...baseFilters,
-        ordem: filters.ordem as any,
-        bounds: filters.bounds || undefined,
-        limit: PAGE_SIZE,
-        offset,
-      });
-      setImoveis((prev) => [...prev, ...result.data]);
-      setPage(nextPage);
+      const loaded = await fetchNextPage(page, PAGE_SIZE);
+      if (loaded > 0) setPage(nextPage);
     } catch (err) {
       console.error("Erro ao carregar mais:", err);
     } finally {
       setLoadingMore(false);
     }
-  }, [page, total, loadingMore, loading, buildFilters, filters]);
-
-  useEffect(() => {
-    loadImoveis();
-  }, [loadImoveis]);
+  }, [page, total, loadingMore, loading, fetchNextPage]);
 
   // Sort dropdown click-outside
   useEffect(() => {

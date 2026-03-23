@@ -276,6 +276,7 @@ export const SearchPropertyCard = forwardRef<HTMLDivElement, Props>(function Sea
             </div>
             <button
               onClick={async (e) => { e.stopPropagation(); const r = await toggleFavorito(imovel.id); if (r === "needs_auth") setShowAuth(true); }}
+              aria-label={liked ? "Remover dos favoritos" : "Adicionar aos favoritos"}
               className="p-1"
             >
               <Heart

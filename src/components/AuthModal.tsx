@@ -181,7 +181,7 @@ export function AuthModal({ open, onClose }: Props) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 12 }}
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="w-full max-w-[420px] rounded-2xl bg-card p-6 shadow-2xl sm:p-8"
+            className="w-full max-w-[420px] my-auto rounded-2xl bg-card p-6 shadow-2xl sm:p-8"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}

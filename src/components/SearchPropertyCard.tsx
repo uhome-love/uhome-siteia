@@ -82,6 +82,13 @@ export const SearchPropertyCard = forwardRef<HTMLDivElement, Props>(function Sea
     return () => observer.disconnect();
   }, []);
 
+  // Merge forwarded ref with internal cardRef
+  const mergedRef = useCallback((node: HTMLDivElement | null) => {
+    cardRef.current = node;
+    if (typeof ref === "function") ref(node);
+    else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+  }, [ref]);
+
   // Load full photo set when card becomes visible (mobile) or on hover (desktop)
   useEffect(() => {
     if (!isVisible || fotosLoadedRef.current || baseFotos.length > 1) return;

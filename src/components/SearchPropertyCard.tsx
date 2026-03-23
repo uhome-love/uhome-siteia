@@ -49,8 +49,10 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavo
   const [fotoAtiva, setFotoAtiva] = useState(0);
   const [showAuth, setShowAuth] = useState(false);
   const [lazyFotos, setLazyFotos] = useState<string[] | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
   const fotosLoadedRef = useRef(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { prefixLink } = useCorretor();
   const isMobile = useIsMobile();
@@ -67,9 +69,22 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavo
   })();
   const fotos = lazyFotos && lazyFotos.length > 0 ? lazyFotos : baseFotos;
 
-  // On mobile, eagerly load full photo set for swipe carousel
+  // Intersection Observer: detect when card enters viewport
   useEffect(() => {
-    if (!isMobile || fotosLoadedRef.current || baseFotos.length > 1) return;
+    const el = cardRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setIsVisible(true); observer.disconnect(); } },
+      { rootMargin: "200px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Load full photo set when card becomes visible (mobile) or on hover (desktop)
+  useEffect(() => {
+    if (!isVisible || fotosLoadedRef.current || baseFotos.length > 1) return;
+    if (!isMobile) return; // desktop loads on hover
     fotosLoadedRef.current = true;
     supabase
       .from("imoveis")
@@ -86,7 +101,7 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavo
           if (urls.length > 0) setLazyFotos(urls);
         }
       });
-  }, [isMobile, imovel.id, baseFotos.length]);
+  }, [isVisible, isMobile, imovel.id, baseFotos.length]);
   const price = formatPreco(imovel.preco);
   const area = imovel.area_total ?? imovel.area_util ?? 0;
 

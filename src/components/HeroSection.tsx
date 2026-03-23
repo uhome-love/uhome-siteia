@@ -10,6 +10,7 @@ import { bairrosData } from "@/data/bairros";
 import { CIDADES_PERMITIDAS } from "@/services/imoveis";
 import { useQueryClient } from "@tanstack/react-query";
 import { prefetchBusca } from "@/lib/prefetch";
+import { useCorretor } from "@/contexts/CorretorContext";
 
 
 

@@ -60,9 +60,12 @@ export function BannerCorretor() {
   )}`;
 
   return (
+    <>
+    {/* Spacer to push content below fixed banner */}
+    <div className="h-10" />
     <div
       data-testid="banner-corretor"
-      className="flex items-center justify-between gap-3 bg-primary/5 border-b border-primary/10 px-4 py-2 sm:px-6"
+      className="fixed top-0 left-0 right-0 z-[60] flex items-center justify-between gap-3 bg-primary/5 border-b border-primary/10 px-4 py-2 sm:px-6"
     >
       <div className="flex items-center gap-2 min-w-0">
         {dados.foto ? (

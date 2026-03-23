@@ -599,11 +599,18 @@ const PropertyDetail = () => {
             asChild
           >
             <a
-              href={buildWhatsAppUrl(undefined, {
-                titulo: imovel.titulo,
-                bairro: imovel.bairro,
-                slug: imovel.slug,
-              })}
+              href={corretor
+                ? buildCorretorWhatsAppUrl(corretor.nome, corretor.telefone, {
+                    titulo: imovel.titulo,
+                    bairro: imovel.bairro,
+                    slug: imovel.slug,
+                  })
+                : buildWhatsAppUrl(undefined, {
+                    titulo: imovel.titulo,
+                    bairro: imovel.bairro,
+                    slug: imovel.slug,
+                  })
+              }
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => trackWhatsAppClick({

@@ -44,7 +44,7 @@ export function AISearchSection() {
                 className="flex-1 bg-transparent font-body text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
-                    navigate(`/busca?modo=ia&q=${encodeURIComponent((e.target as HTMLInputElement).value)}`);
+                    navigate(prefixLink(`/busca?modo=ia&q=${encodeURIComponent((e.target as HTMLInputElement).value)}`));
                   }
                 }}
               />

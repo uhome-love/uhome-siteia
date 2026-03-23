@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { Menu, X, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { UhomeLogo } from "@/components/UhomeLogo";
 import { UserMenu } from "@/components/UserMenu";
 import { useCorretor } from "@/contexts/CorretorContext";
+import { useQueryClient } from "@tanstack/react-query";
+import { prefetchBusca } from "@/lib/prefetch";
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -12,6 +14,11 @@ export function Navbar() {
   const [searchParams] = useSearchParams();
   const { prefixLink } = useCorretor();
   const [bannerVisible, setBannerVisible] = useState(false);
+  const queryClient = useQueryClient();
+
+  const handlePrefetchBusca = useCallback(() => {
+    prefetchBusca(queryClient);
+  }, [queryClient]);
 
   useEffect(() => {
     const check = () => setBannerVisible(!!document.getElementById('banner-corretor-spacer'));
@@ -35,6 +42,7 @@ export function Navbar() {
         <div className="hidden xl:flex items-center absolute left-1/2 -translate-x-1/2 rounded-full bg-secondary p-1 gap-0.5">
           <Link
             to={prefixLink("/busca?finalidade=venda")}
+            onMouseEnter={handlePrefetchBusca}
             className={`rounded-full px-[18px] py-[7px] text-[14px] font-semibold transition-all whitespace-nowrap ${
               isSearchPage && !modoIA
                 ? "bg-background text-foreground shadow-[0_1px_4px_rgba(0,0,0,0.1)]"

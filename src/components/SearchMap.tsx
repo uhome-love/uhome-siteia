@@ -111,6 +111,7 @@ interface SearchMapProps {
 
 export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, onBoundsChange, onDrawFilter, onPertoDeVoce }: SearchMapProps) {
   const navigate = useNavigate();
+  const { prefixLink } = useCorretor();
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const initRef = useRef(false);

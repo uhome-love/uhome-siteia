@@ -24,6 +24,9 @@ export function PerformanceDebug() {
   const [metrics, setMetrics] = useState<PerfMetrics>(initial);
   const [collapsed, setCollapsed] = useState(false);
 
+  // Only render in development mode
+  if (!import.meta.env.DEV) return null;
+
   useEffect(() => {
     const handler = (e: Event) => {
       const detail = (e as CustomEvent).detail;

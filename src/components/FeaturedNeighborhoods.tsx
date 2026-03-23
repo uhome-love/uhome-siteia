@@ -4,6 +4,7 @@ import { MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getBairrosDisponiveis } from "@/services/bairrosCache";
 import { bairrosData } from "@/data/bairros";
+import { useCorretor } from "@/contexts/CorretorContext";
 
 const bairrosConfig = bairrosData.slice(0, 6);
 

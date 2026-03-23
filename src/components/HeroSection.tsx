@@ -8,6 +8,8 @@ import { toast } from "sonner";
 import { formatPhone } from "@/lib/phoneMask";
 import { bairrosData } from "@/data/bairros";
 import { CIDADES_PERMITIDAS } from "@/services/imoveis";
+import { useQueryClient } from "@tanstack/react-query";
+import { prefetchBusca } from "@/lib/prefetch";
 
 const ease = [0.16, 1, 0.3, 1] as [number, number, number, number];
 

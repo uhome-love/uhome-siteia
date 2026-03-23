@@ -120,6 +120,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
   const [autoSearch, setAutoSearch] = useState(false);
   const autoSearchRef = useRef(false);
   const autoSearchTimerRef = useRef<number | null>(null);
+  const userMarkerRef = useRef<mapboxgl.Marker | null>(null);
 
   // FIX 3 — Flag to prevent double initial load
   const initialBoundsReportedRef = useRef(false);
@@ -162,6 +163,49 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
     window.addEventListener("uhome:draw-area", handler);
     return () => window.removeEventListener("uhome:draw-area", handler);
   }, []);
+
+  // Cleanup user marker on unmount
+  useEffect(() => {
+    return () => { userMarkerRef.current?.remove(); };
+  }, []);
+
+  // Handle "Perto de você" — center map + add marker
+  const handlePertoDeVoceInternal = useCallback(() => {
+    if (!("geolocation" in navigator)) {
+      import("sonner").then(({ toast }) => toast.error("Geolocalização não disponível"));
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        const map = mapRef.current;
+
+        // Also call parent handler for filter update
+        onPertoDeVoce?.();
+
+        if (map) {
+          map.flyTo({ center: [longitude, latitude], zoom: 14, duration: 1200, essential: true });
+
+          // Remove previous marker
+          userMarkerRef.current?.remove();
+
+          // Add user location marker
+          const el = document.createElement("div");
+          el.style.cssText = "width:18px;height:18px;background:hsl(var(--primary));border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.3);";
+          userMarkerRef.current = new mapboxgl.Marker(el).setLngLat([longitude, latitude]).addTo(map);
+
+          import("sonner").then(({ toast }) => toast.success("Mapa centralizado na sua localização"));
+        }
+      },
+      (err) => {
+        const msg = err.code === err.PERMISSION_DENIED
+          ? "Permissão de localização negada. Habilite nas configurações."
+          : "Não foi possível obter sua localização";
+        import("sonner").then(({ toast }) => toast.error(msg));
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+    );
+  }, [onPertoDeVoce]);
 
   // Init map once
   useEffect(() => {
@@ -655,7 +699,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
           </button>
           {onPertoDeVoce && (
             <button
-              onClick={onPertoDeVoce}
+              onClick={handlePertoDeVoceInternal}
               className="flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-2 font-body text-[12px] font-semibold text-muted-foreground shadow-lg transition-all hover:border-foreground/30 active:scale-[0.97]"
             >
               <Navigation className="h-3.5 w-3.5" />

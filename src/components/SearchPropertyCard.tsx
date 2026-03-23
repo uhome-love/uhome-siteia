@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { type Imovel, fotoPrincipal, formatPreco } from "@/services/imoveis";
 import { FotoImovel } from "@/components/FotoImovel";
 import { useCorretor } from "@/contexts/CorretorContext";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Props {
   imovel: Imovel;
@@ -46,13 +47,16 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavo
   const [hovering, setHovering] = useState(false);
   const [fotoAtiva, setFotoAtiva] = useState(0);
   const [showAuth, setShowAuth] = useState(false);
+  const [lazyFotos, setLazyFotos] = useState<string[] | null>(null);
+  const fotosLoadedRef = useRef(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { prefixLink } = useCorretor();
   const isFavorito = isFavoritoProp ?? (() => false);
   const toggleFavorito = toggleFavoritoProp ?? (async () => undefined as "needs_auth" | void);
   const liked = isFavorito(imovel.id);
-  const fotos = imovel.fotos && imovel.fotos.length > 0 ? imovel.fotos.map((f) => f.url) : [fotoPrincipal(imovel)];
+  const baseFotos = imovel.fotos && imovel.fotos.length > 0 ? imovel.fotos.map((f) => f.url) : [fotoPrincipal(imovel)];
+  const fotos = lazyFotos && lazyFotos.length > 0 ? lazyFotos : baseFotos;
   const price = formatPreco(imovel.preco);
   const area = imovel.area_total ?? imovel.area_util ?? 0;
 
@@ -76,10 +80,31 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavo
   }
   descParts[0] += ".";
 
-  const handleMouseEnter = () => { setHovering(true); onHover?.(imovel.id); };
-  const handleMouseLeave = () => { setHovering(false); onHover?.(null); };
+  const handleMouseEnter = useCallback(() => {
+    setHovering(true);
+    onHover?.(imovel.id);
+    // Lazy-load full photo set on first hover
+    if (!fotosLoadedRef.current && baseFotos.length <= 1) {
+      fotosLoadedRef.current = true;
+      supabase
+        .from("imoveis")
+        .select("fotos")
+        .eq("id", imovel.id)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (data?.fotos && Array.isArray(data.fotos) && data.fotos.length > 0) {
+            const urls = (data.fotos as any[])
+              .sort((a: any, b: any) => (a.ordem ?? 0) - (b.ordem ?? 0))
+              .map((f: any) => f?.url || f?.src || f)
+              .filter(Boolean)
+              .slice(0, 8);
+            if (urls.length > 0) setLazyFotos(urls);
+          }
+        });
+    }
+  }, [imovel.id, onHover, baseFotos.length]);
 
-  // Track active dot via native scroll position
+  const handleMouseLeave = useCallback(() => { setHovering(false); onHover?.(null); }, [onHover]);
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;

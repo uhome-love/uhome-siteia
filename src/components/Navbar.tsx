@@ -81,7 +81,7 @@ export function Navbar() {
             Quanto vale meu imóvel?
           </Link>
           <Link
-            to="/faq"
+            to={prefixLink("/faq")}
             className="rounded-full px-3.5 py-[6px] font-body text-[13px] font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
             Ajuda

@@ -16,7 +16,7 @@ export function BannerCorretor() {
   } | null>(null);
   const [fechado, setFechado] = useState(false);
 
-  // Re-checar a cada navegação + polling para capturar dados async do CorretorRefLayout
+  // Re-checar a cada navegação + listen for corretor-ref-ready event
   useEffect(() => {
     function check() {
       const slug = getCorretorRef();
@@ -35,14 +35,21 @@ export function BannerCorretor() {
 
     if (check()) return;
 
-    // Retry a few times — CorretorRefLayout sets localStorage async
+    // Listen for the event from CorretorRefLayout
+    const handler = () => check();
+    window.addEventListener('corretor-ref-ready', handler);
+
+    // Also poll as fallback
     let attempts = 0;
     const interval = setInterval(() => {
       attempts++;
-      if (check() || attempts >= 10) clearInterval(interval);
-    }, 300);
+      if (check() || attempts >= 20) clearInterval(interval);
+    }, 500);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('corretor-ref-ready', handler);
+    };
   }, [location.pathname]);
 
   if (!dados || fechado) return null;

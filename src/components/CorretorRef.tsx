@@ -27,6 +27,8 @@ export function CorretorRefLayout() {
         localStorage.setItem('corretor_ref_nome', corretor.nome || '');
         localStorage.setItem('corretor_ref_foto', corretor.foto_url || '');
         localStorage.setItem('corretor_ref_ts', Date.now().toString());
+        // Notify BannerCorretor that ref data is ready
+        window.dispatchEvent(new Event('corretor-ref-ready'));
 
         if (jaRegistrado !== slug) {
           await supabase.from('corretor_visitas').insert({

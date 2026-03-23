@@ -164,6 +164,49 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
     return () => window.removeEventListener("uhome:draw-area", handler);
   }, []);
 
+  // Cleanup user marker on unmount
+  useEffect(() => {
+    return () => { userMarkerRef.current?.remove(); };
+  }, []);
+
+  // Handle "Perto de você" — center map + add marker
+  const handlePertoDeVoceInternal = useCallback(() => {
+    if (!("geolocation" in navigator)) {
+      import("sonner").then(({ toast }) => toast.error("Geolocalização não disponível"));
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        const map = mapRef.current;
+
+        // Also call parent handler for filter update
+        onPertoDeVoce?.();
+
+        if (map) {
+          map.flyTo({ center: [longitude, latitude], zoom: 14, duration: 1200, essential: true });
+
+          // Remove previous marker
+          userMarkerRef.current?.remove();
+
+          // Add user location marker
+          const el = document.createElement("div");
+          el.style.cssText = "width:18px;height:18px;background:hsl(var(--primary));border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.3);";
+          userMarkerRef.current = new mapboxgl.Marker(el).setLngLat([longitude, latitude]).addTo(map);
+
+          import("sonner").then(({ toast }) => toast.success("Mapa centralizado na sua localização"));
+        }
+      },
+      (err) => {
+        const msg = err.code === err.PERMISSION_DENIED
+          ? "Permissão de localização negada. Habilite nas configurações."
+          : "Não foi possível obter sua localização";
+        import("sonner").then(({ toast }) => toast.error(msg));
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+    );
+  }, [onPertoDeVoce]);
+
   // Init map once
   useEffect(() => {
     if (initRef.current || !containerRef.current) return;

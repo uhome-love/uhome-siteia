@@ -117,9 +117,10 @@ export const CIDADES_PERMITIDAS = ["Porto Alegre", "Canoas", "Cachoeirinha", "Gr
 const LISTING_COLUMNS = "id,slug,tipo,finalidade,status,destaque,preco,preco_condominio,preco_iptu,area_total,area_util,quartos,banheiros,vagas,andar,bairro,cidade,uf,latitude,longitude,titulo,diferenciais,video_url,condominio_nome,publicado_em,foto_principal";
 
 export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: Imovel[]; count: number }> {
+  // Build data query — NO count (much faster)
   let query = supabase
     .from("imoveis")
-    .select(LISTING_COLUMNS, { count: "exact" })
+    .select(LISTING_COLUMNS)
     .eq("status", "disponivel")
     .eq("finalidade", "venda");
 
@@ -130,7 +131,6 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
     query = query.in("cidade", CIDADES_PERMITIDAS);
   }
 
-  // finalidade always "venda" — no conditional needed
   if (filters.tipo) query = query.eq("tipo", filters.tipo);
   if (filters.bairros?.length) {
     const bairroFilter = filters.bairros.map(b => `bairro.ilike.%${b}%`).join(",");
@@ -169,12 +169,43 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
   const offset = filters.offset ?? 0;
   query = query.range(offset, offset + limit - 1);
 
-  const t0 = performance.now();
-  const { data, error, count } = await query;
-  const loadMs = Math.round(performance.now() - t0);
-  if (error) throw error;
+  // Build count RPC params (parallel, separate from data query)
+  const bairroStr = filters.bairro || undefined;
+  const bairrosArr = filters.bairros?.length ? filters.bairros : undefined;
+  const countParams: Record<string, any> = {};
+  if (filters.cidade) countParams.p_cidade = filters.cidade;
+  else countParams.p_cidades = CIDADES_PERMITIDAS;
+  if (filters.tipo) countParams.p_tipo = filters.tipo;
+  if (bairrosArr) countParams.p_bairros = bairrosArr;
+  else if (bairroStr) countParams.p_bairro = bairroStr;
+  if (filters.precoMin) countParams.p_preco_min = filters.precoMin;
+  if (filters.precoMax) countParams.p_preco_max = filters.precoMax;
+  if (filters.quartos) countParams.p_quartos = filters.quartos;
+  if (filters.banheiros) countParams.p_banheiros = filters.banheiros;
+  if (filters.vagas) countParams.p_vagas = filters.vagas;
+  if (filters.areaMin) countParams.p_area_min = filters.areaMin;
+  if (filters.areaMax) countParams.p_area_max = filters.areaMax;
+  if (filters.q) countParams.p_q = filters.q;
+  if (filters.bounds) {
+    countParams.lat_min = filters.bounds.lat_min;
+    countParams.lat_max = filters.bounds.lat_max;
+    countParams.lng_min = filters.bounds.lng_min;
+    countParams.lng_max = filters.bounds.lng_max;
+  }
 
-  const rows = data || [];
+  const t0 = performance.now();
+  // Run data + count in parallel for speed
+  const [dataResult, countResult] = await Promise.all([
+    query,
+    supabase.rpc("count_imoveis", countParams),
+  ]);
+  const loadMs = Math.round(performance.now() - t0);
+
+  if (dataResult.error) throw dataResult.error;
+
+  const rows = dataResult.data || [];
+  const totalCount = (countResult.data as number) ?? 0;
+
   // Emit perf metrics in dev
   if (import.meta.env.DEV) {
     const payloadKB = Math.round(JSON.stringify(rows).length / 1024);
@@ -185,7 +216,7 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
 
   return {
     data: rows.map(mapRow),
-    count: count || 0,
+    count: totalCount,
   };
 }
 

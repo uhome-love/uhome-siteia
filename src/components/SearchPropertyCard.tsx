@@ -422,7 +422,7 @@ export const SearchPropertyCard = forwardRef<HTMLDivElement, Props>(function Sea
           <p className="mt-1 font-body text-sm font-bold text-foreground">{price}</p>
         </div>
       </div>
-    </motion.div>
+    </motion.a>
     </>
   );
 });

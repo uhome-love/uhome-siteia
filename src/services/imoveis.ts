@@ -233,9 +233,13 @@ export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSig
   const cached = pinsCache.get(cacheKey);
   if (cached && Date.now() - cached.timestamp < PINS_CACHE_TTL) {
     if (import.meta.env.DEV) {
-      window.dispatchEvent(new CustomEvent("perf:update", { detail: { cacheHit: true } }));
+      console.log(`[MapCache] ✅ HIT key=${cacheKey.slice(0, 60)}…`);
+      window.dispatchEvent(new CustomEvent("perf:update", { detail: { cacheHit: true, pinsCarregados: cached.data.length } }));
     }
     return cached.data;
+  }
+  if (import.meta.env.DEV) {
+    console.log(`[MapCache] ❌ MISS key=${cacheKey.slice(0, 60)}…`);
   }
 
   const rpcParams: Record<string, any> = {

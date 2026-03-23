@@ -56,6 +56,7 @@ export function ExitIntentModal() {
     document.addEventListener("mouseleave", handleMouseLeave);
     return () => {
       document.removeEventListener("mouseleave", handleMouseLeave);
+      document.removeEventListener("mousemove", trackMouse);
       clearTimeout(timer);
     };
   }, []);

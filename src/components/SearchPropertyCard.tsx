@@ -263,6 +263,7 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavo
       <div className="hidden sm:block">
         {/* Photo */}
         <div className="relative w-full overflow-hidden rounded-xl" style={{ aspectRatio: "4/3" }}>
+          {fotos.length > 0 ? (
           <FotoImovel
             src={fotos[fotoAtiva]}
             alt={imovel.titulo}
@@ -271,6 +272,14 @@ export function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavo
             className="h-full w-full object-cover transition-transform duration-500"
             style={{ transform: hovering ? "scale(1.03)" : "scale(1)" }}
           />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-muted">
+              <div className="flex flex-col items-center gap-1 opacity-40">
+                <span className="text-3xl">🏠</span>
+                <span className="font-body text-[11px] text-muted-foreground">Foto em breve</span>
+              </div>
+            </div>
+          )}
 
           {/* Badge */}
           {badge && (

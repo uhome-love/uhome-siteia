@@ -642,7 +642,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
     <div className="relative h-full w-full">
       <div ref={containerRef} data-testid="search-map" style={{ width: "100%", height: "100%", borderRadius: "12px" }} />
 
-      {/* Property preview popup — Airbnb style */}
+      {/* Property preview popup — with photo */}
       <AnimatePresence>
         {previewPin && previewPos && (
           <motion.div
@@ -659,6 +659,18 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
             onClick={() => navigate(`/imovel/${previewPin.slug}`)}
           >
             <div className="overflow-hidden rounded-xl border border-border bg-card shadow-xl">
+              {previewPin.foto ? (
+                <img
+                  src={previewPin.foto}
+                  alt={previewPin.titulo}
+                  className="h-[130px] w-full object-cover"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                />
+              ) : (
+                <div className="flex h-[80px] w-full items-center justify-center bg-muted">
+                  <span className="text-2xl opacity-30">🏠</span>
+                </div>
+              )}
               <div className="px-3 py-2.5">
                 <p className="font-body text-sm font-bold text-foreground">{formatPrecoFull(previewPin.preco)}</p>
                 <div className="mt-0.5 flex items-center gap-2 font-body text-xs text-muted-foreground">
@@ -676,7 +688,9 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
                   )}
                   <span>· {previewPin.bairro}</span>
                 </div>
-                <p className="mt-1 font-body text-[11px] text-primary font-medium">Ver detalhes →</p>
+                <div className="mt-2 rounded-lg bg-primary px-3 py-1.5 text-center font-body text-[12px] font-bold text-primary-foreground">
+                  Ver imóvel →
+                </div>
               </div>
             </div>
             {/* Triangle pointer */}

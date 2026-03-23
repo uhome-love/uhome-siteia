@@ -310,6 +310,7 @@ export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSig
       quartos: row.quartos ?? null,
       bairro: row.bairro ?? "Porto Alegre",
     }),
+    foto: row.foto_principal ?? undefined,
     quartos: row.quartos ?? undefined,
     area_total: row.area_total ?? undefined,
     tipo: row.tipo ?? undefined,

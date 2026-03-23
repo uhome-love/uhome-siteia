@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { Menu, X, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { UhomeLogo } from "@/components/UhomeLogo";
 import { UserMenu } from "@/components/UserMenu";
 import { useCorretor } from "@/contexts/CorretorContext";
+import { useQueryClient } from "@tanstack/react-query";
+import { prefetchBusca } from "@/lib/prefetch";
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);

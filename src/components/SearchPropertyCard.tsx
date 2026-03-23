@@ -168,7 +168,7 @@ export const SearchPropertyCard = forwardRef<HTMLDivElement, Props>(function Sea
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: Math.min(index * 0.03, 0.15) }}
-      className={`relative cursor-pointer select-none outline-none [&_*]:outline-none [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] ${highlighted ? "ring-2 ring-primary rounded-xl" : ""}`}
+      className={`relative cursor-pointer select-none outline-none [&_*]:outline-none [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] ${highlighted ? "sm:ring-2 sm:ring-primary sm:rounded-xl" : ""}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={() => navigate(prefixLink(`/imovel/${imovel.slug}`))}

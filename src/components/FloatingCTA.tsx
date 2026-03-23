@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, X } from "lucide-react";
-import { buildWhatsAppUrl } from "@/lib/whatsapp";
+import { buildWhatsAppUrl, buildCorretorWhatsAppUrl } from "@/lib/whatsapp";
 import { trackWhatsAppClick } from "@/services/whatsappTracker";
+import { useCorretor } from "@/contexts/CorretorContext";
 
 const DISMISSED_KEY = "uhome_float_dismissed";
 
 export function FloatingCTA() {
   const [visible, setVisible] = useState(false);
   const [dismissed, setDismissed] = useState(false);
+  const { corretor } = useCorretor();
 
   useEffect(() => {
     const dismissedAt = localStorage.getItem(DISMISSED_KEY);
@@ -32,10 +34,17 @@ export function FloatingCTA() {
 
   const handleClick = () => {
     trackWhatsAppClick({ origem_pagina: window.location.pathname });
-    window.open(buildWhatsAppUrl(), "_blank");
+    const url = corretor
+      ? buildCorretorWhatsAppUrl(corretor.nome, corretor.telefone)
+      : buildWhatsAppUrl();
+    window.open(url, "_blank");
   };
 
   if (dismissed) return null;
+
+  const ctaLabel = corretor
+    ? `Falar com ${corretor.nome.split(" ")[0]}`
+    : "Falar no WhatsApp";
 
   return (
     <AnimatePresence>
@@ -48,14 +57,14 @@ export function FloatingCTA() {
           className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-between gap-3 px-4 py-3 sm:px-6 bg-primary"
         >
           <p className="flex-1 font-body text-sm font-semibold text-white">
-            Corretor disponível agora
+            {corretor ? `${corretor.nome.split(" ")[0]} disponível agora` : "Corretor disponível agora"}
           </p>
           <button
             onClick={handleClick}
             className="flex items-center gap-2 rounded-full bg-white px-4 py-2 font-body text-sm font-bold text-primary transition-all hover:brightness-95 active:scale-[0.97]"
           >
             <MessageCircle className="h-4 w-4" style={{ color: "#25D366" }} />
-            Falar no WhatsApp
+            {ctaLabel}
           </button>
           <button
             onClick={handleDismiss}

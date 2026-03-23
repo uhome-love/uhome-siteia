@@ -538,10 +538,14 @@ const PropertyDetail = () => {
             {/* Secondary actions below sidebar — desktop only */}
             <div className="mt-4 hidden gap-3 sm:flex">
               <button
-                onClick={() => setLiked(!liked)}
+                onClick={async () => {
+                  if (!imovel) return;
+                  const result = await toggleFavorito(imovel.id);
+                  if (result === "needs_auth") setShowAuth(true);
+                }}
                 className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-border bg-card py-3 font-body text-sm text-muted-foreground transition-colors hover:border-foreground hover:text-foreground active:scale-[0.97]"
               >
-                <Heart className={`h-4 w-4 ${liked ? "fill-red-500 text-red-500" : ""}`} />
+                <Heart className={`h-4 w-4 ${imovel && isFavorito(imovel.id) ? "fill-red-500 text-red-500" : ""}`} />
                 Salvar
               </button>
               <button

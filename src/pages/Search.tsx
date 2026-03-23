@@ -101,7 +101,13 @@ const Search = () => {
   const [aiResult, setAiResult] = useState<AISearchResult | null>(null);
 
   useEffect(() => {
-    if (!modoIA) {
+    if (modoIA) {
+      // Reset filters when entering IA mode so stale filters don't show 0 results
+      resetFilters();
+      setResumoIA(null);
+      setAiResult(null);
+      setAiOverrideData(null);
+    } else {
       const f: Record<string, string | number> = {};
       const urlTipo = searchParams.get("tipo");
       const urlQ = searchParams.get("q");

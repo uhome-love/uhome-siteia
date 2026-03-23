@@ -198,7 +198,6 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
               <div
                 key={i}
                 className="w-full shrink-0 snap-center"
-                onClick={() => window.open(prefixLink(`/imovel/${imovel.slug}`), "_blank", "noopener")}
               >
                 <FotoImovel
                   src={foto}

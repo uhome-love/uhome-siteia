@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, forwardRef } from "react";
 import { MessageCircle, Send, Check, Loader2, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
@@ -7,7 +7,7 @@ import { submitLead } from "@/services/leads";
 import { formatPhone } from "@/lib/phoneMask";
 import { toast } from "sonner";
 
-export function SearchCTACard() {
+export const SearchCTACard = forwardRef<HTMLDivElement>(function SearchCTACard(_props, ref) {
   const [formOpen, setFormOpen] = useState(false);
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");

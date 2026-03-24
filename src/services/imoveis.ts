@@ -241,7 +241,7 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
         .lte("longitude", filters.bounds.lng_max);
     }
 
-    countPromise = countQuery.then(r => (r.count ?? 0) as number);
+    countPromise = Promise.resolve(countQuery).then(r => (r.count ?? 0) as number);
   } else {
     // Use fast RPC for standard filters
     const countParams: Record<string, any> = {};
@@ -267,7 +267,7 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
       countParams.lng_min = filters.bounds.lng_min;
       countParams.lng_max = filters.bounds.lng_max;
     }
-    countPromise = supabase.rpc("count_imoveis", countParams).then(r => (r.data as number) ?? 0);
+    countPromise = Promise.resolve(supabase.rpc("count_imoveis", countParams)).then(r => (r.data as number) ?? 0);
   }
 
   const [dataResult, countResult] = await Promise.all([
@@ -279,7 +279,7 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
   if (dataResult.error) throw dataResult.error;
 
   const rows = dataResult.data || [];
-  const totalCount = (countResult.data as number) ?? 0;
+  const totalCount = countResult ?? 0;
 
   // Emit perf metrics in dev
   if (import.meta.env.DEV) {

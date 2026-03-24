@@ -185,40 +185,94 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
   const offset = filters.offset ?? 0;
   query = query.range(offset, offset + limit - 1);
 
-  // Build count RPC params (parallel, separate from data query)
+  // Detect if advanced filters are active (not supported by count_imoveis RPC)
+  const hasAdvancedFilters = !!(filters.codigo || filters.andarMin || filters.condominioMax || filters.iptuMax || filters.diferenciais?.length);
+
+  // Build count — either via RPC or via a parallel filtered count query
   const bairroStr = filters.bairro || undefined;
   const bairrosArr = filters.bairros?.length ? filters.bairros : undefined;
-  const countParams: Record<string, any> = {};
-  if (filters.cidade) countParams.p_cidade = filters.cidade;
-  else countParams.p_cidades = CIDADES_PERMITIDAS;
-  if (filters.tipo) {
-    const tipos = filters.tipo.split(",").map(s => s.trim()).filter(Boolean);
-    if (tipos.length === 1) countParams.p_tipo = tipos[0];
-    else if (tipos.length > 1) countParams.p_tipos = tipos;
-  }
-  if (bairrosArr) countParams.p_bairros = bairrosArr;
-  else if (bairroStr) countParams.p_bairro = bairroStr;
-  if (filters.precoMin) countParams.p_preco_min = filters.precoMin;
-  if (filters.precoMax) countParams.p_preco_max = filters.precoMax;
-  if (filters.quartos) countParams.p_quartos = filters.quartos;
-  if (filters.banheiros) countParams.p_banheiros = filters.banheiros;
-  if (filters.vagas) countParams.p_vagas = filters.vagas;
-  if (filters.areaMin) countParams.p_area_min = filters.areaMin;
-  if (filters.areaMax) countParams.p_area_max = filters.areaMax;
-
-  if (filters.bounds) {
-    countParams.lat_min = filters.bounds.lat_min;
-    countParams.lat_max = filters.bounds.lat_max;
-    countParams.lng_min = filters.bounds.lng_min;
-    countParams.lng_max = filters.bounds.lng_max;
-  }
 
   const t0 = performance.now();
-  // Skip count on paginated "load more" requests — caller already has total
   const skipCount = (filters.offset ?? 0) > 0;
+
+  let countPromise: Promise<{ data: number | null }>;
+
+  if (skipCount) {
+    countPromise = Promise.resolve({ data: -1 });
+  } else if (hasAdvancedFilters) {
+    // Build a parallel count query with the same filters as the data query
+    let countQuery = supabase
+      .from("imoveis")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "disponivel")
+      .eq("finalidade", "venda");
+
+    if (filters.cidade) countQuery = countQuery.eq("cidade", filters.cidade);
+    else countQuery = countQuery.in("cidade", CIDADES_PERMITIDAS);
+
+    if (filters.tipo) {
+      const tipos = filters.tipo.split(",").map(s => s.trim()).filter(Boolean);
+      if (tipos.length === 1) countQuery = countQuery.eq("tipo", tipos[0]);
+      else if (tipos.length > 1) countQuery = countQuery.in("tipo", tipos);
+    }
+    if (bairrosArr) {
+      countQuery = countQuery.or(bairrosArr.map(b => `bairro.ilike.%${b}%`).join(","));
+    } else if (bairroStr) {
+      countQuery = countQuery.ilike("bairro", `%${bairroStr}%`);
+    }
+    if (filters.precoMin) countQuery = countQuery.gte("preco", filters.precoMin);
+    if (filters.precoMax) countQuery = countQuery.lte("preco", filters.precoMax);
+    if (filters.areaMin) countQuery = countQuery.gte("area_total", filters.areaMin);
+    if (filters.areaMax) countQuery = countQuery.lte("area_total", filters.areaMax);
+    if (filters.quartos) countQuery = countQuery.gte("quartos", filters.quartos);
+    if (filters.banheiros) countQuery = countQuery.gte("banheiros", filters.banheiros);
+    if (filters.vagas) countQuery = countQuery.gte("vagas", filters.vagas);
+    if (filters.diferenciais?.length) countQuery = countQuery.contains("diferenciais", filters.diferenciais);
+    if (filters.andarMin) countQuery = countQuery.gte("andar", filters.andarMin);
+    if (filters.condominioMax) countQuery = countQuery.lte("preco_condominio", filters.condominioMax);
+    if (filters.iptuMax) countQuery = countQuery.lte("preco_iptu", filters.iptuMax);
+    if (filters.q) countQuery = countQuery.or(`titulo.ilike.%${filters.q}%,bairro.ilike.%${filters.q}%,tipo.ilike.%${filters.q}%`);
+    if (filters.codigo) countQuery = countQuery.or(`jetimob_id.ilike.%${filters.codigo}%,slug.ilike.%${filters.codigo}%`);
+    if (filters.bounds) {
+      countQuery = countQuery
+        .gte("latitude", filters.bounds.lat_min)
+        .lte("latitude", filters.bounds.lat_max)
+        .gte("longitude", filters.bounds.lng_min)
+        .lte("longitude", filters.bounds.lng_max);
+    }
+
+    countPromise = countQuery.then(r => ({ data: r.count ?? 0 }));
+  } else {
+    // Use fast RPC for standard filters
+    const countParams: Record<string, any> = {};
+    if (filters.cidade) countParams.p_cidade = filters.cidade;
+    else countParams.p_cidades = CIDADES_PERMITIDAS;
+    if (filters.tipo) {
+      const tipos = filters.tipo.split(",").map(s => s.trim()).filter(Boolean);
+      if (tipos.length === 1) countParams.p_tipo = tipos[0];
+      else if (tipos.length > 1) countParams.p_tipos = tipos;
+    }
+    if (bairrosArr) countParams.p_bairros = bairrosArr;
+    else if (bairroStr) countParams.p_bairro = bairroStr;
+    if (filters.precoMin) countParams.p_preco_min = filters.precoMin;
+    if (filters.precoMax) countParams.p_preco_max = filters.precoMax;
+    if (filters.quartos) countParams.p_quartos = filters.quartos;
+    if (filters.banheiros) countParams.p_banheiros = filters.banheiros;
+    if (filters.vagas) countParams.p_vagas = filters.vagas;
+    if (filters.areaMin) countParams.p_area_min = filters.areaMin;
+    if (filters.areaMax) countParams.p_area_max = filters.areaMax;
+    if (filters.bounds) {
+      countParams.lat_min = filters.bounds.lat_min;
+      countParams.lat_max = filters.bounds.lat_max;
+      countParams.lng_min = filters.bounds.lng_min;
+      countParams.lng_max = filters.bounds.lng_max;
+    }
+    countPromise = supabase.rpc("count_imoveis", countParams);
+  }
+
   const [dataResult, countResult] = await Promise.all([
     query,
-    skipCount ? Promise.resolve({ data: -1 }) : supabase.rpc("count_imoveis", countParams),
+    countPromise,
   ]);
   const loadMs = Math.round(performance.now() - t0);
 

@@ -77,7 +77,10 @@ export function buildCorretorWhatsAppUrl(
     msg = `Olá ${corretorNome}, vi o imóvel ${imovel.titulo}`;
     if (imovel.bairro) msg += ` em ${imovel.bairro}`;
     msg += ` no site Uhome e tenho interesse. Pode me ajudar?`;
-    if (imovel.slug) msg += `\nLink: https://uhome.com.br/imovel/${imovel.slug}`;
+    if (imovel.slug) {
+      const prefix = getCorretorUrlPrefix();
+      msg += `\nLink: https://uhome.com.br${prefix}/imovel/${imovel.slug}`;
+    }
   } else {
     msg = `Olá ${corretorNome}, vim pelo site Uhome e gostaria de informações sobre imóveis.`;
   }

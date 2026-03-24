@@ -433,10 +433,6 @@ const PropertyDetail = () => {
                   <MapPin className="h-4 w-4" />
                   {imovel.bairro}, {imovel.cidade}
                 </span>
-                <span className="text-border">|</span>
-                <span className="font-mono text-xs text-muted-foreground/70">
-                  Cód. {imovel.slug.split("-").pop()?.toUpperCase() || imovel.id.slice(0, 8).toUpperCase()}
-                </span>
               </div>
               {imovel.condominio_nome && (
                 <Link

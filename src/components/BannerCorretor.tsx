@@ -1,11 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCorretor } from "@/contexts/CorretorContext";
 import { useAdmin } from "@/hooks/useAdmin";
+import { useLocation } from "react-router-dom";
 
 export function BannerCorretor() {
-  const { corretor, isDirectAccess, clearCorretor, slug } = useCorretor();
+  const { corretor, isDirectAccess, clearCorretor } = useCorretor();
   const { isAdmin } = useAdmin();
   const [fechado, setFechado] = useState(false);
+  const location = useLocation();
+
+  // Auto-clear via ?clear_ref=1 URL param
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("clear_ref") === "1") {
+      clearCorretor();
+      setFechado(true);
+      params.delete("clear_ref");
+      const clean = params.toString();
+      const newUrl = window.location.pathname + (clean ? `?${clean}` : "");
+      window.history.replaceState(null, "", newUrl);
+    }
+  }, [location.search, clearCorretor]);
+
+  // Show admin button if authenticated admin OR if localStorage flag is set
+  const showAdminControls = isAdmin || localStorage.getItem("uhome_is_admin") === "1";
 
   // Only show banner when user arrived via /c/ URL
   if (!corretor || !isDirectAccess || fechado) return null;
@@ -56,7 +74,7 @@ export function BannerCorretor() {
           )}
 
           {/* Admin: clear corretor reference */}
-          {isAdmin && (
+          {showAdminControls && (
             <button
               onClick={() => {
                 clearCorretor();

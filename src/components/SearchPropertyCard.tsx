@@ -138,26 +138,9 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
   const handleMouseEnter = useCallback(() => {
     setHovering(true);
     onHover?.(imovel.id);
-    // Lazy-load full photo set on first hover
-    if (!fotosLoadedRef.current && baseFotos.length <= 1) {
-      fotosLoadedRef.current = true;
-      supabase
-        .from("imoveis")
-        .select("fotos")
-        .eq("id", imovel.id)
-        .maybeSingle()
-        .then(({ data }) => {
-          if (data?.fotos && Array.isArray(data.fotos) && data.fotos.length > 0) {
-            const urls = (data.fotos as any[])
-              .sort((a: any, b: any) => (a.ordem ?? 0) - (b.ordem ?? 0))
-              .map((f: any) => f?.url || f?.src || f)
-              .filter(Boolean)
-              .slice(0, 8);
-            if (urls.length > 0) setLazyFotos(urls);
-          }
-        });
-    }
-  }, [imovel.id, onHover, baseFotos.length]);
+    // Lazy-load full photo set on first hover (desktop)
+    loadFullFotos();
+  }, [imovel.id, onHover, loadFullFotos]);
 
   const handleMouseLeave = useCallback(() => { setHovering(false); onHover?.(null); }, [onHover]);
   const handleScroll = useCallback(() => {
@@ -165,7 +148,9 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
     if (!el) return;
     const idx = Math.round(el.scrollLeft / el.offsetWidth);
     setFotoAtiva(idx);
-  }, []);
+    // Load full photos on first swipe (mobile)
+    if (idx > 0) loadFullFotos();
+  }, [loadFullFotos]);
 
   return (
     <>

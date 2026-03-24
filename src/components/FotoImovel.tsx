@@ -1,4 +1,4 @@
-import { useState, forwardRef } from "react";
+import { useState, forwardRef, useCallback } from "react";
 import { Home } from "lucide-react";
 
 interface FotoImovelProps {
@@ -13,8 +13,14 @@ interface FotoImovelProps {
   sizes?: string;
 }
 
-export const FotoImovel = forwardRef<HTMLImageElement, FotoImovelProps>(function FotoImovel({ src, alt, className = "", style, loading, decoding, width, height, sizes }, ref) {
+export const FotoImovel = forwardRef<HTMLImageElement, FotoImovelProps>(function FotoImovel(
+  { src, alt, className = "", style, loading = "lazy", decoding = "async", width, height, sizes },
+  ref
+) {
   const [erro, setErro] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  const handleLoad = useCallback(() => setLoaded(true), []);
 
   if (erro) {
     return (
@@ -28,18 +34,28 @@ export const FotoImovel = forwardRef<HTMLImageElement, FotoImovelProps>(function
   }
 
   return (
-    <img
-      ref={ref}
-      src={src}
-      alt={alt}
-      loading={loading}
-      decoding={decoding}
-      className={className}
-      style={style}
-      width={width}
-      height={height}
-      sizes={sizes}
-      onError={() => setErro(true)}
-    />
+    <div className="relative overflow-hidden" style={style}>
+      {/* Skeleton placeholder — visible until image loads */}
+      {!loaded && (
+        <div
+          className={`absolute inset-0 animate-pulse bg-muted ${className}`}
+          style={{ aspectRatio: style?.aspectRatio }}
+        />
+      )}
+      <img
+        ref={ref}
+        src={src}
+        alt={alt}
+        loading={loading}
+        decoding={decoding}
+        className={`${className} transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"}`}
+        style={{ ...style, willChange: loaded ? undefined : "opacity" }}
+        width={width}
+        height={height}
+        sizes={sizes}
+        onLoad={handleLoad}
+        onError={() => setErro(true)}
+      />
+    </div>
   );
 });

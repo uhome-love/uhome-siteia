@@ -41,7 +41,10 @@ export function buildWhatsAppUrl(
     msg = `Olá! Tenho interesse no imóvel: ${imovel.titulo}`;
     if (imovel.bairro) msg += ` em ${imovel.bairro}`;
     msg += ".";
-    if (imovel.slug) msg += `\nLink: https://uhome.com.br/imovel/${imovel.slug}`;
+    if (imovel.slug) {
+      const prefix = getCorretorUrlPrefix();
+      msg += `\nLink: https://uhome.com.br${prefix}/imovel/${imovel.slug}`;
+    }
   } else {
     msg =
       mensagem ??

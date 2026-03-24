@@ -132,6 +132,7 @@ const App = () => (
                   <Route path="favoritos" element={<Favoritos />} />
                   <Route path="condominios" element={<Condominios />} />
                   <Route path="condominios/:slug" element={<CondominioDetail />} />
+                  <Route path="empreendimentos/:slug" element={<EmpreendimentoDetail />} />
                   <Route path="avaliar-imovel" element={<AvaliacaoPage />} />
                 </Route>
 

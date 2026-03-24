@@ -197,6 +197,9 @@ const Search = () => {
       diferenciais: filters.diferenciais.length ? filters.diferenciais : undefined,
       q: filters.q || undefined,
       codigo: filters.codigo || undefined,
+      andarMin: filters.andarMin || undefined,
+      condominioMax: filters.condominioMax || undefined,
+      iptuMax: filters.iptuMax || undefined,
     };
   }, [filters]);
 

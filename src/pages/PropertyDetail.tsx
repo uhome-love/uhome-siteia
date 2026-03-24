@@ -395,9 +395,10 @@ const PropertyDetail = () => {
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
             className="flex-1 space-y-8 lg:max-w-[63%]"
           >
-            {/* Breadcrumb */}
-            <nav className="font-body text-xs text-muted-foreground">
-              <Link to="/busca" className="hover:text-foreground">Imóveis</Link>
+            {/* Property code + Breadcrumb */}
+            <div className="flex items-center justify-between">
+              <nav className="font-body text-xs text-muted-foreground">
+                <Link to="/busca" className="hover:text-foreground">Imóveis</Link>
               {" › "}
               <Link to={`/busca?bairro=${encodeURIComponent(imovel.bairro)}`} className="hover:text-foreground">{imovel.bairro}</Link>
               {imovel.condominio_nome && (
@@ -413,7 +414,11 @@ const PropertyDetail = () => {
               )}
               {" › "}
               <span className="text-foreground">{capitalize(imovel.tipo)}</span>
-            </nav>
+              </nav>
+              <span className="font-mono text-xs text-muted-foreground/70">
+                Cód. {imovel.slug.split("-").pop()?.toUpperCase() || imovel.id.slice(0, 8).toUpperCase()}
+              </span>
+            </div>
 
             {/* Badge + title */}
             <div>
@@ -427,10 +432,6 @@ const PropertyDetail = () => {
                 <span className="flex items-center gap-1.5">
                   <MapPin className="h-4 w-4" />
                   {imovel.bairro}, {imovel.cidade}
-                </span>
-                <span className="text-border">|</span>
-                <span className="font-mono text-xs text-muted-foreground/70">
-                  Cód. {imovel.slug.split("-").pop()?.toUpperCase() || imovel.id.slice(0, 8).toUpperCase()}
                 </span>
               </div>
               {imovel.condominio_nome && (

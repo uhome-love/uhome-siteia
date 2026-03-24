@@ -212,11 +212,10 @@ export default function EmpreendimentoDetail() {
                 <p className="mb-5 text-sm text-muted-foreground">
                   Fale com um especialista sobre o {emp.nome}
                 </p>
-                <LeadFormInline
-                  imovelTitulo={emp.nome}
-                  imovelSlug={emp.slug}
-                  imovelBairro={emp.bairro || undefined}
-                  origemComponente="empreendimento_landing"
+                <EmpreendimentoLeadForm
+                  empreendimentoNome={emp.nome}
+                  empreendimentoSlug={emp.slug}
+                  bairro={emp.bairro || undefined}
                 />
               </div>
             </div>

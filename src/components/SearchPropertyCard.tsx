@@ -52,9 +52,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
   const fotosLoadedRef = useRef(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLElement>(null);
-  const navigate = useNavigate();
   const { prefixLink } = useCorretor();
-  const isMobile = useIsMobile();
   const isFavorito = isFavoritoProp ?? (() => false);
   const toggleFavorito = toggleFavoritoProp ?? (async () => undefined as "needs_auth" | void);
   const liked = isFavorito(imovel.id);

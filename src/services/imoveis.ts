@@ -195,10 +195,10 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
   const t0 = performance.now();
   const skipCount = (filters.offset ?? 0) > 0;
 
-  let countPromise: Promise<{ data: number | null }>;
+  let countPromise: Promise<number>;
 
   if (skipCount) {
-    countPromise = Promise.resolve({ data: -1 });
+    countPromise = Promise.resolve(-1);
   } else if (hasAdvancedFilters) {
     // Build a parallel count query with the same filters as the data query
     let countQuery = supabase
@@ -241,7 +241,7 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
         .lte("longitude", filters.bounds.lng_max);
     }
 
-    countPromise = countQuery.then(r => ({ data: r.count ?? 0 }));
+    countPromise = countQuery.then(r => (r.count ?? 0) as number);
   } else {
     // Use fast RPC for standard filters
     const countParams: Record<string, any> = {};
@@ -267,7 +267,7 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
       countParams.lng_min = filters.bounds.lng_min;
       countParams.lng_max = filters.bounds.lng_max;
     }
-    countPromise = supabase.rpc("count_imoveis", countParams);
+    countPromise = supabase.rpc("count_imoveis", countParams).then(r => (r.data as number) ?? 0);
   }
 
   const [dataResult, countResult] = await Promise.all([

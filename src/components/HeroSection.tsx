@@ -382,7 +382,7 @@ export function HeroSection() {
                 </button>
 
                 <button
-                  onClick={() => navigate("/ia-search")}
+                  onClick={() => navigate(prefixLink("/busca?modo=ia"))}
                   className="mx-auto flex items-center gap-1.5 font-body text-xs font-semibold text-primary transition-colors hover:text-primary/80"
                 >
                   <Sparkles className="h-3.5 w-3.5" />

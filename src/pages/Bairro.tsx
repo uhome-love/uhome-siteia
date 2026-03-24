@@ -282,7 +282,7 @@ const Bairro = () => {
               .map((b) => (
                 <Link
                   key={b.slug}
-                  to={`/bairros/${b.slug}`}
+                  to={prefixLink(`/bairros/${b.slug}`)}
                   className="rounded-full border border-border bg-card px-4 py-2 font-body text-sm text-foreground transition-colors hover:border-primary/40 hover:text-primary active:scale-[0.97]"
                 >
                   {b.nome}

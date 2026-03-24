@@ -32,7 +32,7 @@ const PropertyDetail = () => {
   const [currentImage, setCurrentImage] = useState(0);
   const [viewCount, setViewCount] = useState(0);
   const { isFavorito, toggleFavorito } = useFavoritos();
-  const { corretor } = useCorretor();
+  const { corretor, prefixLink } = useCorretor();
   const [showAuth, setShowAuth] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [imovel, setImovel] = useState<Imovel | null>(null);
@@ -178,7 +178,7 @@ const PropertyDetail = () => {
       <div className="mt-16 hidden sm:block">
         <div className="mx-auto max-w-7xl px-6 pt-4 pb-2">
           <button
-            onClick={() => window.history.length > 2 ? navigate(-1) : navigate("/busca")}
+            onClick={() => window.history.length > 2 ? navigate(-1) : navigate(prefixLink("/busca"))}
             className="flex items-center gap-1.5 rounded-full px-3 py-1.5 font-body text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />

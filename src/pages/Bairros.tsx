@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useCorretor } from "@/contexts/CorretorContext";
 import { Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -22,6 +23,7 @@ function setMeta(attr: string, key: string, content: string) {
 const Bairros = () => {
   useCanonical();
   const [contagens, setContagens] = useState<Record<string, number>>({});
+  const { prefixLink } = useCorretor();
 
   useEffect(() => {
     document.title = "Bairros de Porto Alegre — Imóveis à Venda | Uhome";
@@ -82,7 +84,7 @@ const Bairros = () => {
                 transition={{ duration: 0.45, delay: i * 0.06 }}
               >
                 <Link
-                  to={`/bairros/${b.slug}`}
+                  to={prefixLink(`/bairros/${b.slug}`)}
                   className="group block overflow-hidden rounded-2xl border border-border bg-card transition-shadow hover:shadow-lg"
                 >
                   <div className="aspect-[16/9] overflow-hidden">

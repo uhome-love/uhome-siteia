@@ -501,26 +501,23 @@ export function SearchFiltersBar({ onOpenMobileFilters }: { onOpenMobileFilters?
         ))}
       </FilterPill>
 
-      {/* Código */}
-      <FilterPill
-        label="Código"
-        value={filters.codigo || undefined}
-        active={!!filters.codigo}
-        onClear={() => setFilter("codigo", "")}
+      {/* + Filtros */}
+      <button
+        onClick={() => onOpenAdvancedFilters?.()}
+        className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-2 font-body text-[13px] font-medium transition-colors ${
+          advancedActive
+            ? "border-primary bg-primary/10 text-primary"
+            : "border-border text-foreground hover:bg-muted/50"
+        }`}
       >
-        <div className="px-1">
-          <p className="mb-2 font-body text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-            Código do imóvel
-          </p>
-          <input
-            type="text"
-            placeholder="Ex: 17485-BT"
-            value={filters.codigo || ""}
-            onChange={(e) => setFilter("codigo", e.target.value.trim())}
-            className="w-full rounded-lg border border-border bg-background py-2 px-3 font-body text-[13px] text-foreground outline-none transition-colors focus:border-primary"
-          />
-        </div>
-      </FilterPill>
+        <SlidersHorizontal className="h-3.5 w-3.5" />
+        + Filtros
+        {advancedCount > 0 && (
+          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">
+            {advancedCount}
+          </span>
+        )}
+      </button>
 
       {/* Reset */}
       {hasAny && (

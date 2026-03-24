@@ -1,9 +1,9 @@
-import { createContext, useContext, useMemo, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useMemo, useState, useEffect, useCallback, ReactNode } from "react";
 import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
 const REF_KEY = "uhome_corretor_ref";
-const TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+const TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 export interface CorretorData {
   id: string;
@@ -15,16 +15,30 @@ export interface CorretorData {
 }
 
 interface CorretorContextValue {
+  /** Active slug (from URL or localStorage) — used for silent attribution */
   slug: string | null;
+  /** Corretor data (fetched from DB) */
   corretor: CorretorData | null;
+  /** Whether the user arrived via /c/ URL — controls banner & URL prefixing */
+  isDirectAccess: boolean;
+  /** Prefix links with /c/:slug only when isDirectAccess */
   prefixLink: (path: string) => string;
+  /** Clear corretor reference from localStorage */
+  clearCorretor: () => void;
 }
 
 const CorretorContext = createContext<CorretorContextValue>({
   slug: null,
   corretor: null,
+  isDirectAccess: false,
   prefixLink: (path) => path,
+  clearCorretor: () => {},
 });
+
+const STORAGE_KEYS = [
+  REF_KEY, "corretor_ref_id", "corretor_ref_slug",
+  "corretor_ref_nome", "corretor_ref_foto", "corretor_ref_ts",
+];
 
 /** Read slug from localStorage respecting TTL */
 function getPersistedSlug(): string | null {
@@ -32,8 +46,7 @@ function getPersistedSlug(): string | null {
   if (!slug) return null;
   const ts = localStorage.getItem("corretor_ref_ts");
   if (ts && Date.now() - Number(ts) > TTL_MS) {
-    // Expired — clean up
-    [REF_KEY, "corretor_ref_id", "corretor_ref_slug", "corretor_ref_nome", "corretor_ref_foto", "corretor_ref_ts"].forEach(k => localStorage.removeItem(k));
+    STORAGE_KEYS.forEach(k => localStorage.removeItem(k));
     return null;
   }
   return slug;
@@ -54,11 +67,24 @@ export function CorretorProvider({ children }: { children: ReactNode }) {
   const [corretor, setCorretor] = useState<CorretorData | null>(null);
   const [fetchedSlug, setFetchedSlug] = useState<string | null>(null);
 
-  // Determine active slug: URL > localStorage
-  const activeSlug = useMemo(() => {
+  // Check if current URL has /c/:slug
+  const urlSlug = useMemo(() => {
     const match = location.pathname.match(/^\/c\/([^/]+)/);
-    return match?.[1] ?? getPersistedSlug();
+    return match?.[1] ?? null;
   }, [location.pathname]);
+
+  // isDirectAccess = user is currently on a /c/ URL
+  const isDirectAccess = urlSlug !== null;
+
+  // Active slug for attribution: URL > localStorage
+  const activeSlug = urlSlug ?? getPersistedSlug();
+
+  // Clear function
+  const clearCorretor = useCallback(() => {
+    STORAGE_KEYS.forEach(k => localStorage.removeItem(k));
+    setCorretor(null);
+    setFetchedSlug(null);
+  }, []);
 
   // Fetch corretor data from Supabase once per slug
   useEffect(() => {
@@ -68,26 +94,23 @@ export function CorretorProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    // Already fetched for this slug
     if (fetchedSlug === activeSlug && corretor) return;
 
-    // Try to hydrate from localStorage first for instant render
+    // Hydrate from localStorage for instant render
     const cachedId = localStorage.getItem("corretor_ref_id");
     const cachedNome = localStorage.getItem("corretor_ref_nome");
     const cachedSlugStored = localStorage.getItem("corretor_ref_slug");
     if (cachedSlugStored === activeSlug && cachedId && cachedNome) {
-      const cached: CorretorData = {
+      setCorretor({
         id: cachedId,
         nome: cachedNome,
         foto_url: localStorage.getItem("corretor_ref_foto") || null,
-        telefone: null, // will be updated after fetch
+        telefone: null,
         creci: null,
         slug: activeSlug,
-      };
-      setCorretor(cached);
+      });
     }
 
-    // Fetch from DB
     supabase
       .from("profiles")
       .select("id, nome, foto_url, telefone, creci, slug_ref")
@@ -109,7 +132,6 @@ export function CorretorProvider({ children }: { children: ReactNode }) {
           persistCorretor(c);
           window.dispatchEvent(new Event("corretor-ref-ready"));
         } else {
-          // Slug not found — still persist slug for basic tracking
           localStorage.setItem(REF_KEY, activeSlug);
           localStorage.setItem("corretor_ref_slug", activeSlug);
           localStorage.setItem("corretor_ref_ts", Date.now().toString());
@@ -119,13 +141,14 @@ export function CorretorProvider({ children }: { children: ReactNode }) {
   }, [activeSlug, fetchedSlug, corretor]);
 
   const value = useMemo(() => {
+    // Only prefix links when user arrived via /c/ URL
     function prefixLink(path: string): string {
-      if (!activeSlug) return path;
+      if (!isDirectAccess || !activeSlug) return path;
       if (path.startsWith("/c/")) return path;
       return `/c/${activeSlug}${path.startsWith("/") ? path : "/" + path}`;
     }
-    return { slug: activeSlug, corretor, prefixLink };
-  }, [activeSlug, corretor]);
+    return { slug: activeSlug, corretor, isDirectAccess, prefixLink, clearCorretor };
+  }, [activeSlug, corretor, isDirectAccess, clearCorretor]);
 
   return (
     <CorretorContext.Provider value={value}>

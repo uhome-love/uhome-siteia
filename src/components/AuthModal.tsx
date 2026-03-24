@@ -367,6 +367,7 @@ export const AuthModal = forwardRef<HTMLDivElement, Props>(function AuthModal({ 
         </motion.div>
       )}
     </AnimatePresence>
+    , document.body)}
     </span>
   );
 });

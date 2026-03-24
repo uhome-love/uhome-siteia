@@ -396,28 +396,28 @@ const PropertyDetail = () => {
             className="flex-1 space-y-8 lg:max-w-[63%]"
           >
             {/* Property code + Breadcrumb */}
-            <div className="flex items-center justify-between">
-              <nav className="font-body text-xs text-muted-foreground">
-                <Link to="/busca" className="hover:text-foreground">Imóveis</Link>
-              {" › "}
-              <Link to={`/busca?bairro=${encodeURIComponent(imovel.bairro)}`} className="hover:text-foreground">{imovel.bairro}</Link>
-              {imovel.condominio_nome && (
-                <>
-                  {" › "}
-                  <Link
-                    to={`/condominios/${imovel.condominio_nome.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`}
-                    className="hover:text-foreground"
-                  >
-                    {imovel.condominio_nome}
-                  </Link>
-                </>
-              )}
-              {" › "}
-              <span className="text-foreground">{capitalize(imovel.tipo)}</span>
-              </nav>
-              <span className="font-mono text-xs text-muted-foreground/70">
+            <div className="space-y-1">
+              <span className="font-mono text-[11px] text-muted-foreground/60">
                 Cód. {imovel.slug.split("-").pop()?.toUpperCase() || imovel.id.slice(0, 8).toUpperCase()}
               </span>
+              <nav className="font-body text-xs text-muted-foreground">
+                <Link to="/busca" className="hover:text-foreground">Imóveis</Link>
+                {" › "}
+                <Link to={`/busca?bairro=${encodeURIComponent(imovel.bairro)}`} className="hover:text-foreground">{imovel.bairro}</Link>
+                {imovel.condominio_nome && (
+                  <>
+                    {" › "}
+                    <Link
+                      to={`/condominios/${imovel.condominio_nome.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`}
+                      className="hover:text-foreground"
+                    >
+                      {imovel.condominio_nome}
+                    </Link>
+                  </>
+                )}
+                {" › "}
+                <span className="text-foreground">{capitalize(imovel.tipo)}</span>
+              </nav>
             </div>
 
             {/* Badge + title */}

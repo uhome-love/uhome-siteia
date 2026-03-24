@@ -13,6 +13,7 @@ import { SearchMap } from "@/components/SearchMap";
 import { SkeletonCard } from "@/components/SkeletonCard";
 import { SearchCTACard } from "@/components/SearchCTACard";
 import { MobileFiltersSheet } from "@/components/MobileFiltersSheet";
+import { AdvancedFiltersModal } from "@/components/AdvancedFiltersModal";
 import { useSearchStore, type MapBounds } from "@/stores/searchStore";
 import { fetchImoveis, fetchMapPins, type Imovel, type MapPin as MapPinData, type BuscaFilters } from "@/services/imoveis";
 import { useImoveisQuery } from "@/hooks/useImoveisQuery";
@@ -68,6 +69,7 @@ const Search = () => {
   const ultimaBuscaIA = React.useRef(0);
   const [mobileMap, setMobileMap] = useState(false);
   const [mobileFilters, setMobileFilters] = useState(false);
+  const [advancedFilters, setAdvancedFilters] = useState(false);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [alertEmail, setAlertEmail] = useState("");
@@ -112,7 +114,7 @@ const Search = () => {
       setAiResult(null);
       setAiOverrideData(null);
     } else {
-      const f: Record<string, string | number> = {};
+      const f: Record<string, any> = {};
       const urlTipo = searchParams.get("tipo");
       const urlQ = searchParams.get("q");
       const urlBairro = searchParams.get("bairro");
@@ -124,6 +126,10 @@ const Search = () => {
       const urlPrecoMax = searchParams.get("preco_max");
       const urlAreaMin = searchParams.get("area_min");
       const urlCodigo = searchParams.get("codigo");
+      const urlAndarMin = searchParams.get("andar_min");
+      const urlCondominioMax = searchParams.get("condominio_max");
+      const urlIptuMax = searchParams.get("iptu_max");
+      const urlDiferenciais = searchParams.get("diferenciais");
       if (urlTipo) f.tipo = urlTipo;
       if (urlCidade) f.cidade = urlCidade;
       if (urlQuartos) f.quartos = Number(urlQuartos);
@@ -133,6 +139,10 @@ const Search = () => {
       if (urlPrecoMax) f.precoMax = Number(urlPrecoMax);
       if (urlAreaMin) f.areaMin = Number(urlAreaMin);
       if (urlCodigo) f.codigo = urlCodigo;
+      if (urlAndarMin) f.andarMin = Number(urlAndarMin);
+      if (urlCondominioMax) f.condominioMax = Number(urlCondominioMax);
+      if (urlIptuMax) f.iptuMax = Number(urlIptuMax);
+      if (urlDiferenciais) f.diferenciais = urlDiferenciais.split(",").map((s: string) => s.trim()).filter(Boolean);
       if (urlBairro) {
         f.bairro = urlBairro;
       } else if (urlQ) {
@@ -195,6 +205,9 @@ const Search = () => {
       diferenciais: filters.diferenciais.length ? filters.diferenciais : undefined,
       q: filters.q || undefined,
       codigo: filters.codigo || undefined,
+      andarMin: filters.andarMin || undefined,
+      condominioMax: filters.condominioMax || undefined,
+      iptuMax: filters.iptuMax || undefined,
     };
   }, [filters]);
 
@@ -281,7 +294,7 @@ const Search = () => {
       .finally(() => setMapLoading(false));
     
     return () => { pinAbortRef.current?.abort(); };
-  }, [filters.tipo, filters.bairro, filters.precoMin, filters.precoMax, filters.quartos, filters.areaMin, filters.areaMax, filters.vagas, filters.banheiros]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [filters.tipo, filters.bairro, filters.precoMin, filters.precoMax, filters.quartos, filters.areaMin, filters.areaMax, filters.vagas, filters.banheiros, filters.andarMin, filters.condominioMax, filters.iptuMax, filters.diferenciais, filters.codigo]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadMore = useCallback(async () => {
     if (loadingMore || loading) return;
@@ -360,10 +373,14 @@ const Search = () => {
     if (filters.precoMax) params.set("preco_max", String(filters.precoMax));
     if (filters.areaMin) params.set("area_min", String(filters.areaMin));
     if (filters.codigo) params.set("codigo", filters.codigo);
+    if (filters.andarMin) params.set("andar_min", String(filters.andarMin));
+    if (filters.condominioMax) params.set("condominio_max", String(filters.condominioMax));
+    if (filters.iptuMax) params.set("iptu_max", String(filters.iptuMax));
+    if (filters.diferenciais.length) params.set("diferenciais", filters.diferenciais.join(","));
     const qs = params.toString();
     const basePath = prefixLink("/busca");
     window.history.replaceState(null, "", qs ? `${basePath}?${qs}` : basePath);
-  }, [filters.tipo, filters.bairro, filters.cidade, filters.quartos, filters.banheiros, filters.vagas, filters.precoMin, filters.precoMax, filters.areaMin, filters.q, filters.codigo, modoIA]);
+  }, [filters.tipo, filters.bairro, filters.cidade, filters.quartos, filters.banheiros, filters.vagas, filters.precoMin, filters.precoMax, filters.areaMin, filters.q, filters.codigo, filters.andarMin, filters.condominioMax, filters.iptuMax, filters.diferenciais, modoIA]);
 
   // AI search handler with throttle
   const buscarComIA = useCallback(async (query?: string) => {
@@ -563,7 +580,7 @@ const Search = () => {
           )}
         </div>
       ) : (
-        <SearchFiltersBar onOpenMobileFilters={() => setMobileFilters(true)} />
+        <SearchFiltersBar onOpenMobileFilters={() => setMobileFilters(true)} onOpenAdvancedFilters={() => setAdvancedFilters(true)} />
       )}
 
       {/* AI resumo badge + interpreted filters */}
@@ -942,6 +959,7 @@ const Search = () => {
       {/* Auth modal triggered after alert preferences */}
       <AuthModal open={showAuthAfterAlert} onClose={() => setShowAuthAfterAlert(false)} />
       <MobileFiltersSheet open={mobileFilters} onClose={() => setMobileFilters(false)} total={total} />
+      <AdvancedFiltersModal open={advancedFilters} onClose={() => setAdvancedFilters(false)} />
       <PerformanceDebug />
     </div>
   );

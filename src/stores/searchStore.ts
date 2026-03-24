@@ -22,6 +22,9 @@ export interface SearchFilters {
   ordem: "recentes" | "preco_asc" | "preco_desc" | "area_desc";
   q: string;
   codigo: string;
+  andarMin: number;
+  condominioMax: number;
+  iptuMax: number;
   bounds: MapBounds | null;
 }
 
@@ -51,6 +54,9 @@ const defaultFilters: SearchFilters = {
   ordem: "recentes",
   q: "",
   codigo: "",
+  andarMin: 0,
+  condominioMax: 0,
+  iptuMax: 0,
   bounds: null,
 };
 

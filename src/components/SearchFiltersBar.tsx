@@ -45,7 +45,7 @@ function formatAreaLabel(min: number, max: number): string {
   return "";
 }
 
-export function SearchFiltersBar({ onOpenMobileFilters }: { onOpenMobileFilters?: () => void }) {
+export function SearchFiltersBar({ onOpenMobileFilters, onOpenAdvancedFilters }: { onOpenMobileFilters?: () => void; onOpenAdvancedFilters?: () => void }) {
   const { filters, setFilter, resetFilters } = useSearchStore();
   const navigate = useNavigate();
   const { prefixLink } = useCorretor();
@@ -182,8 +182,13 @@ export function SearchFiltersBar({ onOpenMobileFilters }: { onOpenMobileFilters?
   )?.label || (filters.areaMin || filters.areaMax ? formatAreaLabel(filters.areaMin, filters.areaMax) : undefined);
   const cidadeLabel = filters.cidade || "Todas";
 
+  const advancedCount = [
+    filters.banheiros, filters.andarMin, filters.condominioMax, filters.iptuMax, filters.codigo,
+  ].filter(Boolean).length + filters.diferenciais.length;
+  const advancedActive = advancedCount > 0;
+
   const hasAny =
-    filters.tipo || filters.precoMin || filters.precoMax || filters.areaMin || filters.areaMax || filters.quartos || filters.vagas || filters.q || filters.bairro || filters.codigo || (filters.cidade && filters.cidade !== "Porto Alegre");
+    filters.tipo || filters.precoMin || filters.precoMax || filters.areaMin || filters.areaMax || filters.quartos || filters.vagas || filters.q || filters.bairro || advancedActive || (filters.cidade && filters.cidade !== "Porto Alegre");
 
   const hasInput = bairroInput.trim().length > 0;
   const hasChips = bairrosSelecionados.length > 0;
@@ -501,26 +506,23 @@ export function SearchFiltersBar({ onOpenMobileFilters }: { onOpenMobileFilters?
         ))}
       </FilterPill>
 
-      {/* Código */}
-      <FilterPill
-        label="Código"
-        value={filters.codigo || undefined}
-        active={!!filters.codigo}
-        onClear={() => setFilter("codigo", "")}
+      {/* + Filtros */}
+      <button
+        onClick={() => onOpenAdvancedFilters?.()}
+        className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-2 font-body text-[13px] font-medium transition-colors ${
+          advancedActive
+            ? "border-primary bg-primary/10 text-primary"
+            : "border-border text-foreground hover:bg-muted/50"
+        }`}
       >
-        <div className="px-1">
-          <p className="mb-2 font-body text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-            Código do imóvel
-          </p>
-          <input
-            type="text"
-            placeholder="Ex: 17485-BT"
-            value={filters.codigo || ""}
-            onChange={(e) => setFilter("codigo", e.target.value.trim())}
-            className="w-full rounded-lg border border-border bg-background py-2 px-3 font-body text-[13px] text-foreground outline-none transition-colors focus:border-primary"
-          />
-        </div>
-      </FilterPill>
+        <SlidersHorizontal className="h-3.5 w-3.5" />
+        + Filtros
+        {advancedCount > 0 && (
+          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">
+            {advancedCount}
+          </span>
+        )}
+      </button>
 
       {/* Reset */}
       {hasAny && (

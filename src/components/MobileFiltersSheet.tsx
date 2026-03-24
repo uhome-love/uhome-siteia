@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
-import { X, ArrowLeft, Search, MapPin, Navigation, Clock, Hash } from "lucide-react";
+import { X, ArrowLeft, Search, MapPin, Navigation, Clock, Hash, Building2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSearchStore } from "@/stores/searchStore";
-import { propertyTypes } from "@/data/properties";
+import { propertyTypes, featureOptions } from "@/data/properties";
 import { getBairrosDisponiveis } from "@/services/bairrosCache";
 
 const quartoOptions = [1, 2, 3, 4];
@@ -390,6 +390,84 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
                       className="w-full bg-transparent font-body text-sm text-foreground outline-none placeholder:text-muted-foreground"
                     />
                   </div>
+                </div>
+              </section>
+
+              {/* Andar mínimo */}
+              <section className="mt-8">
+                <p className="font-body text-base font-bold text-foreground">Andar mínimo</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {[{ label: "Qualquer", value: 0 }, { label: "1+", value: 1 }, { label: "5+", value: 5 }, { label: "10+", value: 10 }, { label: "15+", value: 15 }].map((a) => (
+                    <button
+                      key={a.value}
+                      onClick={() => setFilter("andarMin", filters.andarMin === a.value ? 0 : a.value)}
+                      className={`flex h-11 items-center justify-center rounded-full px-4 font-body text-sm font-medium transition-colors ${
+                        filters.andarMin === a.value
+                          ? "bg-primary/10 text-primary border-[1.5px] border-primary"
+                          : "bg-muted/50 text-foreground"
+                      }`}
+                    >
+                      {a.label}
+                    </button>
+                  ))}
+                </div>
+              </section>
+
+              {/* Condomínio máximo */}
+              <section className="mt-8">
+                <p className="font-body text-base font-bold text-foreground">Condomínio máximo</p>
+                <div className="mt-3 relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 font-body text-sm text-muted-foreground">R$</span>
+                  <input
+                    type="number"
+                    placeholder="Ex: 1500"
+                    value={filters.condominioMax || ""}
+                    onChange={(e) => setFilter("condominioMax", Number(e.target.value) || 0)}
+                    className="w-full rounded-xl border border-border bg-background py-3.5 pl-10 pr-4 font-body text-sm text-foreground outline-none transition-colors focus:border-primary"
+                  />
+                </div>
+              </section>
+
+              {/* IPTU máximo */}
+              <section className="mt-8">
+                <p className="font-body text-base font-bold text-foreground">IPTU máximo</p>
+                <div className="mt-3 relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 font-body text-sm text-muted-foreground">R$</span>
+                  <input
+                    type="number"
+                    placeholder="Ex: 500"
+                    value={filters.iptuMax || ""}
+                    onChange={(e) => setFilter("iptuMax", Number(e.target.value) || 0)}
+                    className="w-full rounded-xl border border-border bg-background py-3.5 pl-10 pr-4 font-body text-sm text-foreground outline-none transition-colors focus:border-primary"
+                  />
+                </div>
+              </section>
+
+              {/* Características */}
+              <section className="mt-8">
+                <p className="font-body text-base font-bold text-foreground">Características</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {featureOptions.map((feat) => {
+                    const isSelected = filters.diferenciais.includes(feat);
+                    return (
+                      <button
+                        key={feat}
+                        onClick={() => {
+                          const next = isSelected
+                            ? filters.diferenciais.filter(d => d !== feat)
+                            : [...filters.diferenciais, feat];
+                          setFilter("diferenciais", next);
+                        }}
+                        className={`rounded-full px-3.5 py-2.5 font-body text-sm font-medium transition-colors ${
+                          isSelected
+                            ? "bg-primary/10 text-primary border-[1.5px] border-primary"
+                            : "bg-muted/50 text-foreground"
+                        }`}
+                      >
+                        {feat}
+                      </button>
+                    );
+                  })}
                 </div>
               </section>
             </div>

@@ -74,7 +74,7 @@ export function BannerCorretor() {
           )}
 
           {/* Admin: clear corretor reference */}
-          {isAdmin && (
+          {showAdminControls && (
             <button
               onClick={() => {
                 clearCorretor();

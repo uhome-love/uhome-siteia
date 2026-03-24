@@ -61,6 +61,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
   const toggleFavorito = toggleFavoritoProp ?? (async () => undefined as "needs_auth" | void);
   const liked = isFavorito(imovel.id);
   const baseFotos = (() => {
+    // Use foto_principal directly (always available from listing query)
     if (imovel.fotos && imovel.fotos.length > 0) {
       const urls = imovel.fotos.map((f) => f.url).filter(Boolean);
       if (urls.length > 0) return urls;

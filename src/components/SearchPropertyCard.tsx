@@ -159,7 +159,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: Math.min(index * 0.03, 0.15) }}
-      className={`relative block cursor-pointer select-none outline-none [&_*]:outline-none [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] no-underline text-inherit ${highlighted ? "sm:ring-2 sm:ring-primary sm:rounded-xl" : ""}`}
+      className={`relative block w-full min-w-0 cursor-pointer select-none outline-none [&_*]:outline-none [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] no-underline text-inherit ${highlighted ? "sm:rounded-xl sm:ring-2 sm:ring-primary" : ""}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -303,7 +303,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
       </div>
 
       {/* ===== DESKTOP: existing vertical card ===== */}
-      <div className="hidden sm:block">
+      <div className="hidden w-full sm:block">
         {/* Photo */}
         <div className="relative w-full overflow-hidden rounded-xl" style={{ aspectRatio: "4/3" }}>
           {fotos.length > 0 ? (

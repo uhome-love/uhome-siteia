@@ -167,16 +167,15 @@ export const AuthModal = forwardRef<HTMLDivElement, Props>(function AuthModal({ 
   const inputClass =
     "w-full rounded-lg border-[1.5px] border-border bg-background px-4 py-3 font-body text-sm text-foreground outline-none transition-colors focus:border-primary";
 
-  return (
-    <span ref={ref}>
-    {createPortal(
+  return createPortal(
     <AnimatePresence>
       {open && (
         <motion.div
+          ref={ref}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[60] flex items-center justify-center overflow-y-auto bg-black/40 backdrop-blur-sm px-4 py-6"
+          className="fixed inset-0 z-[60] flex items-center justify-center overflow-y-auto bg-black/40 px-4 py-6 backdrop-blur-sm"
           onClick={onClose}
         >
           <motion.div
@@ -184,7 +183,7 @@ export const AuthModal = forwardRef<HTMLDivElement, Props>(function AuthModal({ 
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 12 }}
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="w-full max-w-[420px] my-auto rounded-2xl bg-card p-6 shadow-2xl sm:p-8"
+            className="my-auto w-full max-w-[420px] rounded-2xl bg-card p-6 shadow-2xl sm:p-8"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
@@ -211,7 +210,6 @@ export const AuthModal = forwardRef<HTMLDivElement, Props>(function AuthModal({ 
             </div>
 
             {tab === "forgot" ? (
-              /* Forgot password form */
               <div className="mt-6 flex flex-col gap-3">
                 <p className="font-body text-sm text-muted-foreground">
                   Digite seu e-mail e enviaremos um link para redefinir sua senha.
@@ -239,7 +237,6 @@ export const AuthModal = forwardRef<HTMLDivElement, Props>(function AuthModal({ 
               </div>
             ) : (
               <>
-                {/* Google */}
                 <button
                   onClick={handleGoogle}
                   className="mt-6 flex w-full items-center justify-center gap-2.5 rounded-lg border-[1.5px] border-border px-4 py-3 font-body text-sm font-semibold text-foreground transition-colors hover:bg-secondary active:scale-[0.98]"
@@ -253,14 +250,12 @@ export const AuthModal = forwardRef<HTMLDivElement, Props>(function AuthModal({ 
                   Continuar com Google
                 </button>
 
-                {/* Divider */}
                 <div className="my-5 flex items-center gap-3">
                   <div className="h-px flex-1 bg-border" />
                   <span className="font-body text-xs text-muted-foreground">ou</span>
                   <div className="h-px flex-1 bg-border" />
                 </div>
 
-                {/* Form */}
                 <div className="flex flex-col gap-3">
                   {tab === "cadastro" && (
                     <input
@@ -293,7 +288,6 @@ export const AuthModal = forwardRef<HTMLDivElement, Props>(function AuthModal({ 
                         }
                       }}
                     />
-                    {/* Password strength indicator */}
                     {senha && (tab === "cadastro" || tab === "login") && (
                       <div className="mt-2 flex items-center gap-2">
                         <div className="flex flex-1 gap-1">
@@ -313,7 +307,6 @@ export const AuthModal = forwardRef<HTMLDivElement, Props>(function AuthModal({ 
                     )}
                   </div>
 
-                  {/* Forgot password link */}
                   {tab === "login" && (
                     <button
                       onClick={() => setTab("forgot")}
@@ -337,7 +330,6 @@ export const AuthModal = forwardRef<HTMLDivElement, Props>(function AuthModal({ 
                   </button>
                 </div>
 
-                {/* Toggle */}
                 <p className="mt-5 text-center font-body text-[13px] text-muted-foreground">
                   {tab === "login" ? (
                     <>
@@ -366,8 +358,7 @@ export const AuthModal = forwardRef<HTMLDivElement, Props>(function AuthModal({ 
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
-    , document.body)}
-    </span>
+    </AnimatePresence>,
+    document.body
   );
 });

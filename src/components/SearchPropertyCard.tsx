@@ -303,7 +303,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
       </div>
 
       {/* ===== DESKTOP: existing vertical card ===== */}
-      <div className="hidden sm:block">
+      <div className="hidden w-full sm:block">
         {/* Photo */}
         <div className="relative w-full overflow-hidden rounded-xl" style={{ aspectRatio: "4/3" }}>
           {fotos.length > 0 ? (

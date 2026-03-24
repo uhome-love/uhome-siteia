@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { useCorretor } from "@/contexts/CorretorContext";
+import { useAdmin } from "@/hooks/useAdmin";
 
 export function BannerCorretor() {
-  const { corretor } = useCorretor();
+  const { corretor, isDirectAccess, clearCorretor, slug } = useCorretor();
+  const { isAdmin } = useAdmin();
   const [fechado, setFechado] = useState(false);
 
-  if (!corretor || fechado) return null;
+  // Only show banner when user arrived via /c/ URL
+  if (!corretor || !isDirectAccess || fechado) return null;
 
   const primeiroNome = corretor.nome.split(" ")[0];
   const telefone = corretor.telefone?.replace(/\D/g, "") || "";
@@ -15,7 +18,6 @@ export function BannerCorretor() {
 
   return (
     <>
-      {/* Spacer for fixed banner + navbar offset */}
       <div className="h-10" id="banner-corretor-spacer" />
       <div
         data-testid="banner-corretor"
@@ -52,6 +54,21 @@ export function BannerCorretor() {
               💬 Falar com {primeiroNome}
             </a>
           )}
+
+          {/* Admin: clear corretor reference */}
+          {isAdmin && (
+            <button
+              onClick={() => {
+                clearCorretor();
+                setFechado(true);
+              }}
+              className="rounded bg-destructive/10 px-2 py-0.5 font-body text-[10px] font-medium text-destructive transition-colors hover:bg-destructive/20"
+              title="Limpar referência do corretor (admin)"
+            >
+              Limpar ref
+            </button>
+          )}
+
           <button
             onClick={() => setFechado(true)}
             className="rounded p-0.5 text-muted-foreground transition-colors hover:text-foreground"

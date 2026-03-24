@@ -414,7 +414,11 @@ const PropertyDetail = () => {
               )}
               {" › "}
               <span className="text-foreground">{capitalize(imovel.tipo)}</span>
-            </nav>
+              </nav>
+              <span className="font-mono text-xs text-muted-foreground/70">
+                Cód. {imovel.slug.split("-").pop()?.toUpperCase() || imovel.id.slice(0, 8).toUpperCase()}
+              </span>
+            </div>
 
             {/* Badge + title */}
             <div>

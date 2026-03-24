@@ -58,6 +58,7 @@ function mapRow(row: any): Imovel {
   const mapped = {
     ...row,
     fotos: parseFotos(row.fotos),
+    foto_principal: row.foto_principal || null,
     diferenciais: row.diferenciais || [],
     destaque: row.destaque ?? false,
     cidade: row.cidade ?? "Porto Alegre",

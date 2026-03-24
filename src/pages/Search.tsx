@@ -123,6 +123,7 @@ const Search = () => {
       const urlPrecoMin = searchParams.get("preco_min");
       const urlPrecoMax = searchParams.get("preco_max");
       const urlAreaMin = searchParams.get("area_min");
+      const urlCodigo = searchParams.get("codigo");
       if (urlTipo) f.tipo = urlTipo;
       if (urlCidade) f.cidade = urlCidade;
       if (urlQuartos) f.quartos = Number(urlQuartos);
@@ -131,6 +132,7 @@ const Search = () => {
       if (urlPrecoMin) f.precoMin = Number(urlPrecoMin);
       if (urlPrecoMax) f.precoMax = Number(urlPrecoMax);
       if (urlAreaMin) f.areaMin = Number(urlAreaMin);
+      if (urlCodigo) f.codigo = urlCodigo;
       if (urlBairro) {
         f.bairro = urlBairro;
       } else if (urlQ) {

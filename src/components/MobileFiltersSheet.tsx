@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { X, ArrowLeft, Search, MapPin, Navigation, Clock } from "lucide-react";
+import { X, ArrowLeft, Search, MapPin, Navigation, Clock, Hash } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSearchStore } from "@/stores/searchStore";
 import { propertyTypes } from "@/data/properties";
@@ -85,6 +85,7 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
     filters.banheiros,
     filters.bairro,
     filters.areaMin || filters.areaMax,
+    filters.codigo,
   ].filter(Boolean).length + filters.diferenciais.length;
 
   const handleReset = () => {
@@ -371,6 +372,23 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
                       className="w-full rounded-xl border border-border bg-background py-3.5 pl-4 pr-10 font-body text-sm text-foreground outline-none transition-colors focus:border-primary"
                     />
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 font-body text-sm text-muted-foreground">m²</span>
+                  </div>
+                </div>
+              </section>
+
+              {/* Código do imóvel */}
+              <section className="mt-8">
+                <p className="font-body text-base font-bold text-foreground">Código do imóvel</p>
+                <div className="mt-3">
+                  <div className="flex items-center gap-3 rounded-xl border border-border bg-background px-4 py-3.5">
+                    <Hash className="h-5 w-5 shrink-0 text-muted-foreground" />
+                    <input
+                      type="text"
+                      placeholder="Ex: 17485-BT"
+                      value={filters.codigo || ""}
+                      onChange={(e) => setFilter("codigo", e.target.value.trim())}
+                      className="w-full bg-transparent font-body text-sm text-foreground outline-none placeholder:text-muted-foreground"
+                    />
                   </div>
                 </div>
               </section>

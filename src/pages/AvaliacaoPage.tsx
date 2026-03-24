@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useCorretor } from "@/contexts/CorretorContext";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight, CheckCircle2, BarChart3, MapPin, Settings2, Loader2 } from "lucide-react";

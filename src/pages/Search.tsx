@@ -114,7 +114,7 @@ const Search = () => {
       setAiResult(null);
       setAiOverrideData(null);
     } else {
-      const f: Record<string, string | number> = {};
+      const f: Record<string, any> = {};
       const urlTipo = searchParams.get("tipo");
       const urlQ = searchParams.get("q");
       const urlBairro = searchParams.get("bairro");
@@ -126,6 +126,10 @@ const Search = () => {
       const urlPrecoMax = searchParams.get("preco_max");
       const urlAreaMin = searchParams.get("area_min");
       const urlCodigo = searchParams.get("codigo");
+      const urlAndarMin = searchParams.get("andar_min");
+      const urlCondominioMax = searchParams.get("condominio_max");
+      const urlIptuMax = searchParams.get("iptu_max");
+      const urlDiferenciais = searchParams.get("diferenciais");
       if (urlTipo) f.tipo = urlTipo;
       if (urlCidade) f.cidade = urlCidade;
       if (urlQuartos) f.quartos = Number(urlQuartos);
@@ -135,6 +139,10 @@ const Search = () => {
       if (urlPrecoMax) f.precoMax = Number(urlPrecoMax);
       if (urlAreaMin) f.areaMin = Number(urlAreaMin);
       if (urlCodigo) f.codigo = urlCodigo;
+      if (urlAndarMin) f.andarMin = Number(urlAndarMin);
+      if (urlCondominioMax) f.condominioMax = Number(urlCondominioMax);
+      if (urlIptuMax) f.iptuMax = Number(urlIptuMax);
+      if (urlDiferenciais) f.diferenciais = urlDiferenciais.split(",").map((s: string) => s.trim()).filter(Boolean);
       if (urlBairro) {
         f.bairro = urlBairro;
       } else if (urlQ) {

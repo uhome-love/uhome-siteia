@@ -365,10 +365,14 @@ const Search = () => {
     if (filters.precoMax) params.set("preco_max", String(filters.precoMax));
     if (filters.areaMin) params.set("area_min", String(filters.areaMin));
     if (filters.codigo) params.set("codigo", filters.codigo);
+    if (filters.andarMin) params.set("andar_min", String(filters.andarMin));
+    if (filters.condominioMax) params.set("condominio_max", String(filters.condominioMax));
+    if (filters.iptuMax) params.set("iptu_max", String(filters.iptuMax));
+    if (filters.diferenciais.length) params.set("diferenciais", filters.diferenciais.join(","));
     const qs = params.toString();
     const basePath = prefixLink("/busca");
     window.history.replaceState(null, "", qs ? `${basePath}?${qs}` : basePath);
-  }, [filters.tipo, filters.bairro, filters.cidade, filters.quartos, filters.banheiros, filters.vagas, filters.precoMin, filters.precoMax, filters.areaMin, filters.q, filters.codigo, modoIA]);
+  }, [filters.tipo, filters.bairro, filters.cidade, filters.quartos, filters.banheiros, filters.vagas, filters.precoMin, filters.precoMax, filters.areaMin, filters.q, filters.codigo, filters.andarMin, filters.condominioMax, filters.iptuMax, filters.diferenciais, modoIA]);
 
   // AI search handler with throttle
   const buscarComIA = useCallback(async (query?: string) => {

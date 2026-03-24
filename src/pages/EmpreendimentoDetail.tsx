@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { LeadFormInline } from "@/components/LeadFormInline";
+import { EmpreendimentoLeadForm } from "@/components/EmpreendimentoLeadForm";
 import { useCanonical } from "@/hooks/useCanonical";
 import { MapPin, Calendar, Building2, Ruler, BedDouble, CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";

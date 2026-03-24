@@ -1,0 +1,1 @@
+UPDATE public.empreendimentos SET imagem_principal = REPLACE(imagem_principal, '.jpeg', '.webp') WHERE imagem_principal LIKE '%/images/empreendimentos/%.jpeg';

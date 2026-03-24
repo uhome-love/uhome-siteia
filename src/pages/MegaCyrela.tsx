@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { FotoImovel } from "@/components/FotoImovel";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -151,11 +152,14 @@ export default function MegaCyrela() {
                     >
                       <div className="relative aspect-[4/3] overflow-hidden">
                         {emp.imagem_principal ? (
-                          <img
+                          <FotoImovel
                             src={emp.imagem_principal}
                             alt={emp.nome}
                             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                             loading="lazy"
+                            decoding="async"
+                            width={800}
+                            height={600}
                           />
                         ) : (
                           <div className="flex h-full w-full items-center justify-center bg-muted">

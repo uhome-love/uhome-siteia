@@ -69,6 +69,7 @@ const Search = () => {
   const ultimaBuscaIA = React.useRef(0);
   const [mobileMap, setMobileMap] = useState(false);
   const [mobileFilters, setMobileFilters] = useState(false);
+  const [advancedFilters, setAdvancedFilters] = useState(false);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [alertEmail, setAlertEmail] = useState("");
@@ -564,7 +565,7 @@ const Search = () => {
           )}
         </div>
       ) : (
-        <SearchFiltersBar onOpenMobileFilters={() => setMobileFilters(true)} />
+        <SearchFiltersBar onOpenMobileFilters={() => setMobileFilters(true)} onOpenAdvancedFilters={() => setAdvancedFilters(true)} />
       )}
 
       {/* AI resumo badge + interpreted filters */}

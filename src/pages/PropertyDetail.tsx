@@ -398,7 +398,7 @@ const PropertyDetail = () => {
             {/* Property code + Breadcrumb */}
             <div className="space-y-1">
               <span className="font-mono text-[11px] text-muted-foreground/60">
-                Cód. {imovel.slug.split("-").pop()?.toUpperCase() || imovel.id.slice(0, 8).toUpperCase()}
+                Cód. {(() => { const parts = imovel.slug.split("-"); const last = parts[parts.length - 1]; const secondLast = parts[parts.length - 2]; return secondLast && /^\d+$/.test(secondLast) ? `${secondLast}-${last}`.toUpperCase() : last?.toUpperCase() || imovel.id.slice(0, 8).toUpperCase(); })()}
               </span>
               <nav className="font-body text-xs text-muted-foreground">
                 <Link to="/busca" className="hover:text-foreground">Imóveis</Link>

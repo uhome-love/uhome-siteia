@@ -34,6 +34,7 @@ const DIFERENCIAIS = [
 const ease = [0.16, 1, 0.3, 1];
 
 export default function AvaliacaoPage() {
+  const { prefixLink } = useCorretor();
   const [passo, setPasso] = useState(1);
   const [dados, setDados] = useState<DadosImovel>({
     tipo: "", bairro: "", area: 0,
@@ -425,7 +426,7 @@ export default function AvaliacaoPage() {
                         {resultado.imoveisSimilares.map((im: any) => (
                           <Link
                             key={im.id}
-                            to={`/imovel/${im.slug}`}
+                            to={prefixLink(`/imovel/${im.slug}`)}
                             target="_blank"
                             className="flex items-center justify-between border-b border-border py-3 font-body text-sm text-muted-foreground transition-colors last:border-0 hover:text-foreground"
                           >

@@ -48,6 +48,7 @@ const AdminLinks = lazy(() => import("./pages/admin/AdminLinks.tsx"));
 const AdminCorretores = lazy(() => import("./pages/admin/AdminCorretores.tsx"));
 const AdminEmpreendimentos = lazy(() => import("./pages/admin/AdminEmpreendimentos.tsx"));
 const EmpreendimentoDetail = lazy(() => import("./pages/EmpreendimentoDetail.tsx"));
+const MegaCyrela = lazy(() => import("./pages/MegaCyrela.tsx"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -112,6 +113,7 @@ const App = () => (
                 <Route path="/politica-de-privacidade" element={<Privacidade />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/empreendimentos/:slug" element={<EmpreendimentoDetail />} />
+                <Route path="/mega-cyrela" element={<MegaCyrela />} />
                 <Route path="/casas-porto-alegre" element={<TipoImovel />} />
                 <Route path="/coberturas-porto-alegre" element={<TipoImovel />} />
                 <Route path="/studios-porto-alegre" element={<TipoImovel />} />
@@ -133,6 +135,7 @@ const App = () => (
                   <Route path="condominios" element={<Condominios />} />
                   <Route path="condominios/:slug" element={<CondominioDetail />} />
                   <Route path="empreendimentos/:slug" element={<EmpreendimentoDetail />} />
+                  <Route path="mega-cyrela" element={<MegaCyrela />} />
                   <Route path="avaliar-imovel" element={<AvaliacaoPage />} />
                 </Route>
 

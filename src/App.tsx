@@ -48,6 +48,7 @@ const AdminLinks = lazy(() => import("./pages/admin/AdminLinks.tsx"));
 const AdminCorretores = lazy(() => import("./pages/admin/AdminCorretores.tsx"));
 const AdminEmpreendimentos = lazy(() => import("./pages/admin/AdminEmpreendimentos.tsx"));
 const EmpreendimentoDetail = lazy(() => import("./pages/EmpreendimentoDetail.tsx"));
+const MegaCyrela = lazy(() => import("./pages/MegaCyrela.tsx"));
 
 const queryClient = new QueryClient({
   defaultOptions: {

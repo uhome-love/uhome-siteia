@@ -49,7 +49,7 @@ function PerformanceDebugInner() {
     return () => window.removeEventListener("perf:update", handler);
   }, []);
 
-  if (import.meta.env.PROD) return null;
+  // Removed redundant PROD check — controlled by localStorage flag
 
   if (collapsed) {
     return (

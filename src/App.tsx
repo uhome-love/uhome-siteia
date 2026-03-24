@@ -113,6 +113,7 @@ const App = () => (
                 <Route path="/politica-de-privacidade" element={<Privacidade />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/empreendimentos/:slug" element={<EmpreendimentoDetail />} />
+                <Route path="/mega-cyrela" element={<MegaCyrela />} />
                 <Route path="/casas-porto-alegre" element={<TipoImovel />} />
                 <Route path="/coberturas-porto-alegre" element={<TipoImovel />} />
                 <Route path="/studios-porto-alegre" element={<TipoImovel />} />

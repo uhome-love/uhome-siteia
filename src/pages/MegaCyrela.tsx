@@ -150,7 +150,7 @@ export default function MegaCyrela() {
                       to={prefixLink(`/empreendimentos/${emp.slug}`)}
                       className="group block overflow-hidden rounded-xl border border-border bg-card transition-all hover:shadow-lg"
                     >
-                      <div className="relative aspect-[4/3] overflow-hidden">
+                      <div className="relative aspect-[16/10] overflow-hidden">
                         {emp.imagem_principal ? (
                           <FotoImovel
                             src={emp.imagem_principal}

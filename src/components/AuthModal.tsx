@@ -1,4 +1,5 @@
 import { useState, useCallback, forwardRef } from "react";
+import { createPortal } from "react-dom";
 import { X, Loader2, ArrowLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -168,6 +169,7 @@ export const AuthModal = forwardRef<HTMLDivElement, Props>(function AuthModal({ 
 
   return (
     <span ref={ref}>
+    {createPortal(
     <AnimatePresence>
       {open && (
         <motion.div
@@ -365,6 +367,7 @@ export const AuthModal = forwardRef<HTMLDivElement, Props>(function AuthModal({ 
         </motion.div>
       )}
     </AnimatePresence>
+    , document.body)}
     </span>
   );
 });

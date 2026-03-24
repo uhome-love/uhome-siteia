@@ -395,9 +395,10 @@ const PropertyDetail = () => {
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
             className="flex-1 space-y-8 lg:max-w-[63%]"
           >
-            {/* Breadcrumb */}
-            <nav className="font-body text-xs text-muted-foreground">
-              <Link to="/busca" className="hover:text-foreground">Imóveis</Link>
+            {/* Property code + Breadcrumb */}
+            <div className="flex items-center justify-between">
+              <nav className="font-body text-xs text-muted-foreground">
+                <Link to="/busca" className="hover:text-foreground">Imóveis</Link>
               {" › "}
               <Link to={`/busca?bairro=${encodeURIComponent(imovel.bairro)}`} className="hover:text-foreground">{imovel.bairro}</Link>
               {imovel.condominio_nome && (

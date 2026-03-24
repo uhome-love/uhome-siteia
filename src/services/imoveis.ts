@@ -156,6 +156,7 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
   if (filters.destaque) query = query.eq("destaque", true);
   if (filters.diferenciais?.length) query = query.contains("diferenciais", filters.diferenciais);
   if (filters.q) query = query.or(`titulo.ilike.%${filters.q}%,bairro.ilike.%${filters.q}%,tipo.ilike.%${filters.q}%`);
+  if (filters.codigo) query = query.or(`jetimob_id.ilike.%${filters.codigo}%,slug.ilike.%${filters.codigo}%`);
   if (filters.bounds) {
     query = query
       .gte("latitude", filters.bounds.lat_min)

@@ -17,6 +17,7 @@ import {
   Menu,
   X,
   Link2,
+  Landmark,
 } from "lucide-react";
 
 const navItems = [
@@ -27,6 +28,7 @@ const navItems = [
   { icon: RefreshCw, label: "Sync Jetimob", path: "/admin/sync" },
   { icon: PenSquare, label: "Integração CRM", path: "/admin/integracao" },
   { icon: Link2, label: "Links Corretores", path: "/admin/links" },
+  { icon: Landmark, label: "Empreendimentos", path: "/admin/empreendimentos" },
   { icon: BarChart3, label: "Conversão", path: "/admin/corretores" },
   { icon: Settings, label: "Configurações", path: "/admin/config" },
 ];

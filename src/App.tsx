@@ -46,6 +46,8 @@ const AdminIntegracao = lazy(() => import("./pages/admin/AdminIntegracao.tsx"));
 const IntegracaoDiagnostico = lazy(() => import("./pages/admin/IntegracaoDiagnostico.tsx"));
 const AdminLinks = lazy(() => import("./pages/admin/AdminLinks.tsx"));
 const AdminCorretores = lazy(() => import("./pages/admin/AdminCorretores.tsx"));
+const AdminEmpreendimentos = lazy(() => import("./pages/admin/AdminEmpreendimentos.tsx"));
+const EmpreendimentoDetail = lazy(() => import("./pages/EmpreendimentoDetail.tsx"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -109,6 +111,7 @@ const App = () => (
                 <Route path="/avaliar-imovel" element={<AvaliacaoPage />} />
                 <Route path="/politica-de-privacidade" element={<Privacidade />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/empreendimentos/:slug" element={<EmpreendimentoDetail />} />
                 <Route path="/casas-porto-alegre" element={<TipoImovel />} />
                 <Route path="/coberturas-porto-alegre" element={<TipoImovel />} />
                 <Route path="/studios-porto-alegre" element={<TipoImovel />} />
@@ -129,6 +132,7 @@ const App = () => (
                   <Route path="favoritos" element={<Favoritos />} />
                   <Route path="condominios" element={<Condominios />} />
                   <Route path="condominios/:slug" element={<CondominioDetail />} />
+                  <Route path="empreendimentos/:slug" element={<EmpreendimentoDetail />} />
                   <Route path="avaliar-imovel" element={<AvaliacaoPage />} />
                 </Route>
 
@@ -144,6 +148,7 @@ const App = () => (
                   <Route path="config" element={<AdminConfig />} />
                   <Route path="links" element={<AdminLinks />} />
                   <Route path="corretores" element={<AdminCorretores />} />
+                  <Route path="empreendimentos" element={<AdminEmpreendimentos />} />
                 </Route>
                 <Route path="*" element={<NotFound />} />
               </Routes>

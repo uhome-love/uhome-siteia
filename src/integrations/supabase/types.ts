@@ -263,6 +263,84 @@ export type Database = {
         }
         Relationships: []
       }
+      empreendimentos: {
+        Row: {
+          ativo: boolean | null
+          bairro: string | null
+          cidade: string | null
+          construtora: string | null
+          created_at: string | null
+          descricao: string | null
+          destaque_home: boolean | null
+          diferenciais: string[] | null
+          id: string
+          imagem_principal: string | null
+          imagens: Json | null
+          localizacao: string | null
+          logo_url: string | null
+          meta_description: string | null
+          meta_title: string | null
+          nome: string
+          ordem: number | null
+          preco_a_partir: number | null
+          preco_ate: number | null
+          previsao_entrega: string | null
+          slug: string
+          tipologias: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          bairro?: string | null
+          cidade?: string | null
+          construtora?: string | null
+          created_at?: string | null
+          descricao?: string | null
+          destaque_home?: boolean | null
+          diferenciais?: string[] | null
+          id?: string
+          imagem_principal?: string | null
+          imagens?: Json | null
+          localizacao?: string | null
+          logo_url?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
+          nome: string
+          ordem?: number | null
+          preco_a_partir?: number | null
+          preco_ate?: number | null
+          previsao_entrega?: string | null
+          slug: string
+          tipologias?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          ativo?: boolean | null
+          bairro?: string | null
+          cidade?: string | null
+          construtora?: string | null
+          created_at?: string | null
+          descricao?: string | null
+          destaque_home?: boolean | null
+          diferenciais?: string[] | null
+          id?: string
+          imagem_principal?: string | null
+          imagens?: Json | null
+          localizacao?: string | null
+          logo_url?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
+          nome?: string
+          ordem?: number | null
+          preco_a_partir?: number | null
+          preco_ate?: number | null
+          previsao_entrega?: string | null
+          slug?: string
+          tipologias?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       favoritos: {
         Row: {
           created_at: string

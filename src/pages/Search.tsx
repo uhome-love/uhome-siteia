@@ -123,6 +123,7 @@ const Search = () => {
       const urlPrecoMin = searchParams.get("preco_min");
       const urlPrecoMax = searchParams.get("preco_max");
       const urlAreaMin = searchParams.get("area_min");
+      const urlCodigo = searchParams.get("codigo");
       if (urlTipo) f.tipo = urlTipo;
       if (urlCidade) f.cidade = urlCidade;
       if (urlQuartos) f.quartos = Number(urlQuartos);
@@ -131,6 +132,7 @@ const Search = () => {
       if (urlPrecoMin) f.precoMin = Number(urlPrecoMin);
       if (urlPrecoMax) f.precoMax = Number(urlPrecoMax);
       if (urlAreaMin) f.areaMin = Number(urlAreaMin);
+      if (urlCodigo) f.codigo = urlCodigo;
       if (urlBairro) {
         f.bairro = urlBairro;
       } else if (urlQ) {
@@ -192,6 +194,7 @@ const Search = () => {
       vagas: filters.vagas || undefined,
       diferenciais: filters.diferenciais.length ? filters.diferenciais : undefined,
       q: filters.q || undefined,
+      codigo: filters.codigo || undefined,
     };
   }, [filters]);
 
@@ -356,10 +359,11 @@ const Search = () => {
     if (filters.precoMin) params.set("preco_min", String(filters.precoMin));
     if (filters.precoMax) params.set("preco_max", String(filters.precoMax));
     if (filters.areaMin) params.set("area_min", String(filters.areaMin));
+    if (filters.codigo) params.set("codigo", filters.codigo);
     const qs = params.toString();
     const basePath = prefixLink("/busca");
     window.history.replaceState(null, "", qs ? `${basePath}?${qs}` : basePath);
-  }, [filters.tipo, filters.bairro, filters.cidade, filters.quartos, filters.banheiros, filters.vagas, filters.precoMin, filters.precoMax, filters.areaMin, filters.q, modoIA]);
+  }, [filters.tipo, filters.bairro, filters.cidade, filters.quartos, filters.banheiros, filters.vagas, filters.precoMin, filters.precoMax, filters.areaMin, filters.q, filters.codigo, modoIA]);
 
   // AI search handler with throttle
   const buscarComIA = useCallback(async (query?: string) => {

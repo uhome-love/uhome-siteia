@@ -21,6 +21,7 @@ export interface SearchFilters {
   diferenciais: string[];
   ordem: "recentes" | "preco_asc" | "preco_desc" | "area_desc";
   q: string;
+  codigo: string;
   bounds: MapBounds | null;
 }
 
@@ -49,6 +50,7 @@ const defaultFilters: SearchFilters = {
   diferenciais: [],
   ordem: "recentes",
   q: "",
+  codigo: "",
   bounds: null,
 };
 

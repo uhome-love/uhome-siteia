@@ -183,7 +183,7 @@ export function SearchFiltersBar({ onOpenMobileFilters }: { onOpenMobileFilters?
   const cidadeLabel = filters.cidade || "Todas";
 
   const hasAny =
-    filters.tipo || filters.precoMin || filters.precoMax || filters.areaMin || filters.areaMax || filters.quartos || filters.vagas || filters.q || filters.bairro || (filters.cidade && filters.cidade !== "Porto Alegre");
+    filters.tipo || filters.precoMin || filters.precoMax || filters.areaMin || filters.areaMax || filters.quartos || filters.vagas || filters.q || filters.bairro || filters.codigo || (filters.cidade && filters.cidade !== "Porto Alegre");
 
   const hasInput = bairroInput.trim().length > 0;
   const hasChips = bairrosSelecionados.length > 0;
@@ -499,6 +499,27 @@ export function SearchFiltersBar({ onOpenMobileFilters }: { onOpenMobileFilters?
             {v}+ vagas
           </PillOption>
         ))}
+      </FilterPill>
+
+      {/* Código */}
+      <FilterPill
+        label="Código"
+        value={filters.codigo || undefined}
+        active={!!filters.codigo}
+        onClear={() => setFilter("codigo", "")}
+      >
+        <div className="px-1">
+          <p className="mb-2 font-body text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Código do imóvel
+          </p>
+          <input
+            type="text"
+            placeholder="Ex: 17485-BT"
+            value={filters.codigo || ""}
+            onChange={(e) => setFilter("codigo", e.target.value.trim())}
+            className="w-full rounded-lg border border-border bg-background py-2 px-3 font-body text-[13px] text-foreground outline-none transition-colors focus:border-primary"
+          />
+        </div>
       </FilterPill>
 
       {/* Reset */}

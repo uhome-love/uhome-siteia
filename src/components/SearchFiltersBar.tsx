@@ -118,11 +118,13 @@ export function SearchFiltersBar({ onOpenMobileFilters }: { onOpenMobileFilters?
     dd.style.position = "fixed";
     dd.style.top = `${anchor.bottom + 8}px`;
     dd.style.left = `${anchor.left}px`;
+    dd.style.minWidth = `${Math.min(anchor.width, 320)}px`;
   }, []);
 
+  // Reposition when dropdown opens, chips change, or input changes
   useEffect(() => {
     if (showDropdown) requestAnimationFrame(positionDropdown);
-  }, [showDropdown, positionDropdown]);
+  }, [showDropdown, positionDropdown, bairrosSelecionados.length, bairroInput, suggestions.length]);
 
   const handleSearchIA = () => {
     setShowDropdown(false);

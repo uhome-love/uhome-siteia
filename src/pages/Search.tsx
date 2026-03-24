@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef, lazy } from "react";
+import { useCorretor } from "@/contexts/CorretorContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 const PerformanceDebug = lazy(() => import("@/components/PerformanceDebug").then(m => ({ default: m.PerformanceDebug })));
 import { AuthModal } from "@/components/AuthModal";
@@ -58,6 +59,7 @@ const Search = () => {
   const { user } = useAuth();
   const { isFavorito, toggleFavorito } = useFavoritos();
   useCanonical();
+  const { prefixLink } = useCorretor();
   const [searchParams, setSearchParams] = useSearchParams();
   const modoIA = searchParams.get("modo") === "ia";
   const { filters, setFilter, setFilters, resetFilters, page, setPage, scrollY, setScrollY } = useSearchStore();
@@ -355,7 +357,8 @@ const Search = () => {
     if (filters.precoMax) params.set("preco_max", String(filters.precoMax));
     if (filters.areaMin) params.set("area_min", String(filters.areaMin));
     const qs = params.toString();
-    window.history.replaceState(null, "", qs ? `/busca?${qs}` : "/busca");
+    const basePath = prefixLink("/busca");
+    window.history.replaceState(null, "", qs ? `${basePath}?${qs}` : basePath);
   }, [filters.tipo, filters.bairro, filters.cidade, filters.quartos, filters.banheiros, filters.vagas, filters.precoMin, filters.precoMax, filters.areaMin, filters.q, modoIA]);
 
   // AI search handler with throttle

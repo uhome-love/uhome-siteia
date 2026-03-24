@@ -13,6 +13,7 @@ import { SearchMap } from "@/components/SearchMap";
 import { SkeletonCard } from "@/components/SkeletonCard";
 import { SearchCTACard } from "@/components/SearchCTACard";
 import { MobileFiltersSheet } from "@/components/MobileFiltersSheet";
+import { AdvancedFiltersModal } from "@/components/AdvancedFiltersModal";
 import { useSearchStore, type MapBounds } from "@/stores/searchStore";
 import { fetchImoveis, fetchMapPins, type Imovel, type MapPin as MapPinData, type BuscaFilters } from "@/services/imoveis";
 import { useImoveisQuery } from "@/hooks/useImoveisQuery";

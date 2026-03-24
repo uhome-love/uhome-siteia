@@ -192,6 +192,7 @@ const Search = () => {
       vagas: filters.vagas || undefined,
       diferenciais: filters.diferenciais.length ? filters.diferenciais : undefined,
       q: filters.q || undefined,
+      codigo: filters.codigo || undefined,
     };
   }, [filters]);
 
@@ -356,10 +357,11 @@ const Search = () => {
     if (filters.precoMin) params.set("preco_min", String(filters.precoMin));
     if (filters.precoMax) params.set("preco_max", String(filters.precoMax));
     if (filters.areaMin) params.set("area_min", String(filters.areaMin));
+    if (filters.codigo) params.set("codigo", filters.codigo);
     const qs = params.toString();
     const basePath = prefixLink("/busca");
     window.history.replaceState(null, "", qs ? `${basePath}?${qs}` : basePath);
-  }, [filters.tipo, filters.bairro, filters.cidade, filters.quartos, filters.banheiros, filters.vagas, filters.precoMin, filters.precoMax, filters.areaMin, filters.q, modoIA]);
+  }, [filters.tipo, filters.bairro, filters.cidade, filters.quartos, filters.banheiros, filters.vagas, filters.precoMin, filters.precoMax, filters.areaMin, filters.q, filters.codigo, modoIA]);
 
   // AI search handler with throttle
   const buscarComIA = useCallback(async (query?: string) => {

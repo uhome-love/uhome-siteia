@@ -45,7 +45,7 @@ function formatAreaLabel(min: number, max: number): string {
   return "";
 }
 
-export function SearchFiltersBar({ onOpenMobileFilters }: { onOpenMobileFilters?: () => void }) {
+export function SearchFiltersBar({ onOpenMobileFilters, onOpenAdvancedFilters }: { onOpenMobileFilters?: () => void; onOpenAdvancedFilters?: () => void }) {
   const { filters, setFilter, resetFilters } = useSearchStore();
   const navigate = useNavigate();
   const { prefixLink } = useCorretor();

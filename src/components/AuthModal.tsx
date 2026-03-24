@@ -169,6 +169,7 @@ export const AuthModal = forwardRef<HTMLDivElement, Props>(function AuthModal({ 
 
   return (
     <span ref={ref}>
+    {createPortal(
     <AnimatePresence>
       {open && (
         <motion.div

@@ -34,7 +34,7 @@ export const FotoImovel = forwardRef<HTMLImageElement, FotoImovelProps>(function
   }
 
   return (
-    <div className="relative overflow-hidden" style={style}>
+    <div className="relative h-full w-full overflow-hidden" style={style}>
       {/* Skeleton placeholder — visible until image loads */}
       {!loaded && (
         <div

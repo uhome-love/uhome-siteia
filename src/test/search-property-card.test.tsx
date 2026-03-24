@@ -42,6 +42,7 @@ const mockImovel: Imovel = {
     { url: "https://example.com/1.jpg", ordem: 0, principal: true },
     { url: "https://example.com/2.jpg", ordem: 1, principal: false },
   ],
+  foto_principal: "https://example.com/1.jpg",
   video_url: null,
   condominio_nome: null,
   publicado_em: new Date().toISOString(),

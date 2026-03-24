@@ -90,10 +90,9 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
     else if (ref) (ref as React.MutableRefObject<HTMLAnchorElement | null>).current = node;
   }, [ref]);
 
-  // Load full photo set when card becomes visible (mobile) or on hover (desktop)
-  useEffect(() => {
-    if (!isVisible || fotosLoadedRef.current || baseFotos.length > 1) return;
-    if (!isMobile) return;
+  // Load full photo set on mobile when user swipes (not on visibility)
+  const loadFullFotos = useCallback(() => {
+    if (fotosLoadedRef.current || baseFotos.length > 1) return;
     fotosLoadedRef.current = true;
     setLoadingFotos(true);
     supabase
@@ -112,7 +111,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
         }
         setLoadingFotos(false);
       });
-  }, [isVisible, isMobile, imovel.id, baseFotos.length]);
+  }, [imovel.id, baseFotos.length]);
   const price = formatPreco(imovel.preco);
   const area = imovel.area_total ?? imovel.area_util ?? 0;
 

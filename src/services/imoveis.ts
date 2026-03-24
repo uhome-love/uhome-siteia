@@ -25,6 +25,7 @@ export interface Imovel {
   descricao: string | null;
   diferenciais: string[];
   fotos: Array<{ url: string; ordem: number; principal: boolean }>;
+  foto_principal: string | null;
   video_url: string | null;
   condominio_nome: string | null;
   publicado_em: string;
@@ -57,6 +58,7 @@ function mapRow(row: any): Imovel {
   const mapped = {
     ...row,
     fotos: parseFotos(row.fotos),
+    foto_principal: row.foto_principal || null,
     diferenciais: row.diferenciais || [],
     destaque: row.destaque ?? false,
     cidade: row.cidade ?? "Porto Alegre",
@@ -70,8 +72,7 @@ function mapRow(row: any): Imovel {
 
 /** Get primary photo URL or a placeholder */
 export function fotoPrincipal(imovel: Imovel): string {
-  // Use foto_principal column first (populated by DB trigger)
-  if ((imovel as any).foto_principal) return (imovel as any).foto_principal;
+  if (imovel.foto_principal) return imovel.foto_principal;
   const fotos = imovel.fotos;
   if (!fotos || fotos.length === 0) return "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&h=400&fit=crop";
   const principal = fotos.find((f) => f.principal);

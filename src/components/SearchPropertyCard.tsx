@@ -1,7 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect, forwardRef } from "react";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { AuthModal } from "@/components/AuthModal";
-import { useNavigate } from "react-router-dom";
 import { Heart } from "lucide-react";
 import { motion } from "framer-motion";
 import { type Imovel, fotoPrincipal, formatPreco } from "@/services/imoveis";
@@ -54,13 +52,12 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
   const fotosLoadedRef = useRef(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLElement>(null);
-  const navigate = useNavigate();
   const { prefixLink } = useCorretor();
-  const isMobile = useIsMobile();
   const isFavorito = isFavoritoProp ?? (() => false);
   const toggleFavorito = toggleFavoritoProp ?? (async () => undefined as "needs_auth" | void);
   const liked = isFavorito(imovel.id);
   const baseFotos = (() => {
+    // Use foto_principal directly (always available from listing query)
     if (imovel.fotos && imovel.fotos.length > 0) {
       const urls = imovel.fotos.map((f) => f.url).filter(Boolean);
       if (urls.length > 0) return urls;
@@ -89,10 +86,9 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
     else if (ref) (ref as React.MutableRefObject<HTMLAnchorElement | null>).current = node;
   }, [ref]);
 
-  // Load full photo set when card becomes visible (mobile) or on hover (desktop)
-  useEffect(() => {
-    if (!isVisible || fotosLoadedRef.current || baseFotos.length > 1) return;
-    if (!isMobile) return;
+  // Load full photo set on mobile when user swipes (not on visibility)
+  const loadFullFotos = useCallback(() => {
+    if (fotosLoadedRef.current || baseFotos.length > 1) return;
     fotosLoadedRef.current = true;
     setLoadingFotos(true);
     supabase
@@ -111,7 +107,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
         }
         setLoadingFotos(false);
       });
-  }, [isVisible, isMobile, imovel.id, baseFotos.length]);
+  }, [imovel.id, baseFotos.length]);
   const price = formatPreco(imovel.preco);
   const area = imovel.area_total ?? imovel.area_util ?? 0;
 
@@ -138,26 +134,9 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
   const handleMouseEnter = useCallback(() => {
     setHovering(true);
     onHover?.(imovel.id);
-    // Lazy-load full photo set on first hover
-    if (!fotosLoadedRef.current && baseFotos.length <= 1) {
-      fotosLoadedRef.current = true;
-      supabase
-        .from("imoveis")
-        .select("fotos")
-        .eq("id", imovel.id)
-        .maybeSingle()
-        .then(({ data }) => {
-          if (data?.fotos && Array.isArray(data.fotos) && data.fotos.length > 0) {
-            const urls = (data.fotos as any[])
-              .sort((a: any, b: any) => (a.ordem ?? 0) - (b.ordem ?? 0))
-              .map((f: any) => f?.url || f?.src || f)
-              .filter(Boolean)
-              .slice(0, 8);
-            if (urls.length > 0) setLazyFotos(urls);
-          }
-        });
-    }
-  }, [imovel.id, onHover, baseFotos.length]);
+    // Lazy-load full photo set on first hover (desktop)
+    loadFullFotos();
+  }, [imovel.id, onHover, loadFullFotos]);
 
   const handleMouseLeave = useCallback(() => { setHovering(false); onHover?.(null); }, [onHover]);
   const handleScroll = useCallback(() => {
@@ -165,7 +144,9 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
     if (!el) return;
     const idx = Math.round(el.scrollLeft / el.offsetWidth);
     setFotoAtiva(idx);
-  }, []);
+    // Load full photos on first swipe (mobile)
+    if (idx > 0) loadFullFotos();
+  }, [loadFullFotos]);
 
   return (
     <>

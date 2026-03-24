@@ -21,8 +21,9 @@ const initial: PerfMetrics = {
 };
 
 export function PerformanceDebug() {
-  // Only render in development mode
-  if (!import.meta.env.DEV) return null;
+  // Only render when explicitly enabled via localStorage: localStorage.setItem('uhome_perf', '1')
+  const enabled = typeof window !== "undefined" && localStorage.getItem("uhome_perf") === "1";
+  if (!enabled) return null;
 
   return <PerformanceDebugInner />;
 }
@@ -48,7 +49,7 @@ function PerformanceDebugInner() {
     return () => window.removeEventListener("perf:update", handler);
   }, []);
 
-  if (import.meta.env.PROD) return null;
+  // Removed redundant PROD check — controlled by localStorage flag
 
   if (collapsed) {
     return (

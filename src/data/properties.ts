@@ -141,7 +141,10 @@ export const propertyTypes = [
   { value: "casa", label: "Casa" },
   { value: "casa em condominio", label: "Casa em Condomínio" },
   { value: "cobertura", label: "Cobertura" },
+  { value: "sobrado", label: "Sobrado" },
   { value: "studio", label: "Studio" },
+  { value: "loft", label: "Loft" },
+  { value: "terreno", label: "Terreno" },
   { value: "comercial", label: "Comercial" },
 ];
 

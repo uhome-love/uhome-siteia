@@ -156,6 +156,12 @@ const PropertyDetail = () => {
     );
   }
 
+  const isIndisponivel = imovel.status !== "disponivel";
+  const statusLabel: Record<string, string> = {
+    vendido: "Vendido",
+    reservado: "Reservado",
+    inativo: "Indisponível",
+  };
   const priceFormatted = formatPreco(imovel.preco);
   const finalidadeLabel = "Venda";
   const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);

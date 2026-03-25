@@ -8,22 +8,27 @@ import { toast } from "sonner";
 import { formatPhone } from "@/lib/phoneMask";
 import { bairrosData } from "@/data/bairros";
 import { CIDADES_PERMITIDAS } from "@/services/imoveis";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { prefetchBusca } from "@/lib/prefetch";
 import { useCorretor } from "@/contexts/CorretorContext";
 
 
 
 function HeroPropertyCount() {
-  const [total, setTotal] = useState(14600);
-  useEffect(() => {
-    supabase
-      .from("imoveis")
-      .select("*", { count: "exact", head: true })
-      .eq("status", "disponivel")
-      .then(({ count }) => { if (count && count > 0) setTotal(count); });
-  }, []);
-  return <>{total.toLocaleString("pt-BR")}+</>;
+  const { data: total } = useQuery({
+    queryKey: ["imoveis", "total-count"],
+    queryFn: async () => {
+      const { count } = await supabase
+        .from("imoveis")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "disponivel");
+      return count && count > 0 ? count : 14600;
+    },
+    staleTime: 10 * 60 * 1000, // 10 min cache
+    gcTime: 30 * 60 * 1000,
+    placeholderData: 14600,
+  });
+  return <>{(total ?? 14600).toLocaleString("pt-BR")}+</>;
 }
 
 export function HeroSection() {

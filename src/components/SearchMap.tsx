@@ -2,23 +2,27 @@ import { useRef, useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, X, Bed, Maximize, ToggleLeft, ToggleRight, PenTool, Navigation, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import mapboxgl from "mapbox-gl";
+import type mapboxgl from "mapbox-gl";
 
-// Load CSS dynamically to avoid blocking render
-if (typeof document !== "undefined" && !document.getElementById("mapbox-css")) {
-  const link = document.createElement("link");
-  link.id = "mapbox-css";
-  link.rel = "stylesheet";
-  link.href = "https://api.mapbox.com/mapbox-gl-js/v3.20.0/mapbox-gl.css";
-  document.head.appendChild(link);
-}
+// Lazy-loaded mapbox reference — filled on first mount
+let mapboxModule: typeof import("mapbox-gl") | null = null;
+const mapboxReady = import("mapbox-gl").then((m) => {
+  mapboxModule = m;
+  // Load CSS dynamically to avoid blocking render
+  if (typeof document !== "undefined" && !document.getElementById("mapbox-css")) {
+    const link = document.createElement("link");
+    link.id = "mapbox-css";
+    link.rel = "stylesheet";
+    link.href = "https://api.mapbox.com/mapbox-gl-js/v3.20.0/mapbox-gl.css";
+    document.head.appendChild(link);
+  }
+  return m;
+});
+
 import { type MapPin as MapPinData } from "@/services/imoveis";
 import { useCorretor } from "@/contexts/CorretorContext";
 
-
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || "pk.eyJ1IjoibHVjYXN1aG9tZSIsImEiOiJjbW16c2l2dmUwYmxsMnJwdDI2bGxrazBkIn0.B4dp727gJlQQIWTci7GpFQ";
-
-mapboxgl.accessToken = MAPBOX_TOKEN;
 
 function formatPreco(preco: number): string {
   if (!preco) return "";

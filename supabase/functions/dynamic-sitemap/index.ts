@@ -289,6 +289,42 @@ function buildBlogSitemap(today: string) {
 }
 
 // ══════════════════════════════════════════════════════════
+// SEO PAGES SITEMAP (tipo+bairro, quartos+bairro combos)
+// ══════════════════════════════════════════════════════════
+async function buildSeoPagesSitemap(today: string) {
+  const slugifyName = (name: string) =>
+    name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
+  // Get bairros with 5+ properties
+  const { data: dbBairros } = await supabase.rpc("get_bairros_disponiveis");
+  const activeBairros = (dbBairros as { bairro: string; count: number }[] || [])
+    .filter((b) => b.count >= 5)
+    .map((b) => slugifyName(b.bairro));
+
+  const entries: string[] = [];
+
+  // tipo + bairro combos (6 tipos × ~80 bairros = ~480 pages)
+  for (const tipo of SEO_TIPOS) {
+    for (const bairroSlug of activeBairros) {
+      entries.push(urlEntry(`${SITE}/${tipo}-${bairroSlug}`, today, "daily", "0.75"));
+    }
+  }
+
+  // quartos combos for main types (3 tipos × 4 quartos × ~80 bairros = ~960 pages)
+  const quartosTipos = ["apartamentos", "casas", "coberturas"];
+  for (const tipo of quartosTipos) {
+    for (const q of [1, 2, 3, 4]) {
+      for (const bairroSlug of activeBairros) {
+        entries.push(urlEntry(`${SITE}/${tipo}-${q}-quartos-${bairroSlug}`, today, "weekly", "0.7"));
+      }
+    }
+  }
+
+  return wrapUrlset(entries);
+}
+
+// ══════════════════════════════════════════════════════════
 // REQUEST HANDLER
 // ══════════════════════════════════════════════════════════
 Deno.serve(async (req) => {

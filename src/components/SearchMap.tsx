@@ -206,7 +206,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
           // Add user location marker
           const el = document.createElement("div");
           el.style.cssText = "width:18px;height:18px;background:hsl(var(--primary));border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.3);";
-          userMarkerRef.current = new mapboxgl.Marker(el).setLngLat([longitude, latitude]).addTo(map);
+          userMarkerRef.current = new mapboxModule!.default.Marker(el).setLngLat([longitude, latitude]).addTo(map);
 
           import("sonner").then(({ toast }) => toast.success("Mapa centralizado na sua localização"));
         }
@@ -221,21 +221,25 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
     );
   }, [onPertoDeVoce]);
 
-  // Init map once
+  // Init map once — wait for mapbox module
   useEffect(() => {
     if (initRef.current || !containerRef.current) return;
     initRef.current = true;
 
-    const map = new mapboxgl.Map({
-      container: containerRef.current,
-      style: "mapbox://styles/mapbox/streets-v12",
-      center: [-51.2177, -30.0346],
-      zoom: 11,
-      dragRotate: false,
-      attributionControl: false,
-    });
+    mapboxReady.then((mb) => {
+      if (!containerRef.current) return;
+      mb.default.accessToken = MAPBOX_TOKEN;
 
-    map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "top-right");
+      const map = new mb.default.Map({
+        container: containerRef.current,
+        style: "mapbox://styles/mapbox/streets-v12",
+        center: [-51.2177, -30.0346],
+        zoom: 11,
+        dragRotate: false,
+        attributionControl: false,
+      });
+
+      map.addControl(new mb.default.NavigationControl({ showCompass: false }), "top-right");
 
     map.on("load", () => {
       // FIX 8 — clusterMaxZoom reduced to 13 (neighborhood level)

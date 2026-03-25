@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef, lazy } from "react";
+import React, { useState, useEffect, useCallback, useMemo, useRef, lazy, Suspense } from "react";
 import { useCorretor } from "@/contexts/CorretorContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 const PerformanceDebug = lazy(() => import("@/components/PerformanceDebug").then(m => ({ default: m.PerformanceDebug })));
@@ -9,7 +9,7 @@ import { useSearchParams } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { SearchFiltersBar } from "@/components/SearchFiltersBar";
 import { SearchPropertyCard } from "@/components/SearchPropertyCard";
-import { SearchMap } from "@/components/SearchMap";
+const SearchMap = lazy(() => import("@/components/SearchMap").then(m => ({ default: m.SearchMap })));
 import { SkeletonCard } from "@/components/SkeletonCard";
 import { SearchCTACard } from "@/components/SearchCTACard";
 import { MobileFiltersSheet } from "@/components/MobileFiltersSheet";

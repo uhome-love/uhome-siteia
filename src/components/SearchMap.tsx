@@ -468,11 +468,12 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
     });
 
     mapRef.current = map;
+    }); // end mapboxReady.then
 
     return () => {
       mapReadyRef.current = false;
       if (autoSearchTimerRef.current) clearTimeout(autoSearchTimerRef.current);
-      map.remove();
+      mapRef.current?.remove();
       mapRef.current = null;
       initRef.current = false;
       initialBoundsReportedRef.current = false;

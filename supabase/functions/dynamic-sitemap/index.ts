@@ -39,6 +39,20 @@ const SEO_CATEGORY_PAGES = [
   "/comerciais-porto-alegre",
 ];
 
+// ── SEO intent pages ────────────────────────────────────
+const SEO_INTENT_PAGES = [
+  "/apartamentos-a-venda-porto-alegre",
+  "/casas-a-venda-porto-alegre",
+  "/coberturas-a-venda-porto-alegre",
+  "/terrenos-a-venda-porto-alegre",
+  "/imoveis-de-luxo-porto-alegre",
+  "/investimento-imobiliario-porto-alegre",
+  "/lancamentos-porto-alegre",
+];
+
+const SEO_TIPOS = ["apartamentos", "casas", "coberturas", "studios", "terrenos", "comerciais"];
+
+
 // ── Blog ─────────────────────────────────────────────────
 const BLOG_SLUGS = [
   "melhores-bairros-porto-alegre-2025",

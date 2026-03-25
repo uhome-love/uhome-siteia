@@ -2,23 +2,30 @@
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <sitemap>
     <loc>https://uhome.com.br/sitemap-paginas.xml</loc>
+    <lastmod>2026-03-25</lastmod>
   </sitemap>
   <sitemap>
     <loc>https://uhome.com.br/sitemap-imoveis.xml</loc>
+    <lastmod>2026-03-25</lastmod>
   </sitemap>
   <sitemap>
     <loc>https://uhome.com.br/sitemap-bairros.xml</loc>
+    <lastmod>2026-03-25</lastmod>
   </sitemap>
   <sitemap>
     <loc>https://uhome.com.br/sitemap-seo.xml</loc>
+    <lastmod>2026-03-25</lastmod>
   </sitemap>
   <sitemap>
     <loc>https://uhome.com.br/sitemap-condominios.xml</loc>
+    <lastmod>2026-03-25</lastmod>
   </sitemap>
   <sitemap>
     <loc>https://uhome.com.br/sitemap-empreendimentos.xml</loc>
+    <lastmod>2026-03-25</lastmod>
   </sitemap>
   <sitemap>
     <loc>https://uhome.com.br/sitemap-blog.xml</loc>
+    <lastmod>2026-03-25</lastmod>
   </sitemap>
 </sitemapindex>

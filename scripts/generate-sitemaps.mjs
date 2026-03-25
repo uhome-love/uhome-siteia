@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * Generates static sitemap XML files in public/ by querying Supabase.
+ * Generates a single sitemap.xml in public/ by querying Supabase.
  * Run: node scripts/generate-sitemaps.mjs
- * Add to package.json: "prebuild": "node scripts/generate-sitemaps.mjs"
+ * Max 50,000 URLs per sitemap spec.
  */
 import { createClient } from "@supabase/supabase-js";
 import fs from "fs";
@@ -14,6 +14,7 @@ const PUBLIC = path.join(__dirname, "..", "public");
 
 const SITE = "https://uhome.com.br";
 const TODAY = new Date().toISOString().split("T")[0];
+const MAX_URLS = 50000;
 
 // ── Supabase client ──
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
@@ -29,16 +30,8 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const entry = (loc, lastmod, changefreq, priority) =>
   `  <url>\n    <loc>${esc(loc)}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`;
-const wrap = (entries) =>
-  `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.join("\n")}\n</urlset>`;
 const slugify = (name) =>
   name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-
-const write = (name, xml) => {
-  const p = path.join(PUBLIC, name);
-  fs.writeFileSync(p, xml, "utf-8");
-  console.log(`✓ ${name} (${(xml.length / 1024).toFixed(1)} KB)`);
-};
 
 // ── Static data ──
 const SEO_CATEGORY_PAGES = [
@@ -66,33 +59,45 @@ const BLOG_SLUGS = [
 ];
 
 // ══════════════════════════════════════════════════════════
-// 1. sitemap-paginas.xml
+// Collect all entries into a single Set (dedup by URL)
 // ══════════════════════════════════════════════════════════
-function buildPages() {
-  const entries = [
-    entry(`${SITE}/`, TODAY, "daily", "1.0"),
-    entry(`${SITE}/busca`, TODAY, "daily", "0.9"),
-    entry(`${SITE}/bairros`, TODAY, "weekly", "0.85"),
-    entry(`${SITE}/condominios`, TODAY, "weekly", "0.85"),
-    entry(`${SITE}/avaliar-imovel`, TODAY, "monthly", "0.7"),
-    entry(`${SITE}/faq`, TODAY, "monthly", "0.6"),
-    entry(`${SITE}/anunciar`, TODAY, "monthly", "0.6"),
-    entry(`${SITE}/carreiras`, TODAY, "monthly", "0.4"),
-    entry(`${SITE}/politica-de-privacidade`, TODAY, "yearly", "0.3"),
-    ...SEO_CATEGORY_PAGES.map((p) => entry(`${SITE}${p}`, TODAY, "daily", "0.8")),
-    ...SEO_INTENT_PAGES.map((p) => entry(`${SITE}${p}`, TODAY, "daily", "0.8")),
-  ];
-  write("sitemap-paginas.xml", wrap(entries));
-}
+async function main() {
+  console.log(`\n🗺️  Generating sitemap.xml for ${SITE} (${TODAY})\n`);
 
-// ══════════════════════════════════════════════════════════
-// 2. sitemap-imoveis.xml
-// ══════════════════════════════════════════════════════════
-async function buildImoveis() {
-  const entries = [];
+  /** @type {Map<string, {lastmod:string, changefreq:string, priority:string}>} */
+  const urls = new Map();
+
+  const add = (path, lastmod, changefreq, priority) => {
+    if (urls.size >= MAX_URLS) return;
+    const loc = `${SITE}${path}`;
+    if (!urls.has(loc)) urls.set(loc, { lastmod, changefreq, priority });
+  };
+
+  // 1. Páginas principais
+  add("/", TODAY, "daily", "1.0");
+  add("/busca", TODAY, "daily", "0.9");
+  add("/bairros", TODAY, "weekly", "0.85");
+  add("/condominios", TODAY, "weekly", "0.85");
+  add("/avaliar-imovel", TODAY, "monthly", "0.7");
+  add("/faq", TODAY, "monthly", "0.6");
+  add("/anunciar", TODAY, "monthly", "0.6");
+  add("/carreiras", TODAY, "monthly", "0.4");
+  add("/politica-de-privacidade", TODAY, "yearly", "0.3");
+
+  // 2. Páginas SEO de categoria e intenção
+  for (const p of SEO_CATEGORY_PAGES) add(p, TODAY, "daily", "0.8");
+  for (const p of SEO_INTENT_PAGES) add(p, TODAY, "daily", "0.8");
+
+  // 3. Blog
+  add("/blog", TODAY, "weekly", "0.7");
+  for (const s of BLOG_SLUGS) add(`/blog/${s}`, TODAY, "monthly", "0.7");
+
+  // 4. Imóveis
+  console.log("  Fetching imóveis...");
   let offset = 0;
   const BATCH = 1000;
-  while (true) {
+  let imoveisCount = 0;
+  while (urls.size < MAX_URLS) {
     const { data, error } = await supabase
       .from("imoveis")
       .select("slug, updated_at")
@@ -100,69 +105,54 @@ async function buildImoveis() {
       .not("slug", "is", null)
       .order("publicado_em", { ascending: false })
       .range(offset, offset + BATCH - 1);
-    if (error) { console.error("Imoveis error:", error.message); break; }
+    if (error) { console.error("  Imoveis error:", error.message); break; }
     if (!data || data.length === 0) break;
     for (const row of data) {
       const lm = row.updated_at ? new Date(row.updated_at).toISOString().split("T")[0] : TODAY;
-      entries.push(entry(`${SITE}/imovel/${row.slug}`, lm, "daily", "0.9"));
+      add(`/imovel/${row.slug}`, lm, "daily", "0.9");
+      imoveisCount++;
     }
     if (data.length < BATCH) break;
     offset += BATCH;
   }
-  write("sitemap-imoveis.xml", wrap(entries));
-  return entries.length;
-}
+  console.log(`  ✓ ${imoveisCount} imóveis`);
 
-// ══════════════════════════════════════════════════════════
-// 3. sitemap-bairros.xml
-// ══════════════════════════════════════════════════════════
-async function buildBairros() {
+  // 5. Bairros
+  console.log("  Fetching bairros...");
   const { data: dbBairros } = await supabase.rpc("get_bairros_disponiveis");
-  const slugSet = new Set();
+  const activeBairros = [];
   if (dbBairros) {
     for (const b of dbBairros) {
       const s = slugify(b.bairro);
-      if (s && b.count >= 3) slugSet.add(s);
+      if (s && b.count >= 3) {
+        add(`/bairros/${s}`, TODAY, "daily", "0.85");
+        if (b.count >= 5) activeBairros.push(s);
+      }
     }
   }
-  const entries = Array.from(slugSet).sort().map((s) =>
-    entry(`${SITE}/bairros/${s}`, TODAY, "daily", "0.85")
-  );
-  write("sitemap-bairros.xml", wrap(entries));
-  return entries.length;
-}
+  console.log(`  ✓ ${activeBairros.length} bairros ativos para SEO`);
 
-// ══════════════════════════════════════════════════════════
-// 4. sitemap-seo.xml
-// ══════════════════════════════════════════════════════════
-async function buildSeo() {
-  const { data: dbBairros } = await supabase.rpc("get_bairros_disponiveis");
-  const activeBairros = (dbBairros || []).filter((b) => b.count >= 5).map((b) => slugify(b.bairro));
-  const entries = [];
+  // 6. Páginas SEO dinâmicas (tipo + bairro)
   for (const tipo of SEO_TIPOS) {
     for (const bs of activeBairros) {
-      entries.push(entry(`${SITE}/${tipo}-${bs}`, TODAY, "daily", "0.75"));
+      add(`/${tipo}-${bs}`, TODAY, "daily", "0.75");
     }
   }
+
+  // 7. Páginas SEO dinâmicas (tipo + quartos + bairro)
   const quartosTipos = ["apartamentos", "casas", "coberturas"];
   for (const tipo of quartosTipos) {
     for (const q of [1, 2, 3, 4]) {
       for (const bs of activeBairros) {
-        entries.push(entry(`${SITE}/${tipo}-${q}-quartos-${bs}`, TODAY, "weekly", "0.7"));
+        add(`/${tipo}-${q}-quartos-${bs}`, TODAY, "weekly", "0.7");
       }
     }
   }
-  write("sitemap-seo.xml", wrap(entries));
-  return entries.length;
-}
 
-// ══════════════════════════════════════════════════════════
-// 5. sitemap-condominios.xml
-// ══════════════════════════════════════════════════════════
-async function buildCondominios() {
+  // 8. Condomínios
+  console.log("  Fetching condomínios...");
   const condoCount = new Map();
-  let offset = 0;
-  const BATCH = 1000;
+  offset = 0;
   while (true) {
     const { data, error } = await supabase
       .from("imoveis")
@@ -178,74 +168,37 @@ async function buildCondominios() {
     if (data.length < BATCH) break;
     offset += BATCH;
   }
-  const entries = [];
+  let condosAdded = 0;
   for (const [name, count] of condoCount) {
     if (count < 2) continue;
     const s = slugify(name);
-    if (s) entries.push(entry(`${SITE}/condominios/${s}`, TODAY, "weekly", "0.7"));
+    if (s) { add(`/condominios/${s}`, TODAY, "weekly", "0.7"); condosAdded++; }
   }
-  write("sitemap-condominios.xml", wrap(entries));
-  return entries.length;
-}
+  console.log(`  ✓ ${condosAdded} condomínios`);
 
-// ══════════════════════════════════════════════════════════
-// 6. sitemap-empreendimentos.xml
-// ══════════════════════════════════════════════════════════
-async function buildEmpreendimentos() {
-  const { data } = await supabase.from("empreendimentos").select("slug, updated_at").eq("ativo", true);
-  const entries = (data || []).map((row) => {
+  // 9. Empreendimentos
+  console.log("  Fetching empreendimentos...");
+  const { data: empData } = await supabase.from("empreendimentos").select("slug, updated_at").eq("ativo", true);
+  for (const row of empData || []) {
     const lm = row.updated_at ? new Date(row.updated_at).toISOString().split("T")[0] : TODAY;
-    return entry(`${SITE}/empreendimentos/${row.slug}`, lm, "weekly", "0.8");
-  });
-  write("sitemap-empreendimentos.xml", wrap(entries));
-  return entries.length;
-}
+    add(`/empreendimentos/${row.slug}`, lm, "weekly", "0.8");
+  }
+  console.log(`  ✓ ${(empData || []).length} empreendimentos`);
 
-// ══════════════════════════════════════════════════════════
-// 7. sitemap-blog.xml
-// ══════════════════════════════════════════════════════════
-function buildBlog() {
-  const entries = [
-    entry(`${SITE}/blog`, TODAY, "weekly", "0.7"),
-    ...BLOG_SLUGS.map((s) => entry(`${SITE}/blog/${s}`, TODAY, "monthly", "0.7")),
-  ];
-  write("sitemap-blog.xml", wrap(entries));
-}
+  // ── Build XML ──
+  const entries = [];
+  for (const [loc, meta] of urls) {
+    entries.push(entry(loc, meta.lastmod, meta.changefreq, meta.priority));
+  }
 
-// ══════════════════════════════════════════════════════════
-// INDEX
-// ══════════════════════════════════════════════════════════
-function buildIndex() {
-  const sitemaps = [
-    "sitemap-paginas.xml", "sitemap-imoveis.xml", "sitemap-bairros.xml",
-    "sitemap-seo.xml", "sitemap-condominios.xml", "sitemap-empreendimentos.xml",
-    "sitemap-blog.xml",
-  ];
-  const entries = sitemaps.map((f) =>
-    `  <sitemap>\n    <loc>${esc(`${SITE}/${f}`)}</loc>\n    <lastmod>${TODAY}</lastmod>\n  </sitemap>`
-  ).join("\n");
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries}\n</sitemapindex>`;
-  write("sitemap.xml", xml);
-}
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.join("\n")}\n</urlset>`;
+  const outPath = path.join(PUBLIC, "sitemap.xml");
+  fs.writeFileSync(outPath, xml, "utf-8");
 
-// ══════════════════════════════════════════════════════════
-// MAIN
-// ══════════════════════════════════════════════════════════
-async function main() {
-  console.log(`\n🗺️  Generating sitemaps for ${SITE} (${TODAY})\n`);
-
-  buildPages();
-  const [nImoveis, nBairros, nSeo, nCondos, nEmpreendimentos] = await Promise.all([
-    buildImoveis(),
-    buildBairros(),
-    buildSeo(),
-    buildCondominios(),
-    buildEmpreendimentos(),
-  ]);
-  buildBlog();
-  buildIndex();
-
-  console.log(`\n✅ Done! ${nImoveis} imóveis, ${nBairros} bairros, ${nSeo} SEO pages, ${nCondos} condominios, ${nEmpreendimentos} empreendimentos\n`);
+  console.log(`\n✅ sitemap.xml generated: ${urls.size} URLs (${(xml.length / 1024).toFixed(1)} KB)\n`);
+  if (urls.size >= MAX_URLS) {
+    console.warn(`⚠️  Hit ${MAX_URLS} URL limit — some URLs were omitted.`);
+  }
 }
 
 main().catch((err) => {

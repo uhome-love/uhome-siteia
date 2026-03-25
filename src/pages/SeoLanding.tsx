@@ -8,6 +8,7 @@ import { LeadFormInline } from "@/components/LeadFormInline";
 import { motion } from "framer-motion";
 import { Loader2, ArrowRight, ChevronRight, TrendingUp, MapPin, Building2 } from "lucide-react";
 import { setJsonLd, removeJsonLd } from "@/lib/jsonld";
+import { useBairroDescricao } from "@/hooks/useBairroDescricao";
 import { useCanonical } from "@/hooks/useCanonical";
 import { useCorretor } from "@/contexts/CorretorContext";
 import {
@@ -136,14 +137,26 @@ const SeoLanding = () => {
     };
   }, [imoveis]);
 
-  // Description text
+  // AI-generated description from DB
+  const { data: aiDesc } = useBairroDescricao(config?.bairro);
+
+  // Description text - prefer AI description, fallback to generated
   const descriptionText = useMemo(() => {
     if (!config) return "";
-    if (config.bairro) {
-      return generateBairroDescription(config.bairro, config.tipo, config.quartos);
-    }
+    if (aiDesc?.descricao_seo) return aiDesc.descricao_seo;
+    if (config.bairro) return generateBairroDescription(config.bairro, config.tipo, config.quartos);
     return generateIntentDescription(config.h1);
-  }, [config]);
+  }, [config, aiDesc]);
+
+  const investText = useMemo(() => {
+    if (aiDesc?.por_que_investir) return aiDesc.por_que_investir;
+    return null;
+  }, [aiDesc]);
+
+  const infraText = useMemo(() => {
+    if (aiDesc?.infraestrutura) return aiDesc.infraestrutura;
+    return null;
+  }, [aiDesc]);
 
   // Related links
   const relatedBairros = useMemo(() => {
@@ -271,24 +284,21 @@ const SeoLanding = () => {
                     Por que investir em {config.bairro}?
                   </h3>
                 </div>
-                <ul className="space-y-2 font-body text-sm text-muted-foreground">
-                  <li className="flex items-start gap-2">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                    Valorização constante nos últimos anos
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                    Infraestrutura completa e consolidada
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                    Alta demanda por locação e revenda
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                    Novos empreendimentos em desenvolvimento
-                  </li>
-                </ul>
+                {investText ? (
+                  <p className="font-body text-sm leading-relaxed text-muted-foreground">{investText}</p>
+                ) : (
+                  <ul className="space-y-2 font-body text-sm text-muted-foreground">
+                    <li className="flex items-start gap-2"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />Valorização constante nos últimos anos</li>
+                    <li className="flex items-start gap-2"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />Infraestrutura completa e consolidada</li>
+                    <li className="flex items-start gap-2"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />Alta demanda por locação e revenda</li>
+                  </ul>
+                )}
+                {infraText && (
+                  <div className="rounded-xl bg-secondary/50 p-3">
+                    <p className="font-body text-xs font-semibold text-muted-foreground mb-1">Infraestrutura</p>
+                    <p className="font-body text-xs text-muted-foreground">{infraText}</p>
+                  </div>
+                )}
                 {stats && (
                   <div className="rounded-xl bg-secondary p-3 text-center">
                     <p className="font-body text-xs text-muted-foreground">Preço médio na região</p>

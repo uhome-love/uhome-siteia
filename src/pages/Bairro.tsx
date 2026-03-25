@@ -5,6 +5,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { SearchPropertyCard } from "@/components/SearchPropertyCard";
 import { getBairroBySlug, bairrosData } from "@/data/bairros";
+import { useBairroDescricao } from "@/hooks/useBairroDescricao";
 import { fetchImoveis, formatPreco, type Imovel } from "@/services/imoveis";
 import { motion } from "framer-motion";
 import { MapPin, Home, ArrowRight, Loader2, ChevronRight } from "lucide-react";
@@ -29,6 +30,7 @@ const Bairro = () => {
   const { prefixLink } = useCorretor();
   const bairro = getBairroBySlug(slug || "");
   useCanonical();
+  const { data: aiDesc } = useBairroDescricao(bairro?.nome);
 
   const [imoveis, setImoveis] = useState<Imovel[]>([]);
   const [total, setTotal] = useState(0);
@@ -149,8 +151,11 @@ const Bairro = () => {
             <div>
               <h2 className="text-h3 text-foreground">Sobre {bairro.nome}</h2>
               <p className="mt-4 font-body text-[15px] leading-relaxed text-muted-foreground">
-                {bairro.descricao}
+                {aiDesc?.descricao_curta || bairro.descricao}
               </p>
+              {aiDesc?.descricao_seo && aiDesc.descricao_seo.split("\n\n").slice(1).map((p, i) => (
+                <p key={i} className="mt-3 font-body text-[15px] leading-relaxed text-muted-foreground">{p}</p>
+              ))}
             </div>
             {stats && (
               <motion.div

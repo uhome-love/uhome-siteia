@@ -70,6 +70,42 @@ export type Database = {
           },
         ]
       }
+      bairro_descricoes: {
+        Row: {
+          bairro_nome: string
+          bairro_slug: string
+          created_at: string | null
+          descricao_curta: string | null
+          descricao_seo: string
+          id: string
+          infraestrutura: string | null
+          por_que_investir: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          bairro_nome: string
+          bairro_slug: string
+          created_at?: string | null
+          descricao_curta?: string | null
+          descricao_seo: string
+          id?: string
+          infraestrutura?: string | null
+          por_que_investir?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          bairro_nome?: string
+          bairro_slug?: string
+          created_at?: string | null
+          descricao_curta?: string | null
+          descricao_seo?: string
+          id?: string
+          infraestrutura?: string | null
+          por_que_investir?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       buscas_salvas: {
         Row: {
           ativa: boolean

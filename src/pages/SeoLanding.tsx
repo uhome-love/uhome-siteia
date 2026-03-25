@@ -284,24 +284,21 @@ const SeoLanding = () => {
                     Por que investir em {config.bairro}?
                   </h3>
                 </div>
-                <ul className="space-y-2 font-body text-sm text-muted-foreground">
-                  <li className="flex items-start gap-2">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                    Valorização constante nos últimos anos
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                    Infraestrutura completa e consolidada
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                    Alta demanda por locação e revenda
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                    Novos empreendimentos em desenvolvimento
-                  </li>
-                </ul>
+                {investText ? (
+                  <p className="font-body text-sm leading-relaxed text-muted-foreground">{investText}</p>
+                ) : (
+                  <ul className="space-y-2 font-body text-sm text-muted-foreground">
+                    <li className="flex items-start gap-2"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />Valorização constante nos últimos anos</li>
+                    <li className="flex items-start gap-2"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />Infraestrutura completa e consolidada</li>
+                    <li className="flex items-start gap-2"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />Alta demanda por locação e revenda</li>
+                  </ul>
+                )}
+                {infraText && (
+                  <div className="rounded-xl bg-secondary/50 p-3">
+                    <p className="font-body text-xs font-semibold text-muted-foreground mb-1">Infraestrutura</p>
+                    <p className="font-body text-xs text-muted-foreground">{infraText}</p>
+                  </div>
+                )}
                 {stats && (
                   <div className="rounded-xl bg-secondary p-3 text-center">
                     <p className="font-body text-xs text-muted-foreground">Preço médio na região</p>

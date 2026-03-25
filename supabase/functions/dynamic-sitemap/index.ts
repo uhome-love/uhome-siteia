@@ -96,6 +96,7 @@ function buildSitemapIndex(today: string) {
     { loc: `${SITE}/sitemap-paginas.xml`, lastmod: today },
     { loc: `${SITE}/sitemap-imoveis.xml`, lastmod: today },
     { loc: `${SITE}/sitemap-bairros.xml`, lastmod: today },
+    { loc: `${SITE}/sitemap-seo.xml`, lastmod: today },
     { loc: `${SITE}/sitemap-condominios.xml`, lastmod: today },
     { loc: `${SITE}/sitemap-empreendimentos.xml`, lastmod: today },
     { loc: `${SITE}/sitemap-blog.xml`, lastmod: today },
@@ -125,6 +126,10 @@ function buildPagesSitemap(today: string) {
     urlEntry(`${SITE}/politica-de-privacidade`, today, "yearly", "0.3"),
     // SEO category pages — priority 0.8
     ...SEO_CATEGORY_PAGES.map((path) =>
+      urlEntry(`${SITE}${path}`, today, "daily", "0.8")
+    ),
+    // SEO intent pages — priority 0.8
+    ...SEO_INTENT_PAGES.map((path) =>
       urlEntry(`${SITE}${path}`, today, "daily", "0.8")
     ),
   ];

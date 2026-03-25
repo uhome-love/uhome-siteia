@@ -794,7 +794,9 @@ const Search = () => {
         {/* Map — desktop */}
         <div className="relative hidden w-[45%] shrink-0 border-l border-border lg:block" style={{ overflow: "visible" }}>
           <div className="h-full w-full overflow-hidden rounded-none">
-            <SearchMap pins={mapPins} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} onBoundsChange={handleMapBoundsChange} onPertoDeVoce={handlePertoDeVoce} />
+            <Suspense fallback={<div className="flex h-full w-full items-center justify-center bg-muted"><div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" /></div>}>
+              <SearchMap pins={mapPins} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} onBoundsChange={handleMapBoundsChange} onPertoDeVoce={handlePertoDeVoce} />
+            </Suspense>
           </div>
         </div>
       </div>
@@ -833,7 +835,9 @@ const Search = () => {
               <X className="h-4 w-4" />
               Voltar à lista
             </button>
-            <SearchMap pins={mapPins} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} onBoundsChange={handleMapBoundsChange} onPertoDeVoce={handlePertoDeVoce} />
+            <Suspense fallback={<div className="flex h-full w-full items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" /></div>}>
+              <SearchMap pins={mapPins} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} onBoundsChange={handleMapBoundsChange} onPertoDeVoce={handlePertoDeVoce} />
+            </Suspense>
           </motion.div>
         )}
       </AnimatePresence>

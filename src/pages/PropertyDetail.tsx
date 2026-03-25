@@ -144,7 +144,14 @@ const PropertyDetail = () => {
           <p className="mt-2 font-body text-sm text-muted-foreground">
             Este imóvel pode ter sido removido ou o link está incorreto.
           </p>
+          <Button
+            onClick={() => navigate(prefixLink("/busca"))}
+            className="mt-6"
+          >
+            Ver imóveis disponíveis
+          </Button>
         </div>
+        <Footer />
       </div>
     );
   }

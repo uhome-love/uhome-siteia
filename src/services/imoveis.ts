@@ -195,7 +195,7 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
   const bairrosArr = filters.bairros?.length ? filters.bairros : undefined;
 
   const t0 = performance.now();
-  const skipCount = (filters.offset ?? 0) > 0;
+  const skipCount = (filters.offset ?? 0) > 0 || !!filters.bounds;
 
   let countPromise: Promise<number>;
 

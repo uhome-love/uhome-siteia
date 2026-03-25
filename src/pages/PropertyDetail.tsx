@@ -187,7 +187,23 @@ const PropertyDetail = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      {/* Desktop Back + Gallery */}
+      {isIndisponivel && (
+        <div className="bg-amber-50 border-b border-amber-200 dark:bg-amber-950/30 dark:border-amber-800">
+          <div className="mx-auto max-w-7xl px-6 py-3 flex items-center justify-between">
+            <p className="font-body text-sm font-medium text-amber-800 dark:text-amber-200">
+              Este imóvel está <strong>{statusLabel[imovel.status] || "indisponível"}</strong> e não está mais à venda.
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate(prefixLink("/busca"))}
+              className="shrink-0 border-amber-300 text-amber-800 hover:bg-amber-100 dark:border-amber-700 dark:text-amber-200 dark:hover:bg-amber-900"
+            >
+              Ver imóveis disponíveis
+            </Button>
+          </div>
+        </div>
+      )}
       <div className="mt-16 hidden sm:block">
         <div className="mx-auto max-w-7xl px-6 pt-4 pb-2">
           <button

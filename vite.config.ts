@@ -24,8 +24,8 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          // Keep mapbox in the Search chunk (lazy loaded) — do NOT separate it
-          if (id.includes("mapbox-gl")) return undefined;
+          // Separate mapbox into its own chunk — only loaded when map is needed
+          if (id.includes("mapbox-gl")) return "vendor-mapbox";
           if (id.includes("node_modules/react-dom") || id.includes("node_modules/react/")) return "vendor-react";
           if (id.includes("react-router-dom")) return "vendor-router";
           if (id.includes("@tanstack/react-query")) return "vendor-query";

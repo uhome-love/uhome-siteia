@@ -2,23 +2,27 @@ import { useRef, useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, X, Bed, Maximize, ToggleLeft, ToggleRight, PenTool, Navigation, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import mapboxgl from "mapbox-gl";
+import type mapboxgl from "mapbox-gl";
 
-// Load CSS dynamically to avoid blocking render
-if (typeof document !== "undefined" && !document.getElementById("mapbox-css")) {
-  const link = document.createElement("link");
-  link.id = "mapbox-css";
-  link.rel = "stylesheet";
-  link.href = "https://api.mapbox.com/mapbox-gl-js/v3.20.0/mapbox-gl.css";
-  document.head.appendChild(link);
-}
+// Lazy-loaded mapbox reference — filled on first mount
+let mapboxModule: typeof import("mapbox-gl") | null = null;
+const mapboxReady = import("mapbox-gl").then((m) => {
+  mapboxModule = m;
+  // Load CSS dynamically to avoid blocking render
+  if (typeof document !== "undefined" && !document.getElementById("mapbox-css")) {
+    const link = document.createElement("link");
+    link.id = "mapbox-css";
+    link.rel = "stylesheet";
+    link.href = "https://api.mapbox.com/mapbox-gl-js/v3.20.0/mapbox-gl.css";
+    document.head.appendChild(link);
+  }
+  return m;
+});
+
 import { type MapPin as MapPinData } from "@/services/imoveis";
 import { useCorretor } from "@/contexts/CorretorContext";
 
-
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || "pk.eyJ1IjoibHVjYXN1aG9tZSIsImEiOiJjbW16c2l2dmUwYmxsMnJwdDI2bGxrazBkIn0.B4dp727gJlQQIWTci7GpFQ";
-
-mapboxgl.accessToken = MAPBOX_TOKEN;
 
 function formatPreco(preco: number): string {
   if (!preco) return "";
@@ -202,7 +206,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
           // Add user location marker
           const el = document.createElement("div");
           el.style.cssText = "width:18px;height:18px;background:hsl(var(--primary));border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.3);";
-          userMarkerRef.current = new mapboxgl.Marker(el).setLngLat([longitude, latitude]).addTo(map);
+          userMarkerRef.current = new mapboxModule!.default.Marker(el).setLngLat([longitude, latitude]).addTo(map);
 
           import("sonner").then(({ toast }) => toast.success("Mapa centralizado na sua localização"));
         }
@@ -217,21 +221,25 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
     );
   }, [onPertoDeVoce]);
 
-  // Init map once
+  // Init map once — wait for mapbox module
   useEffect(() => {
     if (initRef.current || !containerRef.current) return;
     initRef.current = true;
 
-    const map = new mapboxgl.Map({
-      container: containerRef.current,
-      style: "mapbox://styles/mapbox/streets-v12",
-      center: [-51.2177, -30.0346],
-      zoom: 11,
-      dragRotate: false,
-      attributionControl: false,
-    });
+    mapboxReady.then((mb) => {
+      if (!containerRef.current) return;
+      mb.default.accessToken = MAPBOX_TOKEN;
 
-    map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "top-right");
+      const map = new mb.default.Map({
+        container: containerRef.current,
+        style: "mapbox://styles/mapbox/streets-v12",
+        center: [-51.2177, -30.0346],
+        zoom: 11,
+        dragRotate: false,
+        attributionControl: false,
+      });
+
+      map.addControl(new mb.default.NavigationControl({ showCompass: false }), "top-right");
 
     map.on("load", () => {
       // FIX 8 — clusterMaxZoom reduced to 13 (neighborhood level)
@@ -460,11 +468,12 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
     });
 
     mapRef.current = map;
+    }); // end mapboxReady.then
 
     return () => {
       mapReadyRef.current = false;
       if (autoSearchTimerRef.current) clearTimeout(autoSearchTimerRef.current);
-      map.remove();
+      mapRef.current?.remove();
       mapRef.current = null;
       initRef.current = false;
       initialBoundsReportedRef.current = false;

@@ -18,6 +18,8 @@ export function Navbar() {
 
   const handlePrefetchBusca = useCallback(() => {
     prefetchBusca(queryClient);
+    // Preload the Search page chunk so navigation is instant
+    import("../pages/Search");
   }, [queryClient]);
 
   useEffect(() => {

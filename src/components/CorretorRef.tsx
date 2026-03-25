@@ -13,31 +13,34 @@ export function CorretorRefLayout() {
 
   useEffect(() => {
     async function registrar() {
-      if (!slug) { setReady(true); return; }
+      try {
+        if (!slug) { setReady(true); return; }
 
-      const jaRegistrado = sessionStorage.getItem('corretor_ref_registrado');
+        const jaRegistrado = sessionStorage.getItem('corretor_ref_registrado');
 
-      // If not yet registered this session, record the visit
-      if (jaRegistrado !== slug) {
-        const { data: corretor } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('slug_ref', slug)
-          .eq('ativo', true)
-          .maybeSingle();
+        if (jaRegistrado !== slug) {
+          const { data: corretor } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('slug_ref', slug)
+            .eq('ativo', true)
+            .maybeSingle();
 
-        if (corretor) {
-          await supabase.from('corretor_visitas').insert({
-            corretor_id: corretor.id,
-            corretor_slug: slug,
-            user_agent: navigator.userAgent,
-            referrer: document.referrer,
-          });
-          sessionStorage.setItem('corretor_ref_registrado', slug);
+          if (corretor) {
+            await supabase.from('corretor_visitas').insert({
+              corretor_id: corretor.id,
+              corretor_slug: slug,
+              user_agent: navigator.userAgent,
+              referrer: document.referrer,
+            });
+            sessionStorage.setItem('corretor_ref_registrado', slug);
+          }
         }
+      } catch (err) {
+        console.warn('[CorretorRef] Erro ao registrar visita:', err);
+      } finally {
+        setReady(true);
       }
-
-      setReady(true);
     }
 
     registrar();

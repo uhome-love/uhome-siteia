@@ -8,6 +8,7 @@ import { LeadFormInline } from "@/components/LeadFormInline";
 import { motion } from "framer-motion";
 import { Loader2, ArrowRight, ChevronRight, TrendingUp, MapPin, Building2 } from "lucide-react";
 import { setJsonLd, removeJsonLd } from "@/lib/jsonld";
+import { useBairroDescricao } from "@/hooks/useBairroDescricao";
 import { useCanonical } from "@/hooks/useCanonical";
 import { useCorretor } from "@/contexts/CorretorContext";
 import {
@@ -136,14 +137,26 @@ const SeoLanding = () => {
     };
   }, [imoveis]);
 
-  // Description text
+  // AI-generated description from DB
+  const { data: aiDesc } = useBairroDescricao(config?.bairro);
+
+  // Description text - prefer AI description, fallback to generated
   const descriptionText = useMemo(() => {
     if (!config) return "";
-    if (config.bairro) {
-      return generateBairroDescription(config.bairro, config.tipo, config.quartos);
-    }
+    if (aiDesc?.descricao_seo) return aiDesc.descricao_seo;
+    if (config.bairro) return generateBairroDescription(config.bairro, config.tipo, config.quartos);
     return generateIntentDescription(config.h1);
-  }, [config]);
+  }, [config, aiDesc]);
+
+  const investText = useMemo(() => {
+    if (aiDesc?.por_que_investir) return aiDesc.por_que_investir;
+    return null;
+  }, [aiDesc]);
+
+  const infraText = useMemo(() => {
+    if (aiDesc?.infraestrutura) return aiDesc.infraestrutura;
+    return null;
+  }, [aiDesc]);
 
   // Related links
   const relatedBairros = useMemo(() => {

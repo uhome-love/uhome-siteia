@@ -129,11 +129,13 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
     .eq("status", "disponivel")
     .eq("finalidade", "venda");
 
-  // City filter: specific city or all allowed
-  if (filters.cidade) {
-    query = query.eq("cidade", filters.cidade);
-  } else {
-    query = query.in("cidade", CIDADES_PERMITIDAS);
+  // City filter: skip when searching by code to find properties in any city
+  if (!filters.codigo) {
+    if (filters.cidade) {
+      query = query.eq("cidade", filters.cidade);
+    } else {
+      query = query.in("cidade", CIDADES_PERMITIDAS);
+    }
   }
 
   if (filters.tipo) {

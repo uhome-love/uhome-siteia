@@ -21,7 +21,7 @@ export function useBairroDescricao(bairroNome?: string) {
         .eq("bairro_nome", bairroNome)
         .maybeSingle();
       if (error) throw error;
-      return data as BairroDescricao | null;
+      return data as unknown as BairroDescricao | null;
     },
     enabled: !!bairroNome,
     staleTime: 30 * 60 * 1000, // 30 min cache

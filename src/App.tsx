@@ -49,6 +49,7 @@ const AdminCorretores = lazy(() => import("./pages/admin/AdminCorretores.tsx"));
 const AdminEmpreendimentos = lazy(() => import("./pages/admin/AdminEmpreendimentos.tsx"));
 const EmpreendimentoDetail = lazy(() => import("./pages/EmpreendimentoDetail.tsx"));
 const MegaCyrela = lazy(() => import("./pages/MegaCyrela.tsx"));
+const SeoLanding = lazy(() => import("./pages/SeoLanding.tsx"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -118,6 +119,23 @@ const App = () => (
                 <Route path="/coberturas-porto-alegre" element={<TipoImovel />} />
                 <Route path="/studios-porto-alegre" element={<TipoImovel />} />
                 <Route path="/comerciais-porto-alegre" element={<TipoImovel />} />
+
+                {/* SEO landing pages: intent pages */}
+                <Route path="/apartamentos-a-venda-porto-alegre" element={<SeoLanding />} />
+                <Route path="/casas-a-venda-porto-alegre" element={<SeoLanding />} />
+                <Route path="/coberturas-a-venda-porto-alegre" element={<SeoLanding />} />
+                <Route path="/terrenos-a-venda-porto-alegre" element={<SeoLanding />} />
+                <Route path="/imoveis-de-luxo-porto-alegre" element={<SeoLanding />} />
+                <Route path="/investimento-imobiliario-porto-alegre" element={<SeoLanding />} />
+                <Route path="/lancamentos-porto-alegre" element={<SeoLanding />} />
+                {/* Dynamic SEO: tipo+bairro e tipo+quartos+bairro */}
+                <Route path="/apartamentos-*" element={<SeoLanding />} />
+                <Route path="/casas-*" element={<SeoLanding />} />
+                <Route path="/coberturas-*" element={<SeoLanding />} />
+                <Route path="/studios-*" element={<SeoLanding />} />
+                <Route path="/terrenos-*" element={<SeoLanding />} />
+                <Route path="/comerciais-*" element={<SeoLanding />} />
+                <Route path="/imoveis-*" element={<SeoLanding />} />
 
                 {/* Rotas do corretor — mesmas páginas, mantendo /c/:slug na URL */}
                 <Route path="/c/:corretorSlug" element={<CorretorRefLayout />}>

@@ -73,10 +73,6 @@ function PageFallback() {
   );
 }
 
-function RefCapture() {
-  useEffect(() => { captureCorretorRef(); }, []);
-  return null;
-}
 
 const CorretorRefLayout = lazy(() => import("./components/CorretorRef").then(m => ({ default: m.CorretorRefLayout })));
 

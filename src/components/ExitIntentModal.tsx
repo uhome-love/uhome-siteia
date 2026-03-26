@@ -65,6 +65,7 @@ export const ExitIntentModal = forwardRef<HTMLDivElement>(function ExitIntentMod
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setTouched(true);
     if (!nome.trim() || !telefone.trim()) return;
     setLoading(true);
     try {

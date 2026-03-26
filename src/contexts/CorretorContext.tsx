@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState, useEffect, useCallback, ReactNode } from "react";
+import { createContext, useContext, useMemo, useState, useEffect, useCallback, useRef, ReactNode } from "react";
 import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -66,6 +66,7 @@ export function CorretorProvider({ children }: { children: ReactNode }) {
   const location = useLocation();
   const [corretor, setCorretor] = useState<CorretorData | null>(null);
   const [fetchedSlug, setFetchedSlug] = useState<string | null>(null);
+  const fetchingRef = useRef<string | null>(null);
 
   // Check if current URL has /c/:slug
   const urlSlug = useMemo(() => {
@@ -94,10 +95,14 @@ export function CorretorProvider({ children }: { children: ReactNode }) {
     if (!activeSlug) {
       setCorretor(null);
       setFetchedSlug(null);
+      fetchingRef.current = null;
       return;
     }
 
-    if (fetchedSlug === activeSlug && corretor) return;
+    // Already fetched or currently fetching this slug — skip
+    if (fetchedSlug === activeSlug || fetchingRef.current === activeSlug) return;
+
+    fetchingRef.current = activeSlug;
 
     // Hydrate from localStorage for instant render
     const cachedId = localStorage.getItem("corretor_ref_id");
@@ -121,6 +126,9 @@ export function CorretorProvider({ children }: { children: ReactNode }) {
       .eq("ativo", true)
       .maybeSingle()
       .then(({ data }) => {
+        // Stale response — slug changed while fetching
+        if (fetchingRef.current !== activeSlug) return;
+
         if (data) {
           const c: CorretorData = {
             id: data.id,
@@ -141,7 +149,7 @@ export function CorretorProvider({ children }: { children: ReactNode }) {
           setFetchedSlug(activeSlug);
         }
       });
-  }, [activeSlug, fetchedSlug, corretor]);
+  }, [activeSlug, fetchedSlug]);
 
   const value = useMemo(() => {
     // Only prefix links when user arrived via /c/ URL

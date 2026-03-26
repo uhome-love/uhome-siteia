@@ -4,7 +4,6 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Home, Search } from "lucide-react";
 import { motion } from "framer-motion";
-import { supabase } from "@/integrations/supabase/client";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -81,14 +80,17 @@ const NotFound = () => {
     // 2. Tenta encontrar como slug de imóvel no banco
     const slug = extractPossibleSlug(location.pathname);
     if (slug) {
-      supabase
-        .from("imoveis")
-        .select("slug")
-        .eq("slug", slug)
-        .maybeSingle()
-        .then(({ data }) => {
-          if (data) {
-            navigate(`/imovel/${data.slug}`, { replace: true });
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/imoveis?select=slug&slug=eq.${encodeURIComponent(slug)}&limit=1`;
+      fetch(url, {
+        headers: {
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          "accept-profile": "public",
+        },
+      })
+        .then((r) => r.json())
+        .then((rows: any[]) => {
+          if (rows?.[0]?.slug) {
+            navigate(`/imovel/${rows[0].slug}`, { replace: true });
             return;
           }
           setChecking(false);

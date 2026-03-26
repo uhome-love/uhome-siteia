@@ -59,7 +59,6 @@ const PropertyDetail = () => {
     if (!slug) return;
 
     let cancelled = false;
-    let retryTimer: ReturnType<typeof setTimeout> | null = null;
     setLoading(true);
     setLoadError(null);
     setImovel(null);
@@ -88,24 +87,12 @@ const PropertyDetail = () => {
       .catch((error) => {
         console.error("Erro ao carregar imóvel:", error);
         if (cancelled) return;
-        // Auto-retry once at component level (on top of service-level retry)
-        retryTimer = setTimeout(() => {
-          if (cancelled) return;
-          fetchImovelBySlug(slug)
-            .then(handleSuccess)
-            .catch((retryError) => {
-              console.error("Erro ao carregar imóvel (retry):", retryError);
-              if (!cancelled) {
-                setLoadError("Não foi possível carregar este imóvel agora.");
-                setLoading(false);
-              }
-            });
-        }, 2000);
+        setLoadError("Não foi possível carregar este imóvel agora.");
+        setLoading(false);
       });
 
     return () => {
       cancelled = true;
-      if (retryTimer) clearTimeout(retryTimer);
     };
   }, [slug]);
 

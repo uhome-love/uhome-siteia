@@ -124,6 +124,12 @@ const LISTING_COLUMNS = "id,slug,tipo,finalidade,status,destaque,preco,preco_con
 // Focused detail payload — excludes large sync/debug fields that can slow or stall property pages
 const DETAIL_COLUMNS = "id,slug,tipo,finalidade,status,destaque,preco,preco_condominio,preco_iptu,area_total,area_util,quartos,banheiros,vagas,andar,latitude,longitude,titulo,descricao,diferenciais,fotos,foto_principal,video_url,condominio_nome,publicado_em,bairro,cidade,uf";
 
+const PUBLIC_REST_URL = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/imoveis`;
+const PUBLIC_REST_HEADERS: HeadersInit = {
+  apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+  "accept-profile": "public",
+};
+
 export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: Imovel[]; count: number }> {
   // Build data query — NO count (much faster)
   let query = supabase
@@ -443,32 +449,37 @@ export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSig
 
 /** Single attempt to fetch an imóvel by slug */
 async function fetchImovelBySlugOnce(slug: string, signal?: AbortSignal): Promise<Imovel | null> {
-  const exactResult = await supabase
-    .from("imoveis")
-    .select(DETAIL_COLUMNS)
-    .eq("slug", slug)
-    .abortSignal(signal!)
-    .maybeSingle();
+  const fetchRows = async (operator: "eq" | "ilike") => {
+    const url = new URL(PUBLIC_REST_URL);
+    url.searchParams.set("select", DETAIL_COLUMNS);
+    url.searchParams.set("slug", `${operator}.${slug}`);
+    url.searchParams.set("limit", "1");
 
-  if (exactResult.error) throw exactResult.error;
-  if (exactResult.data) return mapRow(exactResult.data);
+    const response = await fetch(url.toString(), {
+      method: "GET",
+      headers: PUBLIC_REST_HEADERS,
+      signal,
+      cache: "no-store",
+    });
 
-  const fallbackResult = await supabase
-    .from("imoveis")
-    .select(DETAIL_COLUMNS)
-    .ilike("slug", slug)
-    .abortSignal(signal!)
-    .maybeSingle();
+    if (!response.ok) {
+      throw new Error(`Erro ao buscar imóvel (${response.status})`);
+    }
 
-  if (fallbackResult.error) throw fallbackResult.error;
-  if (!fallbackResult.data) return null;
-  return mapRow(fallbackResult.data);
+    return (await response.json()) as any[];
+  };
+
+  const exactRows = await fetchRows("eq");
+  if (exactRows[0]) return mapRow(exactRows[0]);
+
+  const fallbackRows = await fetchRows("ilike");
+  if (!fallbackRows[0]) return null;
+  return mapRow(fallbackRows[0]);
 }
 
 /**
- * Fetch a single imóvel by slug with automatic retry.
- * Retries once after a short delay to handle auth-token refresh race
- * conditions that occur on hard page reloads.
+ * Fetch a single imóvel by slug via public read endpoint, without relying
+ * on any authenticated browser session.
  */
 export async function fetchImovelBySlug(slug: string): Promise<Imovel | null> {
   const normalizedSlug = decodeURIComponent(slug).trim().replace(/^\/+|\/+$/g, "");
@@ -476,16 +487,7 @@ export async function fetchImovelBySlug(slug: string): Promise<Imovel | null> {
   const timeoutId = setTimeout(() => controller.abort(), 12000);
 
   try {
-    try {
-      return await fetchImovelBySlugOnce(normalizedSlug, controller.signal);
-    } catch (firstError: any) {
-      // Don't retry aborts or if the controller already fired
-      if (controller.signal.aborted) throw firstError;
-      // Wait briefly for auth token refresh to complete, then retry
-      await new Promise(r => setTimeout(r, 1200));
-      if (controller.signal.aborted) throw firstError;
-      return await fetchImovelBySlugOnce(normalizedSlug, controller.signal);
-    }
+    return await fetchImovelBySlugOnce(normalizedSlug, controller.signal);
   } catch (error: any) {
     if (error?.name === "AbortError") {
       throw new Error(`Timeout ao buscar imóvel: ${normalizedSlug}`);

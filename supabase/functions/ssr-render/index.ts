@@ -129,7 +129,7 @@ function html(title: string, description: string, ogImage: string, canonical: st
   height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <!-- End Google Tag Manager (noscript) -->
   ${bodyHtml}
-  <script>window.location.replace("${esc(canonical)}");</script>
+  
 </body>
 </html>`;
 }

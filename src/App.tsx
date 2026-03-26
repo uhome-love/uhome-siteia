@@ -113,7 +113,9 @@ const App = () => (
                 <Route path="/avaliar-imovel" element={<AvaliacaoPage />} />
                 <Route path="/politica-de-privacidade" element={<Privacidade />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/empreendimentos" element={<Condominios />} />
                 <Route path="/empreendimentos/:slug" element={<EmpreendimentoDetail />} />
+                <Route path="/lancamentos" element={<Navigate to="/condominios" replace />} />
                 <Route path="/mega-cyrela" element={<MegaCyrela />} />
                 <Route path="/casas-porto-alegre" element={<TipoImovel />} />
                 <Route path="/coberturas-porto-alegre" element={<TipoImovel />} />

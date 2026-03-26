@@ -483,7 +483,7 @@ async function fetchImovelBySlugOnce(slug: string, signal?: AbortSignal): Promis
  */
 export async function fetchImovelBySlug(slug: string): Promise<Imovel | null> {
   const normalizedSlug = decodeURIComponent(slug).trim().replace(/^\/+|\/+$/g, "");
-  console.log("[fetchImovelBySlug] slug recebido:", slug, "| normalizado:", normalizedSlug);
+  
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 12000);
 

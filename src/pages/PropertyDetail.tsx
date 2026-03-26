@@ -63,7 +63,7 @@ const PropertyDetail = () => {
     setLoadError(null);
     setImovel(null);
 
-    console.log("[PropertyDetail] useParams slug:", slug, "| all params:", window.location.pathname);
+    
 
     function handleSuccess(data: Imovel | null) {
       if (cancelled) return;

@@ -121,6 +121,9 @@ export const CIDADES_PERMITIDAS = ["Porto Alegre", "Canoas", "Cachoeirinha", "Gr
 // Minimal columns for listing cards — no fotos/descricao/jetimob_raw/diferenciais
 const LISTING_COLUMNS = "id,slug,tipo,finalidade,status,destaque,preco,preco_condominio,area_total,quartos,banheiros,vagas,bairro,cidade,uf,publicado_em,foto_principal";
 
+// Focused detail payload — excludes large sync/debug fields that can slow or stall property pages
+const DETAIL_COLUMNS = "id,slug,tipo,finalidade,status,destaque,preco,preco_condominio,preco_iptu,area_total,area_util,quartos,banheiros,vagas,andar,latitude,longitude,titulo,descricao,diferenciais,fotos,foto_principal,video_url,condominio_nome,publicado_em,bairro,cidade,uf";
+
 export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: Imovel[]; count: number }> {
   // Build data query — NO count (much faster)
   let query = supabase
@@ -439,15 +442,39 @@ export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSig
 }
 
 export async function fetchImovelBySlug(slug: string): Promise<Imovel | null> {
-  const { data, error } = await supabase
-    .from("imoveis")
-    .select("*")
-    .eq("slug", slug)
-    .maybeSingle();
+  const normalizedSlug = decodeURIComponent(slug).trim().replace(/^\/+|\/+$/g, "");
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-  if (error) throw error;
-  if (!data) return null;
-  return mapRow(data);
+  try {
+    const exactResult = await supabase
+      .from("imoveis")
+      .select(DETAIL_COLUMNS)
+      .eq("slug", normalizedSlug)
+      .abortSignal(controller.signal)
+      .maybeSingle();
+
+    if (exactResult.error) throw exactResult.error;
+    if (exactResult.data) return mapRow(exactResult.data);
+
+    const fallbackResult = await supabase
+      .from("imoveis")
+      .select(DETAIL_COLUMNS)
+      .ilike("slug", normalizedSlug)
+      .abortSignal(controller.signal)
+      .maybeSingle();
+
+    if (fallbackResult.error) throw fallbackResult.error;
+    if (!fallbackResult.data) return null;
+    return mapRow(fallbackResult.data);
+  } catch (error: any) {
+    if (error?.name === "AbortError") {
+      throw new Error(`Timeout ao buscar imóvel: ${normalizedSlug}`);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
 export async function fetchImoveisDestaque(limit = 6): Promise<Imovel[]> {

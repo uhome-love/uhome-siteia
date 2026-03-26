@@ -441,32 +441,51 @@ export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSig
   return mapped;
 }
 
+/** Single attempt to fetch an imóvel by slug */
+async function fetchImovelBySlugOnce(slug: string, signal?: AbortSignal): Promise<Imovel | null> {
+  const exactResult = await supabase
+    .from("imoveis")
+    .select(DETAIL_COLUMNS)
+    .eq("slug", slug)
+    .abortSignal(signal!)
+    .maybeSingle();
+
+  if (exactResult.error) throw exactResult.error;
+  if (exactResult.data) return mapRow(exactResult.data);
+
+  const fallbackResult = await supabase
+    .from("imoveis")
+    .select(DETAIL_COLUMNS)
+    .ilike("slug", slug)
+    .abortSignal(signal!)
+    .maybeSingle();
+
+  if (fallbackResult.error) throw fallbackResult.error;
+  if (!fallbackResult.data) return null;
+  return mapRow(fallbackResult.data);
+}
+
+/**
+ * Fetch a single imóvel by slug with automatic retry.
+ * Retries once after a short delay to handle auth-token refresh race
+ * conditions that occur on hard page reloads.
+ */
 export async function fetchImovelBySlug(slug: string): Promise<Imovel | null> {
   const normalizedSlug = decodeURIComponent(slug).trim().replace(/^\/+|\/+$/g, "");
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 8000);
+  const timeoutId = setTimeout(() => controller.abort(), 12000);
 
   try {
-    const exactResult = await supabase
-      .from("imoveis")
-      .select(DETAIL_COLUMNS)
-      .eq("slug", normalizedSlug)
-      .abortSignal(controller.signal)
-      .maybeSingle();
-
-    if (exactResult.error) throw exactResult.error;
-    if (exactResult.data) return mapRow(exactResult.data);
-
-    const fallbackResult = await supabase
-      .from("imoveis")
-      .select(DETAIL_COLUMNS)
-      .ilike("slug", normalizedSlug)
-      .abortSignal(controller.signal)
-      .maybeSingle();
-
-    if (fallbackResult.error) throw fallbackResult.error;
-    if (!fallbackResult.data) return null;
-    return mapRow(fallbackResult.data);
+    try {
+      return await fetchImovelBySlugOnce(normalizedSlug, controller.signal);
+    } catch (firstError: any) {
+      // Don't retry aborts or if the controller already fired
+      if (controller.signal.aborted) throw firstError;
+      // Wait briefly for auth token refresh to complete, then retry
+      await new Promise(r => setTimeout(r, 1200));
+      if (controller.signal.aborted) throw firstError;
+      return await fetchImovelBySlugOnce(normalizedSlug, controller.signal);
+    }
   } catch (error: any) {
     if (error?.name === "AbortError") {
       throw new Error(`Timeout ao buscar imóvel: ${normalizedSlug}`);

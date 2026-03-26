@@ -4,7 +4,7 @@ import { useAdmin } from "@/hooks/useAdmin";
 import { useLocation } from "react-router-dom";
 
 export function BannerCorretor() {
-  const { corretor, isDirectAccess, clearCorretor } = useCorretor();
+  const { corretor, isDirectAccess } = useCorretor();
   const { isAdmin } = useAdmin();
   const [fechado, setFechado] = useState(false);
   const location = useLocation();
@@ -13,14 +13,13 @@ export function BannerCorretor() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("clear_ref") === "1") {
-      clearCorretor();
       setFechado(true);
       params.delete("clear_ref");
       const clean = params.toString();
       const newUrl = window.location.pathname + (clean ? `?${clean}` : "");
       window.history.replaceState(null, "", newUrl);
     }
-  }, [location.search, clearCorretor]);
+  }, [location.search]);
 
   // Show admin button if authenticated admin OR if localStorage flag is set
   const showAdminControls = isAdmin || localStorage.getItem("uhome_is_admin") === "1";
@@ -77,7 +76,6 @@ export function BannerCorretor() {
           {showAdminControls && (
             <button
               onClick={() => {
-                clearCorretor();
                 setFechado(true);
               }}
               className="rounded bg-destructive/10 px-2 py-0.5 font-body text-[10px] font-medium text-destructive transition-colors hover:bg-destructive/20"

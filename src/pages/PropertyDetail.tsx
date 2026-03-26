@@ -495,7 +495,7 @@ const PropertyDetail = () => {
                   {viewCount} {viewCount === 1 ? "pessoa viu" : "pessoas viram"} hoje
                 </span>
               )}
-              </span>
+            </div>
               <h1 className="mt-3 font-body text-[clamp(1.5rem,4vw,2rem)] font-extrabold leading-tight tracking-tight text-foreground" style={{ textWrap: "balance" }}>
                 {imovel.titulo}
               </h1>

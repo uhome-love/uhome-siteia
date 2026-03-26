@@ -3,6 +3,7 @@ import { MessageCircle, Send, Check, Loader2, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { buildWhatsAppUrl, buildCorretorWhatsAppUrl } from "@/lib/whatsapp";
 import { trackWhatsAppClick } from "@/services/whatsappTracker";
+import { trackClickWhatsapp } from "@/lib/gtag";
 import { useCorretor } from "@/contexts/CorretorContext";
 import { submitLead } from "@/services/leads";
 import { formatPhone } from "@/lib/phoneMask";
@@ -22,6 +23,7 @@ export const SearchCTACard = forwardRef<HTMLDivElement>(function SearchCTACard(_
       ? buildCorretorWhatsAppUrl(corretor.nome, corretor.telefone)
       : buildWhatsAppUrl("Olá! Estou buscando imóveis no site da Uhome e gostaria de receber uma lista personalizada.");
     trackWhatsAppClick({ origem_pagina: "/busca" });
+    trackClickWhatsapp({ origem_componente: "busca_cta", origem_pagina: "/busca" });
     window.open(url, "_blank", "noopener");
   };
 

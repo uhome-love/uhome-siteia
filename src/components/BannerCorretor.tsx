@@ -4,7 +4,7 @@ import { useAdmin } from "@/hooks/useAdmin";
 import { useLocation } from "react-router-dom";
 
 export function BannerCorretor() {
-  const { corretor, isDirectAccess, clearCorretor } = useCorretor();
+  const { corretor, isDirectAccess } = useCorretor();
   const { isAdmin } = useAdmin();
   const [fechado, setFechado] = useState(false);
   const location = useLocation();

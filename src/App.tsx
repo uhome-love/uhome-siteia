@@ -78,7 +78,7 @@ const CorretorRefLayout = lazy(() => import("./components/CorretorRef").then(m =
 
 const App = () => (
   <BrowserRouter>
-    <RefCapture />
+    
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <CorretorProvider>

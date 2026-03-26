@@ -9,7 +9,7 @@ export const ExitIntentModal = forwardRef<HTMLDivElement>(function ExitIntentMod
   const [show, setShow] = useState(false);
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [touched, setTouched] = useState(false);
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {

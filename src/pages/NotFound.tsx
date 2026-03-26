@@ -1,22 +1,92 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Home, Search } from "lucide-react";
 import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
+/**
+ * Tenta redirecionar URLs comuns que geram 404.
+ * Retorna o path de destino ou null se não houver redirect.
+ */
+function tryRedirect(pathname: string): string | null {
+  const p = pathname.toLowerCase().replace(/\/+$/, "");
+
+  // /imoveis/slug → /imovel/slug
+  if (p.startsWith("/imoveis/")) {
+    return p.replace("/imoveis/", "/imovel/");
+  }
+
+  // /propriedade/slug ou /property/slug → /imovel/slug
+  if (p.startsWith("/propriedade/") || p.startsWith("/property/")) {
+    const slug = p.split("/").pop();
+    return `/imovel/${slug}`;
+  }
+
+  // /bairro/slug (singular) → /bairros/slug
+  if (p.startsWith("/bairro/") && !p.startsWith("/bairros/")) {
+    return p.replace("/bairro/", "/bairros/");
+  }
+
+  // /empreendimento/slug (singular) → /empreendimentos/slug
+  if (p.startsWith("/empreendimento/") && !p.startsWith("/empreendimentos/")) {
+    return p.replace("/empreendimento/", "/empreendimentos/");
+  }
+
+  // /condominio/slug (singular) → /condominios/slug
+  if (p.startsWith("/condominio/") && !p.startsWith("/condominios/")) {
+    return p.replace("/condominio/", "/condominios/");
+  }
+
+  // /lancamentos → /condominios (empreendimentos page)
+  if (p === "/lancamentos" || p === "/empreendimentos") {
+    return "/condominios";
+  }
+
+  // /pesquisa or /search → /busca
+  if (p === "/pesquisa" || p === "/search") {
+    return "/busca";
+  }
+
+  return null;
+}
+
 const NotFound = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    console.error("404 Error: User attempted to access non-existent route:", location.pathname);
+    // Tenta redirect antes de mostrar 404
+    const redirect = tryRedirect(location.pathname);
+    if (redirect) {
+      navigate(redirect, { replace: true });
+      return;
+    }
+
+    console.error("404 Error:", location.pathname);
     document.title = "Página não encontrada | Uhome Imóveis";
+
+    // Log 404 no banco (fire-and-forget)
+    supabase
+      .from("page_404_log")
+      .insert({
+        path: location.pathname + location.search,
+        referrer: document.referrer || null,
+        user_agent: navigator.userAgent,
+      } as any)
+      .then(() => {});
+
     return () => {
       document.title = "Uhome Imóveis | Apartamentos e Casas à Venda em Porto Alegre";
     };
-  }, [location.pathname]);
+  }, [location.pathname, location.search, navigate]);
+
+  // Se está redirecionando, não mostra nada
+  const redirect = tryRedirect(location.pathname);
+  if (redirect) return null;
 
   return (
     <div className="min-h-screen bg-background">

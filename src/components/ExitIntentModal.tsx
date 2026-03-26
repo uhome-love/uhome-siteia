@@ -126,13 +126,21 @@ export const ExitIntentModal = forwardRef<HTMLDivElement>(function ExitIntentMod
 
                 <form onSubmit={handleSubmit} className="mt-6 space-y-3">
                   <input
+                    type="text"
+                    placeholder="Seu nome"
+                    value={nome}
+                    onChange={(e) => setNome(e.target.value)}
+                    className="w-full rounded-xl border-[1.5px] border-border bg-card px-4 py-3 font-body text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+                    maxLength={100}
+                    autoFocus
+                  />
+                  <input
                     type="tel"
                     placeholder="(51) 99999-9999"
                     value={telefone}
                     onChange={(e) => setTelefone(formatPhone(e.target.value))}
                     className="w-full rounded-xl border-[1.5px] border-border bg-card px-4 py-3 font-body text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
                     maxLength={16}
-                    autoFocus
                   />
                   <button
                     type="submit"

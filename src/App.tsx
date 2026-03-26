@@ -8,6 +8,8 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { CorretorProvider } from "@/contexts/CorretorContext";
 
 const ExitIntentModal = lazy(() => import("@/components/ExitIntentModal").then(m => ({ default: m.ExitIntentModal })));
+const FloatingWhatsApp = lazy(() => import("@/components/FloatingWhatsApp").then(m => ({ default: m.FloatingWhatsApp })));
+const RetargetingBanner = lazy(() => import("@/components/RetargetingBanner").then(m => ({ default: m.RetargetingBanner })));
 import { BannerCorretor } from "@/components/BannerCorretor";
 
 // Eager load homepage
@@ -172,6 +174,8 @@ const App = () => (
               </Routes>
             </Suspense>
             <ExitIntentModal />
+            <FloatingWhatsApp />
+            <RetargetingBanner />
           </TooltipProvider>
         </CorretorProvider>
       </AuthProvider>

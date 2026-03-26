@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { getSessionId, getTrackingData, classifyOrigemCanal, getCorretorRef, getCorretorRefId } from "@/lib/session";
 import { trackEvent } from "@/lib/trackEvent";
+import { trackGenerateLead } from "@/lib/gtag";
 
 interface LeadData {
   nome: string;
@@ -94,6 +95,15 @@ export async function submitLead(data: LeadData) {
     tipo: "formulario_enviado",
     imovel_slug: data.imovel_slug,
     imovel_titulo: data.imovel_titulo,
+  });
+
+  // GA4 dataLayer event
+  trackGenerateLead({
+    origem_componente: data.origem_componente,
+    origem_pagina: data.origem_pagina,
+    imovel_titulo: data.imovel_titulo,
+    imovel_slug: data.imovel_slug,
+    imovel_bairro: data.imovel_bairro,
   });
 
   return true;

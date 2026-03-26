@@ -1,5 +1,9 @@
 import { createRoot } from "react-dom/client";
+import { captureUtmParams } from "./lib/session";
 import App from "./App.tsx";
+
+// Capture UTMs + referrer on first page load (first-touch attribution)
+captureUtmParams();
 // Critical font weights only — load eagerly
 import "@fontsource/plus-jakarta-sans/400.css";
 import "@fontsource/plus-jakarta-sans/700.css";

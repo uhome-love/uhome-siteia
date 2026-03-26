@@ -7,6 +7,7 @@ import { formatPhone } from "@/lib/phoneMask";
 
 export const ExitIntentModal = forwardRef<HTMLDivElement>(function ExitIntentModal(_props, ref) {
   const [show, setShow] = useState(false);
+  const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -63,11 +64,11 @@ export const ExitIntentModal = forwardRef<HTMLDivElement>(function ExitIntentMod
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!telefone.trim()) return;
+    if (!nome.trim() || !telefone.trim()) return;
     setLoading(true);
     try {
       await submitLead({
-        nome: "Via Exit Intent",
+        nome: nome.trim(),
         telefone: telefone.trim(),
         origem_componente: "exit_intent",
       });

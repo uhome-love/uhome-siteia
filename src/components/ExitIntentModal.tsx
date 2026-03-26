@@ -127,23 +127,33 @@ export const ExitIntentModal = forwardRef<HTMLDivElement>(function ExitIntentMod
                 </p>
 
                 <form onSubmit={handleSubmit} className="mt-6 space-y-3">
-                  <input
-                    type="text"
-                    placeholder="Seu nome"
-                    value={nome}
-                    onChange={(e) => setNome(e.target.value)}
-                    className="w-full rounded-xl border-[1.5px] border-border bg-card px-4 py-3 font-body text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
-                    maxLength={100}
-                    autoFocus
-                  />
-                  <input
-                    type="tel"
-                    placeholder="(51) 99999-9999"
-                    value={telefone}
-                    onChange={(e) => setTelefone(formatPhone(e.target.value))}
-                    className="w-full rounded-xl border-[1.5px] border-border bg-card px-4 py-3 font-body text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
-                    maxLength={16}
-                  />
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="Seu nome"
+                      value={nome}
+                      onChange={(e) => setNome(e.target.value)}
+                      className={`w-full rounded-xl border-[1.5px] bg-card px-4 py-3 font-body text-sm text-foreground placeholder:text-muted-foreground focus:outline-none ${touched && !nome.trim() ? "border-destructive focus:border-destructive" : "border-border focus:border-primary"}`}
+                      maxLength={100}
+                      autoFocus
+                    />
+                    {touched && !nome.trim() && (
+                      <p className="mt-1 font-body text-xs text-destructive">Preencha seu nome</p>
+                    )}
+                  </div>
+                  <div>
+                    <input
+                      type="tel"
+                      placeholder="(51) 99999-9999"
+                      value={telefone}
+                      onChange={(e) => setTelefone(formatPhone(e.target.value))}
+                      className={`w-full rounded-xl border-[1.5px] bg-card px-4 py-3 font-body text-sm text-foreground placeholder:text-muted-foreground focus:outline-none ${touched && !telefone.trim() ? "border-destructive focus:border-destructive" : "border-border focus:border-primary"}`}
+                      maxLength={16}
+                    />
+                    {touched && !telefone.trim() && (
+                      <p className="mt-1 font-body text-xs text-destructive">Preencha seu WhatsApp</p>
+                    )}
+                  </div>
                   <button
                     type="submit"
                     disabled={loading}

@@ -70,7 +70,10 @@ export function CorretorProvider({ children }: { children: ReactNode }) {
   // Check if current URL has /c/:slug
   const urlSlug = useMemo(() => {
     const match = location.pathname.match(/^\/c\/([^/]+)/);
-    return match?.[1] ?? null;
+    const raw = match?.[1] ?? null;
+    // Reject invalid slugs (React Router param names, empty, or special chars)
+    if (!raw || raw.startsWith(":") || raw.length < 2 || !/^[a-z0-9]/.test(raw)) return null;
+    return raw;
   }, [location.pathname]);
 
   // isDirectAccess = user is currently on a /c/ URL

@@ -74,6 +74,11 @@ export async function captureCorretorRef(): Promise<void> {
 export function getCorretorRef(): string | null {
   const slug = localStorage.getItem(REF_KEY) || localStorage.getItem('corretor_ref_slug');
   if (!slug) return null;
+  // Reject invalid slugs that may have been persisted (e.g. ":corretorSlug")
+  if (slug.startsWith(':') || slug.length < 2 || !/^[a-z0-9]/.test(slug)) {
+    clearCorretorRef();
+    return null;
+  }
   const ts = localStorage.getItem('corretor_ref_ts');
   if (ts && Date.now() - Number(ts) > TTL_MS) {
     clearCorretorRef();

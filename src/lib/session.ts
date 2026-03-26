@@ -1,8 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
-
 const SESSION_KEY = 'uhome_session_id';
-const REF_KEY = 'uhome_corretor_ref';
-const TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 export function getSessionId(): string {
   let id = sessionStorage.getItem(SESSION_KEY);
@@ -22,84 +18,28 @@ export function getUtmParams() {
   };
 }
 
-/** Capture ?ref=slug from URL once per session, persist all corretor data */
-export async function captureCorretorRef(): Promise<void> {
-  const params = new URLSearchParams(window.location.search);
-  const ref = params.get('ref');
-  if (!ref) return;
+// --- Corretor reference: URL-based + module-level cache ---
+// CorretorContext calls setCorretorCache when it fetches data.
+// Services call getCorretorRef / getCorretorRefId for attribution.
 
-  const slug = ref.toLowerCase().trim();
+let _cachedSlug: string | null = null;
+let _cachedId: string | null = null;
 
-  // Clean the URL without reload
-  params.delete('ref');
-  const clean = params.toString();
-  const newUrl = window.location.pathname + (clean ? `?${clean}` : '') + window.location.hash;
-  window.history.replaceState(null, '', newUrl);
-
-  // Evita registrar visita duplicada na mesma sessão
-  if (sessionStorage.getItem(`ref_captured_${slug}`)) return;
-  sessionStorage.setItem(`ref_captured_${slug}`, '1');
-
-  try {
-    const { data: corretor } = await supabase
-      .from('profiles')
-      .select('id, nome, foto_url, slug_ref')
-      .eq('slug_ref', slug)
-      .eq('ativo', true)
-      .maybeSingle();
-
-    if (!corretor) {
-      localStorage.setItem(REF_KEY, slug);
-      localStorage.setItem('corretor_ref_ts', Date.now().toString());
-      return;
-    }
-
-    localStorage.setItem(REF_KEY, slug);
-    localStorage.setItem('corretor_ref_id', corretor.id);
-    localStorage.setItem('corretor_ref_slug', slug);
-    localStorage.setItem('corretor_ref_nome', corretor.nome || '');
-    localStorage.setItem('corretor_ref_ts', Date.now().toString());
-
-    await (supabase as any).from('corretor_visitas').insert({
-      corretor_id: corretor.id,
-      corretor_slug: slug,
-      user_agent: navigator.userAgent,
-      referrer: document.referrer || null,
-    });
-  } catch (err) {
-    console.error('captureCorretorRef error:', err);
-  }
+/** Called by CorretorContext to update the module-level cache */
+export function setCorretorCache(slug: string | null, id: string | null): void {
+  _cachedSlug = slug;
+  _cachedId = id;
 }
 
+/** Get active corretor slug — reads from URL pathname, falls back to cache */
 export function getCorretorRef(): string | null {
-  const slug = localStorage.getItem(REF_KEY) || localStorage.getItem('corretor_ref_slug');
-  if (!slug) return null;
-  // Reject invalid slugs that may have been persisted (e.g. ":corretorSlug")
-  if (slug.startsWith(':') || slug.length < 2 || !/^[a-z0-9]/.test(slug)) {
-    clearCorretorRef();
-    return null;
-  }
-  const ts = localStorage.getItem('corretor_ref_ts');
-  if (ts && Date.now() - Number(ts) > TTL_MS) {
-    clearCorretorRef();
-    return null;
-  }
-  return slug;
+  const match = window.location.pathname.match(/^\/c\/([^/]+)/);
+  if (match?.[1]) return match[1];
+  return _cachedSlug;
 }
 
+/** Get active corretor profile ID — available after CorretorContext fetches */
 export function getCorretorRefId(): string | null {
   if (!getCorretorRef()) return null;
-  return localStorage.getItem('corretor_ref_id');
-}
-
-export function getCorretorRefNome(): string | null {
-  if (!getCorretorRef()) return null;
-  return localStorage.getItem('corretor_ref_nome');
-}
-
-export function clearCorretorRef(): void {
-  [
-    REF_KEY, 'corretor_ref_id', 'corretor_ref_slug',
-    'corretor_ref_nome', 'corretor_ref_foto', 'corretor_ref_ts'
-  ].forEach(k => localStorage.removeItem(k));
+  return _cachedId;
 }

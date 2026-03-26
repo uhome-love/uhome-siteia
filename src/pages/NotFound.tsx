@@ -103,14 +103,20 @@ const NotFound = () => {
 
     function log404() {
       document.title = "Página não encontrada | Uhome Imóveis";
-      supabase
-        .from("page_404_log")
-        .insert({
+      fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/page_404_log`, {
+        method: "POST",
+        headers: {
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          "content-profile": "public",
+          "Content-Type": "application/json",
+          Prefer: "return=minimal",
+        },
+        body: JSON.stringify({
           path: location.pathname + location.search,
           referrer: document.referrer || null,
           user_agent: navigator.userAgent,
-        } as any)
-        .then(() => {});
+        }),
+      }).catch(() => {});
     }
 
     return () => {

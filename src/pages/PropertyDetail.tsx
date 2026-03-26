@@ -479,23 +479,24 @@ const PropertyDetail = () => {
             </div>
 
             {/* Badge + title */}
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-block rounded-full bg-primary/10 px-3 py-1 font-body text-xs font-semibold text-primary">
-                {finalidadeLabel}
-              </span>
-              {viewCount >= 5 && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-accent px-3 py-1 font-body text-xs font-semibold text-accent-foreground">
-                  <TrendingUp className="h-3 w-3" />
-                  Alta procura
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-block rounded-full bg-primary/10 px-3 py-1 font-body text-xs font-semibold text-primary">
+                  {finalidadeLabel}
                 </span>
-              )}
-              {viewCount > 0 && (
-                <span className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 font-body text-[11px] text-muted-foreground">
-                  <Eye className="h-3 w-3" />
-                  {viewCount} {viewCount === 1 ? "pessoa viu" : "pessoas viram"} hoje
-                </span>
-              )}
-            </div>
+                {viewCount >= 5 && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-accent px-3 py-1 font-body text-xs font-semibold text-accent-foreground">
+                    <TrendingUp className="h-3 w-3" />
+                    Alta procura
+                  </span>
+                )}
+                {viewCount > 0 && (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 font-body text-[11px] text-muted-foreground">
+                    <Eye className="h-3 w-3" />
+                    {viewCount} {viewCount === 1 ? "pessoa viu" : "pessoas viram"} hoje
+                  </span>
+                )}
+              </div>
               <h1 className="mt-3 font-body text-[clamp(1.5rem,4vw,2rem)] font-extrabold leading-tight tracking-tight text-foreground" style={{ textWrap: "balance" }}>
                 {imovel.titulo}
               </h1>

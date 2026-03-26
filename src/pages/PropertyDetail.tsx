@@ -11,7 +11,7 @@ import { PropertyMap } from "@/components/PropertyMap";
 import { FotoImovel } from "@/components/FotoImovel";
 import { CardUhomePreco } from "@/components/CardUhomePreco";
 import { AuthModal } from "@/components/AuthModal";
-import { Bed, Car, Maximize, Bath, MapPin, Share2, Heart, ChevronLeft, ChevronRight, Loader2, Camera, ArrowLeft, MoreVertical, Map as MapIcon, Play, MessageCircle, Building2 } from "lucide-react";
+import { Bed, Car, Maximize, Bath, MapPin, Share2, Heart, ChevronLeft, ChevronRight, Loader2, Camera, ArrowLeft, MoreVertical, Map as MapIcon, Play, MessageCircle, Building2, Eye, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { buildWhatsAppUrl, buildCorretorWhatsAppUrl } from "@/lib/whatsapp";
 import { useCorretor } from "@/contexts/CorretorContext";
@@ -479,9 +479,22 @@ const PropertyDetail = () => {
             </div>
 
             {/* Badge + title */}
-            <div>
+            <div className="flex flex-wrap items-center gap-2">
               <span className="inline-block rounded-full bg-primary/10 px-3 py-1 font-body text-xs font-semibold text-primary">
                 {finalidadeLabel}
+              </span>
+              {viewCount >= 5 && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-accent px-3 py-1 font-body text-xs font-semibold text-accent-foreground">
+                  <TrendingUp className="h-3 w-3" />
+                  Alta procura
+                </span>
+              )}
+              {viewCount > 0 && (
+                <span className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 font-body text-[11px] text-muted-foreground">
+                  <Eye className="h-3 w-3" />
+                  {viewCount} {viewCount === 1 ? "pessoa viu" : "pessoas viram"} hoje
+                </span>
+              )}
               </span>
               <h1 className="mt-3 font-body text-[clamp(1.5rem,4vw,2rem)] font-extrabold leading-tight tracking-tight text-foreground" style={{ textWrap: "balance" }}>
                 {imovel.titulo}

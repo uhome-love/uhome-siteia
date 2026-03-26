@@ -24,6 +24,7 @@ import { setJsonLd, removeJsonLd, buildImovelJsonLd, buildImovelBreadcrumbJsonLd
 import { useCanonical } from "@/hooks/useCanonical";
 import { useFavoritos } from "@/hooks/useFavoritos";
 import { trackWhatsAppClick } from "@/services/whatsappTracker";
+import { StickyPropertyCTA } from "@/components/StickyPropertyCTA";
 
 const PropertyDetail = () => {
   const { slug } = useParams();
@@ -650,6 +651,15 @@ const PropertyDetail = () => {
       </div>
 
       <Footer />
+
+      {/* Desktop sticky CTA */}
+      <StickyPropertyCTA
+        imovelId={imovel.id}
+        imovelSlug={imovel.slug}
+        imovelTitulo={imovel.titulo}
+        imovelBairro={imovel.bairro}
+        imovelPreco={imovel.preco}
+      />
 
       {/* Fixed bottom bar — mobile only */}
       <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-md px-4 py-3 sm:hidden">

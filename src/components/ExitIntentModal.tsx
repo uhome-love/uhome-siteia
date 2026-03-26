@@ -7,6 +7,7 @@ import { formatPhone } from "@/lib/phoneMask";
 
 export const ExitIntentModal = forwardRef<HTMLDivElement>(function ExitIntentModal(_props, ref) {
   const [show, setShow] = useState(false);
+  const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -63,11 +64,11 @@ export const ExitIntentModal = forwardRef<HTMLDivElement>(function ExitIntentMod
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!telefone.trim()) return;
+    if (!nome.trim() || !telefone.trim()) return;
     setLoading(true);
     try {
       await submitLead({
-        nome: "Via Exit Intent",
+        nome: nome.trim(),
         telefone: telefone.trim(),
         origem_componente: "exit_intent",
       });
@@ -125,13 +126,21 @@ export const ExitIntentModal = forwardRef<HTMLDivElement>(function ExitIntentMod
 
                 <form onSubmit={handleSubmit} className="mt-6 space-y-3">
                   <input
+                    type="text"
+                    placeholder="Seu nome"
+                    value={nome}
+                    onChange={(e) => setNome(e.target.value)}
+                    className="w-full rounded-xl border-[1.5px] border-border bg-card px-4 py-3 font-body text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+                    maxLength={100}
+                    autoFocus
+                  />
+                  <input
                     type="tel"
                     placeholder="(51) 99999-9999"
                     value={telefone}
                     onChange={(e) => setTelefone(formatPhone(e.target.value))}
                     className="w-full rounded-xl border-[1.5px] border-border bg-card px-4 py-3 font-body text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
                     maxLength={16}
-                    autoFocus
                   />
                   <button
                     type="submit"

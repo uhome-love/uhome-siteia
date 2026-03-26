@@ -34,6 +34,28 @@ export async function submitLead(data: LeadData) {
     } catch { /* silent */ }
   }
 
+  // Deduplicate: skip if same phone submitted in last 24h
+  const digitsOnly = data.telefone.replace(/\D/g, "");
+  if (digitsOnly.length >= 10) {
+    try {
+      const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const { data: existing } = await supabase
+        .from("public_leads")
+        .select("id", { count: "exact", head: true })
+        .ilike("telefone", `%${digitsOnly.slice(-8)}%`)
+        .gte("created_at", since);
+      if (existing !== null) {
+        // Lead already exists — silently succeed
+        trackEvent({
+          tipo: "formulario_enviado",
+          imovel_slug: data.imovel_slug,
+          imovel_titulo: data.imovel_titulo,
+        });
+        return true;
+      }
+    } catch { /* if check fails, proceed with insert */ }
+  }
+
   const payload = {
     nome: data.nome,
     telefone: data.telefone,

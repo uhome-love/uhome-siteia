@@ -697,6 +697,7 @@ export type Database = {
           corretor_ref_id: string | null
           corretor_ref_slug: string | null
           created_at: string | null
+          device: string | null
           email: string | null
           id: string
           imovel_bairro: string | null
@@ -704,10 +705,13 @@ export type Database = {
           imovel_preco: number | null
           imovel_slug: string | null
           imovel_titulo: string | null
+          landing_page: string | null
           nome: string
+          origem_canal: string | null
           origem_componente: string | null
           origem_pagina: string | null
           origem_ref: string | null
+          referrer: string | null
           session_id: string | null
           sincronizado_em: string | null
           status: string | null
@@ -715,13 +719,16 @@ export type Database = {
           tipo_interesse: string | null
           uhomesales_lead_id: string | null
           utm_campaign: string | null
+          utm_content: string | null
           utm_medium: string | null
           utm_source: string | null
+          utm_term: string | null
         }
         Insert: {
           corretor_ref_id?: string | null
           corretor_ref_slug?: string | null
           created_at?: string | null
+          device?: string | null
           email?: string | null
           id?: string
           imovel_bairro?: string | null
@@ -729,10 +736,13 @@ export type Database = {
           imovel_preco?: number | null
           imovel_slug?: string | null
           imovel_titulo?: string | null
+          landing_page?: string | null
           nome: string
+          origem_canal?: string | null
           origem_componente?: string | null
           origem_pagina?: string | null
           origem_ref?: string | null
+          referrer?: string | null
           session_id?: string | null
           sincronizado_em?: string | null
           status?: string | null
@@ -740,13 +750,16 @@ export type Database = {
           tipo_interesse?: string | null
           uhomesales_lead_id?: string | null
           utm_campaign?: string | null
+          utm_content?: string | null
           utm_medium?: string | null
           utm_source?: string | null
+          utm_term?: string | null
         }
         Update: {
           corretor_ref_id?: string | null
           corretor_ref_slug?: string | null
           created_at?: string | null
+          device?: string | null
           email?: string | null
           id?: string
           imovel_bairro?: string | null
@@ -754,10 +767,13 @@ export type Database = {
           imovel_preco?: number | null
           imovel_slug?: string | null
           imovel_titulo?: string | null
+          landing_page?: string | null
           nome?: string
+          origem_canal?: string | null
           origem_componente?: string | null
           origem_pagina?: string | null
           origem_ref?: string | null
+          referrer?: string | null
           session_id?: string | null
           sincronizado_em?: string | null
           status?: string | null
@@ -765,8 +781,10 @@ export type Database = {
           tipo_interesse?: string | null
           uhomesales_lead_id?: string | null
           utm_campaign?: string | null
+          utm_content?: string | null
           utm_medium?: string | null
           utm_source?: string | null
+          utm_term?: string | null
         }
         Relationships: [
           {

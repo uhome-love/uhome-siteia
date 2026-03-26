@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { getSessionId, getUtmParams, getCorretorRef, getCorretorRefId } from "@/lib/session";
+import { getSessionId, getTrackingData, classifyOrigemCanal, getCorretorRef, getCorretorRefId } from "@/lib/session";
 import { trackEvent } from "@/lib/trackEvent";
 
 interface LeadData {
@@ -17,11 +17,11 @@ interface LeadData {
 }
 
 export async function submitLead(data: LeadData) {
-  const utm = getUtmParams();
+  const tracking = getTrackingData();
   const session_id = getSessionId();
   const refSlug = getCorretorRef();
 
-  // Resolve corretor ref to profile id — prefer cached id from /c/ route
+  // Resolve corretor ref to profile id
   let corretor_ref_id: string | null = getCorretorRefId();
   if (!corretor_ref_id && refSlug) {
     try {
@@ -45,7 +45,6 @@ export async function submitLead(data: LeadData) {
         .ilike("telefone", `%${digitsOnly.slice(-8)}%`)
         .gte("created_at", since);
       if (existing !== null) {
-        // Lead already exists — silently succeed
         trackEvent({
           tipo: "formulario_enviado",
           imovel_slug: data.imovel_slug,
@@ -55,6 +54,8 @@ export async function submitLead(data: LeadData) {
       }
     } catch { /* if check fails, proceed with insert */ }
   }
+
+  const origem_canal = classifyOrigemCanal(tracking);
 
   const payload = {
     nome: data.nome,
@@ -68,9 +69,15 @@ export async function submitLead(data: LeadData) {
     imovel_preco: data.imovel_preco || null,
     origem_pagina: data.origem_pagina || window.location.pathname,
     origem_componente: data.origem_componente,
-    utm_source: utm.utm_source || null,
-    utm_medium: utm.utm_medium || null,
-    utm_campaign: utm.utm_campaign || null,
+    utm_source: tracking.utm_source || null,
+    utm_medium: tracking.utm_medium || null,
+    utm_campaign: tracking.utm_campaign || null,
+    utm_term: tracking.utm_term || null,
+    utm_content: tracking.utm_content || null,
+    referrer: tracking.referrer || null,
+    landing_page: tracking.landing_page || null,
+    device: tracking.device || null,
+    origem_canal,
     session_id,
     corretor_ref_id,
     corretor_ref_slug: refSlug || null,
@@ -83,7 +90,6 @@ export async function submitLead(data: LeadData) {
 
   if (error) throw error;
 
-  // Track in lead_events
   trackEvent({
     tipo: "formulario_enviado",
     imovel_slug: data.imovel_slug,

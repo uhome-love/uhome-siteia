@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { getSessionId, getCorretorRef, getCorretorRefId } from "@/lib/session";
 import { trackEvent } from "@/lib/trackEvent";
+import { trackClickWhatsapp } from "@/lib/gtag";
 
 interface WhatsAppClickData {
   imovel_id?: string;
@@ -34,6 +35,14 @@ export async function trackWhatsAppClick(data: WhatsAppClickData = {}) {
       tipo: "whatsapp_click",
       imovel_slug: data.imovel_slug,
       imovel_titulo: data.imovel_titulo,
+    });
+
+    // GA4 dataLayer event
+    trackClickWhatsapp({
+      origem_componente: "whatsapp_tracker",
+      origem_pagina: data.origem_pagina || window.location.pathname,
+      imovel_titulo: data.imovel_titulo,
+      imovel_slug: data.imovel_slug,
     });
   } catch {
     // silent — never block user flow

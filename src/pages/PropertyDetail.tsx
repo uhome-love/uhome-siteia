@@ -37,6 +37,7 @@ const PropertyDetail = () => {
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [imovel, setImovel] = useState<Imovel | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const mapRef = useRef<HTMLDivElement>(null);
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, dragFree: false });
 
@@ -56,14 +57,22 @@ const PropertyDetail = () => {
 
   useEffect(() => {
     if (!slug) return;
+
+    let cancelled = false;
     setLoading(true);
+    setLoadError(null);
+    setImovel(null);
+
     fetchImovelBySlug(slug)
       .then((data) => {
+        if (cancelled) return;
         setImovel(data);
         if (data) {
           trackView(data.id);
           trackEvent({ tipo: "imovel_visualizado", imovel_slug: data.slug, imovel_titulo: data.titulo });
-          getViewCount(data.id).then(setViewCount);
+          getViewCount(data.id).then((count) => {
+            if (!cancelled) setViewCount(count);
+          });
           const vistos: string[] = JSON.parse(localStorage.getItem("imoveis_vistos") || "[]");
           if (!vistos.includes(data.id)) {
             vistos.push(data.id);
@@ -72,8 +81,18 @@ const PropertyDetail = () => {
           }
         }
       })
-      .catch(console.error)
-      .finally(() => setLoading(false));
+      .catch((error) => {
+        console.error("Erro ao carregar imóvel:", error);
+        if (cancelled) return;
+        setLoadError("Não foi possível carregar este imóvel agora.");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [slug]);
 
   const images = imovel?.fotos.map((f) => f.url) ?? [];
@@ -140,16 +159,22 @@ const PropertyDetail = () => {
       <div className="min-h-screen bg-background">
         <Navbar />
         <div className="flex flex-col items-center justify-center pt-32">
-          <p className="font-body text-xl font-bold text-foreground">Imóvel não encontrado</p>
-          <p className="mt-2 font-body text-sm text-muted-foreground">
-            Este imóvel pode ter sido removido ou o link está incorreto.
+          <p className="font-body text-xl font-bold text-foreground">
+            {loadError ? "Erro ao carregar imóvel" : "Imóvel não encontrado"}
           </p>
-          <Button
-            onClick={() => navigate(prefixLink("/busca"))}
-            className="mt-6"
-          >
-            Ver imóveis disponíveis
-          </Button>
+          <p className="mt-2 font-body text-sm text-muted-foreground">
+            {loadError ?? "Este imóvel pode ter sido removido ou o link está incorreto."}
+          </p>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            {loadError && (
+              <Button variant="outline" onClick={() => window.location.reload()}>
+                Tentar novamente
+              </Button>
+            )}
+            <Button onClick={() => navigate(prefixLink("/busca"))}>
+              Ver imóveis disponíveis
+            </Button>
+          </div>
         </div>
         <Footer />
       </div>

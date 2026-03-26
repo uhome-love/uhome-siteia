@@ -59,39 +59,53 @@ const PropertyDetail = () => {
     if (!slug) return;
 
     let cancelled = false;
+    let retryTimer: ReturnType<typeof setTimeout> | null = null;
     setLoading(true);
     setLoadError(null);
     setImovel(null);
 
-    fetchImovelBySlug(slug)
-      .then((data) => {
-        if (cancelled) return;
-        setImovel(data);
-        if (data) {
-          trackView(data.id);
-          trackEvent({ tipo: "imovel_visualizado", imovel_slug: data.slug, imovel_titulo: data.titulo });
-          getViewCount(data.id).then((count) => {
-            if (!cancelled) setViewCount(count);
-          });
-          const vistos: string[] = JSON.parse(localStorage.getItem("imoveis_vistos") || "[]");
-          if (!vistos.includes(data.id)) {
-            vistos.push(data.id);
-            if (vistos.length > 100) vistos.shift();
-            localStorage.setItem("imoveis_vistos", JSON.stringify(vistos));
-          }
+    function handleSuccess(data: Imovel | null) {
+      if (cancelled) return;
+      setImovel(data);
+      if (data) {
+        trackView(data.id);
+        trackEvent({ tipo: "imovel_visualizado", imovel_slug: data.slug, imovel_titulo: data.titulo });
+        getViewCount(data.id).then((count) => {
+          if (!cancelled) setViewCount(count);
+        });
+        const vistos: string[] = JSON.parse(localStorage.getItem("imoveis_vistos") || "[]");
+        if (!vistos.includes(data.id)) {
+          vistos.push(data.id);
+          if (vistos.length > 100) vistos.shift();
+          localStorage.setItem("imoveis_vistos", JSON.stringify(vistos));
         }
-      })
+      }
+      setLoading(false);
+    }
+
+    fetchImovelBySlug(slug)
+      .then(handleSuccess)
       .catch((error) => {
         console.error("Erro ao carregar imóvel:", error);
         if (cancelled) return;
-        setLoadError("Não foi possível carregar este imóvel agora.");
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
+        // Auto-retry once at component level (on top of service-level retry)
+        retryTimer = setTimeout(() => {
+          if (cancelled) return;
+          fetchImovelBySlug(slug)
+            .then(handleSuccess)
+            .catch((retryError) => {
+              console.error("Erro ao carregar imóvel (retry):", retryError);
+              if (!cancelled) {
+                setLoadError("Não foi possível carregar este imóvel agora.");
+                setLoading(false);
+              }
+            });
+        }, 2000);
       });
 
     return () => {
       cancelled = true;
+      if (retryTimer) clearTimeout(retryTimer);
     };
   }, [slug]);
 

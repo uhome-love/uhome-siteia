@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { TrendingDown, TrendingUp, Minus, ChevronDown, ChevronUp, ShieldCheck, ShieldAlert, Shield } from "lucide-react";
-import { useAnalisePreco, type SimilarComparable } from "@/hooks/useAnalisePreco";
+import { TrendingDown, TrendingUp, Minus, ChevronDown, ChevronUp, ShieldCheck, ShieldAlert, Shield, MapPin, Building2, Sparkles } from "lucide-react";
+import { useAnalisePreco, type ScoredComparable } from "@/hooks/useAnalisePreco";
 import { formatPreco, type Imovel } from "@/services/imoveis";
+import { formatMatchReason, conditionLabel } from "@/lib/similarityEngine";
 
 export function CardUhomePreco({ imovel }: { imovel: Imovel }) {
   const analise = useAnalisePreco(imovel);
@@ -48,12 +49,15 @@ export function CardUhomePreco({ imovel }: { imovel: Imovel }) {
     baixa: { label: "Poucos dados", Icon: ShieldAlert, color: "text-muted-foreground", bg: "bg-secondary" },
   }[analise.confianca];
 
+  const estadoLabel = conditionLabel(analise.estadoImovel);
+
   return (
     <div className="rounded-2xl border border-border bg-card p-5">
       {/* Badge */}
       <div className="mb-3 flex items-center justify-between">
         <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-secondary px-3 py-1 font-body text-[11px] font-semibold text-muted-foreground">
-          ◎ Análise UhomePreço
+          <Sparkles className="h-3 w-3 text-primary" />
+          Análise UhomePreço
         </span>
         <span className={`inline-flex items-center gap-1 rounded-full ${confiancaConfig.bg} px-2.5 py-1 font-body text-[10px] font-semibold ${confiancaConfig.color}`}>
           <confiancaConfig.Icon className="h-3 w-3" />
@@ -65,9 +69,10 @@ export function CardUhomePreco({ imovel }: { imovel: Imovel }) {
       <p className="font-body text-sm font-bold text-foreground">{config.label}</p>
       <p className="mt-0.5 font-body text-xs text-muted-foreground">
         Baseado em {analise.totalSimilares} imóveis similares em {imovel.bairro}
+        {estadoLabel && <span className="ml-1 text-primary">· {estadoLabel}</span>}
       </p>
 
-      {/* Gauge bar — continuous needle position */}
+      {/* Gauge bar */}
       <div className="relative mt-4 mb-1">
         <div className="flex h-2 overflow-hidden rounded-full">
           <div className="flex-1 bg-green-400" />
@@ -112,7 +117,7 @@ export function CardUhomePreco({ imovel }: { imovel: Imovel }) {
                 value={`R$ ${analise.custoTotalMensal.toLocaleString("pt-BR")}`}
               />
             )}
-            <Row label="Similaridade mínima" value="Score ≥ 30%" border={false} />
+            <Row label="Score mínimo" value="≥ 50%" border={false} />
 
             {/* Comparáveis top 5 */}
             {analise.comparaveis.length > 0 && (
@@ -122,7 +127,7 @@ export function CardUhomePreco({ imovel }: { imovel: Imovel }) {
                 </p>
                 <div className="space-y-2">
                   {analise.comparaveis.map((c, i) => (
-                    <ComparableRow key={i} comp={c} rank={i + 1} />
+                    <ComparableRow key={c.id || i} comp={c} rank={i + 1} />
                   ))}
                 </div>
               </div>
@@ -160,29 +165,61 @@ function Row({ label, value, border = true }: { label: string; value: string; bo
   );
 }
 
-function ComparableRow({ comp, rank }: { comp: SimilarComparable; rank: number }) {
+function ComparableRow({ comp, rank }: { comp: ScoredComparable; rank: number }) {
   const similarityPct = Math.round(comp.score * 100);
+  const estadoStr = conditionLabel(comp.estado);
+  const distStr = comp.distanciaMetros != null
+    ? comp.distanciaMetros < 1000
+      ? `${Math.round(comp.distanciaMetros)}m`
+      : `${(comp.distanciaMetros / 1000).toFixed(1)}km`
+    : null;
+
   return (
-    <div className="flex items-center justify-between rounded-lg bg-secondary/50 px-3 py-2">
-      <div className="flex items-center gap-2">
-        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-muted font-body text-[10px] font-bold text-muted-foreground">
-          {rank}
-        </span>
-        <div>
-          <span className="font-body text-xs font-medium text-foreground">
-            {comp.area_total}m² · {comp.quartos}q · {comp.vagas}v
+    <div className="rounded-lg bg-secondary/50 px-3 py-2">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-muted font-body text-[10px] font-bold text-muted-foreground">
+            {rank}
           </span>
-          {comp.andar != null && (
-            <span className="font-body text-[10px] text-muted-foreground"> · {comp.andar}º andar</span>
-          )}
+          <div>
+            <span className="font-body text-xs font-medium text-foreground">
+              {comp.area_total}m² · {comp.quartos}q · {comp.banheiros}bh · {comp.vagas}v
+            </span>
+            {comp.andar != null && (
+              <span className="font-body text-[10px] text-muted-foreground"> · {comp.andar}º</span>
+            )}
+          </div>
+        </div>
+        <div className="text-right">
+          <span className="font-body text-xs font-bold text-foreground">
+            R$ {comp.precoM2.toLocaleString("pt-BR")}/m²
+          </span>
+          <div className="font-body text-[10px] text-muted-foreground">{similarityPct}% similar</div>
         </div>
       </div>
-      <div className="text-right">
-        <span className="font-body text-xs font-bold text-foreground">
-          R$ {comp.precoM2.toLocaleString("pt-BR")}/m²
-        </span>
-        <div className="font-body text-[10px] text-muted-foreground">{similarityPct}% similar</div>
-      </div>
+      {/* Match reasons + distance */}
+      {(comp.matchReasons.length > 0 || distStr || estadoStr) && (
+        <div className="mt-1 flex flex-wrap gap-1">
+          {comp.matchReasons.map((r) => (
+            <span key={r} className="inline-flex items-center gap-0.5 rounded-full bg-primary/10 px-1.5 py-0.5 font-body text-[9px] font-semibold text-primary">
+              {r === "mesmo_edificio" && <Building2 className="h-2.5 w-2.5" />}
+              {(r === "mesma_rua" || r === "muito_proximo") && <MapPin className="h-2.5 w-2.5" />}
+              {formatMatchReason(r)}
+            </span>
+          ))}
+          {distStr && (
+            <span className="inline-flex items-center gap-0.5 rounded-full bg-secondary px-1.5 py-0.5 font-body text-[9px] text-muted-foreground">
+              <MapPin className="h-2.5 w-2.5" />
+              {distStr}
+            </span>
+          )}
+          {estadoStr && (
+            <span className="rounded-full bg-secondary px-1.5 py-0.5 font-body text-[9px] text-muted-foreground">
+              {estadoStr}
+            </span>
+          )}
+        </div>
+      )}
     </div>
   );
 }

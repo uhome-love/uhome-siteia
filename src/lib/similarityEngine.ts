@@ -168,23 +168,23 @@ export function computeAdvancedScore(
     matchReasons.push("mesmo_edificio");
   }
   
-  // ── 2. Geographic proximity (20%) ──
+  // ── 2. Geographic proximity (22%) — strongest signal with high data coverage ──
   let distanciaMetros: number | null = null;
   if (ref.latitude && ref.longitude && comp.latitude && comp.longitude) {
     distanciaMetros = haversineMeters(ref.latitude, ref.longitude, comp.latitude, comp.longitude);
-    // sigma = 500m → within ~200m scores very high
-    const geoScore = gaussianScore(0, distanciaMetros, 500);
-    dimensions.push({ name: "geo", weight: 0.20, score: geoScore });
+    // sigma = 400m → tighter radius, within ~150m scores very high
+    const geoScore = gaussianScore(0, distanciaMetros, 400);
+    dimensions.push({ name: "geo", weight: 0.22, score: geoScore });
     
     if (distanciaMetros < 100 && !sameBuilding) matchReasons.push("mesma_rua");
     else if (distanciaMetros < 300 && !sameBuilding) matchReasons.push("muito_proximo");
   }
   
-  // ── 3. Area (18%) ──
+  // ── 3. Area (22%) — core signal, always available ──
   const iArea = ref.area_total ?? 0;
   const cArea = comp.area_total ?? 0;
   if (iArea > 0 && cArea > 0) {
-    dimensions.push({ name: "area", weight: 0.18, score: gaussianScore(iArea, cArea, iArea * 0.25) });
+    dimensions.push({ name: "area", weight: 0.22, score: gaussianScore(iArea, cArea, iArea * 0.20) });
   }
   
   // ── 4. Quartos (12%) ──
@@ -206,12 +206,12 @@ export function computeAdvancedScore(
   const cV = comp.vagas ?? 0;
   dimensions.push({ name: "vagas", weight: 0.08, score: gaussianScore(iV, cV, 1) });
   
-  // ── 7. Padrão construtivo via condomínio (8%) ──
+  // ── 7. Padrão construtivo via condomínio (12%) — good coverage ~60% ──
   const iCond = ref.preco_condominio ?? 0;
   const cCond = comp.preco_condominio ?? 0;
   if (iCond > 0 && cCond > 0) {
-    const condScore = gaussianScore(iCond, cCond, iCond * 0.4);
-    dimensions.push({ name: "padrao", weight: 0.08, score: condScore });
+    const condScore = gaussianScore(iCond, cCond, iCond * 0.35);
+    dimensions.push({ name: "padrao", weight: 0.12, score: condScore });
     if (condScore > 0.8) matchReasons.push("mesmo_padrao");
   }
   
@@ -222,7 +222,7 @@ export function computeAdvancedScore(
     dimensions.push({ name: "andar", weight: 0.06, score: gaussianScore(iA, cA, 3) });
   }
   
-  // ── 9. Diferenciais overlap (10%) — Jaccard ──
+  // ── 9. Diferenciais overlap (2%) — almost no data in production, minimal weight ──
   const iDif = ref.diferenciais ?? [];
   const cDif = comp.diferenciais ?? [];
   if (iDif.length > 0 && cDif.length > 0) {
@@ -230,10 +230,10 @@ export function computeAdvancedScore(
     const cSet = new Set(cDif.map(d => d.toLowerCase()));
     const intersection = [...iSet].filter(d => cSet.has(d)).length;
     const union = new Set([...iSet, ...cSet]).size;
-    dimensions.push({ name: "diferenciais", weight: 0.10, score: intersection / union });
+    dimensions.push({ name: "diferenciais", weight: 0.02, score: intersection / union });
   }
   
-  // ── 10. Property condition: novo/usado/planta (10%) ──
+  // ── 10. Property condition: novo/usado/planta (12%) — strong differentiator ──
   const refCondition = extractCondition(ref.titulo, ref.descricao);
   const compCondition = extractCondition(comp.titulo, comp.descricao);
   const estado = compCondition;
@@ -243,7 +243,7 @@ export function computeAdvancedScore(
     conditionScore = refCondition === compCondition ? 1.0 : 0.15;
     if (refCondition === compCondition) matchReasons.push("mesmo_tipo_estado");
   }
-  dimensions.push({ name: "estado", weight: 0.10, score: conditionScore });
+  dimensions.push({ name: "estado", weight: 0.12, score: conditionScore });
   
   // ── 11. Area efficiency (implicit bonus, not weighted separately) ──
   const effScore = areaEfficiencyScore(ref, comp);

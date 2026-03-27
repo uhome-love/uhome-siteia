@@ -124,7 +124,7 @@ export function useAnalisePreco(imovel: Imovel | null): AnalisePreco | null {
             recencyWeight: result.recencyWeight,
           } satisfies ScoredComparable;
         })
-        .filter((s) => s.score > 0.35) // balanced threshold for multi-dimensional scoring
+        .filter((s) => s.score > 0.40) // calibrated threshold for tighter similarity
         .sort((a, b) => b.score - a.score);
 
       if (scored.length < 3) return;

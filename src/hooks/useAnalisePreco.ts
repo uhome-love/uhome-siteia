@@ -124,7 +124,7 @@ export function useAnalisePreco(imovel: Imovel | null): AnalisePreco | null {
             recencyWeight: result.recencyWeight,
           } satisfies ScoredComparable;
         })
-        .filter((s) => s.score > 0.5) // stricter minimum
+        .filter((s) => s.score > 0.35) // balanced threshold for multi-dimensional scoring
         .sort((a, b) => b.score - a.score);
 
       if (scored.length < 3) return;
@@ -176,7 +176,7 @@ export function useAnalisePreco(imovel: Imovel | null): AnalisePreco | null {
         confianca,
         custoTotalMensal,
         comparaveis: top.slice(0, 5),
-        estadoImovel: extractCondition(imovel!.titulo, (imovel as any).descricao),
+        estadoImovel: extractCondition(imovel!.titulo, imovel!.descricao),
       });
     }
 

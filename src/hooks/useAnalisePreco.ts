@@ -30,7 +30,7 @@ export interface AnalisePreco {
   estadoImovel: PropertyCondition;
 }
 
-const COMPARABLE_COLUMNS = "id, preco, area_total, area_util, quartos, banheiros, vagas, andar, diferenciais, preco_condominio, condominio_nome, condominio_id, latitude, longitude, titulo, descricao, publicado_em";
+const COMPARABLE_COLUMNS = "id, preco, area_total, area_util, quartos, banheiros, vagas, andar, diferenciais, preco_condominio, condominio_nome, condominio_id, latitude, longitude, titulo, descricao, publicado_em, slug, foto_principal, bairro";
 
 export function useAnalisePreco(imovel: Imovel | null): AnalisePreco | null {
   const [analise, setAnalise] = useState<AnalisePreco | null>(null);
@@ -122,6 +122,9 @@ export function useAnalisePreco(imovel: Imovel | null): AnalisePreco | null {
             estado: result.estado,
             matchReasons: result.matchReasons,
             recencyWeight: result.recencyWeight,
+            slug: (s as any).slug,
+            foto_principal: (s as any).foto_principal,
+            bairro: (s as any).bairro,
           } satisfies ScoredComparable;
         })
         .filter((s) => s.score > 0.40) // calibrated threshold for tighter similarity

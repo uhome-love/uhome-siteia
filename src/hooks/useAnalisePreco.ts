@@ -122,6 +122,9 @@ export function useAnalisePreco(imovel: Imovel | null): AnalisePreco | null {
             estado: result.estado,
             matchReasons: result.matchReasons,
             recencyWeight: result.recencyWeight,
+            slug: (s as any).slug,
+            foto_principal: (s as any).foto_principal,
+            bairro: (s as any).bairro,
           } satisfies ScoredComparable;
         })
         .filter((s) => s.score > 0.40) // calibrated threshold for tighter similarity

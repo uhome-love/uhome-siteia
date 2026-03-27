@@ -30,7 +30,7 @@ export interface AnalisePreco {
   estadoImovel: PropertyCondition;
 }
 
-const COMPARABLE_COLUMNS = "id, preco, area_total, area_util, quartos, banheiros, vagas, andar, diferenciais, preco_condominio, condominio_nome, condominio_id, latitude, longitude, titulo, descricao, publicado_em";
+const COMPARABLE_COLUMNS = "id, preco, area_total, area_util, quartos, banheiros, vagas, andar, diferenciais, preco_condominio, condominio_nome, condominio_id, latitude, longitude, titulo, descricao, publicado_em, slug, foto_principal, bairro";
 
 export function useAnalisePreco(imovel: Imovel | null): AnalisePreco | null {
   const [analise, setAnalise] = useState<AnalisePreco | null>(null);

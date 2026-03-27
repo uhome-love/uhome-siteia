@@ -71,6 +71,9 @@ export interface ScoredComparable {
   estado: PropertyCondition;
   matchReasons: MatchReason[];
   recencyWeight: number;
+  slug?: string;
+  foto_principal?: string | null;
+  bairro?: string;
 }
 
 export type PropertyCondition = "novo" | "usado" | "planta" | "reformado" | "desconhecido";

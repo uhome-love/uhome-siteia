@@ -50,19 +50,19 @@ export function useAnalisePreco(imovel: Imovel | null): AnalisePreco | null {
         id: imovel!.id,
         preco: imovel!.preco,
         area_total: imovel!.area_total,
-        area_util: (imovel as any).area_util ?? null,
+        area_util: imovel!.area_util ?? null,
         quartos: imovel!.quartos,
-        banheiros: (imovel as any).banheiros ?? null,
+        banheiros: imovel!.banheiros ?? null,
         vagas: imovel!.vagas,
         andar: imovel!.andar,
         diferenciais: imovel!.diferenciais,
         preco_condominio: imovel!.preco_condominio ?? null,
-        condominio_nome: (imovel as any).condominio_nome ?? null,
-        condominio_id: (imovel as any).condominio_id ?? null,
-        latitude: (imovel as any).latitude ?? null,
-        longitude: (imovel as any).longitude ?? null,
+        condominio_nome: imovel!.condominio_nome ?? null,
+        condominio_id: null, // not in Imovel type
+        latitude: imovel!.latitude ?? null,
+        longitude: imovel!.longitude ?? null,
         titulo: imovel!.titulo ?? null,
-        descricao: (imovel as any).descricao ?? null,
+        descricao: imovel!.descricao ?? null,
         bairro: imovel!.bairro,
         tipo: imovel!.tipo,
         preco_iptu: imovel!.preco_iptu ?? null,
@@ -124,7 +124,7 @@ export function useAnalisePreco(imovel: Imovel | null): AnalisePreco | null {
             recencyWeight: result.recencyWeight,
           } satisfies ScoredComparable;
         })
-        .filter((s) => s.score > 0.5) // stricter minimum
+        .filter((s) => s.score > 0.35) // balanced threshold for multi-dimensional scoring
         .sort((a, b) => b.score - a.score);
 
       if (scored.length < 3) return;
@@ -176,7 +176,7 @@ export function useAnalisePreco(imovel: Imovel | null): AnalisePreco | null {
         confianca,
         custoTotalMensal,
         comparaveis: top.slice(0, 5),
-        estadoImovel: extractCondition(imovel!.titulo, (imovel as any).descricao),
+        estadoImovel: extractCondition(imovel!.titulo, imovel!.descricao),
       });
     }
 

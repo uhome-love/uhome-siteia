@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { getVisitorId } from "./visitor";
-import { getSessionId, getCorretorRef, getCorretorRefId } from "./session";
+import { getSessionId, getCorretorRef, getCorretorRefId, getLeadIdentity } from "./session";
 
 type EventTipo =
   | "imovel_visualizado"
@@ -27,6 +27,7 @@ export async function trackEvent(params: TrackEventParams) {
     const session_id = getSessionId();
     const corretor_slug = getCorretorRef();
     const corretor_id = getCorretorRefId();
+    const identidade = getLeadIdentity();
 
     await (supabase as any).from("lead_events").insert({
       visitor_id,
@@ -39,6 +40,9 @@ export async function trackEvent(params: TrackEventParams) {
       imovel_titulo: params.imovel_titulo || null,
       busca_query: params.busca_query || null,
       busca_filtros: params.busca_filtros || null,
+      identidade: (identidade.telefone || identidade.email)
+        ? { telefone: identidade.telefone || null, email: identidade.email || null }
+        : null,
     });
 
     // Real-time notification for corretor on high-value events

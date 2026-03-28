@@ -1,5 +1,7 @@
 const SESSION_KEY = 'uhome_session_id';
 const UTM_KEY = 'uhome_utm_data';
+const LEAD_TELEFONE_KEY = 'uhome_lead_telefone';
+const LEAD_EMAIL_KEY = 'uhome_lead_email';
 
 export function getSessionId(): string {
   let id = sessionStorage.getItem(SESSION_KEY);
@@ -22,6 +24,28 @@ interface UtmData {
   landing_page?: string;
   first_visit_at?: string;
   device?: string;
+}
+
+/** Capture lead identity params (?telefone=, ?email=) into sessionStorage */
+export function captureLeadIdentity(): void {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const tel = params.get('telefone');
+    const email = params.get('email');
+    if (tel) sessionStorage.setItem(LEAD_TELEFONE_KEY, tel);
+    if (email) sessionStorage.setItem(LEAD_EMAIL_KEY, email);
+  } catch { /* silent */ }
+}
+
+/** Get captured lead identity (telefone/email from URL params) */
+export function getLeadIdentity(): { telefone?: string; email?: string } {
+  try {
+    const telefone = sessionStorage.getItem(LEAD_TELEFONE_KEY) || undefined;
+    const email = sessionStorage.getItem(LEAD_EMAIL_KEY) || undefined;
+    return { telefone, email };
+  } catch {
+    return {};
+  }
 }
 
 /** Capture UTMs from URL + referrer + device on first visit (first-touch attribution) */

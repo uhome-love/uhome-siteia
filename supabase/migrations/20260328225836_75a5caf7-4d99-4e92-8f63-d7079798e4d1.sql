@@ -1,0 +1,1 @@
+ALTER TABLE public.lead_events ADD COLUMN identidade jsonb DEFAULT NULL;

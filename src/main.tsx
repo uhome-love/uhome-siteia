@@ -1,10 +1,12 @@
 import { createRoot } from "react-dom/client";
 import { HelmetProvider } from "react-helmet-async";
-import { captureUtmParams } from "./lib/session";
+import { captureUtmParams, captureLeadIdentity } from "./lib/session";
 import App from "./App.tsx";
 
 // Capture UTMs + referrer on first page load (first-touch attribution)
 captureUtmParams();
+// Capture ?telefone= and ?email= from URL for lead identity (Radar de Intenção)
+captureLeadIdentity();
 // Critical font weights only — load eagerly
 import "@fontsource/plus-jakarta-sans/400.css";
 import "@fontsource/plus-jakarta-sans/700.css";

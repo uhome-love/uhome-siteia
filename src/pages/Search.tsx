@@ -789,6 +789,13 @@ const Search = () => {
               )}
             </>
           )}
+
+          {/* Bairros recomendados — QuintoAndar style */}
+          {!modoIA && imoveis.length > 0 && (
+            <Suspense fallback={null}>
+              <BairrosRecomendados />
+            </Suspense>
+          )}
         </div>
 
         {/* Map — desktop */}

@@ -10,6 +10,7 @@ const FeaturedNeighborhoods = lazy(() => import("@/components/FeaturedNeighborho
 const FeaturedProperties = lazy(() => import("@/components/FeaturedProperties").then(m => ({ default: m.FeaturedProperties })));
 const EmpreendimentosDestaque = lazy(() => import("@/components/EmpreendimentosDestaque").then(m => ({ default: m.EmpreendimentosDestaque })));
 const PorQueUhome = lazy(() => import("@/components/PorQueUhome").then(m => ({ default: m.PorQueUhome })));
+const SeoLinksSection = lazy(() => import("@/components/SeoLinksSection").then(m => ({ default: m.SeoLinksSection })));
 
 const Index = () => {
   useCanonical("/");
@@ -27,6 +28,7 @@ const Index = () => {
         <EmpreendimentosDestaque />
         <FeaturedNeighborhoods />
         <FeaturedProperties />
+        <SeoLinksSection />
         <PorQueUhome />
       </Suspense>
       <Footer />

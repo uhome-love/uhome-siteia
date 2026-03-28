@@ -26,6 +26,8 @@ export function Footer() {
               <li><Link to={prefixLink("/apartamentos-porto-alegre")} className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Apartamentos</Link></li>
               <li><Link to={prefixLink("/casas-porto-alegre")} className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Casas</Link></li>
               <li><Link to={prefixLink("/coberturas-porto-alegre")} className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Coberturas</Link></li>
+              <li><Link to={prefixLink("/apartamentos-ate-500-mil-porto-alegre")} className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Até R$ 500 mil</Link></li>
+              <li><Link to={prefixLink("/imoveis-de-luxo-porto-alegre")} className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Imóveis de luxo</Link></li>
               <li><Link to={prefixLink("/bairros")} className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Bairros</Link></li>
               <li><Link to={prefixLink("/condominios")} className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Condomínios</Link></li>
               <li><Link to={prefixLink("/anunciar")} className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Anunciar imóvel</Link></li>

@@ -1,11 +1,12 @@
 import React, { useState, useRef, useCallback, useEffect, forwardRef } from "react";
 import { AuthModal } from "@/components/AuthModal";
-import { Heart } from "lucide-react";
+import { Heart, TrendingDown, Sparkles, Clock } from "lucide-react";
 import { motion } from "framer-motion";
 import { type Imovel, fotoPrincipal, formatPreco } from "@/services/imoveis";
 import { FotoImovel } from "@/components/FotoImovel";
 import { useCorretor } from "@/contexts/CorretorContext";
 import { supabase } from "@/integrations/supabase/client";
+import { getBairroStats } from "@/services/bairroStatsCache";
 
 interface Props {
   imovel: Imovel;
@@ -16,30 +17,40 @@ interface Props {
   toggleFavorito?: (id: string) => Promise<"needs_auth" | void>;
 }
 
-type BadgeStyle = "novo" | "exclusivo" | "visto";
+type BadgeStyle = "novo" | "exclusivo" | "visto" | "otimo-preco" | "oportunidade";
 
-function getBadge(imovel: Imovel): { label: string; style: BadgeStyle } | null {
+interface SmartBadge {
+  label: string;
+  style: BadgeStyle;
+  icon?: React.ReactNode;
+}
+
+function getBaseBadges(imovel: Imovel): SmartBadge[] {
+  const badges: SmartBadge[] = [];
   const vistos: string[] = JSON.parse(localStorage.getItem("imoveis_vistos") || "[]");
+
   if (vistos.includes(imovel.id)) {
-    return { label: "Visualizado", style: "visto" };
+    badges.push({ label: "Visualizado", style: "visto" });
   }
 
   if (imovel.publicado_em) {
     const dias = Math.floor(
       (Date.now() - new Date(imovel.publicado_em).getTime()) / 86400000
     );
-    if (dias <= 7) return { label: "Anúncio novo", style: "novo" };
+    if (dias <= 7) badges.push({ label: "Novidade", style: "novo", icon: <Clock className="h-3 w-3" /> });
   }
 
-  if (imovel.destaque) return { label: "Exclusivo", style: "exclusivo" };
+  if (imovel.destaque) badges.push({ label: "Exclusivo", style: "exclusivo" });
 
-  return null;
+  return badges;
 }
 
 const badgeClasses: Record<BadgeStyle, string> = {
-  novo: "bg-white/95 text-foreground font-semibold shadow-sm",
+  novo: "bg-emerald-500/90 text-white font-semibold shadow-sm",
   exclusivo: "bg-black/80 text-white font-semibold shadow-sm",
   visto: "bg-white/90 text-primary font-semibold shadow-sm backdrop-blur-sm",
+  "otimo-preco": "bg-primary/90 text-primary-foreground font-semibold shadow-sm",
+  oportunidade: "bg-amber-500/90 text-white font-semibold shadow-sm",
 };
 
 export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavorito: isFavoritoProp, toggleFavorito: toggleFavoritoProp }, ref) {
@@ -118,7 +129,24 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
   ].filter(Boolean);
   const stats = statsArr.join(" · ");
 
-  const badge = getBadge(imovel);
+  // Smart badges: base + price-based (loaded async)
+  const [smartBadges, setSmartBadges] = useState<SmartBadge[]>(() => getBaseBadges(imovel));
+  useEffect(() => {
+    if (area <= 0 || imovel.preco <= 0) return;
+    const precoM2 = imovel.preco / area;
+    getBairroStats().then((stats) => {
+      const bairroStat = stats.get(imovel.bairro);
+      if (!bairroStat || bairroStat.count < 5) return;
+      const ratio = precoM2 / bairroStat.precoM2Medio;
+      const newBadges = [...getBaseBadges(imovel)];
+      if (ratio <= 0.75) {
+        newBadges.unshift({ label: "Oportunidade", style: "oportunidade", icon: <TrendingDown className="h-3 w-3" /> });
+      } else if (ratio <= 0.90) {
+        newBadges.unshift({ label: "Ótimo preço", style: "otimo-preco", icon: <Sparkles className="h-3 w-3" /> });
+      }
+      setSmartBadges(newBadges);
+    });
+  }, [imovel.id, imovel.preco, imovel.bairro, area]);
 
   // Build a short description
   const tipoCapitalized = imovel.tipo.charAt(0).toUpperCase() + imovel.tipo.slice(1);
@@ -201,13 +229,13 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
           )}
 
           {/* Badges */}
-          <div className="pointer-events-none absolute left-3 top-3 z-10 flex gap-1.5">
-            {badge && (
-              <span className={`rounded-md px-2.5 py-1 font-body text-[11px] ${badgeClasses[badge.style]}`}>
-                {badge.label}
-              </span>
-            )}
-          </div>
+           <div className="pointer-events-none absolute left-3 top-3 z-10 flex flex-wrap gap-1.5">
+              {smartBadges.slice(0, 2).map((b, i) => (
+                <span key={i} className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 font-body text-[11px] ${badgeClasses[b.style]}`}>
+                  {b.icon}{b.label}
+                </span>
+              ))}
+            </div>
 
           {/* Heart */}
           <button
@@ -324,13 +352,15 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
             </div>
           )}
 
-          {/* Badge */}
-          {badge && (
-            <span
-              className={`absolute left-2.5 top-2.5 z-10 rounded-md px-2.5 py-1 font-body text-xs ${badgeClasses[badge.style]}`}
-            >
-              {badge.label}
-            </span>
+          {/* Badges */}
+          {smartBadges.length > 0 && (
+            <div className="absolute left-2.5 top-2.5 z-10 flex flex-wrap gap-1.5">
+              {smartBadges.slice(0, 2).map((b, i) => (
+                <span key={i} className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 font-body text-xs ${badgeClasses[b.style]}`}>
+                  {b.icon}{b.label}
+                </span>
+              ))}
+            </div>
           )}
 
           {/* Nav arrows on hover */}

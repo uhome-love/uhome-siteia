@@ -862,6 +862,53 @@ export type Database = {
         }
         Relationships: []
       }
+      vitrines: {
+        Row: {
+          corretor_id: string | null
+          corretor_slug: string | null
+          created_at: string
+          id: string
+          imovel_codigos: string[]
+          lead_nome: string | null
+          lead_telefone: string | null
+          mensagem: string | null
+          titulo: string | null
+          visualizacoes: number
+        }
+        Insert: {
+          corretor_id?: string | null
+          corretor_slug?: string | null
+          created_at?: string
+          id?: string
+          imovel_codigos?: string[]
+          lead_nome?: string | null
+          lead_telefone?: string | null
+          mensagem?: string | null
+          titulo?: string | null
+          visualizacoes?: number
+        }
+        Update: {
+          corretor_id?: string | null
+          corretor_slug?: string | null
+          created_at?: string
+          id?: string
+          imovel_codigos?: string[]
+          lead_nome?: string | null
+          lead_telefone?: string | null
+          mensagem?: string | null
+          titulo?: string | null
+          visualizacoes?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vitrines_corretor_id_fkey"
+            columns: ["corretor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       whatsapp_clicks: {
         Row: {
           corretor_ref_id: string | null

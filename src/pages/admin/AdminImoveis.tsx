@@ -44,8 +44,12 @@ export default function AdminImoveis() {
       .order("publicado_em", { ascending: false })
       .limit(100);
 
-    if (statusFilter !== "todos") query = query.eq("status", statusFilter);
-    if (search) query = query.or(`titulo.ilike.%${search}%,bairro.ilike.%${search}%`);
+    if (statusFilter === "destaque") {
+      query = query.eq("destaque", true);
+    } else if (statusFilter !== "todos") {
+      query = query.eq("status", statusFilter);
+    }
+    if (search) query = query.or(`titulo.ilike.%${search}%,bairro.ilike.%${search}%,slug.ilike.%${search}%`);
 
     const { data } = await query;
     setImoveis((data as ImovelRow[]) || []);

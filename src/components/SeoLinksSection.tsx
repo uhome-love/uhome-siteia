@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useCorretor } from "@/contexts/CorretorContext";
-import { Building2, Home, Crown, DollarSign, Bed } from "lucide-react";
+import { Building2, Home, Crown, DollarSign, Bed, MapPin } from "lucide-react";
 
 const seoLinks = {
   "Por faixa de preço": [
@@ -28,6 +28,16 @@ const seoLinks = {
     { label: "Casas 3 quartos", href: "/casas-3-quartos-porto-alegre", icon: Bed },
     { label: "Casas 4 quartos", href: "/casas-4-quartos-porto-alegre", icon: Bed },
   ],
+  "Por bairro": [
+    { label: "Moinhos de Vento", href: "/apartamentos-moinhos-de-vento", icon: MapPin },
+    { label: "Petrópolis", href: "/apartamentos-petropolis", icon: MapPin },
+    { label: "Bela Vista", href: "/apartamentos-bela-vista", icon: MapPin },
+    { label: "Mont'Serrat", href: "/apartamentos-montserrat", icon: MapPin },
+    { label: "Auxiliadora", href: "/apartamentos-auxiliadora", icon: MapPin },
+    { label: "Boa Vista", href: "/apartamentos-boa-vista", icon: MapPin },
+    { label: "Três Figueiras", href: "/apartamentos-tres-figueiras", icon: MapPin },
+    { label: "Todos os bairros →", href: "/bairros", icon: MapPin },
+  ],
 };
 
 export function SeoLinksSection() {
@@ -49,11 +59,11 @@ export function SeoLinksSection() {
             Encontre imóveis em Porto Alegre
           </h2>
           <p className="mt-3 max-w-lg font-body text-muted-foreground">
-            Navegue por tipo, faixa de preço ou número de dormitórios para encontrar o imóvel ideal.
+            Navegue por bairro, tipo, faixa de preço ou dormitórios para encontrar o imóvel ideal.
           </p>
         </motion.div>
 
-        <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {Object.entries(seoLinks).map(([category, links], catIdx) => (
             <motion.div
               key={category}

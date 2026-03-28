@@ -547,6 +547,7 @@ export type Database = {
           corretor_slug: string | null
           created_at: string
           id: string
+          identidade: Json | null
           imovel_slug: string | null
           imovel_titulo: string | null
           pagina: string | null
@@ -561,6 +562,7 @@ export type Database = {
           corretor_slug?: string | null
           created_at?: string
           id?: string
+          identidade?: Json | null
           imovel_slug?: string | null
           imovel_titulo?: string | null
           pagina?: string | null
@@ -575,6 +577,7 @@ export type Database = {
           corretor_slug?: string | null
           created_at?: string
           id?: string
+          identidade?: Json | null
           imovel_slug?: string | null
           imovel_titulo?: string | null
           pagina?: string | null

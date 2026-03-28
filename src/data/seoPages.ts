@@ -287,6 +287,17 @@ export function generateQuartosBairroPaths(bairros: string[]): string[] {
   return paths;
 }
 
+export function generateTipoPrecoPaths(): string[] {
+  const paths: string[] = [];
+  const precoTipos = ["apartamentos", "casas", "coberturas"] as const;
+  for (const tipo of precoTipos) {
+    for (const rangeSlug of Object.keys(PRECO_RANGES)) {
+      paths.push(`${tipo}-${rangeSlug}-porto-alegre`);
+    }
+  }
+  return paths;
+}
+
 // ── Content generation helpers ───────────────────────────
 
 export function generateBairroDescription(bairroNome: string, tipo?: string, quartos?: number): string {

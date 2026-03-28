@@ -287,51 +287,27 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
         </div>
 
         {/* Text content — QuintoAndar style */}
-        <div className="px-0.5 pt-3 pb-2">
-          {/* Description */}
-          <p className="font-body text-[13px] leading-snug text-muted-foreground line-clamp-2">
-            {descParts[0]}
-          </p>
+        <div className="px-1 pt-2.5 pb-1">
+          {/* Price */}
+          <p className="font-body text-[17px] font-extrabold leading-tight text-foreground">{price}</p>
 
-          {/* Price row */}
-          <div className="mt-2 flex items-baseline justify-between">
-            <div>
-              <span className="font-body text-lg font-extrabold text-foreground">{price}</span>
-            </div>
-            <button
-              onClick={async (e) => { e.preventDefault(); e.stopPropagation(); const r = await toggleFavorito(imovel.id); if (r === "needs_auth") setShowAuth(true); }}
-              aria-label={liked ? "Remover dos favoritos" : "Adicionar aos favoritos"}
-              className="p-1"
-            >
-              <Heart
-                className="h-5 w-5 transition-colors"
-                fill={liked ? "#ff385c" : "transparent"}
-                stroke={liked ? "#ff385c" : "hsl(var(--muted-foreground))"}
-                strokeWidth={1.5}
-              />
-            </button>
-          </div>
-
-          {/* Monthly costs */}
-          {(imovel.preco_condominio ?? 0) > 0 && (
+          {/* Monthly costs inline */}
+          {((imovel.preco_condominio ?? 0) > 0 || (imovel.preco_iptu ?? 0) > 0) && (
             <p className="mt-0.5 font-body text-[12px] text-muted-foreground">
-              R$ {(imovel.preco_condominio!).toLocaleString("pt-BR")}/mês cond.
-            </p>
-          )}
-          {(imovel.preco_iptu ?? 0) > 0 && (
-            <p className="mt-0.5 font-body text-[12px] text-muted-foreground">
-              R$ {(imovel.preco_iptu!).toLocaleString("pt-BR")}/mês IPTU
+              {(imovel.preco_condominio ?? 0) > 0 && `Cond. R$ ${imovel.preco_condominio!.toLocaleString("pt-BR")}`}
+              {(imovel.preco_condominio ?? 0) > 0 && (imovel.preco_iptu ?? 0) > 0 && " · "}
+              {(imovel.preco_iptu ?? 0) > 0 && `IPTU R$ ${imovel.preco_iptu!.toLocaleString("pt-BR")}`}
             </p>
           )}
 
           {/* Stats line */}
           {stats && (
-            <p className="mt-2 font-body text-[13px] font-medium text-foreground">{stats}</p>
+            <p className="mt-1.5 font-body text-[13px] text-foreground">{stats}</p>
           )}
 
           {/* Address */}
           <p className="mt-0.5 font-body text-[12px] text-muted-foreground truncate">
-            {imovel.bairro} · {imovel.cidade || "Porto Alegre"}
+            {imovel.bairro}, {imovel.cidade || "Porto Alegre"}
           </p>
         </div>
       </div>

@@ -46,7 +46,7 @@ export function FloatingWhatsApp() {
           initial={{ opacity: 0, scale: 0.5, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.5, y: 20 }}
-          className="fixed bottom-20 right-4 z-[60] sm:bottom-6 sm:right-6 flex flex-col items-end gap-2"
+          className="fixed bottom-[4.5rem] right-3 z-[60] sm:bottom-6 sm:right-6 flex flex-col items-end gap-2"
         >
           {/* Tooltip bubble */}
           <AnimatePresence>

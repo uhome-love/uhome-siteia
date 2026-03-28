@@ -57,7 +57,7 @@ export default function Vitrine() {
           .in("jetimob_id", v.imovel_codigos)
           .eq("status", "disponivel");
 
-        setImoveis((props as Imovel[]) || []);
+        setImoveis((props as unknown as Imovel[]) || []);
       }
 
       // Track vitrine view

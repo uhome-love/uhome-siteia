@@ -528,7 +528,7 @@ const Search = () => {
   const animatedTotal = useCountUp(total);
 
   return (
-    <div className="flex h-screen flex-col bg-background pt-16">
+    <div className="flex min-h-screen flex-col bg-background pt-16 overflow-x-hidden">
       <Navbar />
 
       {/* Filter bar — switches between normal and AI */}
@@ -546,7 +546,7 @@ const Search = () => {
                 onKeyDown={(e) => e.key === "Enter" && buscarComIA()}
                 placeholder="Ex: apartamento 2 quartos perto do Iguatemi até 800 mil..."
                 autoFocus
-                className="w-full border-none bg-transparent font-body text-[13px] text-foreground outline-none placeholder:text-muted-foreground sm:text-sm"
+                className="w-full border-none bg-transparent font-body text-base text-foreground outline-none placeholder:text-muted-foreground sm:text-sm"
               />
               {queryIA && (
                 <button
@@ -713,9 +713,9 @@ const Search = () => {
       </div>
 
       {/* Main area: cards + map */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 lg:overflow-hidden overflow-visible">
         {/* Cards column */}
-        <div className="flex-1 overflow-y-auto px-3 pt-2 pb-24 sm:px-6 sm:pt-3 sm:pb-5" style={{ minWidth: 0 }}>
+        <div className="flex-1 lg:overflow-y-auto px-3 pt-2 pb-24 sm:px-6 sm:pt-3 sm:pb-5" style={{ minWidth: 0 }}>
           {loading ? (
             <div className="grid grid-cols-1 gap-4 pb-20 sm:grid-cols-2 sm:gap-6 sm:pb-4 xl:grid-cols-3">
               {Array.from({ length: 6 }).map((_, i) => (

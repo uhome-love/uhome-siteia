@@ -41,7 +41,7 @@ export function AISearchSection() {
               <input
                 type="text"
                 placeholder="Descreva o que você procura..."
-                className="flex-1 bg-transparent font-body text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+                className="flex-1 bg-transparent font-body text-base text-foreground placeholder:text-muted-foreground focus:outline-none sm:text-sm"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     navigate(prefixLink(`/busca?modo=ia&q=${encodeURIComponent((e.target as HTMLInputElement).value)}`));

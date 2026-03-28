@@ -12,13 +12,15 @@ export interface SeoPageConfig {
   tipo?: string;
   bairro?: string;
   quartos?: number;
+  precoMin?: number;
+  precoMax?: number;
   /** SEO content */
   h1: string;
   metaTitle: string;
   metaDescription: string;
   breadcrumbs: Array<{ label: string; href?: string }>;
   /** For internal links */
-  pageType: "tipo-bairro" | "tipo-quartos-bairro" | "intent" | "tipo-cidade";
+  pageType: "tipo-bairro" | "tipo-quartos-bairro" | "intent" | "tipo-cidade" | "tipo-preco";
   canonicalPath: string;
 }
 

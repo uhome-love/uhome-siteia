@@ -610,7 +610,12 @@ const Search = () => {
               const f = aiResult.filtros;
               const pills: { label: string; value: string }[] = [];
               if (f.tipo) pills.push({ label: "Tipo", value: f.tipo.charAt(0).toUpperCase() + f.tipo.slice(1) });
-              if (f.bairros && f.bairros.length > 0) pills.push({ label: "Bairros", value: f.bairros.join(", ") });
+              if (f.bairros && f.bairros.length > 0) {
+                const MAX_BAIRROS = 3;
+                const shown = f.bairros.slice(0, MAX_BAIRROS).join(", ");
+                const extra = f.bairros.length - MAX_BAIRROS;
+                pills.push({ label: "Bairros", value: extra > 0 ? `${shown} +${extra}` : shown });
+              }
               if (f.preco_min && f.preco_max) pills.push({ label: "Preço", value: `R$ ${(f.preco_min / 1000).toFixed(0)}k – ${(f.preco_max / 1000).toFixed(0)}k` });
               else if (f.preco_max) pills.push({ label: "Preço", value: `até R$ ${(f.preco_max / 1000).toFixed(0)}k` });
               else if (f.preco_min) pills.push({ label: "Preço", value: `a partir de R$ ${(f.preco_min / 1000).toFixed(0)}k` });

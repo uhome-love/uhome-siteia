@@ -143,6 +143,9 @@ async function main() {
   const quartosTipos = ["apartamentos", "casas", "coberturas"];
   for (const tipo of quartosTipos) {
     for (const q of [1, 2, 3, 4]) {
+      // tipo + quartos + cidade
+      add(`/${tipo}-${q}-quartos-porto-alegre`, TODAY, "daily", "0.75");
+      // tipo + quartos + bairro
       for (const bs of activeBairros) {
         add(`/${tipo}-${q}-quartos-${bs}`, TODAY, "weekly", "0.7");
       }

@@ -7,7 +7,7 @@ const UHOMESALES_SITE_EVENTS_URL =
 
 // UhomeSales anon key — public/publishable, safe to embed
 const UHOMESALES_ANON_KEY =
-  "COLE_A_ANON_KEY_AQUI";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1bmJ4cXpodnVlbWdudGtseXpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1ODI2NTUsImV4cCI6MjA4ODE1ODY1NX0.giwij9kxlColZF21iBHZO8in86kGNJIHWXHqtdik6oY";
 
 type EventTipo =
   | "imovel_visualizado"
@@ -30,7 +30,7 @@ interface TrackEventParams {
  * Runs async, never blocks the caller.
  */
 function postToCRM(params: TrackEventParams, identidade: { telefone?: string; email?: string }) {
-  if (UHOMESALES_ANON_KEY === "COLE_A_ANON_KEY_AQUI") return; // skip until key is set
+  if (!UHOMESALES_ANON_KEY) return; // skip if key is empty
 
   const body = {
     tipo: params.tipo,

@@ -59,11 +59,11 @@ export function SeoLinksSection() {
             Encontre imóveis em Porto Alegre
           </h2>
           <p className="mt-3 max-w-lg font-body text-muted-foreground">
-            Navegue por tipo, faixa de preço ou número de dormitórios para encontrar o imóvel ideal.
+            Navegue por bairro, tipo, faixa de preço ou dormitórios para encontrar o imóvel ideal.
           </p>
         </motion.div>
 
-        <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {Object.entries(seoLinks).map(([category, links], catIdx) => (
             <motion.div
               key={category}

@@ -229,13 +229,13 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
           )}
 
           {/* Badges */}
-          <div className="pointer-events-none absolute left-3 top-3 z-10 flex gap-1.5">
-            {badge && (
-              <span className={`rounded-md px-2.5 py-1 font-body text-[11px] ${badgeClasses[badge.style]}`}>
-                {badge.label}
-              </span>
-            )}
-          </div>
+           <div className="pointer-events-none absolute left-3 top-3 z-10 flex flex-wrap gap-1.5">
+              {smartBadges.slice(0, 2).map((b, i) => (
+                <span key={i} className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 font-body text-[11px] ${badgeClasses[b.style]}`}>
+                  {b.icon}{b.label}
+                </span>
+              ))}
+            </div>
 
           {/* Heart */}
           <button

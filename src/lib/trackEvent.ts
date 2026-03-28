@@ -47,6 +47,8 @@ function postToCRM(params: TrackEventParams, identidade: { telefone?: string; em
     pagina: window.location.href,
   };
 
+  console.log('[CRM POST]', body.tipo, body.identidade);
+
   fetch(UHOMESALES_SITE_EVENTS_URL, {
     method: "POST",
     headers: {
@@ -55,9 +57,14 @@ function postToCRM(params: TrackEventParams, identidade: { telefone?: string; em
       Authorization: `Bearer ${UHOMESALES_ANON_KEY}`,
     },
     body: JSON.stringify(body),
-  }).catch(() => {
-    // Silent — CRM sync must never block the user
-  });
+  })
+    .then((res) => {
+      console.log('[CRM POST] response:', res.status, res.statusText);
+      if (!res.ok) res.text().then((t) => console.warn('[CRM POST] error body:', t));
+    })
+    .catch((err) => {
+      console.warn('[CRM POST] fetch error:', err);
+    });
 }
 
 /**

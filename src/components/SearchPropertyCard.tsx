@@ -38,7 +38,7 @@ function getBaseBadges(imovel: Imovel): SmartBadge[] {
     const dias = Math.floor(
       (Date.now() - new Date(imovel.publicado_em).getTime()) / 86400000
     );
-    if (dias <= 30) badges.push({ label: "Novidade", style: "novo", icon: <Clock className="h-3 w-3" /> });
+    if (dias <= 15) badges.push({ label: "Novidade", style: "novo", icon: <Clock className="h-3 w-3" /> });
   }
 
   // Visualizado — lowest priority

@@ -30,7 +30,7 @@ interface TrackEventParams {
  * Runs async, never blocks the caller.
  */
 function postToCRM(params: TrackEventParams, identidade: { telefone?: string; email?: string }) {
-  if (UHOMESALES_ANON_KEY === "COLE_A_ANON_KEY_AQUI") return; // skip until key is set
+  if (!UHOMESALES_ANON_KEY) return; // skip if key is empty
 
   const body = {
     tipo: params.tipo,

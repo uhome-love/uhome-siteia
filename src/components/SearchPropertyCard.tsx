@@ -352,13 +352,15 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
             </div>
           )}
 
-          {/* Badge */}
-          {badge && (
-            <span
-              className={`absolute left-2.5 top-2.5 z-10 rounded-md px-2.5 py-1 font-body text-xs ${badgeClasses[badge.style]}`}
-            >
-              {badge.label}
-            </span>
+          {/* Badges */}
+          {smartBadges.length > 0 && (
+            <div className="absolute left-2.5 top-2.5 z-10 flex flex-wrap gap-1.5">
+              {smartBadges.slice(0, 2).map((b, i) => (
+                <span key={i} className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 font-body text-xs ${badgeClasses[b.style]}`}>
+                  {b.icon}{b.label}
+                </span>
+              ))}
+            </div>
           )}
 
           {/* Nav arrows on hover */}

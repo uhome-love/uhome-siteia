@@ -2,6 +2,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { getVisitorId } from "./visitor";
 import { getSessionId, getCorretorRef, getCorretorRefId, getLeadIdentity } from "./session";
 
+const UHOMESALES_SITE_EVENTS_URL =
+  "https://hunbxqzhvuemgntklyzb.supabase.co/functions/v1/site-events";
+
+// UhomeSales anon key — public/publishable, safe to embed
+const UHOMESALES_ANON_KEY =
+  "COLE_A_ANON_KEY_AQUI";
+
 type EventTipo =
   | "imovel_visualizado"
   | "busca_realizada"
@@ -12,14 +19,52 @@ interface TrackEventParams {
   tipo: EventTipo;
   imovel_slug?: string | null;
   imovel_titulo?: string | null;
+  imovel_bairro?: string | null;
+  imovel_preco?: number | null;
   busca_query?: string | null;
   busca_filtros?: Record<string, unknown> | null;
+}
+
+/**
+ * Fire-and-forget: POST event to UhomeSales CRM site-events edge function.
+ * Runs async, never blocks the caller.
+ */
+function postToCRM(params: TrackEventParams, identidade: { telefone?: string; email?: string }) {
+  if (UHOMESALES_ANON_KEY === "COLE_A_ANON_KEY_AQUI") return; // skip until key is set
+
+  const body = {
+    tipo: params.tipo,
+    dados: {
+      imovel_codigo: params.imovel_slug || null,
+      imovel_titulo: params.imovel_titulo || null,
+      imovel_bairro: params.imovel_bairro || null,
+      imovel_preco: params.imovel_preco || null,
+    },
+    identidade: {
+      telefone: identidade.telefone || null,
+      email: identidade.email || null,
+    },
+    pagina: window.location.href,
+  };
+
+  fetch(UHOMESALES_SITE_EVENTS_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      apikey: UHOMESALES_ANON_KEY,
+      Authorization: `Bearer ${UHOMESALES_ANON_KEY}`,
+    },
+    body: JSON.stringify(body),
+  }).catch(() => {
+    // Silent — CRM sync must never block the user
+  });
 }
 
 /**
  * Fire-and-forget event tracking.
  * Inserts into lead_events and, when a corretor is active,
  * also creates a real-time notification for the corretor.
+ * Additionally POSTs to UhomeSales CRM site-events.
  */
 export async function trackEvent(params: TrackEventParams) {
   try {
@@ -29,6 +74,7 @@ export async function trackEvent(params: TrackEventParams) {
     const corretor_id = getCorretorRefId();
     const identidade = getLeadIdentity();
 
+    // 1. Local insert (lead_events)
     await (supabase as any).from("lead_events").insert({
       visitor_id,
       session_id,
@@ -45,7 +91,10 @@ export async function trackEvent(params: TrackEventParams) {
         : null,
     });
 
-    // Real-time notification for corretor on high-value events
+    // 2. Async POST to UhomeSales CRM (non-blocking)
+    postToCRM(params, identidade);
+
+    // 3. Real-time notification for corretor on high-value events
     if (
       corretor_id &&
       (params.tipo === "imovel_visualizado" || params.tipo === "whatsapp_click")

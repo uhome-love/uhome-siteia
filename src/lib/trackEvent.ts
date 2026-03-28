@@ -32,8 +32,17 @@ interface TrackEventParams {
 function postToCRM(params: TrackEventParams, identidade: { telefone?: string; email?: string }) {
   if (!UHOMESALES_ANON_KEY) return; // skip if key is empty
 
+  const tiposCRM: Record<string, string> = {
+    'busca_realizada': 'buscou_ia',
+    'imovel_visualizado': 'visitou_imovel',
+    'imovel_favoritado': 'favoritou_imovel',
+    'whatsapp_click': 'clicou_contato',
+    'simulador_aberto': 'abriu_simulador',
+  };
+  const tipoCRM = tiposCRM[params.tipo] || params.tipo;
+
   const body = {
-    tipo: params.tipo,
+    tipo: tipoCRM,
     dados: {
       imovel_codigo: params.imovel_slug || null,
       imovel_titulo: params.imovel_titulo || null,

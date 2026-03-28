@@ -444,8 +444,8 @@ const PropertyDetail = () => {
       )}
 
       {/* Content */}
-      <div className="mx-auto max-w-7xl px-6 py-10">
-        <div className="flex flex-col gap-10 lg:flex-row">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10">
+        <div className="flex flex-col gap-8 sm:gap-10 lg:flex-row">
           {/* Left column */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -533,15 +533,15 @@ const PropertyDetail = () => {
             </div>
 
             {/* Stats pills */}
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-2 sm:gap-3">
               {statItems.map(({ icon: Icon, value, label }) => (
-                <div key={label} className="flex items-center gap-3 rounded-xl border border-border bg-card px-5 py-3.5">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary">
-                    <Icon className="h-4 w-4 text-muted-foreground" />
+                <div key={label} className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2.5 sm:gap-3 sm:px-5 sm:py-3.5">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-secondary sm:h-9 sm:w-9">
+                    <Icon className="h-3.5 w-3.5 text-muted-foreground sm:h-4 sm:w-4" />
                   </div>
                   <div>
-                    <p className="font-body text-base font-bold text-foreground">{value}</p>
-                    <p className="font-body text-[11px] text-muted-foreground">{label}</p>
+                    <p className="font-body text-sm font-bold text-foreground sm:text-base">{value}</p>
+                    <p className="font-body text-[10px] text-muted-foreground sm:text-[11px]">{label}</p>
                   </div>
                 </div>
               ))}
@@ -676,7 +676,7 @@ const PropertyDetail = () => {
       />
 
       {/* Fixed bottom bar — mobile only */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-md px-4 py-3 sm:hidden">
+      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-md px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:hidden">
         <div className="flex items-center gap-3">
           <div className="flex-1 min-w-0">
             <p className="font-body text-xs text-muted-foreground truncate">{imovel.bairro}</p>

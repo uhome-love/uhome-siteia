@@ -149,6 +149,19 @@ async function main() {
     }
   }
 
+  // 7b. Páginas SEO dinâmicas (tipo + faixa de preço)
+  const precoRanges = [
+    "ate-300-mil", "ate-400-mil", "ate-500-mil", "ate-600-mil", "ate-700-mil",
+    "ate-800-mil", "ate-1-milhao", "de-500-mil-a-1-milhao", "de-1-a-2-milhoes",
+    "acima-1-milhao", "acima-2-milhoes",
+  ];
+  const precoTipos = ["apartamentos", "casas", "coberturas"];
+  for (const tipo of precoTipos) {
+    for (const range of precoRanges) {
+      add(`/${tipo}-${range}-porto-alegre`, TODAY, "daily", "0.75");
+    }
+  }
+  console.log(`  ✓ ${precoTipos.length * precoRanges.length} páginas tipo+preço`);
   // 8. Condomínios
   console.log("  Fetching condomínios...");
   const condoCount = new Map();

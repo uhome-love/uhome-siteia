@@ -94,6 +94,8 @@ const SeoLanding = () => {
       tipo: config.tipo,
       bairro: config.bairro,
       quartos: config.quartos,
+      precoMin: config.precoMin,
+      precoMax: config.precoMax,
       limit: PAGE_SIZE,
     })
       .then((r) => {
@@ -115,6 +117,8 @@ const SeoLanding = () => {
         tipo: config.tipo,
         bairro: config.bairro,
         quartos: config.quartos,
+        precoMin: config.precoMin,
+        precoMax: config.precoMax,
         limit: PAGE_SIZE,
         offset,
       });

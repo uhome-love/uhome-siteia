@@ -129,7 +129,24 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
   ].filter(Boolean);
   const stats = statsArr.join(" · ");
 
-  const badge = getBadge(imovel);
+  // Smart badges: base + price-based (loaded async)
+  const [smartBadges, setSmartBadges] = useState<SmartBadge[]>(() => getBaseBadges(imovel));
+  useEffect(() => {
+    if (area <= 0 || imovel.preco <= 0) return;
+    const precoM2 = imovel.preco / area;
+    getBairroStats().then((stats) => {
+      const bairroStat = stats.get(imovel.bairro);
+      if (!bairroStat || bairroStat.count < 5) return;
+      const ratio = precoM2 / bairroStat.precoM2Medio;
+      const newBadges = [...getBaseBadges(imovel)];
+      if (ratio <= 0.75) {
+        newBadges.unshift({ label: "Oportunidade", style: "oportunidade", icon: <TrendingDown className="h-3 w-3" /> });
+      } else if (ratio <= 0.90) {
+        newBadges.unshift({ label: "Ótimo preço", style: "otimo-preco", icon: <Sparkles className="h-3 w-3" /> });
+      }
+      setSmartBadges(newBadges);
+    });
+  }, [imovel.id, imovel.preco, imovel.bairro, area]);
 
   // Build a short description
   const tipoCapitalized = imovel.tipo.charAt(0).toUpperCase() + imovel.tipo.slice(1);

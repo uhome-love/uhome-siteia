@@ -71,7 +71,7 @@ const PropertyDetail = () => {
       setImovel(data);
       if (data) {
         trackView(data.id);
-        trackEvent({ tipo: "imovel_visualizado", imovel_slug: data.slug, imovel_titulo: data.titulo });
+        trackEvent({ tipo: "imovel_visualizado", imovel_slug: data.slug, imovel_titulo: data.titulo, imovel_bairro: data.bairro, imovel_preco: data.preco });
         getViewCount(data.id).then((count) => {
           if (!cancelled) setViewCount(count);
         });

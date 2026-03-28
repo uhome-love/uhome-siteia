@@ -740,7 +740,7 @@ const Search = () => {
             </div>
           ) : (
             <>
-              <div className="grid content-start items-start grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
+              <div className="grid content-start items-start grid-cols-1 gap-y-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
                 {imoveis.map((imovel, i) => (
                   <React.Fragment key={imovel.id}>
                     <SearchPropertyCard

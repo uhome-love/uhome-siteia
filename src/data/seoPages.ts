@@ -106,12 +106,35 @@ export function deslugify(slug: string): string {
 
 // ── Main parser ──────────────────────────────────────────
 
+// ── Price range config ────────────────────────────────────
+
+const PRECO_RANGES: Record<string, { label: string; precoMax?: number; precoMin?: number }> = {
+  "ate-300-mil": { label: "até R$ 300 mil", precoMax: 300000 },
+  "ate-400-mil": { label: "até R$ 400 mil", precoMax: 400000 },
+  "ate-500-mil": { label: "até R$ 500 mil", precoMax: 500000 },
+  "ate-600-mil": { label: "até R$ 600 mil", precoMax: 600000 },
+  "ate-700-mil": { label: "até R$ 700 mil", precoMax: 700000 },
+  "ate-800-mil": { label: "até R$ 800 mil", precoMax: 800000 },
+  "ate-1-milhao": { label: "até R$ 1 milhão", precoMax: 1000000 },
+  "de-500-mil-a-1-milhao": { label: "de R$ 500 mil a R$ 1 milhão", precoMin: 500000, precoMax: 1000000 },
+  "de-1-a-2-milhoes": { label: "de R$ 1 a R$ 2 milhões", precoMin: 1000000, precoMax: 2000000 },
+  "acima-1-milhao": { label: "acima de R$ 1 milhão", precoMin: 1000000 },
+  "acima-2-milhoes": { label: "acima de R$ 2 milhões", precoMin: 2000000 },
+};
+
+export function getPrecoRangeKeys(): string[] {
+  return Object.keys(PRECO_RANGES);
+}
+
+// ── Main parser ──────────────────────────────────────────
+
 export function parseSeoSlug(slug: string): SeoPageConfig | null {
   // 1) Check intent pages first
   if (INTENT_PAGES[slug]) {
     const intent = INTENT_PAGES[slug];
     return {
       tipo: intent.tipo,
+      precoMin: intent.precoMin,
       h1: intent.h1,
       metaTitle: intent.metaTitle,
       metaDescription: intent.metaDesc,
@@ -125,7 +148,60 @@ export function parseSeoSlug(slug: string): SeoPageConfig | null {
     };
   }
 
-  // 2) Pattern: {tipo}-{N}-quartos-{bairro-slug}
+  // 2) Pattern: {tipo}-{precoRange}-porto-alegre (e.g. apartamentos-ate-500-mil-porto-alegre)
+  for (const tipoSlug of Object.keys(TIPO_MAP).sort((a, b) => b.length - a.length)) {
+    if (!slug.startsWith(tipoSlug + "-")) continue;
+    const rest = slug.slice(tipoSlug.length + 1);
+    
+    for (const [rangeSlug, rangeInfo] of Object.entries(PRECO_RANGES)) {
+      const suffix = `${rangeSlug}-porto-alegre`;
+      if (rest === suffix) {
+        const tipoInfo = TIPO_MAP[tipoSlug];
+        return {
+          tipo: tipoInfo.tipoDb || undefined,
+          precoMin: rangeInfo.precoMin,
+          precoMax: rangeInfo.precoMax,
+          h1: `${tipoInfo.plural} ${rangeInfo.label} em Porto Alegre`,
+          metaTitle: `${tipoInfo.plural} ${rangeInfo.label} em Porto Alegre | Uhome`,
+          metaDescription: `Encontre ${tipoInfo.plural.toLowerCase()} ${rangeInfo.label} à venda em Porto Alegre. Preços, fotos e localização no mapa. Busca inteligente com a Uhome.`,
+          breadcrumbs: [
+            { label: "Uhome", href: "/" },
+            { label: tipoInfo.plural, href: `/${tipoSlug}-porto-alegre` },
+            { label: rangeInfo.label },
+          ],
+          pageType: "tipo-preco",
+          canonicalPath: `/${slug}`,
+        };
+      }
+
+      // Also support: {tipo}-{precoRange}-{bairro} (e.g. apartamentos-ate-500-mil-moinhos-de-vento)
+      if (rest.startsWith(rangeSlug + "-")) {
+        const bairroSlug = rest.slice(rangeSlug.length + 1);
+        if (bairroSlug === "porto-alegre") continue; // already handled above
+        const tipoInfo = TIPO_MAP[tipoSlug];
+        const bairroNome = deslugify(bairroSlug);
+        return {
+          tipo: tipoInfo.tipoDb || undefined,
+          bairro: bairroNome,
+          precoMin: rangeInfo.precoMin,
+          precoMax: rangeInfo.precoMax,
+          h1: `${tipoInfo.plural} ${rangeInfo.label} em ${bairroNome}`,
+          metaTitle: `${tipoInfo.plural} ${rangeInfo.label} em ${bairroNome} — Porto Alegre | Uhome`,
+          metaDescription: `${tipoInfo.plural} ${rangeInfo.label} à venda em ${bairroNome}, Porto Alegre. Veja preços, fotos e localize no mapa.`,
+          breadcrumbs: [
+            { label: "Uhome", href: "/" },
+            { label: tipoInfo.plural, href: `/${tipoSlug}-porto-alegre` },
+            { label: bairroNome, href: `/bairros/${bairroSlug}` },
+            { label: rangeInfo.label },
+          ],
+          pageType: "tipo-preco",
+          canonicalPath: `/${slug}`,
+        };
+      }
+    }
+  }
+
+  // 3) Pattern: {tipo}-{N}-quartos-{bairro-slug}
   const quartosMatch = slug.match(/^(\w+)-(\d)-quartos-(.+)$/);
   if (quartosMatch) {
     const [, tipoSlug, quartosStr, bairroSlug] = quartosMatch;
@@ -152,12 +228,10 @@ export function parseSeoSlug(slug: string): SeoPageConfig | null {
     }
   }
 
-  // 3) Pattern: {tipo}-{bairro-slug}  (e.g. apartamentos-moinhos-de-vento)
-  // Try matching longest tipo prefix
+  // 4) Pattern: {tipo}-{bairro-slug}  (e.g. apartamentos-moinhos-de-vento)
   for (const tipoSlug of Object.keys(TIPO_MAP).sort((a, b) => b.length - a.length)) {
     if (slug.startsWith(tipoSlug + "-")) {
       const bairroSlug = slug.slice(tipoSlug.length + 1);
-      // Skip if it looks like an intent page suffix
       if (bairroSlug === "porto-alegre" || bairroSlug.startsWith("a-venda") || bairroSlug.startsWith("de-luxo")) continue;
       
       const tipoInfo = TIPO_MAP[tipoSlug];

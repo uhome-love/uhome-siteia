@@ -1,4 +1,5 @@
 import { createRoot } from "react-dom/client";
+import { HelmetProvider } from "react-helmet-async";
 import { captureUtmParams } from "./lib/session";
 import App from "./App.tsx";
 
@@ -19,4 +20,8 @@ if (import.meta.env.DEV) {
   import("./utils/testCorretorFlow").then(m => m.setupCorretorFlowTest());
 }
 
-createRoot(document.getElementById("root")!).render(<App />);
+createRoot(document.getElementById("root")!).render(
+  <HelmetProvider>
+    <App />
+  </HelmetProvider>
+);

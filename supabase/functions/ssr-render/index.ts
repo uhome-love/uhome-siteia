@@ -356,6 +356,48 @@ async function renderFaq() {
   return html(title, desc, LOGO, canonical, [faqSchema, orgJsonLd()], `<h1>${esc(title)}</h1>${bodyHtml}`);
 }
 
+/* ── vitrine renderer ────────────────────────────────── */
+
+async function renderVitrine(vitrineId: string, corretorSlug?: string) {
+  const { data: v } = await supabase
+    .from("vitrines")
+    .select("id, lead_nome, titulo, mensagem, imovel_codigos, corretor_slug")
+    .eq("id", vitrineId)
+    .maybeSingle();
+
+  if (!v) return null;
+
+  const slug = corretorSlug || v.corretor_slug;
+  const prefix = slug ? `/c/${slug}` : "";
+
+  let ogImage = LOGO;
+  let bodyCards = "";
+
+  if (v.imovel_codigos?.length) {
+    const { data: props } = await supabase
+      .from("imoveis")
+      .select("titulo, bairro, preco, foto_principal, slug, quartos")
+      .in("jetimob_id", v.imovel_codigos)
+      .eq("status", "disponivel");
+
+    if (props?.length) {
+      ogImage = props[0].foto_principal || LOGO;
+      bodyCards = props.map((p: any) => `
+        <div><a href="${SITE}${prefix}/imovel/${esc(p.slug)}">
+          <img src="${esc(p.foto_principal || "")}" alt="${esc(p.titulo)}" width="400" height="300" />
+          <h3>${esc(p.titulo)}</h3>
+          <p>${esc(p.bairro)} · ${p.quartos || 0} dorms · ${formatBRL(p.preco)}</p>
+        </a></div>`).join("");
+    }
+  }
+
+  const title = v.titulo || (v.lead_nome ? `Vitrine personalizada para ${v.lead_nome}` : "Vitrine personalizada | Uhome");
+  const desc = `${v.imovel_codigos?.length || 0} imóveis selecionados especialmente para você. Confira preços, fotos e detalhes.`;
+  const canonical = `${SITE}${prefix}/vitrine/${v.id}`;
+
+  return html(title, desc, ogImage, canonical, [orgJsonLd()], `<h1>${esc(title)}</h1>${bodyCards}`);
+}
+
 /* ── main handler ────────────────────────────────────── */
 
 Deno.serve(async (req) => {
@@ -384,6 +426,14 @@ Deno.serve(async (req) => {
     } else if (path.startsWith("/imovel/")) {
       const slug = path.replace("/imovel/", "").replace(/\/$/, "");
       rendered = await renderImovel(slug);
+    } else if (path.match(/\/vitrine\/[a-f0-9-]+/)) {
+      const parts = path.split("/").filter(Boolean);
+      // /vitrine/:id or /c/:slug/vitrine/:id
+      if (parts[0] === "c" && parts[2] === "vitrine") {
+        rendered = await renderVitrine(parts[3], parts[1]);
+      } else if (parts[0] === "vitrine") {
+        rendered = await renderVitrine(parts[1]);
+      }
     }
 
     if (!rendered) {

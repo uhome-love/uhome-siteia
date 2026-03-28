@@ -201,7 +201,31 @@ export function parseSeoSlug(slug: string): SeoPageConfig | null {
     }
   }
 
-  // 3) Pattern: {tipo}-{N}-quartos-{bairro-slug}
+  // 3) Pattern: {tipo}-{N}-quartos-porto-alegre (city-level, no bairro)
+  const quartosCidadeMatch = slug.match(/^(\w+)-(\d)-quartos-porto-alegre$/);
+  if (quartosCidadeMatch) {
+    const [, tipoSlug, quartosStr] = quartosCidadeMatch;
+    const tipoInfo = TIPO_MAP[tipoSlug];
+    if (tipoInfo) {
+      const quartos = parseInt(quartosStr, 10);
+      return {
+        tipo: tipoInfo.tipoDb || undefined,
+        quartos,
+        h1: `${tipoInfo.plural} com ${quartos} Quartos em Porto Alegre`,
+        metaTitle: `${tipoInfo.plural} ${quartos} Quartos em Porto Alegre | Uhome`,
+        metaDescription: `Encontre ${tipoInfo.plural.toLowerCase()} com ${quartos} quartos à venda em Porto Alegre. Preços, fotos e mapa interativo.`,
+        breadcrumbs: [
+          { label: "Uhome", href: "/" },
+          { label: tipoInfo.plural, href: `/${tipoSlug}-porto-alegre` },
+          { label: `${quartos} quartos` },
+        ],
+        pageType: "tipo-quartos-bairro",
+        canonicalPath: `/${slug}`,
+      };
+    }
+  }
+
+  // 3b) Pattern: {tipo}-{N}-quartos-{bairro-slug}
   const quartosMatch = slug.match(/^(\w+)-(\d)-quartos-(.+)$/);
   if (quartosMatch) {
     const [, tipoSlug, quartosStr, bairroSlug] = quartosMatch;

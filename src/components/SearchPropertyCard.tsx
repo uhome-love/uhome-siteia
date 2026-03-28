@@ -17,7 +17,7 @@ interface Props {
   toggleFavorito?: (id: string) => Promise<"needs_auth" | void>;
 }
 
-type BadgeStyle = "novo" | "exclusivo" | "visto" | "otimo-preco" | "oportunidade";
+type BadgeStyle = "novo" | "exclusivo" | "visto" | "otimo-preco" | "oportunidade" | "destaque";
 
 interface SmartBadge {
   label: string;
@@ -27,30 +27,36 @@ interface SmartBadge {
 
 function getBaseBadges(imovel: Imovel): SmartBadge[] {
   const badges: SmartBadge[] = [];
-  const vistos: string[] = JSON.parse(localStorage.getItem("imoveis_vistos") || "[]");
 
-  if (vistos.includes(imovel.id)) {
-    badges.push({ label: "Visualizado", style: "visto" });
+  // Destaque (admin-selected) — highest priority
+  if (imovel.destaque) {
+    badges.push({ label: "Destaque", style: "destaque", icon: <Sparkles className="h-3 w-3" /> });
   }
 
+  // Novidade — using real jetimob registration date (now in publicado_em)
   if (imovel.publicado_em) {
     const dias = Math.floor(
       (Date.now() - new Date(imovel.publicado_em).getTime()) / 86400000
     );
-    if (dias <= 7) badges.push({ label: "Novidade", style: "novo", icon: <Clock className="h-3 w-3" /> });
+    if (dias <= 30) badges.push({ label: "Novidade", style: "novo", icon: <Clock className="h-3 w-3" /> });
   }
 
-  if (imovel.destaque) badges.push({ label: "Exclusivo", style: "exclusivo" });
+  // Visualizado — lowest priority
+  const vistos: string[] = JSON.parse(localStorage.getItem("imoveis_vistos") || "[]");
+  if (vistos.includes(imovel.id)) {
+    badges.push({ label: "Visualizado", style: "visto" });
+  }
 
   return badges;
 }
 
 const badgeClasses: Record<BadgeStyle, string> = {
-  novo: "bg-emerald-500/90 text-white font-semibold shadow-sm",
-  exclusivo: "bg-black/80 text-white font-semibold shadow-sm",
-  visto: "bg-white/90 text-primary font-semibold shadow-sm backdrop-blur-sm",
-  "otimo-preco": "bg-primary/90 text-primary-foreground font-semibold shadow-sm",
-  oportunidade: "bg-amber-500/90 text-white font-semibold shadow-sm",
+  novo: "bg-primary/90 text-primary-foreground font-semibold shadow-sm",
+  destaque: "bg-foreground text-background font-semibold shadow-sm",
+  exclusivo: "bg-foreground text-background font-semibold shadow-sm",
+  visto: "bg-white/90 text-foreground font-semibold shadow-sm backdrop-blur-sm",
+  "otimo-preco": "bg-white/95 text-primary font-bold shadow-sm backdrop-blur-sm border border-primary/20",
+  oportunidade: "bg-white/95 text-primary font-bold shadow-sm backdrop-blur-sm border border-primary/20",
 };
 
 export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavorito: isFavoritoProp, toggleFavorito: toggleFavoritoProp }, ref) {

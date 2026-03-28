@@ -44,8 +44,12 @@ export default function AdminImoveis() {
       .order("publicado_em", { ascending: false })
       .limit(100);
 
-    if (statusFilter !== "todos") query = query.eq("status", statusFilter);
-    if (search) query = query.or(`titulo.ilike.%${search}%,bairro.ilike.%${search}%`);
+    if (statusFilter === "destaque") {
+      query = query.eq("destaque", true);
+    } else if (statusFilter !== "todos") {
+      query = query.eq("status", statusFilter);
+    }
+    if (search) query = query.or(`titulo.ilike.%${search}%,bairro.ilike.%${search}%,slug.ilike.%${search}%`);
 
     const { data } = await query;
     setImoveis((data as ImovelRow[]) || []);
@@ -84,6 +88,35 @@ export default function AdminImoveis() {
     }
   }
 
+  const [codigoDestaque, setCodigoDestaque] = useState("");
+  const [addingDestaque, setAddingDestaque] = useState(false);
+
+  async function addDestaqueByCode() {
+    if (!codigoDestaque.trim()) return;
+    setAddingDestaque(true);
+    const code = codigoDestaque.trim();
+    // Search by slug containing the code, or by jetimob_id
+    const { data, error } = await supabase
+      .from("imoveis")
+      .select("id,slug,titulo")
+      .or(`slug.ilike.%${code}%,jetimob_id.eq.${code}`)
+      .limit(1)
+      .maybeSingle();
+
+    if (error || !data) {
+      toast.error("Imóvel não encontrado com o código: " + code);
+      setAddingDestaque(false);
+      return;
+    }
+
+    const { error: upErr } = await supabase.from("imoveis").update({ destaque: true }).eq("id", data.id);
+    if (upErr) { toast.error("Erro ao marcar destaque"); setAddingDestaque(false); return; }
+    toast.success(`"${data.titulo}" marcado como destaque!`);
+    setCodigoDestaque("");
+    setAddingDestaque(false);
+    load();
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -93,6 +126,24 @@ export default function AdminImoveis() {
           {syncing ? "Sincronizando..." : "Sync Jetimob"}
         </Button>
       </div>
+
+      {/* Quick add destaque by code */}
+      <Card>
+        <CardContent className="flex items-center gap-3 py-3">
+          <Star className="h-5 w-5 text-amber-400 shrink-0" />
+          <span className="font-body text-sm font-medium text-foreground shrink-0">Adicionar destaque por código:</span>
+          <Input
+            placeholder="Ex: 14267-LI ou código Jetimob"
+            value={codigoDestaque}
+            onChange={(e) => setCodigoDestaque(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && addDestaqueByCode()}
+            className="max-w-xs"
+          />
+          <Button onClick={addDestaqueByCode} disabled={addingDestaque || !codigoDestaque.trim()} size="sm">
+            {addingDestaque ? <Loader2 className="h-4 w-4 animate-spin" /> : "Marcar destaque"}
+          </Button>
+        </CardContent>
+      </Card>
 
       <div className="flex items-center gap-3">
         <div className="relative flex-1">
@@ -109,6 +160,7 @@ export default function AdminImoveis() {
             <SelectItem value="reservado">Reservado</SelectItem>
             <SelectItem value="vendido">Vendido</SelectItem>
             <SelectItem value="inativo">Inativo</SelectItem>
+            <SelectItem value="destaque">⭐ Destaques</SelectItem>
           </SelectContent>
         </Select>
       </div>

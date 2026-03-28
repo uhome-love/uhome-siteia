@@ -12,6 +12,7 @@ import { SearchPropertyCard } from "@/components/SearchPropertyCard";
 const SearchMap = lazy(() => import("@/components/SearchMap").then(m => ({ default: m.SearchMap })));
 import { SkeletonCard } from "@/components/SkeletonCard";
 import { SearchCTACard } from "@/components/SearchCTACard";
+const BairrosRecomendados = lazy(() => import("@/components/BairrosRecomendados").then(m => ({ default: m.BairrosRecomendados })));
 import { MobileFiltersSheet } from "@/components/MobileFiltersSheet";
 import { AdvancedFiltersModal } from "@/components/AdvancedFiltersModal";
 import { useSearchStore, type MapBounds } from "@/stores/searchStore";

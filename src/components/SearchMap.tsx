@@ -722,7 +722,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
 
       {/* Map toolbar — draw, nearby, auto-search */}
       {onBoundsSearch && !drawMode && !hasDrawn && (
-        <div className="absolute bottom-12 left-3 right-3 z-20 flex flex-wrap items-center justify-center gap-2 sm:bottom-4 sm:left-4 sm:right-14 sm:justify-end">
+        <div className="absolute bottom-12 left-1/2 z-20 flex -translate-x-1/2 flex-wrap items-center justify-center gap-2 sm:bottom-4">
           <button
             onClick={() => window.dispatchEvent(new CustomEvent("uhome:draw-area"))}
             className="flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-2 font-body text-[12px] font-semibold text-muted-foreground shadow-lg transition-all hover:border-foreground/30 active:scale-[0.97]"

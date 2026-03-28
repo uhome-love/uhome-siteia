@@ -36,7 +36,7 @@ export function AISearchBar({ onSearch, loading = false }: AISearchBarProps) {
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
           placeholder="Ex: apartamento 2 quartos no Moinhos até R$ 3.000/mês..."
-          className="flex-1 bg-transparent font-body text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+          className="flex-1 bg-transparent font-body text-base text-foreground placeholder:text-muted-foreground focus:outline-none sm:text-sm"
           disabled={loading}
         />
         <button

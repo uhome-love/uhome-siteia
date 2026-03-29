@@ -528,12 +528,12 @@ const Search = () => {
   const animatedTotal = useCountUp(total);
 
   return (
-    <div className="flex min-h-screen flex-col bg-background pt-16 overflow-x-hidden">
+    <div className="flex min-h-screen flex-col bg-background pt-14 overflow-x-hidden">
       <Navbar />
 
       {/* Filter bar — switches between normal and AI */}
       {modoIA ? (
-        <div className="sticky top-16 z-10 border-b border-border bg-background px-4 py-3 sm:px-6">
+        <div className="sticky top-14 z-10 border-b border-border bg-background px-4 py-3 sm:px-6">
           <div className="flex items-center gap-2 sm:gap-3">
             <div
               className="flex flex-1 items-center gap-2.5 rounded-xl border-[1.5px] border-primary bg-primary/[0.03] px-3 py-2.5 sm:px-4 sm:py-3"
@@ -805,7 +805,7 @@ const Search = () => {
         </div>
 
         {/* Map — desktop */}
-        <div className="relative hidden w-[45%] shrink-0 border-l border-border lg:block" style={{ overflow: "visible" }}>
+        <div className="relative hidden w-[45%] shrink-0 border-l border-border lg:block" style={{ overflow: "hidden" }}>
           <div className="h-full w-full overflow-hidden rounded-none">
             <Suspense fallback={<div className="flex h-full w-full items-center justify-center bg-muted"><div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" /></div>}>
               <SearchMap pins={mapPins} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} onBoundsChange={handleMapBoundsChange} onPertoDeVoce={handlePertoDeVoce} />

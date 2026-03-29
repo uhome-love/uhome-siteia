@@ -215,7 +215,7 @@ export function SearchFiltersBar({ onOpenMobileFilters, onOpenAdvancedFilters }:
     const filterSummary = filterParts.join(" · ");
 
     return (
-      <div className="sticky top-16 z-10 border-b border-border bg-background px-4 py-3">
+      <div className="sticky top-14 z-10 border-b border-border bg-background px-4 py-3">
         <button
           onClick={onOpenMobileFilters}
           className="flex w-full items-center justify-between rounded-2xl bg-muted/40 border border-border px-4 py-3 text-left transition-colors active:bg-muted/60"
@@ -231,7 +231,7 @@ export function SearchFiltersBar({ onOpenMobileFilters, onOpenAdvancedFilters }:
   }
 
   return (
-    <div className="sticky top-16 z-20 flex items-center gap-2 overflow-x-auto border-b border-border bg-background px-5 py-3 scrollbar-none">
+    <div className="sticky top-14 z-20 flex items-center gap-2 overflow-x-auto border-b border-border bg-background px-5 py-3 scrollbar-none">
       {/* Search input with chips + autocomplete */}
       <div className="relative shrink-0" ref={dropdownRef}>
         <div

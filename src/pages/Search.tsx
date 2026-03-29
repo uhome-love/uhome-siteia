@@ -528,7 +528,9 @@ const Search = () => {
   const animatedTotal = useCountUp(total);
 
   return (
-    <div className="flex min-h-screen flex-col bg-background pt-14 overflow-x-hidden lg:h-screen lg:max-h-screen lg:overflow-hidden">
+    <div className="flex min-h-screen flex-col bg-background overflow-x-hidden" style={{ paddingTop: 56 }}>
+      {/* Desktop: lock viewport height so cards scroll inside, map fills remaining space */}
+      <style>{`@media(min-width:1024px){.search-shell{height:100vh!important;max-height:100vh!important;overflow:hidden!important;min-height:auto!important}}`}</style>
       <Navbar />
 
       {/* Filter bar — switches between normal and AI */}

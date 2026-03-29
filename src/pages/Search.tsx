@@ -528,8 +528,10 @@ const Search = () => {
   const animatedTotal = useCountUp(total);
 
   return (
-    <div className="flex min-h-screen flex-col bg-background pt-14 overflow-x-hidden lg:h-screen lg:max-h-screen lg:overflow-hidden">
+    <div className="flex flex-col bg-background overflow-x-hidden min-h-screen lg:h-screen lg:max-h-screen lg:overflow-hidden">
       <Navbar />
+      {/* Spacer to push content below the fixed navbar */}
+      <div className="shrink-0" style={{ height: 56 }} />
 
       {/* Filter bar — switches between normal and AI */}
       {modoIA ? (

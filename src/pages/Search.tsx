@@ -528,10 +528,10 @@ const Search = () => {
   const animatedTotal = useCountUp(total);
 
   return (
-    <div className="flex min-h-screen flex-col bg-background overflow-x-hidden" style={{ paddingTop: 56 }}>
-      {/* Desktop: lock viewport height so cards scroll inside, map fills remaining space */}
-      <style>{`@media(min-width:1024px){.search-shell{height:100vh!important;max-height:100vh!important;overflow:hidden!important;min-height:auto!important}}`}</style>
+    <div className="flex flex-col bg-background overflow-x-hidden min-h-screen lg:h-screen lg:max-h-screen lg:overflow-hidden">
       <Navbar />
+      {/* Spacer to push content below the fixed navbar */}
+      <div className="shrink-0" style={{ height: 56 }} />
 
       {/* Filter bar — switches between normal and AI */}
       {modoIA ? (

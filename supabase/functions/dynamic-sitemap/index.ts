@@ -38,12 +38,12 @@ const SEO_TIPOS = ["apartamentos", "casas", "coberturas", "studios", "terrenos",
 
 // Map sitemap tipo slugs to DB tipo values
 const TIPO_DB_MAP: Record<string, string> = {
-  apartamentos: "Apartamento",
-  casas: "Casa",
-  coberturas: "Cobertura",
-  studios: "Studio",
-  terrenos: "Terreno",
-  comerciais: "Comercial",
+  apartamentos: "apartamento",
+  casas: "casa",
+  coberturas: "cobertura",
+  studios: "studio",
+  terrenos: "terreno",
+  comerciais: "comercial",
 };
 
 // ── Blog slugs (must match src/data/blog.ts) ────────────

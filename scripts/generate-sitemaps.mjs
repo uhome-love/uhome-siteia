@@ -36,12 +36,12 @@ const slugify = (name) =>
 
 // ── DB tipo mapping ──
 const TIPO_DB_MAP = {
-  apartamentos: "Apartamento",
-  casas: "Casa",
-  coberturas: "Cobertura",
-  studios: "Studio",
-  terrenos: "Terreno",
-  comerciais: "Comercial",
+  apartamentos: "apartamento",
+  casas: "casa",
+  coberturas: "cobertura",
+  studios: "studio",
+  terrenos: "terreno",
+  comerciais: "comercial",
 };
 
 // ── Static data ──

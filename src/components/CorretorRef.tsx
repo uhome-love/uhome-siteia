@@ -11,6 +11,15 @@ export function CorretorRefLayout() {
   const slug = useParams().corretorSlug;
   const location = useLocation();
 
+  // Add noindex meta tag for corretor pages (prevent duplicate indexing)
+  useEffect(() => {
+    const meta = document.createElement("meta");
+    meta.setAttribute("name", "robots");
+    meta.setAttribute("content", "noindex, nofollow");
+    document.head.appendChild(meta);
+    return () => { meta.remove(); };
+  }, []);
+
   useEffect(() => {
     function registrar() {
       try {

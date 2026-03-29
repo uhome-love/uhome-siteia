@@ -528,7 +528,7 @@ const Search = () => {
   const animatedTotal = useCountUp(total);
 
   return (
-    <div className="flex min-h-screen flex-col bg-background pt-14 overflow-x-hidden">
+    <div className="flex min-h-screen flex-col bg-background pt-14 overflow-x-hidden lg:h-screen lg:max-h-screen lg:overflow-hidden">
       <Navbar />
 
       {/* Filter bar — switches between normal and AI */}
@@ -718,7 +718,7 @@ const Search = () => {
       </div>
 
       {/* Main area: cards + map */}
-      <div className="flex flex-1 lg:overflow-hidden overflow-visible">
+      <div className="flex flex-1 min-h-0 lg:overflow-hidden overflow-visible">
         {/* Cards column */}
         <div className="flex-1 lg:overflow-y-auto px-3 pt-2 pb-24 sm:px-6 sm:pt-3 sm:pb-5" style={{ minWidth: 0 }}>
           {loading ? (
@@ -805,12 +805,10 @@ const Search = () => {
         </div>
 
         {/* Map — desktop */}
-        <div className="relative hidden w-[45%] shrink-0 border-l border-border lg:block" style={{ overflow: "hidden" }}>
-          <div className="h-full w-full overflow-hidden rounded-none">
-            <Suspense fallback={<div className="flex h-full w-full items-center justify-center bg-muted"><div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" /></div>}>
-              <SearchMap pins={mapPins} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} onBoundsChange={handleMapBoundsChange} onPertoDeVoce={handlePertoDeVoce} />
-            </Suspense>
-          </div>
+        <div className="relative hidden w-[45%] shrink-0 border-l border-border lg:block overflow-hidden">
+          <Suspense fallback={<div className="flex h-full w-full items-center justify-center bg-muted"><div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" /></div>}>
+            <SearchMap pins={mapPins} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} onBoundsChange={handleMapBoundsChange} onPertoDeVoce={handlePertoDeVoce} />
+          </Suspense>
         </div>
       </div>
 

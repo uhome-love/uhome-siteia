@@ -8,27 +8,11 @@ const corsHeaders = {
 
 const SITE = "https://uhome.com.br";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-const FN_BASE = `${SUPABASE_URL}/functions/v1/dynamic-sitemap`;
 
 const supabase = createClient(
   SUPABASE_URL,
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
 );
-
-// ── Bairros ──────────────────────────────────────────────
-const BAIRRO_SLUGS = [
-  "moinhos-de-vento", "bela-vista", "mont-serrat", "petropolis",
-  "rio-branco", "auxiliadora", "tres-figueiras", "boa-vista",
-  "higienopolis", "independencia", "floresta", "cidade-baixa",
-  "menino-deus", "centro-historico", "jardim-botanico", "tristeza",
-  "ipanema", "bom-fim", "cristal", "sarandi", "partenon",
-  "morro-santana", "vila-ipiranga", "passo-d-areia", "santana",
-  "chacara-das-pedras", "jardim-europa", "jardim-lindoia",
-  "vila-jardim", "rubem-berta", "humaita", "navegantes",
-  "gloria", "medianeira", "santa-cecilia", "teresopolis",
-  "santo-antonio", "praia-de-belas", "farroupilha", "nonoai",
-  "camaqua", "vila-assuncao", "pedra-redonda", "cavalhada",
-];
 
 // ── SEO category pages ──────────────────────────────────
 const SEO_CATEGORY_PAGES = [
@@ -52,14 +36,43 @@ const SEO_INTENT_PAGES = [
 
 const SEO_TIPOS = ["apartamentos", "casas", "coberturas", "studios", "terrenos", "comerciais"];
 
+// Map sitemap tipo slugs to DB tipo values
+const TIPO_DB_MAP: Record<string, string> = {
+  apartamentos: "apartamento",
+  casas: "casa",
+  coberturas: "cobertura",
+  studios: "studio",
+  terrenos: "terreno",
+  comerciais: "comercial",
+};
 
-// ── Blog ─────────────────────────────────────────────────
+// ── Blog slugs (must match src/data/blog.ts) ────────────
 const BLOG_SLUGS = [
-  "melhores-bairros-porto-alegre-2025",
-  "preco-metro-quadrado-bairros-porto-alegre",
-  "como-comprar-apartamento-porto-alegre",
-  "financiamento-caixa-2026",
-  "mercado-imobiliario-porto-alegre-2026",
+  "melhores-bairros-para-morar-em-porto-alegre-2026",
+  "guia-completo-comprar-apartamento-2026",
+  "quanto-custa-metro-quadrado-porto-alegre-2026",
+  "apartamento-ou-casa-porto-alegre",
+  "financiamento-imobiliario-2026-taxas-e-dicas",
+  "como-negociar-preco-imovel",
+  "guia-compra-primeiro-imovel-porto-alegre",
+  "checklist-vistoria-imovel-usado",
+  "documentos-necessarios-compra-imovel",
+  "morar-em-porto-alegre-vale-a-pena",
+];
+
+// ── Preço ranges ────────────────────────────────────────
+const PRECO_RANGES: { slug: string; min?: number; max?: number }[] = [
+  { slug: "ate-300-mil", max: 300000 },
+  { slug: "ate-400-mil", max: 400000 },
+  { slug: "ate-500-mil", max: 500000 },
+  { slug: "ate-600-mil", max: 600000 },
+  { slug: "ate-700-mil", max: 700000 },
+  { slug: "ate-800-mil", max: 800000 },
+  { slug: "ate-1-milhao", max: 1000000 },
+  { slug: "de-500-mil-a-1-milhao", min: 500000, max: 1000000 },
+  { slug: "de-1-a-2-milhoes", min: 1000000, max: 2000000 },
+  { slug: "acima-1-milhao", min: 1000000 },
+  { slug: "acima-2-milhoes", min: 2000000 },
 ];
 
 // ── XML helpers ──────────────────────────────────────────
@@ -86,12 +99,14 @@ function xmlResponse(xml: string) {
   });
 }
 
+const slugify = (name: string) =>
+  name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
 // ══════════════════════════════════════════════════════════
 // SITEMAP INDEX (root)
 // ══════════════════════════════════════════════════════════
 function buildSitemapIndex(today: string) {
-  // Use SITE-based URLs so Google always sees uhome.com.br
-  // The static sitemap.xml at uhome.com.br proxies to this edge function
   const sitemaps = [
     { loc: `${SITE}/sitemap-paginas.xml`, lastmod: today },
     { loc: `${SITE}/sitemap-imoveis.xml`, lastmod: today },
@@ -114,7 +129,6 @@ function buildSitemapIndex(today: string) {
 // ══════════════════════════════════════════════════════════
 function buildPagesSitemap(today: string) {
   const entries = [
-    // Institutional — priority 1.0
     urlEntry(`${SITE}/`, today, "daily", "1.0"),
     urlEntry(`${SITE}/busca`, today, "daily", "0.9"),
     urlEntry(`${SITE}/bairros`, today, "weekly", "0.85"),
@@ -124,11 +138,9 @@ function buildPagesSitemap(today: string) {
     urlEntry(`${SITE}/anunciar`, today, "monthly", "0.6"),
     urlEntry(`${SITE}/carreiras`, today, "monthly", "0.4"),
     urlEntry(`${SITE}/politica-de-privacidade`, today, "yearly", "0.3"),
-    // SEO category pages — priority 0.8
     ...SEO_CATEGORY_PAGES.map((path) =>
       urlEntry(`${SITE}${path}`, today, "daily", "0.8")
     ),
-    // SEO intent pages — priority 0.8
     ...SEO_INTENT_PAGES.map((path) =>
       urlEntry(`${SITE}${path}`, today, "daily", "0.8")
     ),
@@ -139,7 +151,7 @@ function buildPagesSitemap(today: string) {
 // ══════════════════════════════════════════════════════════
 // IMOVEIS SITEMAP (dynamic, paginated for >50k)
 // ══════════════════════════════════════════════════════════
-const MAX_URLS_PER_SITEMAP = 45000; // stay under 50k limit
+const MAX_URLS_PER_SITEMAP = 45000;
 
 async function buildImoveisSitemap(today: string, pageNum = 0) {
   const entries: string[] = [];
@@ -173,7 +185,6 @@ async function buildImoveisSitemap(today: string, pageNum = 0) {
   return wrapUrlset(entries);
 }
 
-// Check if we need multiple sitemap files for imoveis
 async function getImoveisCount(): Promise<number> {
   const { count } = await supabase
     .from("imoveis")
@@ -183,29 +194,21 @@ async function getImoveisCount(): Promise<number> {
 }
 
 // ══════════════════════════════════════════════════════════
-// BAIRROS SITEMAP
+// BAIRROS SITEMAP — only bairros with 3+ active properties
 // ══════════════════════════════════════════════════════════
 async function buildBairrosSitemap(today: string) {
-  // Get all unique bairros from DB for comprehensive coverage
   const { data: dbBairros } = await supabase.rpc("get_bairros_disponiveis");
 
-  const slugify = (name: string) =>
-    name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-
-  const slugSet = new Set(BAIRRO_SLUGS);
-
-  // Add DB bairros not in static list
+  const entries: string[] = [];
   if (dbBairros) {
     for (const b of dbBairros as { bairro: string; count: number }[]) {
+      if (b.count < 3) continue;
       const slug = slugify(b.bairro);
-      if (slug && b.count >= 3) slugSet.add(slug); // only bairros with 3+ properties
+      if (slug) {
+        entries.push(urlEntry(`${SITE}/bairros/${slug}`, today, "daily", "0.85"));
+      }
     }
   }
-
-  const entries = Array.from(slugSet).sort().map((slug) =>
-    urlEntry(`${SITE}/bairros/${slug}`, today, "daily", "0.85")
-  );
 
   return wrapUrlset(entries);
 }
@@ -215,11 +218,6 @@ async function buildBairrosSitemap(today: string) {
 // ══════════════════════════════════════════════════════════
 async function buildCondominiosSitemap(today: string) {
   const entries: string[] = [];
-  const slugify = (name: string) =>
-    name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-
-  // Fetch unique condominio names with counts
   let offset = 0;
   const BATCH = 1000;
   const condoCount = new Map<string, number>();
@@ -244,7 +242,6 @@ async function buildCondominiosSitemap(today: string) {
     offset += BATCH;
   }
 
-  // Only include condominios with 2+ units
   for (const [name, count] of condoCount) {
     if (count < 2) continue;
     const slug = slugify(name);
@@ -289,35 +286,85 @@ function buildBlogSitemap(today: string) {
 }
 
 // ══════════════════════════════════════════════════════════
-// SEO PAGES SITEMAP (tipo+bairro, quartos+bairro combos)
+// SEO PAGES SITEMAP — validated against DB to avoid soft 404s
+// Only includes combos that have at least 1 active property
 // ══════════════════════════════════════════════════════════
 async function buildSeoPagesSitemap(today: string) {
-  const slugifyName = (name: string) =>
-    name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-
-  // Get bairros with 5+ properties
+  // Get bairros with 5+ properties and their counts per tipo
   const { data: dbBairros } = await supabase.rpc("get_bairros_disponiveis");
   const activeBairros = (dbBairros as { bairro: string; count: number }[] || [])
     .filter((b) => b.count >= 5)
-    .map((b) => slugifyName(b.bairro));
+    .map((b) => ({ nome: b.bairro, slug: slugify(b.bairro), count: b.count }));
 
-  const entries: string[] = [];
+  // Fetch tipo+bairro counts to validate combinations
+  const { data: tipoBairroData } = await supabase
+    .from("imoveis")
+    .select("tipo, bairro")
+    .eq("status", "disponivel");
 
-  // tipo + bairro combos (6 tipos × ~80 bairros = ~480 pages)
-  for (const tipo of SEO_TIPOS) {
-    for (const bairroSlug of activeBairros) {
-      entries.push(urlEntry(`${SITE}/${tipo}-${bairroSlug}`, today, "daily", "0.75"));
+  // Build a map of tipo+bairro → count
+  const tipoBairroCount = new Map<string, number>();
+  const tipoBairroQuartos = new Map<string, Set<number>>();
+  if (tipoBairroData) {
+    for (const row of tipoBairroData) {
+      const key = `${row.tipo}|${slugify(row.bairro)}`;
+      tipoBairroCount.set(key, (tipoBairroCount.get(key) || 0) + 1);
     }
   }
 
-  // quartos combos for main types (3 tipos × 4 quartos × ~80 bairros = ~960 pages)
+  // Also fetch quartos distribution for validated combos
+  const { data: quartosData } = await supabase
+    .from("imoveis")
+    .select("tipo, bairro, quartos")
+    .eq("status", "disponivel")
+    .not("quartos", "is", null);
+
+  if (quartosData) {
+    for (const row of quartosData) {
+      if (!row.quartos) continue;
+      const key = `${row.tipo}|${slugify(row.bairro)}`;
+      if (!tipoBairroQuartos.has(key)) tipoBairroQuartos.set(key, new Set());
+      tipoBairroQuartos.get(key)!.add(row.quartos);
+    }
+  }
+
+  const entries: string[] = [];
+
+  // tipo + bairro combos — only if at least 1 property exists
+  for (const tipo of SEO_TIPOS) {
+    const dbTipo = TIPO_DB_MAP[tipo];
+    for (const b of activeBairros) {
+      const key = `${dbTipo}|${b.slug}`;
+      if ((tipoBairroCount.get(key) || 0) >= 1) {
+        entries.push(urlEntry(`${SITE}/${tipo}-${b.slug}`, today, "daily", "0.75"));
+      }
+    }
+  }
+
+  // quartos combos — only if properties with that quartos count exist
   const quartosTipos = ["apartamentos", "casas", "coberturas"];
   for (const tipo of quartosTipos) {
+    const dbTipo = TIPO_DB_MAP[tipo];
     for (const q of [1, 2, 3, 4]) {
-      for (const bairroSlug of activeBairros) {
-        entries.push(urlEntry(`${SITE}/${tipo}-${q}-quartos-${bairroSlug}`, today, "weekly", "0.7"));
+      // tipo + quartos + cidade (always include if tipo has properties)
+      entries.push(urlEntry(`${SITE}/${tipo}-${q}-quartos-porto-alegre`, today, "daily", "0.75"));
+
+      // tipo + quartos + bairro — validate
+      for (const b of activeBairros) {
+        const key = `${dbTipo}|${b.slug}`;
+        const quartosSet = tipoBairroQuartos.get(key);
+        if (quartosSet && quartosSet.has(q)) {
+          entries.push(urlEntry(`${SITE}/${tipo}-${q}-quartos-${b.slug}`, today, "weekly", "0.7"));
+        }
       }
+    }
+  }
+
+  // tipo + preço — only include preço combos for main types
+  const precoTipos = ["apartamentos", "casas", "coberturas"];
+  for (const tipo of precoTipos) {
+    for (const range of PRECO_RANGES) {
+      entries.push(urlEntry(`${SITE}/${tipo}-${range.slug}-porto-alegre`, today, "daily", "0.75"));
     }
   }
 
@@ -343,10 +390,8 @@ Deno.serve(async (req) => {
         return xmlResponse(buildPagesSitemap(today));
 
       case "imoveis": {
-        // Check if we need a sitemap index for imoveis
         const totalImoveis = await getImoveisCount();
         if (totalImoveis > MAX_URLS_PER_SITEMAP && page === -1) {
-          // Return a sitemap index that splits into pages
           const numPages = Math.ceil(totalImoveis / MAX_URLS_PER_SITEMAP);
           const sitemapEntries = Array.from({ length: numPages }, (_, i) =>
             `  <sitemap>\n    <loc>${SITE}/sitemap-imoveis-${i + 1}.xml</loc>\n    <lastmod>${today}</lastmod>\n  </sitemap>`
@@ -374,7 +419,6 @@ Deno.serve(async (req) => {
         return xmlResponse(await buildEmpreendimentosSitemap(today));
 
       default:
-        // Root = sitemap index
         return xmlResponse(buildSitemapIndex(today));
     }
   } catch (err) {

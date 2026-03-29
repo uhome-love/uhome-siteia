@@ -3,6 +3,7 @@
  * Generates a single sitemap.xml in public/ by querying Supabase.
  * Run: node scripts/generate-sitemaps.mjs
  * Max 50,000 URLs per sitemap spec.
+ * Validates tipo+bairro combos against DB to avoid soft 404s.
  */
 import { createClient } from "@supabase/supabase-js";
 import fs from "fs";
@@ -33,6 +34,16 @@ const entry = (loc, lastmod, changefreq, priority) =>
 const slugify = (name) =>
   name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
+// ── DB tipo mapping ──
+const TIPO_DB_MAP = {
+  apartamentos: "apartamento",
+  casas: "casa",
+  coberturas: "cobertura",
+  studios: "studio",
+  terrenos: "terreno",
+  comerciais: "comercial",
+};
+
 // ── Static data ──
 const SEO_CATEGORY_PAGES = [
   "/apartamentos-porto-alegre", "/casas-porto-alegre", "/coberturas-porto-alegre",
@@ -58,13 +69,16 @@ const BLOG_SLUGS = [
   "morar-em-porto-alegre-vale-a-pena",
 ];
 
-// ══════════════════════════════════════════════════════════
-// Collect all entries into a single Set (dedup by URL)
+const precoRanges = [
+  "ate-300-mil", "ate-400-mil", "ate-500-mil", "ate-600-mil", "ate-700-mil",
+  "ate-800-mil", "ate-1-milhao", "de-500-mil-a-1-milhao", "de-1-a-2-milhoes",
+  "acima-1-milhao", "acima-2-milhoes",
+];
+
 // ══════════════════════════════════════════════════════════
 async function main() {
   console.log(`\n🗺️  Generating sitemap.xml for ${SITE} (${TODAY})\n`);
 
-  /** @type {Map<string, {lastmod:string, changefreq:string, priority:string}>} */
   const urls = new Map();
 
   const add = (path, lastmod, changefreq, priority) => {
@@ -117,7 +131,7 @@ async function main() {
   }
   console.log(`  ✓ ${imoveisCount} imóveis`);
 
-  // 5. Bairros
+  // 5. Bairros — only those with 3+ properties
   console.log("  Fetching bairros...");
   const { data: dbBairros } = await supabase.rpc("get_bairros_disponiveis");
   const activeBairros = [];
@@ -126,38 +140,76 @@ async function main() {
       const s = slugify(b.bairro);
       if (s && b.count >= 3) {
         add(`/bairros/${s}`, TODAY, "daily", "0.85");
-        if (b.count >= 5) activeBairros.push(s);
+        if (b.count >= 5) activeBairros.push({ nome: b.bairro, slug: s, count: b.count });
       }
     }
   }
   console.log(`  ✓ ${activeBairros.length} bairros ativos para SEO`);
 
-  // 6. Páginas SEO dinâmicas (tipo + bairro)
-  for (const tipo of SEO_TIPOS) {
-    for (const bs of activeBairros) {
-      add(`/${tipo}-${bs}`, TODAY, "daily", "0.75");
+  // 6. Fetch tipo+bairro counts for validation
+  console.log("  Validating tipo+bairro combos...");
+  const tipoBairroCount = new Map();
+  const tipoBairroQuartos = new Map();
+  offset = 0;
+  while (true) {
+    const { data, error } = await supabase
+      .from("imoveis")
+      .select("tipo, bairro, quartos")
+      .eq("status", "disponivel")
+      .range(offset, offset + BATCH - 1);
+    if (error || !data || data.length === 0) break;
+    for (const row of data) {
+      const key = `${row.tipo}|${slugify(row.bairro)}`;
+      tipoBairroCount.set(key, (tipoBairroCount.get(key) || 0) + 1);
+      if (row.quartos) {
+        if (!tipoBairroQuartos.has(key)) tipoBairroQuartos.set(key, new Set());
+        tipoBairroQuartos.get(key).add(row.quartos);
+      }
     }
+    if (data.length < BATCH) break;
+    offset += BATCH;
   }
 
-  // 7. Páginas SEO dinâmicas (tipo + quartos + bairro)
-  const quartosTipos = ["apartamentos", "casas", "coberturas"];
-  for (const tipo of quartosTipos) {
-    for (const q of [1, 2, 3, 4]) {
-      // tipo + quartos + cidade
-      add(`/${tipo}-${q}-quartos-porto-alegre`, TODAY, "daily", "0.75");
-      // tipo + quartos + bairro
-      for (const bs of activeBairros) {
-        add(`/${tipo}-${q}-quartos-${bs}`, TODAY, "weekly", "0.7");
+  // 7. Páginas SEO dinâmicas (tipo + bairro) — validated
+  let seoValidated = 0;
+  let seoSkipped = 0;
+  for (const tipo of SEO_TIPOS) {
+    const dbTipo = TIPO_DB_MAP[tipo];
+    for (const b of activeBairros) {
+      const key = `${dbTipo}|${b.slug}`;
+      if ((tipoBairroCount.get(key) || 0) >= 1) {
+        add(`/${tipo}-${b.slug}`, TODAY, "daily", "0.75");
+        seoValidated++;
+      } else {
+        seoSkipped++;
       }
     }
   }
+  console.log(`  ✓ ${seoValidated} tipo+bairro (${seoSkipped} skipped — no results)`);
 
-  // 7b. Páginas SEO dinâmicas (tipo + faixa de preço)
-  const precoRanges = [
-    "ate-300-mil", "ate-400-mil", "ate-500-mil", "ate-600-mil", "ate-700-mil",
-    "ate-800-mil", "ate-1-milhao", "de-500-mil-a-1-milhao", "de-1-a-2-milhoes",
-    "acima-1-milhao", "acima-2-milhoes",
-  ];
+  // 8. Páginas SEO dinâmicas (tipo + quartos + bairro) — validated
+  const quartosTipos = ["apartamentos", "casas", "coberturas"];
+  let quartosValidated = 0;
+  let quartosSkipped = 0;
+  for (const tipo of quartosTipos) {
+    const dbTipo = TIPO_DB_MAP[tipo];
+    for (const q of [1, 2, 3, 4]) {
+      add(`/${tipo}-${q}-quartos-porto-alegre`, TODAY, "daily", "0.75");
+      for (const b of activeBairros) {
+        const key = `${dbTipo}|${b.slug}`;
+        const quartosSet = tipoBairroQuartos.get(key);
+        if (quartosSet && quartosSet.has(q)) {
+          add(`/${tipo}-${q}-quartos-${b.slug}`, TODAY, "weekly", "0.7");
+          quartosValidated++;
+        } else {
+          quartosSkipped++;
+        }
+      }
+    }
+  }
+  console.log(`  ✓ ${quartosValidated} tipo+quartos+bairro (${quartosSkipped} skipped)`);
+
+  // 9. Páginas SEO dinâmicas (tipo + faixa de preço)
   const precoTipos = ["apartamentos", "casas", "coberturas"];
   for (const tipo of precoTipos) {
     for (const range of precoRanges) {
@@ -165,7 +217,8 @@ async function main() {
     }
   }
   console.log(`  ✓ ${precoTipos.length * precoRanges.length} páginas tipo+preço`);
-  // 8. Condomínios
+
+  // 10. Condomínios
   console.log("  Fetching condomínios...");
   const condoCount = new Map();
   offset = 0;
@@ -192,7 +245,7 @@ async function main() {
   }
   console.log(`  ✓ ${condosAdded} condomínios`);
 
-  // 9. Empreendimentos
+  // 11. Empreendimentos
   console.log("  Fetching empreendimentos...");
   const { data: empData } = await supabase.from("empreendimentos").select("slug, updated_at").eq("ativo", true);
   for (const row of empData || []) {

@@ -1,8 +1,18 @@
 User-agent: Googlebot
 Allow: /
+Disallow: /c/
+Disallow: /admin/
+Disallow: /onboarding
+Disallow: /reset-password
+Disallow: /favoritos
 
 User-agent: Bingbot
 Allow: /
+Disallow: /c/
+Disallow: /admin/
+Disallow: /onboarding
+Disallow: /reset-password
+Disallow: /favoritos
 
 User-agent: Twitterbot
 Allow: /
@@ -12,5 +22,10 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /c/
+Disallow: /admin/
+Disallow: /onboarding
+Disallow: /reset-password
+Disallow: /favoritos
 
 Sitemap: https://uhome.com.br/sitemap.xml

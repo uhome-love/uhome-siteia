@@ -8,12 +8,19 @@ const PARAMS_PERMITIDOS = ["tipo", "bairros", "quartos"];
  * Injeta/atualiza a tag <link rel="canonical"> no <head>.
  * Aceita um pathname override (ex.: página de imóvel com slug dinâmico).
  * Para a página de busca, preserva apenas parâmetros indexáveis.
+ * Rotas /c/:slug são normalizadas para a versão canônica sem o prefixo do corretor.
  */
 export function useCanonical(overridePath?: string) {
   const { pathname, search } = useLocation();
 
   useEffect(() => {
-    const path = overridePath ?? pathname;
+    let path = overridePath ?? pathname;
+
+    // Strip /c/:corretorSlug prefix so corretor pages point to the canonical URL
+    const corretorMatch = path.match(/^\/c\/[^/]+(\/.*)?$/);
+    if (corretorMatch) {
+      path = corretorMatch[1] || "/";
+    }
 
     // Filtrar apenas parâmetros que devem ser indexados
     const params = new URLSearchParams(search);

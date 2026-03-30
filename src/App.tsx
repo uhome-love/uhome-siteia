@@ -178,7 +178,7 @@ const App = () => (
             </Suspense>
             <ExitIntentModal />
             <FloatingWhatsApp />
-            <RetargetingBanner />
+            
           </TooltipProvider>
         </CorretorProvider>
       </AuthProvider>

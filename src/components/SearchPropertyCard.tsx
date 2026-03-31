@@ -84,6 +84,29 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
   })();
   const fotos = lazyFotos && lazyFotos.length > 0 ? lazyFotos : baseFotos;
 
+  // Load full photo set lazily
+  const loadFullFotos = useCallback(() => {
+    if (fotosLoadedRef.current || baseFotos.length > 1) return;
+    fotosLoadedRef.current = true;
+    setLoadingFotos(true);
+    supabase
+      .from("imoveis")
+      .select("fotos")
+      .eq("id", imovel.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.fotos && Array.isArray(data.fotos) && data.fotos.length > 0) {
+          const urls = (data.fotos as any[])
+            .sort((a: any, b: any) => (a.ordem ?? 0) - (b.ordem ?? 0))
+            .map((f: any) => f?.url || f?.src || f)
+            .filter(Boolean)
+            .slice(0, 8);
+          if (urls.length > 0) setLazyFotos(urls);
+        }
+        setLoadingFotos(false);
+      });
+  }, [imovel.id, baseFotos.length]);
+
   // Intersection Observer: detect when card enters viewport
   useEffect(() => {
     const el = cardRef.current;
@@ -109,29 +132,6 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
     if (typeof ref === "function") ref(node);
     else if (ref) (ref as React.MutableRefObject<HTMLAnchorElement | null>).current = node;
   }, [ref]);
-
-  // Load full photo set on mobile when user swipes (not on visibility)
-  const loadFullFotos = useCallback(() => {
-    if (fotosLoadedRef.current || baseFotos.length > 1) return;
-    fotosLoadedRef.current = true;
-    setLoadingFotos(true);
-    supabase
-      .from("imoveis")
-      .select("fotos")
-      .eq("id", imovel.id)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (data?.fotos && Array.isArray(data.fotos) && data.fotos.length > 0) {
-          const urls = (data.fotos as any[])
-            .sort((a: any, b: any) => (a.ordem ?? 0) - (b.ordem ?? 0))
-            .map((f: any) => f?.url || f?.src || f)
-            .filter(Boolean)
-            .slice(0, 8);
-          if (urls.length > 0) setLazyFotos(urls);
-        }
-        setLoadingFotos(false);
-      });
-  }, [imovel.id, baseFotos.length]);
   const price = formatPreco(imovel.preco);
   const area = imovel.area_total ?? imovel.area_util ?? 0;
 

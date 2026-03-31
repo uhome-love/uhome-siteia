@@ -835,6 +835,10 @@ Deno.serve(async (req) => {
       rendered = renderPrivacidade();
     } else if (path === "/favoritos") {
       rendered = renderFavoritos();
+    } else if (path === "/sobre") {
+      rendered = renderSobre();
+    } else if (path === "/guia-bairros") {
+      rendered = renderGuiaBairros();
     } else if (path.startsWith("/blog/")) {
       const slug = path.replace("/blog/", "").replace(/\/$/, "");
       rendered = await renderBlogPost(slug);

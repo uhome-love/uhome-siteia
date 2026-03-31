@@ -6,7 +6,8 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { useCanonical } from "@/hooks/useCanonical";
 import { setJsonLd, removeJsonLd, buildOrganizationJsonLd } from "@/lib/jsonld";
-import { blogPosts, blogCategorias, type BlogPost } from "@/data/blog";
+import { blogCategorias, type BlogPost } from "@/data/blog";
+import { useBlogPosts } from "@/hooks/useBlogPosts";
 
 function BlogCard({ post, index }: { post: BlogPost; index: number }) {
   return (

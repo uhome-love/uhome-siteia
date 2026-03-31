@@ -60,6 +60,48 @@ const TOPICS = [
     tags: ["condomínios", "Porto Alegre", "ranking"],
     prompt_context: "ranking dos condomínios mais buscados e valorizados de Porto Alegre com análise de infraestrutura e preços",
   },
+  {
+    titulo_template: "Quanto custa morar em {bairro} em {ano}?",
+    categoria: "Cidade",
+    tags: ["custo de vida", "Porto Alegre", "bairros"],
+    prompt_context: "análise do custo de morar no bairro {bairro} de Porto Alegre incluindo preço de imóveis, condomínio, IPTU e custo de vida geral",
+  },
+  {
+    titulo_template: "Apartamento 2 quartos em Porto Alegre: onde encontrar as melhores opções?",
+    categoria: "Guias",
+    tags: ["2 quartos", "apartamento", "Porto Alegre"],
+    prompt_context: "guia para encontrar os melhores apartamentos de 2 quartos em Porto Alegre, analisando bairros, faixas de preço e diferenciais",
+  },
+  {
+    titulo_template: "Cobertura em Porto Alegre: vale o investimento?",
+    categoria: "Investimento",
+    tags: ["cobertura", "investimento", "Porto Alegre"],
+    prompt_context: "análise se comprar cobertura em Porto Alegre vale como investimento, comparando valorização, custo por m² e perfil de moradia",
+  },
+  {
+    titulo_template: "Porto Alegre vs Litoral Gaúcho: onde investir em imóveis?",
+    categoria: "Investimento",
+    tags: ["comparativo", "litoral gaúcho", "investimento"],
+    prompt_context: "comparativo entre investir em imóveis em Porto Alegre versus litoral gaúcho (Capão, Torres, Atlântida), analisando valorização, rentabilidade e perfil",
+  },
+  {
+    titulo_template: "Primeiro imóvel em Porto Alegre: guia para quem nunca comprou",
+    categoria: "Guias",
+    tags: ["primeiro imóvel", "guia iniciante", "Porto Alegre"],
+    prompt_context: "guia completo para quem vai comprar o primeiro imóvel em Porto Alegre, desde planejamento financeiro até escolha do bairro e fechamento",
+  },
+  {
+    titulo_template: "Os melhores bairros para famílias em Porto Alegre em {ano}",
+    categoria: "Cidade",
+    tags: ["famílias", "bairros", "escolas", "Porto Alegre"],
+    prompt_context: "ranking dos melhores bairros de Porto Alegre para famílias com crianças, avaliando escolas, segurança, parques e infraestrutura",
+  },
+  {
+    titulo_template: "Studio em Porto Alegre: tendência ou bolha?",
+    categoria: "Mercado",
+    tags: ["studio", "mercado", "Porto Alegre", "tendência"],
+    prompt_context: "análise da tendência de studios e apartments compactos em Porto Alegre, se é uma boa opção de investimento ou moradia",
+  },
 ];
 
 const BAIRROS = [

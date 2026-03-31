@@ -8,7 +8,9 @@ import { useCorretor } from "@/contexts/CorretorContext";
 
 export function FloatingWhatsApp() {
   const [visible, setVisible] = useState(false);
-  const [tooltip, setTooltip] = useState(true);
+  const [tooltip, setTooltip] = useState(() => {
+    return sessionStorage.getItem("uhome_tooltip_dismissed") !== "1";
+  });
   const [retargetingPopup, setRetargetingPopup] = useState(false);
   const { corretor } = useCorretor();
 
@@ -17,10 +19,13 @@ export function FloatingWhatsApp() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Hide initial tooltip after 8s
+  // Hide initial tooltip after 8s and persist
   useEffect(() => {
     if (!tooltip) return;
-    const t = setTimeout(() => setTooltip(false), 8000);
+    const t = setTimeout(() => {
+      setTooltip(false);
+      sessionStorage.setItem("uhome_tooltip_dismissed", "1");
+    }, 8000);
     return () => clearTimeout(t);
   }, [tooltip]);
 

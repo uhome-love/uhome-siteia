@@ -451,69 +451,6 @@ async function renderBlogPost(slug: string) {
     `<h1>${esc(post.titulo)}</h1><p>${esc(post.resumo)}</p><img src="${esc(post.imagem || LOGO)}" alt="${esc(post.titulo)}" width="800" height="450" />`);
 }
 
-async function renderBlog() {
-  const title = "Blog | Mercado Imobiliário em Porto Alegre — Uhome";
-  const desc = "Artigos, guias e análises sobre o mercado imobiliário de Porto Alegre. Dicas para comprar, investir e financiar seu imóvel.";
-  const canonical = `${SITE}/blog`;
-
-  const blogSchema = JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "Blog",
-    name: "Uhome Blog",
-    description: desc,
-    url: canonical,
-    publisher: { "@type": "Organization", name: "Uhome", url: SITE },
-    blogPost: Object.entries(BLOG_POSTS).map(([slug, p]) => ({
-      "@type": "BlogPosting",
-      headline: p.titulo,
-      description: p.resumo,
-      url: `${SITE}/blog/${slug}`,
-      datePublished: p.publicadoEm,
-      author: { "@type": "Organization", name: p.autor },
-      image: p.imagem,
-    })),
-  });
-
-  const bodyHtml = Object.entries(BLOG_POSTS).map(([slug, p]) =>
-    `<article><h2><a href="${SITE}/blog/${slug}">${esc(p.titulo)}</a></h2><p>${esc(p.resumo)}</p></article>`
-  ).join("");
-
-  return html(title, desc, LOGO, canonical, [blogSchema, orgJsonLd()], `<h1>${esc(title)}</h1>${bodyHtml}`);
-}
-
-function renderBlogPost(slug: string) {
-  const post = BLOG_POSTS[slug];
-  if (!post) return null;
-
-  const title = `${post.titulo} | Blog Uhome`;
-  const canonical = `${SITE}/blog/${slug}`;
-
-  const postSchema = JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    headline: post.titulo,
-    description: post.resumo,
-    image: post.imagem,
-    url: canonical,
-    datePublished: post.publicadoEm,
-    author: { "@type": "Organization", name: post.autor },
-    publisher: { "@type": "Organization", name: "Uhome", url: SITE, logo: LOGO },
-    mainEntityOfPage: canonical,
-  });
-
-  const breadcrumb = JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Uhome", item: `${SITE}/` },
-      { "@type": "ListItem", position: 2, name: "Blog", item: `${SITE}/blog` },
-      { "@type": "ListItem", position: 3, name: post.titulo, item: canonical },
-    ],
-  });
-
-  return html(title, post.resumo, post.imagem, canonical, [postSchema, breadcrumb, orgJsonLd()],
-    `<h1>${esc(post.titulo)}</h1><p>${esc(post.resumo)}</p><img src="${esc(post.imagem)}" alt="${esc(post.titulo)}" width="800" height="450" />`);
-}
 
 async function renderFaq() {
   const faqs = [

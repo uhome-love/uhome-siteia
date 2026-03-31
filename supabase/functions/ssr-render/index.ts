@@ -481,8 +481,9 @@ async function renderBlogPost(slug: string) {
     ],
   });
 
-  return html(title, post.resumo, post.imagem || LOGO, canonical, [postSchema, breadcrumb, orgJsonLd()],
-    `<h1>${esc(post.titulo)}</h1><p>${esc(post.resumo)}</p><img src="${esc(post.imagem || LOGO)}" alt="${esc(post.titulo)}" width="800" height="450" />`);
+  const postImg = post.imagem || OG_DEFAULT;
+  return html(title, post.resumo, postImg, canonical, [postSchema, breadcrumb, orgJsonLd()],
+    `<h1>${esc(post.titulo)}</h1><p>${esc(post.resumo)}</p><img src="${esc(postImg)}" alt="${esc(post.titulo)}" width="800" height="450" />`);
 }
 
 

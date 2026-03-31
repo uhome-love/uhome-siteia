@@ -7,6 +7,7 @@ import { Footer } from "@/components/Footer";
 import { useCanonical } from "@/hooks/useCanonical";
 import { setJsonLd, removeJsonLd, buildOrganizationJsonLd } from "@/lib/jsonld";
 import { blogPosts } from "@/data/blog";
+import { useBlogPosts } from "@/hooks/useBlogPosts";
 
 function renderMarkdown(md: string) {
   // Simple markdown → HTML for headings, bold, lists, paragraphs
@@ -40,7 +41,8 @@ function renderMarkdown(md: string) {
 
 export default function BlogPost() {
   const { slug } = useParams<{ slug: string }>();
-  const post = blogPosts.find((p) => p.slug === slug);
+  const { data: allPosts = blogPosts } = useBlogPosts();
+  const post = allPosts.find((p) => p.slug === slug);
 
   useCanonical(post ? `/blog/${post.slug}` : undefined);
 
@@ -97,7 +99,7 @@ export default function BlogPost() {
   const contentHtml = renderMarkdown(post.conteudo);
 
   // Related posts (same category, excluding current)
-  const relacionados = blogPosts
+  const relacionados = allPosts
     .filter((p) => p.categoria === post.categoria && p.slug !== post.slug)
     .slice(0, 2);
 

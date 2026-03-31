@@ -202,6 +202,80 @@ const Bairro = () => {
         </div>
       </section>
 
+      {/* Infraestrutura */}
+      {aiDesc?.infraestrutura && (
+        <section className="border-b border-border py-12 sm:py-16">
+          <div className="mx-auto max-w-5xl px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+              <h2 className="text-h3 text-foreground">Infraestrutura de {bairro.nome}</h2>
+              {aiDesc.infraestrutura.split("\n\n").map((p, i) => (
+                <p key={i} className="mt-4 font-body text-[15px] leading-relaxed text-muted-foreground">{p}</p>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+      )}
+
+      {/* Por que investir */}
+      {aiDesc?.por_que_investir && (
+        <section className="border-b border-border bg-primary/[0.02] py-12 sm:py-16">
+          <div className="mx-auto max-w-5xl px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+              <h2 className="text-h3 text-foreground">Por que investir em {bairro.nome}?</h2>
+              {aiDesc.por_que_investir.split("\n\n").map((p, i) => (
+                <p key={i} className="mt-4 font-body text-[15px] leading-relaxed text-muted-foreground">{p}</p>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+      )}
+
+      {/* Faixas de preço */}
+      {stats && (
+        <section className="border-b border-border py-12 sm:py-16">
+          <div className="mx-auto max-w-5xl px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+              <h2 className="text-h3 text-foreground">Faixas de preço em {bairro.nome}</h2>
+              <p className="mt-2 font-body text-sm text-muted-foreground">
+                Distribuição dos imóveis disponíveis por valor
+              </p>
+              <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                {[
+                  { label: "Até R$ 500 mil", filter: (i: Imovel) => i.preco <= 500000 },
+                  { label: "R$ 500 mil – R$ 1 mi", filter: (i: Imovel) => i.preco > 500000 && i.preco <= 1000000 },
+                  { label: "R$ 1 mi – R$ 2 mi", filter: (i: Imovel) => i.preco > 1000000 && i.preco <= 2000000 },
+                  { label: "Acima de R$ 2 mi", filter: (i: Imovel) => i.preco > 2000000 },
+                ].map((faixa) => {
+                  const count = imoveis.filter(faixa.filter).length;
+                  if (count === 0) return null;
+                  return (
+                    <div key={faixa.label} className="rounded-xl border border-border bg-card p-4 text-center">
+                      <p className="font-body text-2xl font-bold text-foreground">{count}</p>
+                      <p className="font-body text-xs text-muted-foreground">{faixa.label}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </motion.div>
+          </div>
+        </section>
+      )}
+
       {/* Properties grid */}
       <section className="py-12 sm:py-16">
         <div className="mx-auto max-w-7xl px-6">

@@ -216,15 +216,17 @@ async function renderBairro(slug: string) {
   const bairro = BAIRROS[slug];
   if (!bairro) return null;
 
-  const { count } = await supabase
-    .from("imoveis")
-    .select("*", { count: "exact", head: true })
-    .eq("status", "disponivel")
-    .ilike("bairro", `%${bairro.nome}%`);
+  // Fetch count + AI descriptions in parallel
+  const [countResult, descResult] = await Promise.all([
+    supabase.from("imoveis").select("*", { count: "exact", head: true }).eq("status", "disponivel").ilike("bairro", `%${bairro.nome}%`),
+    supabase.from("bairro_descricoes").select("descricao_seo, descricao_curta, infraestrutura, por_que_investir").eq("bairro_nome", bairro.nome).maybeSingle(),
+  ]);
 
-  const total = count ?? 0;
+  const total = countResult.count ?? 0;
+  const aiDesc = descResult.data as any;
+  const longDesc = aiDesc?.descricao_seo || bairro.descricao;
   const title = `Imóveis à Venda em ${bairro.nome} — Porto Alegre | Uhome`;
-  const desc = `${bairro.descricao.slice(0, 140)}. Veja ${total} apartamentos, casas e coberturas à venda em ${bairro.nome} com a Uhome.`;
+  const desc = `${(aiDesc?.descricao_curta || bairro.descricao).slice(0, 140)}. Veja ${total} apartamentos, casas e coberturas à venda em ${bairro.nome} com a Uhome.`;
   const canonical = `${SITE}/bairros/${slug}`;
 
   const breadcrumb = JSON.stringify({
@@ -241,7 +243,7 @@ async function renderBairro(slug: string) {
     "@context": "https://schema.org",
     "@type": "ItemList",
     name: `Imóveis à Venda em ${bairro.nome}, Porto Alegre`,
-    description: bairro.descricao.slice(0, 300),
+    description: longDesc.slice(0, 300),
     url: canonical,
     numberOfItems: total,
     itemListElement: {
@@ -256,8 +258,35 @@ async function renderBairro(slug: string) {
     },
   });
 
-  return html(title, desc, bairro.foto, canonical, [breadcrumb, itemList, orgJsonLd()],
-    `<h1>Imóveis à Venda em ${esc(bairro.nome)}</h1><p>${esc(desc)}</p><p>${total} imóveis disponíveis</p>`);
+  // Build rich body HTML with all available content
+  let bodyHtml = `<h1>Imóveis à Venda em ${esc(bairro.nome)}</h1>`;
+  bodyHtml += `<p>${esc(desc)}</p>`;
+  bodyHtml += `<p>${total} imóveis disponíveis em ${esc(bairro.nome)}, Porto Alegre.</p>`;
+
+  // SEO description
+  bodyHtml += `<h2>Sobre ${esc(bairro.nome)}</h2>`;
+  bodyHtml += longDesc.split("\n\n").map((p: string) => `<p>${esc(p)}</p>`).join("");
+
+  // Infrastructure section
+  if (aiDesc?.infraestrutura) {
+    bodyHtml += `<h2>Infraestrutura de ${esc(bairro.nome)}</h2>`;
+    bodyHtml += aiDesc.infraestrutura.split("\n\n").map((p: string) => `<p>${esc(p)}</p>`).join("");
+  }
+
+  // Investment section
+  if (aiDesc?.por_que_investir) {
+    bodyHtml += `<h2>Por que investir em ${esc(bairro.nome)}?</h2>`;
+    bodyHtml += aiDesc.por_que_investir.split("\n\n").map((p: string) => `<p>${esc(p)}</p>`).join("");
+  }
+
+  // Internal links
+  bodyHtml += `<h2>Buscar por tipo em ${esc(bairro.nome)}</h2><ul>`;
+  bodyHtml += `<li><a href="${SITE}/apartamentos-${slug}">Apartamentos em ${esc(bairro.nome)}</a></li>`;
+  bodyHtml += `<li><a href="${SITE}/casas-${slug}">Casas em ${esc(bairro.nome)}</a></li>`;
+  bodyHtml += `<li><a href="${SITE}/coberturas-${slug}">Coberturas em ${esc(bairro.nome)}</a></li>`;
+  bodyHtml += `</ul>`;
+
+  return html(title, desc, bairro.foto, canonical, [breadcrumb, itemList, orgJsonLd()], bodyHtml);
 }
 
 async function renderImovel(slug: string) {
@@ -339,18 +368,44 @@ async function renderImovel(slug: string) {
     `<h1>${esc(titulo)}</h1><p>${esc(preco)} — ${esc(statsHtml)}</p><p>${esc(desc)}</p><img src="${esc(imgUrl)}" alt="${esc(titulo)}" width="800" height="600" />`);
 }
 
-/* ── blog data (mirror from codebase) ───────────────── */
+/* ── blog data from DB + static fallback ─────────────── */
 
-const BLOG_POSTS: Record<string, { titulo: string; resumo: string; imagem: string; publicadoEm: string; autor: string }> = {
-  "guia-compra-primeiro-imovel-porto-alegre": { titulo: "Guia completo para comprar seu primeiro imóvel em Porto Alegre", resumo: "Tudo que você precisa saber antes de dar o primeiro passo: documentação, financiamento, bairros e dicas práticas.", imagem: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=450&fit=crop", publicadoEm: "2025-03-15", autor: "Equipe Uhome" },
-  "melhores-bairros-para-investir-2025": { titulo: "Os 5 bairros de Porto Alegre com maior valorização em 2025", resumo: "Dados do mercado mostram quais regiões estão se valorizando mais rápido e por quê.", imagem: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=450&fit=crop", publicadoEm: "2025-02-28", autor: "Equipe Uhome" },
-  "financiamento-imobiliario-tudo-que-voce-precisa-saber": { titulo: "Financiamento imobiliário: taxas, prazos e como se preparar", resumo: "Entenda como funciona o financiamento bancário, quais as melhores taxas do mercado.", imagem: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&h=450&fit=crop", publicadoEm: "2025-02-10", autor: "Equipe Uhome" },
-  "checklist-vistoria-imovel-usado": { titulo: "Checklist: 15 itens para verificar na vistoria de um imóvel usado", resumo: "Não feche negócio sem conferir esses pontos. Um guia prático para identificar problemas ocultos.", imagem: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=800&h=450&fit=crop", publicadoEm: "2025-01-22", autor: "Equipe Uhome" },
-  "morar-em-porto-alegre-vale-a-pena": { titulo: "Morar em Porto Alegre em 2025: custo de vida, qualidade e o que esperar", resumo: "Uma análise honesta sobre o custo de vida, mobilidade, segurança e qualidade dos bairros.", imagem: "https://images.unsplash.com/photo-1598971861713-54ad09c93b3e?w=800&h=450&fit=crop", publicadoEm: "2025-01-08", autor: "Equipe Uhome" },
-  "documentos-necessarios-compra-imovel": { titulo: "Lista completa de documentos para comprar um imóvel em 2025", resumo: "Do comprador ao vendedor, do imóvel ao cartório: todos os documentos organizados por etapa.", imagem: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&h=450&fit=crop", publicadoEm: "2024-12-18", autor: "Equipe Uhome" },
+const STATIC_BLOG_POSTS: Record<string, { titulo: string; resumo: string; imagem: string; publicadoEm: string; autor: string }> = {
+  "melhores-bairros-para-morar-em-porto-alegre-2026": { titulo: "Melhores bairros para morar em Porto Alegre em 2026", resumo: "Ranking completo dos bairros mais desejados de Porto Alegre em 2026.", imagem: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=450&fit=crop", publicadoEm: "2026-03-20", autor: "Equipe Uhome" },
+  "guia-completo-comprar-apartamento-2026": { titulo: "Guia completo para comprar apartamento em 2026", resumo: "Passo a passo atualizado.", imagem: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=450&fit=crop", publicadoEm: "2026-03-15", autor: "Equipe Uhome" },
+  "quanto-custa-metro-quadrado-porto-alegre-2026": { titulo: "Preço do metro quadrado em Porto Alegre em 2026", resumo: "Análise por bairro.", imagem: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=450&fit=crop", publicadoEm: "2026-03-10", autor: "Equipe Uhome" },
+  "apartamento-ou-casa-porto-alegre": { titulo: "Apartamento ou casa em Porto Alegre?", resumo: "Comparativo honesto.", imagem: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&h=450&fit=crop", publicadoEm: "2026-02-28", autor: "Equipe Uhome" },
+  "financiamento-imobiliario-2026-taxas-e-dicas": { titulo: "Financiamento imobiliário em 2026", resumo: "Taxas e dicas.", imagem: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&h=450&fit=crop", publicadoEm: "2026-02-20", autor: "Equipe Uhome" },
+  "como-negociar-preco-imovel": { titulo: "Como negociar o preço de um imóvel", resumo: "8 técnicas.", imagem: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&h=450&fit=crop", publicadoEm: "2026-02-10", autor: "Equipe Uhome" },
+  "guia-compra-primeiro-imovel-porto-alegre": { titulo: "Guia completo para comprar seu primeiro imóvel em Porto Alegre", resumo: "Tudo que você precisa saber.", imagem: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=450&fit=crop", publicadoEm: "2025-03-15", autor: "Equipe Uhome" },
+  "melhores-bairros-para-investir-2025": { titulo: "Os 5 bairros de Porto Alegre com maior valorização em 2025", resumo: "Dados do mercado.", imagem: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=450&fit=crop", publicadoEm: "2025-02-28", autor: "Equipe Uhome" },
 };
 
+async function getAllBlogPosts(): Promise<Record<string, { titulo: string; resumo: string; imagem: string; publicadoEm: string; autor: string }>> {
+  const { data } = await supabase
+    .from("blog_posts")
+    .select("slug, titulo, resumo, imagem, publicado_em, autor")
+    .eq("ativo", true)
+    .order("publicado_em", { ascending: false })
+    .limit(100);
+
+  const combined = { ...STATIC_BLOG_POSTS };
+  if (data) {
+    for (const p of data as any[]) {
+      combined[p.slug] = {
+        titulo: p.titulo,
+        resumo: p.resumo,
+        imagem: p.imagem || "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=450&fit=crop",
+        publicadoEm: p.publicado_em,
+        autor: p.autor,
+      };
+    }
+  }
+  return combined;
+}
+
 async function renderBlog() {
+  const allPosts = await getAllBlogPosts();
   const title = "Blog | Mercado Imobiliário em Porto Alegre — Uhome";
   const desc = "Artigos, guias e análises sobre o mercado imobiliário de Porto Alegre. Dicas para comprar, investir e financiar seu imóvel.";
   const canonical = `${SITE}/blog`;
@@ -362,7 +417,7 @@ async function renderBlog() {
     description: desc,
     url: canonical,
     publisher: { "@type": "Organization", name: "Uhome", url: SITE },
-    blogPost: Object.entries(BLOG_POSTS).map(([slug, p]) => ({
+    blogPost: Object.entries(allPosts).map(([slug, p]) => ({
       "@type": "BlogPosting",
       headline: p.titulo,
       description: p.resumo,
@@ -373,15 +428,26 @@ async function renderBlog() {
     })),
   });
 
-  const bodyHtml = Object.entries(BLOG_POSTS).map(([slug, p]) =>
+  const bodyHtml = Object.entries(allPosts).map(([slug, p]) =>
     `<article><h2><a href="${SITE}/blog/${slug}">${esc(p.titulo)}</a></h2><p>${esc(p.resumo)}</p></article>`
   ).join("");
 
   return html(title, desc, LOGO, canonical, [blogSchema, orgJsonLd()], `<h1>${esc(title)}</h1>${bodyHtml}`);
 }
 
-function renderBlogPost(slug: string) {
-  const post = BLOG_POSTS[slug];
+async function renderBlogPost(slug: string) {
+  // Try DB first
+  const { data: dbPost } = await supabase
+    .from("blog_posts")
+    .select("titulo, resumo, conteudo, imagem, publicado_em, autor")
+    .eq("slug", slug)
+    .eq("ativo", true)
+    .maybeSingle();
+
+  const post = dbPost
+    ? { titulo: (dbPost as any).titulo, resumo: (dbPost as any).resumo, imagem: (dbPost as any).imagem, publicadoEm: (dbPost as any).publicado_em, autor: (dbPost as any).autor }
+    : STATIC_BLOG_POSTS[slug];
+
   if (!post) return null;
 
   const title = `${post.titulo} | Blog Uhome`;
@@ -410,9 +476,10 @@ function renderBlogPost(slug: string) {
     ],
   });
 
-  return html(title, post.resumo, post.imagem, canonical, [postSchema, breadcrumb, orgJsonLd()],
-    `<h1>${esc(post.titulo)}</h1><p>${esc(post.resumo)}</p><img src="${esc(post.imagem)}" alt="${esc(post.titulo)}" width="800" height="450" />`);
+  return html(title, post.resumo, post.imagem || LOGO, canonical, [postSchema, breadcrumb, orgJsonLd()],
+    `<h1>${esc(post.titulo)}</h1><p>${esc(post.resumo)}</p><img src="${esc(post.imagem || LOGO)}" alt="${esc(post.titulo)}" width="800" height="450" />`);
 }
+
 
 async function renderFaq() {
   const faqs = [
@@ -667,6 +734,70 @@ function renderIntentPage(slug: string) {
     `<h1>${esc(page.title)}</h1><p>${esc(page.desc)}</p>`);
 }
 
+/* ── static pages ─────────────────────────────────────── */
+
+function renderAnunciar() {
+  const title = "Anuncie seu Imóvel em Porto Alegre | Uhome";
+  const desc = "Anuncie seu imóvel em Porto Alegre com a Uhome. Alcance milhares de compradores qualificados com tecnologia e curadoria especializada.";
+  return html(title, desc, LOGO, `${SITE}/anunciar`, [orgJsonLd()],
+    `<h1>Anuncie seu Imóvel</h1><p>${esc(desc)}</p>`);
+}
+
+function renderAvaliarImovel() {
+  const title = "Avaliação Gratuita de Imóvel em Porto Alegre | Uhome";
+  const desc = "Descubra quanto vale seu imóvel em Porto Alegre. Avaliação gratuita baseada em dados reais do mercado.";
+  return html(title, desc, LOGO, `${SITE}/avaliar-imovel`, [orgJsonLd()],
+    `<h1>Avaliação de Imóvel</h1><p>${esc(desc)}</p>`);
+}
+
+function renderCarreiras() {
+  const title = "Carreiras na Uhome | Trabalhe Conosco";
+  const desc = "Faça parte da Uhome, a imobiliária digital de Porto Alegre. Vagas para corretores, desenvolvedores e marketing.";
+  return html(title, desc, LOGO, `${SITE}/carreiras`, [orgJsonLd()],
+    `<h1>Carreiras na Uhome</h1><p>${esc(desc)}</p>`);
+}
+
+function renderPrivacidade() {
+  const title = "Política de Privacidade | Uhome Imóveis";
+  const desc = "Política de privacidade da Uhome. Saiba como tratamos seus dados pessoais.";
+  return html(title, desc, LOGO, `${SITE}/politica-de-privacidade`, [orgJsonLd()],
+    `<h1>Política de Privacidade</h1><p>${esc(desc)}</p>`);
+}
+
+function renderBusca() {
+  const title = "Buscar Imóveis em Porto Alegre | Uhome";
+  const desc = "Busque imóveis à venda em Porto Alegre com filtros de bairro, preço, tipo e quartos. Mais de 14.600 opções com busca inteligente por IA.";
+  return html(title, desc, LOGO, `${SITE}/busca`, [orgJsonLd()],
+    `<h1>Buscar Imóveis em Porto Alegre</h1><p>${esc(desc)}</p>`);
+}
+
+function renderFavoritos() {
+  const title = "Meus Favoritos | Uhome Imóveis";
+  const desc = "Seus imóveis favoritos salvos na Uhome.";
+  return html(title, desc, LOGO, `${SITE}/favoritos`, [orgJsonLd()],
+    `<h1>Meus Favoritos</h1><p>${esc(desc)}</p>`);
+}
+
+async function renderEmpreendimentos() {
+  const title = "Empreendimentos em Porto Alegre | Uhome";
+  const desc = "Lançamentos e empreendimentos imobiliários em Porto Alegre. Conheça os melhores projetos com a Uhome.";
+  const canonical = `${SITE}/empreendimentos`;
+
+  const { data: emps } = await supabase
+    .from("empreendimentos")
+    .select("nome, slug, bairro, preco_a_partir")
+    .eq("ativo", true)
+    .order("ordem", { ascending: true })
+    .limit(50);
+
+  const empHtml = emps?.map((e: any) =>
+    `<li><a href="${SITE}/empreendimentos/${esc(e.slug)}">${esc(e.nome)}</a> — ${esc(e.bairro || "Porto Alegre")}${e.preco_a_partir ? ` a partir de ${formatBRL(e.preco_a_partir)}` : ""}</li>`
+  ).join("") || "";
+
+  return html(title, desc, LOGO, canonical, [orgJsonLd()],
+    `<h1>Empreendimentos em Porto Alegre</h1><p>${esc(desc)}</p><ul>${empHtml}</ul>`);
+}
+
 /* ── main handler ────────────────────────────────────── */
 
 Deno.serve(async (req) => {
@@ -688,11 +819,25 @@ Deno.serve(async (req) => {
       rendered = await renderBairros();
     } else if (path === "/condominios") {
       rendered = await renderCondominios();
+    } else if (path === "/empreendimentos") {
+      rendered = await renderEmpreendimentos();
     } else if (path === "/blog") {
       rendered = await renderBlog();
+    } else if (path === "/busca") {
+      rendered = renderBusca();
+    } else if (path === "/anunciar") {
+      rendered = renderAnunciar();
+    } else if (path === "/avaliar-imovel") {
+      rendered = renderAvaliarImovel();
+    } else if (path === "/carreiras") {
+      rendered = renderCarreiras();
+    } else if (path === "/politica-de-privacidade") {
+      rendered = renderPrivacidade();
+    } else if (path === "/favoritos") {
+      rendered = renderFavoritos();
     } else if (path.startsWith("/blog/")) {
       const slug = path.replace("/blog/", "").replace(/\/$/, "");
-      rendered = renderBlogPost(slug);
+      rendered = await renderBlogPost(slug);
     } else if (path.startsWith("/bairros/")) {
       const slug = path.replace("/bairros/", "").replace(/\/$/, "");
       rendered = await renderBairro(slug);
@@ -746,3 +891,4 @@ Deno.serve(async (req) => {
     });
   }
 });
+

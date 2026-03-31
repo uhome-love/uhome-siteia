@@ -9,7 +9,6 @@ const corsHeaders = {
 const SITE = "https://uhome.com.br";
 const LOGO = `${SITE}/uhome-logo.svg`;
 const OG_DEFAULT = `${SITE}/og-default.jpg`;
-const OG_HOME = `${SITE}/og-default.jpg`;
 
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -39,8 +38,21 @@ function parseFotos(raw: unknown): Array<{ url: string; ordem: number; principal
   return [];
 }
 
+/**
+ * Returns the best photo URL optimized for OG previews (1200x630).
+ * If the URL is from a known CDN that supports transforms, appends size params.
+ */
+function ogImageUrl(rawUrl: string): string {
+  if (!rawUrl) return OG_DEFAULT;
+  // Already our default
+  if (rawUrl === OG_DEFAULT) return rawUrl;
+  // Don't use SVGs — WhatsApp doesn't render them
+  if (rawUrl.endsWith(".svg")) return OG_DEFAULT;
+  return rawUrl;
+}
+
 function fotoPrincipal(fotos: ReturnType<typeof parseFotos>): string {
-  if (!fotos.length) return "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&h=630&fit=crop";
+  if (!fotos.length) return OG_DEFAULT;
   const p = fotos.find((f) => f.principal);
   return (p ?? fotos[0]).url;
 }
@@ -65,7 +77,19 @@ function slugify(name: string) {
   return name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
-/* ── bairros static data (mirror from codebase) ────── */
+/**
+ * Strip /c/:corretorSlug prefix from path so SSR works for corretor links.
+ * Returns { cleanPath, corretorSlug }.
+ */
+function stripCorretorPrefix(path: string): { cleanPath: string; corretorSlug?: string } {
+  const m = path.match(/^\/c\/([^/]+)(\/.*)?$/);
+  if (m) {
+    return { cleanPath: m[2] || "/", corretorSlug: m[1] };
+  }
+  return { cleanPath: path };
+}
+
+// ... keep existing code (BAIRROS, TIPO_MAP data)
 
 const BAIRROS: Record<string, { nome: string; descricao: string; foto: string; lat: number; lng: number }> = {
   "moinhos-de-vento": { nome: "Moinhos de Vento", descricao: "Moinhos de Vento é o bairro mais nobre de Porto Alegre.", foto: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=800&h=500&fit=crop", lat: -30.0277, lng: -51.1937 },
@@ -84,8 +108,6 @@ const BAIRROS: Record<string, { nome: string; descricao: string; foto: string; l
   "centro-historico": { nome: "Centro Histórico", descricao: "O Centro Histórico é onde a história de Porto Alegre pulsa.", foto: "https://images.unsplash.com/photo-1551038247-3d9af20df552?w=800&h=500&fit=crop", lat: -30.0317, lng: -51.2297 },
   "jardim-botanico": { nome: "Jardim Botânico", descricao: "Jardim Botânico é o refúgio verde de Porto Alegre.", foto: "https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=800&h=500&fit=crop", lat: -30.0527, lng: -51.1777 },
 };
-
-/* ── SEO tipo mapping ──────────────────────────────── */
 
 const TIPO_MAP: Record<string, { label: string; plural: string; dbTipo: string }> = {
   apartamentos: { label: "Apartamento", plural: "Apartamentos", dbTipo: "apartamento" },
@@ -142,7 +164,12 @@ function localBusinessJsonLd() {
   });
 }
 
-function html(title: string, description: string, ogImage: string, canonical: string, jsonLdBlocks: string[], bodyHtml: string) {
+function html(title: string, description: string, rawOgImage: string, canonical: string, jsonLdBlocks: string[], bodyHtml: string) {
+  const ogImage = ogImageUrl(rawOgImage);
+  // Detect image type from URL
+  const isJpeg = ogImage.includes(".jpg") || ogImage.includes(".jpeg") || ogImage.includes("unsplash.com");
+  const imgType = isJpeg ? "image/jpeg" : "image/png";
+
   return `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -159,7 +186,7 @@ function html(title: string, description: string, ogImage: string, canonical: st
   <meta property="og:image" content="${esc(ogImage)}" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:type" content="image/jpeg" />
+  <meta property="og:image:type" content="${imgType}" />
   <meta property="og:url" content="${esc(canonical)}" />
   <meta property="og:site_name" content="Uhome Imóveis" />
   <meta property="og:locale" content="pt_BR" />
@@ -213,7 +240,7 @@ async function renderHome() {
 
   const faqHtml = homeFaqs.map((f) => `<h2>${esc(f.q)}</h2><p>${esc(f.a)}</p>`).join("");
 
-  return html(title, desc, OG_HOME, SITE, [orgJsonLd(), websiteJsonLd(), localBusinessJsonLd(), faqSchema],
+  return html(title, desc, OG_DEFAULT, SITE, [orgJsonLd(), websiteJsonLd(), localBusinessJsonLd(), faqSchema],
     `<h1>Imóveis à Venda em Porto Alegre</h1><p>${esc(desc)}</p>${seoText}${faqHtml}`);
 }
 
@@ -221,7 +248,6 @@ async function renderBairro(slug: string) {
   const bairro = BAIRROS[slug];
   if (!bairro) return null;
 
-  // Fetch count + AI descriptions in parallel
   const [countResult, descResult] = await Promise.all([
     supabase.from("imoveis").select("*", { count: "exact", head: true }).eq("status", "disponivel").ilike("bairro", `%${bairro.nome}%`),
     supabase.from("bairro_descricoes").select("descricao_seo, descricao_curta, infraestrutura, por_que_investir").eq("bairro_nome", bairro.nome).maybeSingle(),
@@ -263,28 +289,23 @@ async function renderBairro(slug: string) {
     },
   });
 
-  // Build rich body HTML with all available content
   let bodyHtml = `<h1>Imóveis à Venda em ${esc(bairro.nome)}</h1>`;
   bodyHtml += `<p>${esc(desc)}</p>`;
   bodyHtml += `<p>${total} imóveis disponíveis em ${esc(bairro.nome)}, Porto Alegre.</p>`;
 
-  // SEO description
   bodyHtml += `<h2>Sobre ${esc(bairro.nome)}</h2>`;
   bodyHtml += longDesc.split("\n\n").map((p: string) => `<p>${esc(p)}</p>`).join("");
 
-  // Infrastructure section
   if (aiDesc?.infraestrutura) {
     bodyHtml += `<h2>Infraestrutura de ${esc(bairro.nome)}</h2>`;
     bodyHtml += aiDesc.infraestrutura.split("\n\n").map((p: string) => `<p>${esc(p)}</p>`).join("");
   }
 
-  // Investment section
   if (aiDesc?.por_que_investir) {
     bodyHtml += `<h2>Por que investir em ${esc(bairro.nome)}?</h2>`;
     bodyHtml += aiDesc.por_que_investir.split("\n\n").map((p: string) => `<p>${esc(p)}</p>`).join("");
   }
 
-  // Internal links
   bodyHtml += `<h2>Buscar por tipo em ${esc(bairro.nome)}</h2><ul>`;
   bodyHtml += `<li><a href="${SITE}/apartamentos-${slug}">Apartamentos em ${esc(bairro.nome)}</a></li>`;
   bodyHtml += `<li><a href="${SITE}/casas-${slug}">Casas em ${esc(bairro.nome)}</a></li>`;
@@ -441,7 +462,6 @@ async function renderBlog() {
 }
 
 async function renderBlogPost(slug: string) {
-  // Try DB first
   const { data: dbPost } = await supabase
     .from("blog_posts")
     .select("titulo, resumo, conteudo, imagem, publicado_em, autor")
@@ -519,7 +539,6 @@ async function renderFaq() {
 /* ── SEO landing page renderer ───────────────────────── */
 
 async function renderSeoLanding(path: string) {
-  // Parse tipo from the beginning of the path
   const cleanPath = path.replace(/^\//, "");
   let tipo: string | null = null;
   let tipoConfig: typeof TIPO_MAP[string] | null = null;
@@ -536,7 +555,6 @@ async function renderSeoLanding(path: string) {
 
   const remainder = cleanPath.slice(tipo.length);
 
-  // Pattern: /apartamentos-porto-alegre (tipo + cidade)
   if (remainder === "-porto-alegre") {
     const { count } = await supabase.from("imoveis").select("*", { count: "exact", head: true })
       .eq("status", "disponivel").eq("tipo", tipoConfig.dbTipo);
@@ -548,7 +566,6 @@ async function renderSeoLanding(path: string) {
       `<h1>${tipoConfig.plural} à Venda em Porto Alegre</h1><p>${esc(desc)}</p><p>${total} imóveis disponíveis</p>`);
   }
 
-  // Pattern: /apartamentos-2-quartos-porto-alegre
   const quartosMatch = remainder.match(/^-(\d)-quartos-porto-alegre$/);
   if (quartosMatch) {
     const quartos = parseInt(quartosMatch[1]);
@@ -562,7 +579,6 @@ async function renderSeoLanding(path: string) {
       `<h1>${tipoConfig.plural} ${quartos} Quartos em Porto Alegre</h1><p>${esc(desc)}</p>`);
   }
 
-  // Pattern: /apartamentos-ate-500-mil-porto-alegre (preço)
   const precoMatch = remainder.match(/^-(ate|acima|de)-(.+)-porto-alegre$/);
   if (precoMatch) {
     const title = `${tipoConfig.plural} ${cap(precoMatch[1])} ${precoMatch[2].replace(/-/g, " ")} em Porto Alegre | Uhome`;
@@ -572,10 +588,8 @@ async function renderSeoLanding(path: string) {
       `<h1>${esc(title.split("|")[0].trim())}</h1><p>${esc(desc)}</p>`);
   }
 
-  // Pattern: /apartamentos-bairro-slug (tipo + bairro)
   const bairroSlug = remainder.replace(/^-/, "");
   if (bairroSlug) {
-    // Deslugify
     const bairroNome = bairroSlug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
     const { count } = await supabase.from("imoveis").select("*", { count: "exact", head: true })
       .eq("status", "disponivel").eq("tipo", tipoConfig.dbTipo).ilike("bairro", `%${bairroNome}%`);
@@ -584,7 +598,10 @@ async function renderSeoLanding(path: string) {
     const title = `${tipoConfig.plural} em ${bairroNome}, Porto Alegre | Uhome`;
     const desc = `${total} ${tipoConfig.plural.toLowerCase()} à venda em ${bairroNome}. Preços, fotos e detalhes na Uhome Imóveis.`;
     const canonical = `${SITE}/${cleanPath}`;
-    return html(title, desc, OG_DEFAULT, canonical, [orgJsonLd()],
+    // Try to use bairro photo if available
+    const bairroData = BAIRROS[bairroSlug];
+    const ogImg = bairroData?.foto || OG_DEFAULT;
+    return html(title, desc, ogImg, canonical, [orgJsonLd()],
       `<h1>${tipoConfig.plural} em ${esc(bairroNome)}</h1><p>${esc(desc)}</p><p>${total} imóveis disponíveis</p>`);
   }
 
@@ -594,7 +611,6 @@ async function renderSeoLanding(path: string) {
 /* ── condominios renderer ────────────────────────────── */
 
 async function renderCondominio(slug: string) {
-  // Find condominio by slug match
   const { data: rows } = await supabase
     .from("imoveis")
     .select("condominio_nome, bairro, preco, foto_principal, quartos, area_total")
@@ -604,7 +620,6 @@ async function renderCondominio(slug: string) {
 
   if (!rows) return null;
 
-  // Group by condominio and find matching slug
   const condoMap = new Map<string, { nome: string; bairro: string; count: number; minPreco: number; maxPreco: number; foto: string }>();
   for (const row of rows) {
     const nome = row.condominio_nome?.trim();
@@ -627,7 +642,7 @@ async function renderCondominio(slug: string) {
   const desc = `${condo.count} imóveis disponíveis no ${condo.nome}, ${condo.bairro}. A partir de ${formatBRL(condo.minPreco)}. Veja fotos e detalhes.`;
   const canonical = `${SITE}/condominios/${slug}`;
 
-  return html(title, desc, condo.foto || LOGO, canonical, [orgJsonLd()],
+  return html(title, desc, condo.foto || OG_DEFAULT, canonical, [orgJsonLd()],
     `<h1>${esc(condo.nome)}</h1><p>${esc(condo.bairro)} · ${condo.count} imóveis</p><p>${esc(desc)}</p>`);
 }
 
@@ -647,7 +662,7 @@ async function renderEmpreendimento(slug: string) {
   const desc = emp.meta_description || `${emp.nome} em ${emp.bairro || "Porto Alegre"}. ${emp.preco_a_partir ? `A partir de ${formatBRL(emp.preco_a_partir)}.` : ""} Detalhes, tipologias e condições.`;
   const canonical = `${SITE}/empreendimentos/${slug}`;
 
-  return html(title, desc, emp.imagem_principal || LOGO, canonical, [orgJsonLd()],
+  return html(title, desc, emp.imagem_principal || OG_DEFAULT, canonical, [orgJsonLd()],
     `<h1>${esc(emp.nome)}</h1><p>${esc(desc)}</p>${emp.imagem_principal ? `<img src="${esc(emp.imagem_principal)}" alt="${esc(emp.nome)}" width="800" height="600" />` : ""}`);
 }
 
@@ -691,7 +706,7 @@ async function renderVitrine(vitrineId: string, corretorSlug?: string) {
   const slug = corretorSlug || v.corretor_slug;
   const prefix = slug ? `/c/${slug}` : "";
 
-  let ogImage = LOGO;
+  let ogImage = OG_DEFAULT;
   let bodyCards = "";
 
   if (v.imovel_codigos?.length) {
@@ -702,7 +717,7 @@ async function renderVitrine(vitrineId: string, corretorSlug?: string) {
       .eq("status", "disponivel");
 
     if (props?.length) {
-      ogImage = props[0].foto_principal || LOGO;
+      ogImage = props[0].foto_principal || OG_DEFAULT;
       bodyCards = props.map((p: any) => `
         <div><a href="${SITE}${prefix}/imovel/${esc(p.slug)}">
           <img src="${esc(p.foto_principal || "")}" alt="${esc(p.titulo)}" width="400" height="300" />
@@ -736,7 +751,7 @@ function renderIntentPage(slug: string) {
   if (!page) return null;
   const title = `${page.title} | Uhome Imóveis`;
   const canonical = `${SITE}/${slug}`;
-  return html(title, page.desc, LOGO, canonical, [orgJsonLd()],
+  return html(title, page.desc, OG_DEFAULT, canonical, [orgJsonLd()],
     `<h1>${esc(page.title)}</h1><p>${esc(page.desc)}</p>`);
 }
 
@@ -837,7 +852,10 @@ Deno.serve(async (req) => {
 
   try {
     const url = new URL(req.url);
-    const path = url.searchParams.get("path") ?? "/";
+    const rawPath = url.searchParams.get("path") ?? "/";
+
+    // Strip /c/:corretorSlug prefix so all corretor links get proper OG
+    const { cleanPath: path, corretorSlug } = stripCorretorPrefix(rawPath);
 
     let rendered: string | null = null;
 
@@ -886,15 +904,13 @@ Deno.serve(async (req) => {
       rendered = await renderEmpreendimento(slug);
     } else if (path.match(/\/vitrine\/[a-f0-9-]+/)) {
       const parts = path.split("/").filter(Boolean);
-      if (parts[0] === "c" && parts[2] === "vitrine") {
-        rendered = await renderVitrine(parts[3], parts[1]);
-      } else if (parts[0] === "vitrine") {
-        rendered = await renderVitrine(parts[1]);
+      if (parts[0] === "vitrine") {
+        rendered = await renderVitrine(parts[1], corretorSlug);
       }
     } else {
       // Try intent pages
-      const cleanPath = path.replace(/^\//, "").replace(/\/$/, "");
-      rendered = renderIntentPage(cleanPath);
+      const cleanSlug = path.replace(/^\//, "").replace(/\/$/, "");
+      rendered = renderIntentPage(cleanSlug);
 
       // Try SEO landing pages (tipo + bairro/quartos/preço)
       if (!rendered) {
@@ -925,4 +941,3 @@ Deno.serve(async (req) => {
     });
   }
 });
-

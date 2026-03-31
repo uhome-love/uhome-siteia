@@ -7,6 +7,7 @@ import { Footer } from "@/components/Footer";
 import { useCanonical } from "@/hooks/useCanonical";
 import { setJsonLd, removeJsonLd, buildOrganizationJsonLd } from "@/lib/jsonld";
 import { blogPosts } from "@/data/blog";
+import { useBlogPosts } from "@/hooks/useBlogPosts";
 
 function renderMarkdown(md: string) {
   // Simple markdown → HTML for headings, bold, lists, paragraphs

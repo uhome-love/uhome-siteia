@@ -705,6 +705,70 @@ function renderIntentPage(slug: string) {
     `<h1>${esc(page.title)}</h1><p>${esc(page.desc)}</p>`);
 }
 
+/* ── static pages ─────────────────────────────────────── */
+
+function renderAnunciar() {
+  const title = "Anuncie seu Imóvel em Porto Alegre | Uhome";
+  const desc = "Anuncie seu imóvel em Porto Alegre com a Uhome. Alcance milhares de compradores qualificados com tecnologia e curadoria especializada.";
+  return html(title, desc, LOGO, `${SITE}/anunciar`, [orgJsonLd()],
+    `<h1>Anuncie seu Imóvel</h1><p>${esc(desc)}</p>`);
+}
+
+function renderAvaliarImovel() {
+  const title = "Avaliação Gratuita de Imóvel em Porto Alegre | Uhome";
+  const desc = "Descubra quanto vale seu imóvel em Porto Alegre. Avaliação gratuita baseada em dados reais do mercado.";
+  return html(title, desc, LOGO, `${SITE}/avaliar-imovel`, [orgJsonLd()],
+    `<h1>Avaliação de Imóvel</h1><p>${esc(desc)}</p>`);
+}
+
+function renderCarreiras() {
+  const title = "Carreiras na Uhome | Trabalhe Conosco";
+  const desc = "Faça parte da Uhome, a imobiliária digital de Porto Alegre. Vagas para corretores, desenvolvedores e marketing.";
+  return html(title, desc, LOGO, `${SITE}/carreiras`, [orgJsonLd()],
+    `<h1>Carreiras na Uhome</h1><p>${esc(desc)}</p>`);
+}
+
+function renderPrivacidade() {
+  const title = "Política de Privacidade | Uhome Imóveis";
+  const desc = "Política de privacidade da Uhome. Saiba como tratamos seus dados pessoais.";
+  return html(title, desc, LOGO, `${SITE}/politica-de-privacidade`, [orgJsonLd()],
+    `<h1>Política de Privacidade</h1><p>${esc(desc)}</p>`);
+}
+
+function renderBusca() {
+  const title = "Buscar Imóveis em Porto Alegre | Uhome";
+  const desc = "Busque imóveis à venda em Porto Alegre com filtros de bairro, preço, tipo e quartos. Mais de 14.600 opções com busca inteligente por IA.";
+  return html(title, desc, LOGO, `${SITE}/busca`, [orgJsonLd()],
+    `<h1>Buscar Imóveis em Porto Alegre</h1><p>${esc(desc)}</p>`);
+}
+
+function renderFavoritos() {
+  const title = "Meus Favoritos | Uhome Imóveis";
+  const desc = "Seus imóveis favoritos salvos na Uhome.";
+  return html(title, desc, LOGO, `${SITE}/favoritos`, [orgJsonLd()],
+    `<h1>Meus Favoritos</h1><p>${esc(desc)}</p>`);
+}
+
+async function renderEmpreendimentos() {
+  const title = "Empreendimentos em Porto Alegre | Uhome";
+  const desc = "Lançamentos e empreendimentos imobiliários em Porto Alegre. Conheça os melhores projetos com a Uhome.";
+  const canonical = `${SITE}/empreendimentos`;
+
+  const { data: emps } = await supabase
+    .from("empreendimentos")
+    .select("nome, slug, bairro, preco_a_partir")
+    .eq("ativo", true)
+    .order("ordem", { ascending: true })
+    .limit(50);
+
+  const empHtml = emps?.map((e: any) =>
+    `<li><a href="${SITE}/empreendimentos/${esc(e.slug)}">${esc(e.nome)}</a> — ${esc(e.bairro || "Porto Alegre")}${e.preco_a_partir ? ` a partir de ${formatBRL(e.preco_a_partir)}` : ""}</li>`
+  ).join("") || "";
+
+  return html(title, desc, LOGO, canonical, [orgJsonLd()],
+    `<h1>Empreendimentos em Porto Alegre</h1><p>${esc(desc)}</p><ul>${empHtml}</ul>`);
+}
+
 /* ── main handler ────────────────────────────────────── */
 
 Deno.serve(async (req) => {
@@ -726,11 +790,25 @@ Deno.serve(async (req) => {
       rendered = await renderBairros();
     } else if (path === "/condominios") {
       rendered = await renderCondominios();
+    } else if (path === "/empreendimentos") {
+      rendered = await renderEmpreendimentos();
     } else if (path === "/blog") {
       rendered = await renderBlog();
+    } else if (path === "/busca") {
+      rendered = renderBusca();
+    } else if (path === "/anunciar") {
+      rendered = renderAnunciar();
+    } else if (path === "/avaliar-imovel") {
+      rendered = renderAvaliarImovel();
+    } else if (path === "/carreiras") {
+      rendered = renderCarreiras();
+    } else if (path === "/politica-de-privacidade") {
+      rendered = renderPrivacidade();
+    } else if (path === "/favoritos") {
+      rendered = renderFavoritos();
     } else if (path.startsWith("/blog/")) {
       const slug = path.replace("/blog/", "").replace(/\/$/, "");
-      rendered = renderBlogPost(slug);
+      rendered = await renderBlogPost(slug);
     } else if (path.startsWith("/bairros/")) {
       const slug = path.replace("/bairros/", "").replace(/\/$/, "");
       rendered = await renderBairro(slug);
@@ -784,3 +862,4 @@ Deno.serve(async (req) => {
     });
   }
 });
+

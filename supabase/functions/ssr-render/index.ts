@@ -184,13 +184,32 @@ function html(title: string, description: string, ogImage: string, canonical: st
 }
 
 async function renderHome() {
-  const title = "Uhome Imóveis | Apartamentos e Casas à Venda em Porto Alegre";
-  const desc = "Encontre apartamentos, casas e coberturas à venda em Porto Alegre com curadoria e tecnologia. Uhome — imobiliária digital com mais de 14.600 imóveis.";
+  const title = "Imóveis à Venda em Porto Alegre | Uhome Imóveis";
+  const desc = "Encontre apartamentos, casas e coberturas à venda em Porto Alegre. Busca inteligente com IA, mais de 14.600 imóveis nos melhores bairros. Uhome — imobiliária digital.";
+
+  const homeFaqs = [
+    { q: "Quanto custa um apartamento em Porto Alegre?", a: "O preço varia de R$ 250 mil em bairros como Cidade Baixa até R$ 5 milhões+ em Moinhos de Vento e Três Figueiras." },
+    { q: "Quais os melhores bairros para morar em Porto Alegre?", a: "Moinhos de Vento (alto padrão), Petrópolis (famílias), Bela Vista (modernidade), Três Figueiras (exclusividade), Menino Deus (vista Guaíba)." },
+    { q: "Como funciona a busca por IA da Uhome?", a: "Descreva em linguagem natural o que procura e a IA encontra os resultados mais relevantes automaticamente." },
+    { q: "Como financiar um imóvel em Porto Alegre?", a: "Financiamento cobre até 80% do valor com prazos de até 35 anos. Taxas entre 8% e 12% ao ano. Entrada mínima de 20%." },
+  ];
+
+  const faqSchema = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: homeFaqs.map((f) => ({
+      "@type": "Question",
+      name: f.q,
+      acceptedAnswer: { "@type": "Answer", text: f.a },
+    })),
+  });
 
   const seoText = `<p>A Uhome é uma imobiliária digital em Porto Alegre especializada na venda de apartamentos, casas, coberturas e studios. Com mais de 14.600 imóveis disponíveis e tecnologia de busca inteligente por IA, ajudamos você a encontrar o imóvel perfeito nos melhores bairros: Moinhos de Vento, Petrópolis, Bela Vista, Três Figueiras, Auxiliadora e Mont'Serrat.</p>`;
 
-  return html(title, desc, LOGO, SITE, [orgJsonLd(), websiteJsonLd(), localBusinessJsonLd()],
-    `<h1>${esc(title)}</h1><p>${esc(desc)}</p>${seoText}`);
+  const faqHtml = homeFaqs.map((f) => `<h2>${esc(f.q)}</h2><p>${esc(f.a)}</p>`).join("");
+
+  return html(title, desc, LOGO, SITE, [orgJsonLd(), websiteJsonLd(), localBusinessJsonLd(), faqSchema],
+    `<h1>Imóveis à Venda em Porto Alegre</h1><p>${esc(desc)}</p>${seoText}${faqHtml}`);
 }
 
 async function renderBairro(slug: string) {

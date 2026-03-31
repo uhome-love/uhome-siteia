@@ -11,6 +11,14 @@ const FeaturedProperties = lazy(() => import("@/components/FeaturedProperties").
 const EmpreendimentosDestaque = lazy(() => import("@/components/EmpreendimentosDestaque").then(m => ({ default: m.EmpreendimentosDestaque })));
 const PorQueUhome = lazy(() => import("@/components/PorQueUhome").then(m => ({ default: m.PorQueUhome })));
 const SeoLinksSection = lazy(() => import("@/components/SeoLinksSection").then(m => ({ default: m.SeoLinksSection })));
+const HomeFaqSection = lazy(() => import("@/components/HomeFaqSection").then(m => ({ default: m.HomeFaqSection })));
+
+const HOME_FAQS = [
+  { q: "Quanto custa um apartamento em Porto Alegre?", a: "O preço varia de R$ 250 mil em bairros como Cidade Baixa até R$ 5 milhões+ em Moinhos de Vento e Três Figueiras. Use nossa busca com filtro de preço para encontrar opções no seu orçamento." },
+  { q: "Quais os melhores bairros para morar em Porto Alegre?", a: "Moinhos de Vento (alto padrão), Petrópolis (famílias), Bela Vista (modernidade), Três Figueiras (exclusividade), Menino Deus (vista Guaíba) e Tristeza (zona sul). Compare na nossa página de bairros." },
+  { q: "Como funciona a busca por IA da Uhome?", a: "Descreva em linguagem natural o que procura — por exemplo, 'apartamento 3 quartos perto do Parcão até 900 mil' — e a IA encontra os resultados mais relevantes automaticamente." },
+  { q: "Como financiar um imóvel em Porto Alegre?", a: "O financiamento cobre até 80% do valor com prazos de até 35 anos. Taxas entre 8% e 12% ao ano. Entrada mínima de 20%. Use nosso simulador de financiamento para calcular." },
+];
 
 const Index = () => {
   useCanonical("/");
@@ -19,10 +27,20 @@ const Index = () => {
     setJsonLd("jsonld-org", buildOrganizationJsonLd());
     setJsonLd("jsonld-website", buildWebSiteJsonLd());
     setJsonLd("jsonld-local", buildLocalBusinessJsonLd());
+    setJsonLd("jsonld-home-faq", {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: HOME_FAQS.map((f) => ({
+        "@type": "Question",
+        name: f.q,
+        acceptedAnswer: { "@type": "Answer", text: f.a },
+      })),
+    });
     return () => {
       removeJsonLd("jsonld-org");
       removeJsonLd("jsonld-website");
       removeJsonLd("jsonld-local");
+      removeJsonLd("jsonld-home-faq");
     };
   }, []);
 
@@ -36,6 +54,7 @@ const Index = () => {
           <FeaturedNeighborhoods />
           <FeaturedProperties />
           <SeoLinksSection />
+          <HomeFaqSection faqs={HOME_FAQS} />
           <PorQueUhome />
         </Suspense>
       </main>

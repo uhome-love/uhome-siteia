@@ -8,6 +8,8 @@ const corsHeaders = {
 
 const SITE = "https://uhome.com.br";
 const LOGO = `${SITE}/uhome-logo.svg`;
+const OG_DEFAULT = `${SITE}/og-default.jpg`;
+const OG_HOME = `${SITE}/og-default.jpg`;
 
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -155,6 +157,9 @@ function html(title: string, description: string, ogImage: string, canonical: st
   <meta property="og:title" content="${esc(title)}" />
   <meta property="og:description" content="${esc(description)}" />
   <meta property="og:image" content="${esc(ogImage)}" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:url" content="${esc(canonical)}" />
   <meta property="og:site_name" content="Uhome Imóveis" />
   <meta property="og:locale" content="pt_BR" />
@@ -208,7 +213,7 @@ async function renderHome() {
 
   const faqHtml = homeFaqs.map((f) => `<h2>${esc(f.q)}</h2><p>${esc(f.a)}</p>`).join("");
 
-  return html(title, desc, LOGO, SITE, [orgJsonLd(), websiteJsonLd(), localBusinessJsonLd(), faqSchema],
+  return html(title, desc, OG_HOME, SITE, [orgJsonLd(), websiteJsonLd(), localBusinessJsonLd(), faqSchema],
     `<h1>Imóveis à Venda em Porto Alegre</h1><p>${esc(desc)}</p>${seoText}${faqHtml}`);
 }
 
@@ -432,7 +437,7 @@ async function renderBlog() {
     `<article><h2><a href="${SITE}/blog/${slug}">${esc(p.titulo)}</a></h2><p>${esc(p.resumo)}</p></article>`
   ).join("");
 
-  return html(title, desc, LOGO, canonical, [blogSchema, orgJsonLd()], `<h1>${esc(title)}</h1>${bodyHtml}`);
+  return html(title, desc, OG_DEFAULT, canonical, [blogSchema, orgJsonLd()], `<h1>${esc(title)}</h1>${bodyHtml}`);
 }
 
 async function renderBlogPost(slug: string) {
@@ -476,8 +481,9 @@ async function renderBlogPost(slug: string) {
     ],
   });
 
-  return html(title, post.resumo, post.imagem || LOGO, canonical, [postSchema, breadcrumb, orgJsonLd()],
-    `<h1>${esc(post.titulo)}</h1><p>${esc(post.resumo)}</p><img src="${esc(post.imagem || LOGO)}" alt="${esc(post.titulo)}" width="800" height="450" />`);
+  const postImg = post.imagem || OG_DEFAULT;
+  return html(title, post.resumo, postImg, canonical, [postSchema, breadcrumb, orgJsonLd()],
+    `<h1>${esc(post.titulo)}</h1><p>${esc(post.resumo)}</p><img src="${esc(postImg)}" alt="${esc(post.titulo)}" width="800" height="450" />`);
 }
 
 
@@ -507,7 +513,7 @@ async function renderFaq() {
   });
 
   const bodyHtml = faqs.map((f) => `<h2>${esc(f.q)}</h2><p>${esc(f.a)}</p>`).join("");
-  return html(title, desc, LOGO, canonical, [faqSchema, orgJsonLd()], `<h1>${esc(title)}</h1>${bodyHtml}`);
+  return html(title, desc, OG_DEFAULT, canonical, [faqSchema, orgJsonLd()], `<h1>${esc(title)}</h1>${bodyHtml}`);
 }
 
 /* ── SEO landing page renderer ───────────────────────── */
@@ -538,7 +544,7 @@ async function renderSeoLanding(path: string) {
     const title = `${tipoConfig.plural} à Venda em Porto Alegre | Uhome Imóveis`;
     const desc = `Encontre ${total}+ ${tipoConfig.plural.toLowerCase()} à venda em Porto Alegre. Busca com IA, fotos e detalhes. Uhome Imóveis.`;
     const canonical = `${SITE}/${cleanPath}`;
-    return html(title, desc, LOGO, canonical, [orgJsonLd()],
+    return html(title, desc, OG_DEFAULT, canonical, [orgJsonLd()],
       `<h1>${tipoConfig.plural} à Venda em Porto Alegre</h1><p>${esc(desc)}</p><p>${total} imóveis disponíveis</p>`);
   }
 
@@ -552,7 +558,7 @@ async function renderSeoLanding(path: string) {
     const title = `${tipoConfig.plural} ${quartos} Quartos em Porto Alegre | Uhome`;
     const desc = `${total}+ ${tipoConfig.plural.toLowerCase()} com ${quartos} quartos à venda em Porto Alegre. Fotos, preços e detalhes.`;
     const canonical = `${SITE}/${cleanPath}`;
-    return html(title, desc, LOGO, canonical, [orgJsonLd()],
+    return html(title, desc, OG_DEFAULT, canonical, [orgJsonLd()],
       `<h1>${tipoConfig.plural} ${quartos} Quartos em Porto Alegre</h1><p>${esc(desc)}</p>`);
   }
 
@@ -562,7 +568,7 @@ async function renderSeoLanding(path: string) {
     const title = `${tipoConfig.plural} ${cap(precoMatch[1])} ${precoMatch[2].replace(/-/g, " ")} em Porto Alegre | Uhome`;
     const desc = `Encontre ${tipoConfig.plural.toLowerCase()} ${precoMatch[1]} ${precoMatch[2].replace(/-/g, " ")} em Porto Alegre. Uhome Imóveis.`;
     const canonical = `${SITE}/${cleanPath}`;
-    return html(title, desc, LOGO, canonical, [orgJsonLd()],
+    return html(title, desc, OG_DEFAULT, canonical, [orgJsonLd()],
       `<h1>${esc(title.split("|")[0].trim())}</h1><p>${esc(desc)}</p>`);
   }
 
@@ -578,7 +584,7 @@ async function renderSeoLanding(path: string) {
     const title = `${tipoConfig.plural} em ${bairroNome}, Porto Alegre | Uhome`;
     const desc = `${total} ${tipoConfig.plural.toLowerCase()} à venda em ${bairroNome}. Preços, fotos e detalhes na Uhome Imóveis.`;
     const canonical = `${SITE}/${cleanPath}`;
-    return html(title, desc, LOGO, canonical, [orgJsonLd()],
+    return html(title, desc, OG_DEFAULT, canonical, [orgJsonLd()],
       `<h1>${tipoConfig.plural} em ${esc(bairroNome)}</h1><p>${esc(desc)}</p><p>${total} imóveis disponíveis</p>`);
   }
 
@@ -656,7 +662,7 @@ async function renderBairros() {
     `<li><a href="${SITE}/bairros/${slug}">${esc(b.nome)}</a> — ${esc(b.descricao.slice(0, 100))}</li>`
   ).join("");
 
-  return html(title, desc, LOGO, canonical, [orgJsonLd()],
+  return html(title, desc, OG_DEFAULT, canonical, [orgJsonLd()],
     `<h1>Bairros de Porto Alegre</h1><p>${esc(desc)}</p><ul>${bairroLinks}</ul>`);
 }
 
@@ -667,7 +673,7 @@ async function renderCondominios() {
   const desc = "Encontre os melhores condomínios de Porto Alegre com imóveis à venda. Compare opções por bairro, preço e infraestrutura.";
   const canonical = `${SITE}/condominios`;
 
-  return html(title, desc, LOGO, canonical, [orgJsonLd()],
+  return html(title, desc, OG_DEFAULT, canonical, [orgJsonLd()],
     `<h1>Condomínios em Porto Alegre</h1><p>${esc(desc)}</p>`);
 }
 
@@ -739,49 +745,49 @@ function renderIntentPage(slug: string) {
 function renderAnunciar() {
   const title = "Anuncie seu Imóvel em Porto Alegre | Uhome";
   const desc = "Anuncie seu imóvel em Porto Alegre com a Uhome. Alcance milhares de compradores qualificados com tecnologia e curadoria especializada.";
-  return html(title, desc, LOGO, `${SITE}/anunciar`, [orgJsonLd()],
+  return html(title, desc, OG_DEFAULT, `${SITE}/anunciar`, [orgJsonLd()],
     `<h1>Anuncie seu Imóvel</h1><p>${esc(desc)}</p>`);
 }
 
 function renderAvaliarImovel() {
   const title = "Avaliação Gratuita de Imóvel em Porto Alegre | Uhome";
   const desc = "Descubra quanto vale seu imóvel em Porto Alegre. Avaliação gratuita baseada em dados reais do mercado.";
-  return html(title, desc, LOGO, `${SITE}/avaliar-imovel`, [orgJsonLd()],
+  return html(title, desc, OG_DEFAULT, `${SITE}/avaliar-imovel`, [orgJsonLd()],
     `<h1>Avaliação de Imóvel</h1><p>${esc(desc)}</p>`);
 }
 
 function renderCarreiras() {
   const title = "Carreiras na Uhome | Trabalhe Conosco";
   const desc = "Faça parte da Uhome, a imobiliária digital de Porto Alegre. Vagas para corretores, desenvolvedores e marketing.";
-  return html(title, desc, LOGO, `${SITE}/carreiras`, [orgJsonLd()],
+  return html(title, desc, OG_DEFAULT, `${SITE}/carreiras`, [orgJsonLd()],
     `<h1>Carreiras na Uhome</h1><p>${esc(desc)}</p>`);
 }
 
 function renderPrivacidade() {
   const title = "Política de Privacidade | Uhome Imóveis";
   const desc = "Política de privacidade da Uhome. Saiba como tratamos seus dados pessoais.";
-  return html(title, desc, LOGO, `${SITE}/politica-de-privacidade`, [orgJsonLd()],
+  return html(title, desc, OG_DEFAULT, `${SITE}/politica-de-privacidade`, [orgJsonLd()],
     `<h1>Política de Privacidade</h1><p>${esc(desc)}</p>`);
 }
 
 function renderBusca() {
   const title = "Buscar Imóveis em Porto Alegre | Uhome";
   const desc = "Busque imóveis à venda em Porto Alegre com filtros de bairro, preço, tipo e quartos. Mais de 14.600 opções com busca inteligente por IA.";
-  return html(title, desc, LOGO, `${SITE}/busca`, [orgJsonLd()],
+  return html(title, desc, OG_DEFAULT, `${SITE}/busca`, [orgJsonLd()],
     `<h1>Buscar Imóveis em Porto Alegre</h1><p>${esc(desc)}</p>`);
 }
 
 function renderFavoritos() {
   const title = "Meus Favoritos | Uhome Imóveis";
   const desc = "Seus imóveis favoritos salvos na Uhome.";
-  return html(title, desc, LOGO, `${SITE}/favoritos`, [orgJsonLd()],
+  return html(title, desc, OG_DEFAULT, `${SITE}/favoritos`, [orgJsonLd()],
     `<h1>Meus Favoritos</h1><p>${esc(desc)}</p>`);
 }
 
 function renderSobre() {
   const title = "Sobre a Uhome | Imobiliária Digital em Porto Alegre";
   const desc = "Conheça a Uhome, imobiliária digital de Porto Alegre. Equipe especializada, CRECI-RS 25682J, tecnologia de busca com IA e curadoria de imóveis nos melhores bairros.";
-  return html(title, desc, LOGO, `${SITE}/sobre`, [orgJsonLd()],
+  return html(title, desc, OG_DEFAULT, `${SITE}/sobre`, [orgJsonLd()],
     `<h1>Sobre a Uhome — Imobiliária Digital de Porto Alegre</h1>
      <p>${esc(desc)}</p>
      <h2>Nossa história</h2>
@@ -795,7 +801,7 @@ function renderSobre() {
 function renderGuiaBairros() {
   const title = "Guia de Bairros de Porto Alegre | Comparativo de Preços | Uhome";
   const desc = "Compare todos os bairros de Porto Alegre: preço médio, quantidade de imóveis, perfil de moradia e infraestrutura. Guia completo para escolher onde morar.";
-  return html(title, desc, LOGO, `${SITE}/guia-bairros`, [orgJsonLd()],
+  return html(title, desc, OG_DEFAULT, `${SITE}/guia-bairros`, [orgJsonLd()],
     `<h1>Guia de Bairros de Porto Alegre</h1>
      <p>${esc(desc)}</p>
      <h2>Como escolher o melhor bairro</h2>
@@ -818,7 +824,7 @@ async function renderEmpreendimentos() {
     `<li><a href="${SITE}/empreendimentos/${esc(e.slug)}">${esc(e.nome)}</a> — ${esc(e.bairro || "Porto Alegre")}${e.preco_a_partir ? ` a partir de ${formatBRL(e.preco_a_partir)}` : ""}</li>`
   ).join("") || "";
 
-  return html(title, desc, LOGO, canonical, [orgJsonLd()],
+  return html(title, desc, OG_DEFAULT, canonical, [orgJsonLd()],
     `<h1>Empreendimentos em Porto Alegre</h1><p>${esc(desc)}</p><ul>${empHtml}</ul>`);
 }
 

@@ -2,7 +2,7 @@ import { useEffect, lazy, Suspense } from "react";
 import { Navbar } from "@/components/Navbar";
 import { HeroSection } from "@/components/HeroSection";
 import { Footer } from "@/components/Footer";
-import { setJsonLd, removeJsonLd, buildOrganizationJsonLd } from "@/lib/jsonld";
+import { setJsonLd, removeJsonLd, buildOrganizationJsonLd, buildWebSiteJsonLd, buildLocalBusinessJsonLd } from "@/lib/jsonld";
 import { useCanonical } from "@/hooks/useCanonical";
 
 // Lazy load below-fold sections
@@ -17,20 +17,28 @@ const Index = () => {
 
   useEffect(() => {
     setJsonLd("jsonld-org", buildOrganizationJsonLd());
-    return () => removeJsonLd("jsonld-org");
+    setJsonLd("jsonld-website", buildWebSiteJsonLd());
+    setJsonLd("jsonld-local", buildLocalBusinessJsonLd());
+    return () => {
+      removeJsonLd("jsonld-org");
+      removeJsonLd("jsonld-website");
+      removeJsonLd("jsonld-local");
+    };
   }, []);
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <HeroSection />
-      <Suspense fallback={null}>
-        <EmpreendimentosDestaque />
-        <FeaturedNeighborhoods />
-        <FeaturedProperties />
-        <SeoLinksSection />
-        <PorQueUhome />
-      </Suspense>
+      <main>
+        <HeroSection />
+        <Suspense fallback={null}>
+          <EmpreendimentosDestaque />
+          <FeaturedNeighborhoods />
+          <FeaturedProperties />
+          <SeoLinksSection />
+          <PorQueUhome />
+        </Suspense>
+      </main>
       <Footer />
     </div>
   );

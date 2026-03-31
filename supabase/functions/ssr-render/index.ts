@@ -59,6 +59,10 @@ function esc(s: string) {
     .replace(/"/g, "&quot;");
 }
 
+function slugify(name: string) {
+  return name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
 /* ── bairros static data (mirror from codebase) ────── */
 
 const BAIRROS: Record<string, { nome: string; descricao: string; foto: string; lat: number; lng: number }> = {
@@ -79,6 +83,17 @@ const BAIRROS: Record<string, { nome: string; descricao: string; foto: string; l
   "jardim-botanico": { nome: "Jardim Botânico", descricao: "Jardim Botânico é o refúgio verde de Porto Alegre.", foto: "https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=800&h=500&fit=crop", lat: -30.0527, lng: -51.1777 },
 };
 
+/* ── SEO tipo mapping ──────────────────────────────── */
+
+const TIPO_MAP: Record<string, { label: string; plural: string; dbTipo: string }> = {
+  apartamentos: { label: "Apartamento", plural: "Apartamentos", dbTipo: "apartamento" },
+  casas: { label: "Casa", plural: "Casas", dbTipo: "casa" },
+  coberturas: { label: "Cobertura", plural: "Coberturas", dbTipo: "cobertura" },
+  studios: { label: "Studio", plural: "Studios", dbTipo: "studio" },
+  terrenos: { label: "Terreno", plural: "Terrenos", dbTipo: "terreno" },
+  comerciais: { label: "Comercial", plural: "Comerciais", dbTipo: "comercial" },
+};
+
 /* ── page renderers ──────────────────────────────────── */
 
 function orgJsonLd() {
@@ -91,6 +106,37 @@ function orgJsonLd() {
     description: "Imobiliária digital em Porto Alegre. Apartamentos, casas e coberturas à venda com curadoria e tecnologia.",
     address: { "@type": "PostalAddress", addressLocality: "Porto Alegre", addressRegion: "RS", addressCountry: "BR" },
     areaServed: { "@type": "City", name: "Porto Alegre" },
+    sameAs: ["https://www.instagram.com/uhome.imoveis"],
+  });
+}
+
+function websiteJsonLd() {
+  return JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Uhome Imóveis",
+    url: SITE,
+    potentialAction: {
+      "@type": "SearchAction",
+      target: { "@type": "EntryPoint", urlTemplate: `${SITE}/busca?q={search_term_string}` },
+      "query-input": "required name=search_term_string",
+    },
+  });
+}
+
+function localBusinessJsonLd() {
+  return JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "RealEstateAgent",
+    name: "Uhome Imóveis",
+    image: LOGO,
+    "@id": SITE,
+    url: SITE,
+    telephone: "+5551991898989",
+    address: { "@type": "PostalAddress", streetAddress: "Porto Alegre", addressLocality: "Porto Alegre", addressRegion: "RS", postalCode: "90000-000", addressCountry: "BR" },
+    geo: { "@type": "GeoCoordinates", latitude: -30.0346, longitude: -51.2177 },
+    openingHoursSpecification: { "@type": "OpeningHoursSpecification", dayOfWeek: ["Monday","Tuesday","Wednesday","Thursday","Friday"], opens: "09:00", closes: "18:00" },
+    priceRange: "$$",
   });
 }
 
@@ -103,12 +149,15 @@ function html(title: string, description: string, ogImage: string, canonical: st
   <title>${esc(title)}</title>
   <meta name="description" content="${esc(description)}" />
   <link rel="canonical" href="${esc(canonical)}" />
+  <meta name="geo.region" content="BR-RS" />
+  <meta name="geo.placename" content="Porto Alegre" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="${esc(title)}" />
   <meta property="og:description" content="${esc(description)}" />
   <meta property="og:image" content="${esc(ogImage)}" />
   <meta property="og:url" content="${esc(canonical)}" />
-  <meta property="og:site_name" content="Uhome" />
+  <meta property="og:site_name" content="Uhome Imóveis" />
+  <meta property="og:locale" content="pt_BR" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="${esc(title)}" />
   <meta name="twitter:description" content="${esc(description)}" />
@@ -136,8 +185,12 @@ function html(title: string, description: string, ogImage: string, canonical: st
 
 async function renderHome() {
   const title = "Uhome Imóveis | Apartamentos e Casas à Venda em Porto Alegre";
-  const desc = "Encontre apartamentos, casas e coberturas à venda em Porto Alegre com curadoria e tecnologia. Uhome — imobiliária digital.";
-  return html(title, desc, LOGO, SITE, [orgJsonLd()], `<h1>${esc(title)}</h1><p>${esc(desc)}</p>`);
+  const desc = "Encontre apartamentos, casas e coberturas à venda em Porto Alegre com curadoria e tecnologia. Uhome — imobiliária digital com mais de 14.600 imóveis.";
+
+  const seoText = `<p>A Uhome é uma imobiliária digital em Porto Alegre especializada na venda de apartamentos, casas, coberturas e studios. Com mais de 14.600 imóveis disponíveis e tecnologia de busca inteligente por IA, ajudamos você a encontrar o imóvel perfeito nos melhores bairros: Moinhos de Vento, Petrópolis, Bela Vista, Três Figueiras, Auxiliadora e Mont'Serrat.</p>`;
+
+  return html(title, desc, LOGO, SITE, [orgJsonLd(), websiteJsonLd(), localBusinessJsonLd()],
+    `<h1>${esc(title)}</h1><p>${esc(desc)}</p>${seoText}`);
 }
 
 async function renderBairro(slug: string) {
@@ -152,7 +205,7 @@ async function renderBairro(slug: string) {
 
   const total = count ?? 0;
   const title = `Imóveis à Venda em ${bairro.nome} — Porto Alegre | Uhome`;
-  const desc = `${bairro.descricao.slice(0, 140)}. Veja apartamentos, casas e coberturas à venda em ${bairro.nome} com a Uhome.`;
+  const desc = `${bairro.descricao.slice(0, 140)}. Veja ${total} apartamentos, casas e coberturas à venda em ${bairro.nome} com a Uhome.`;
   const canonical = `${SITE}/bairros/${slug}`;
 
   const breadcrumb = JSON.stringify({
@@ -202,8 +255,13 @@ async function renderImovel(slug: string) {
   const preco = formatBRL(row.preco);
   const imgUrl = fotoPrincipal(fotos);
   const canonical = `${SITE}/imovel/${slug}`;
-  const title = `${titulo} | Uhome Imóveis`;
-  const desc = `${cap(row.tipo)} ${(row.quartos ?? 0) > 0 ? `com ${row.quartos} quartos` : ""} em ${row.bairro}, Porto Alegre. ${preco}.`;
+  const title = `${titulo} | ${preco} | Uhome Imóveis`;
+  const descParts = [`${cap(row.tipo)}`];
+  if ((row.quartos ?? 0) > 0) descParts.push(`com ${row.quartos} quartos`);
+  if (row.area_total) descParts.push(`${row.area_total}m²`);
+  descParts.push(`em ${row.bairro}, Porto Alegre`);
+  descParts.push(`por ${preco}`);
+  const desc = descParts.join(" ") + ". Fotos, planta e detalhes na Uhome.";
 
   const breadcrumb = JSON.stringify({
     "@context": "https://schema.org",
@@ -251,8 +309,15 @@ async function renderImovel(slug: string) {
     },
   });
 
+  const statsHtml = [
+    row.quartos && `${row.quartos} quartos`,
+    row.banheiros && `${row.banheiros} banheiros`,
+    row.area_total && `${row.area_total}m²`,
+    row.vagas && `${row.vagas} vagas`,
+  ].filter(Boolean).join(" · ");
+
   return html(title, desc, imgUrl, canonical, [breadcrumb, listing, orgJsonLd()],
-    `<h1>${esc(titulo)}</h1><p>${esc(desc)}</p><img src="${esc(imgUrl)}" alt="${esc(titulo)}" />`);
+    `<h1>${esc(titulo)}</h1><p>${esc(preco)} — ${esc(statsHtml)}</p><p>${esc(desc)}</p><img src="${esc(imgUrl)}" alt="${esc(titulo)}" width="800" height="600" />`);
 }
 
 /* ── blog data (mirror from codebase) ───────────────── */
@@ -327,19 +392,22 @@ function renderBlogPost(slug: string) {
   });
 
   return html(title, post.resumo, post.imagem, canonical, [postSchema, breadcrumb, orgJsonLd()],
-    `<h1>${esc(post.titulo)}</h1><p>${esc(post.resumo)}</p><img src="${esc(post.imagem)}" alt="${esc(post.titulo)}" />`);
+    `<h1>${esc(post.titulo)}</h1><p>${esc(post.resumo)}</p><img src="${esc(post.imagem)}" alt="${esc(post.titulo)}" width="800" height="450" />`);
 }
 
 async function renderFaq() {
   const faqs = [
-    { q: "Quais documentos preciso para comprar um imóvel em Porto Alegre?", a: "RG, CPF, comprovante de renda, certidões negativas de débitos, comprovante de estado civil e extrato do FGTS (se aplicável)." },
-    { q: "Como funciona o financiamento imobiliário?", a: "Você financia até 80% do valor do imóvel em até 35 anos, com parcelas decrescentes (SAC) ou fixas (PRICE)." },
-    { q: "Qual o custo total além do preço do imóvel?", a: "ITBI (3% em Porto Alegre), escritura (1-2%), registro (1-2%), e eventualmente corretagem." },
-    { q: "Como a Uhome ajuda na busca por imóveis?", a: "A Uhome é uma imobiliária digital com busca inteligente com IA, filtros avançados e atendimento personalizado." },
+    { q: "Quanto custa um apartamento em Porto Alegre?", a: "O preço varia conforme bairro, tamanho e padrão. Em bairros como Moinhos de Vento e Três Figueiras, apartamentos partem de R$ 800 mil. Em regiões como Cidade Baixa, opções a partir de R$ 350 mil." },
+    { q: "Quais são os melhores bairros para morar em Porto Alegre?", a: "Moinhos de Vento (alto padrão), Petrópolis (famílias), Bela Vista (condomínios modernos), Três Figueiras (exclusividade), Menino Deus (vista Guaíba), Tristeza (zona sul)." },
+    { q: "Como funciona o financiamento imobiliário?", a: "Cobre até 80% do valor do imóvel, prazos até 35 anos, taxas entre 8% e 12% ao ano. Entrada mínima de 20%. Use nosso simulador para calcular." },
+    { q: "Posso usar o FGTS para comprar imóvel?", a: "Sim, desde que o imóvel seja residencial, avaliado em até R$ 1,5 milhão pelo SFH, e você tenha 3+ anos de contribuição." },
+    { q: "O que é a Uhome e como funciona?", a: "A Uhome é uma imobiliária digital em Porto Alegre com busca por IA, curadoria especializada e mais de 14.600 imóveis. Catálogo atualizado diariamente." },
+    { q: "Como funciona a busca por IA da Uhome?", a: "Nossa busca inteligente entende linguagem natural. Descreva o que procura e a IA aplica os filtros automaticamente." },
+    { q: "Qual a documentação necessária para comprar um imóvel?", a: "RG, CPF, comprovante de renda, comprovante de residência, certidão de estado civil e IR. O vendedor apresenta matrícula atualizada e certidões negativas." },
   ];
 
   const title = "Perguntas Frequentes sobre Imóveis em Porto Alegre | Uhome";
-  const desc = "Tire suas dúvidas sobre compra, financiamento e documentação de imóveis em Porto Alegre.";
+  const desc = "Tire suas dúvidas sobre compra de imóveis, financiamento, bairros e mercado imobiliário em Porto Alegre.";
   const canonical = `${SITE}/faq`;
 
   const faqSchema = JSON.stringify({
@@ -354,6 +422,167 @@ async function renderFaq() {
 
   const bodyHtml = faqs.map((f) => `<h2>${esc(f.q)}</h2><p>${esc(f.a)}</p>`).join("");
   return html(title, desc, LOGO, canonical, [faqSchema, orgJsonLd()], `<h1>${esc(title)}</h1>${bodyHtml}`);
+}
+
+/* ── SEO landing page renderer ───────────────────────── */
+
+async function renderSeoLanding(path: string) {
+  // Parse tipo from the beginning of the path
+  const cleanPath = path.replace(/^\//, "");
+  let tipo: string | null = null;
+  let tipoConfig: typeof TIPO_MAP[string] | null = null;
+
+  for (const [key, config] of Object.entries(TIPO_MAP)) {
+    if (cleanPath.startsWith(key)) {
+      tipo = key;
+      tipoConfig = config;
+      break;
+    }
+  }
+
+  if (!tipo || !tipoConfig) return null;
+
+  const remainder = cleanPath.slice(tipo.length);
+
+  // Pattern: /apartamentos-porto-alegre (tipo + cidade)
+  if (remainder === "-porto-alegre") {
+    const { count } = await supabase.from("imoveis").select("*", { count: "exact", head: true })
+      .eq("status", "disponivel").eq("tipo", tipoConfig.dbTipo);
+    const total = count ?? 0;
+    const title = `${tipoConfig.plural} à Venda em Porto Alegre | Uhome Imóveis`;
+    const desc = `Encontre ${total}+ ${tipoConfig.plural.toLowerCase()} à venda em Porto Alegre. Busca com IA, fotos e detalhes. Uhome Imóveis.`;
+    const canonical = `${SITE}/${cleanPath}`;
+    return html(title, desc, LOGO, canonical, [orgJsonLd()],
+      `<h1>${tipoConfig.plural} à Venda em Porto Alegre</h1><p>${esc(desc)}</p><p>${total} imóveis disponíveis</p>`);
+  }
+
+  // Pattern: /apartamentos-2-quartos-porto-alegre
+  const quartosMatch = remainder.match(/^-(\d)-quartos-porto-alegre$/);
+  if (quartosMatch) {
+    const quartos = parseInt(quartosMatch[1]);
+    const { count } = await supabase.from("imoveis").select("*", { count: "exact", head: true })
+      .eq("status", "disponivel").eq("tipo", tipoConfig.dbTipo).eq("quartos", quartos);
+    const total = count ?? 0;
+    const title = `${tipoConfig.plural} ${quartos} Quartos em Porto Alegre | Uhome`;
+    const desc = `${total}+ ${tipoConfig.plural.toLowerCase()} com ${quartos} quartos à venda em Porto Alegre. Fotos, preços e detalhes.`;
+    const canonical = `${SITE}/${cleanPath}`;
+    return html(title, desc, LOGO, canonical, [orgJsonLd()],
+      `<h1>${tipoConfig.plural} ${quartos} Quartos em Porto Alegre</h1><p>${esc(desc)}</p>`);
+  }
+
+  // Pattern: /apartamentos-ate-500-mil-porto-alegre (preço)
+  const precoMatch = remainder.match(/^-(ate|acima|de)-(.+)-porto-alegre$/);
+  if (precoMatch) {
+    const title = `${tipoConfig.plural} ${cap(precoMatch[1])} ${precoMatch[2].replace(/-/g, " ")} em Porto Alegre | Uhome`;
+    const desc = `Encontre ${tipoConfig.plural.toLowerCase()} ${precoMatch[1]} ${precoMatch[2].replace(/-/g, " ")} em Porto Alegre. Uhome Imóveis.`;
+    const canonical = `${SITE}/${cleanPath}`;
+    return html(title, desc, LOGO, canonical, [orgJsonLd()],
+      `<h1>${esc(title.split("|")[0].trim())}</h1><p>${esc(desc)}</p>`);
+  }
+
+  // Pattern: /apartamentos-bairro-slug (tipo + bairro)
+  const bairroSlug = remainder.replace(/^-/, "");
+  if (bairroSlug) {
+    // Deslugify
+    const bairroNome = bairroSlug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+    const { count } = await supabase.from("imoveis").select("*", { count: "exact", head: true })
+      .eq("status", "disponivel").eq("tipo", tipoConfig.dbTipo).ilike("bairro", `%${bairroNome}%`);
+    const total = count ?? 0;
+    if (total === 0) return null;
+    const title = `${tipoConfig.plural} em ${bairroNome}, Porto Alegre | Uhome`;
+    const desc = `${total} ${tipoConfig.plural.toLowerCase()} à venda em ${bairroNome}. Preços, fotos e detalhes na Uhome Imóveis.`;
+    const canonical = `${SITE}/${cleanPath}`;
+    return html(title, desc, LOGO, canonical, [orgJsonLd()],
+      `<h1>${tipoConfig.plural} em ${esc(bairroNome)}</h1><p>${esc(desc)}</p><p>${total} imóveis disponíveis</p>`);
+  }
+
+  return null;
+}
+
+/* ── condominios renderer ────────────────────────────── */
+
+async function renderCondominio(slug: string) {
+  // Find condominio by slug match
+  const { data: rows } = await supabase
+    .from("imoveis")
+    .select("condominio_nome, bairro, preco, foto_principal, quartos, area_total")
+    .eq("status", "disponivel")
+    .not("condominio_nome", "is", null)
+    .limit(1000);
+
+  if (!rows) return null;
+
+  // Group by condominio and find matching slug
+  const condoMap = new Map<string, { nome: string; bairro: string; count: number; minPreco: number; maxPreco: number; foto: string }>();
+  for (const row of rows) {
+    const nome = row.condominio_nome?.trim();
+    if (!nome) continue;
+    const s = slugify(nome);
+    if (!condoMap.has(s)) {
+      condoMap.set(s, { nome, bairro: row.bairro, count: 0, minPreco: row.preco, maxPreco: row.preco, foto: row.foto_principal || "" });
+    }
+    const c = condoMap.get(s)!;
+    c.count++;
+    if (row.preco < c.minPreco) c.minPreco = row.preco;
+    if (row.preco > c.maxPreco) c.maxPreco = row.preco;
+    if (!c.foto && row.foto_principal) c.foto = row.foto_principal;
+  }
+
+  const condo = condoMap.get(slug);
+  if (!condo || condo.count < 1) return null;
+
+  const title = `${condo.nome} — ${condo.bairro} | Uhome Imóveis`;
+  const desc = `${condo.count} imóveis disponíveis no ${condo.nome}, ${condo.bairro}. A partir de ${formatBRL(condo.minPreco)}. Veja fotos e detalhes.`;
+  const canonical = `${SITE}/condominios/${slug}`;
+
+  return html(title, desc, condo.foto || LOGO, canonical, [orgJsonLd()],
+    `<h1>${esc(condo.nome)}</h1><p>${esc(condo.bairro)} · ${condo.count} imóveis</p><p>${esc(desc)}</p>`);
+}
+
+/* ── empreendimentos renderer ────────────────────────── */
+
+async function renderEmpreendimento(slug: string) {
+  const { data: emp } = await supabase
+    .from("empreendimentos")
+    .select("*")
+    .eq("slug", slug)
+    .eq("ativo", true)
+    .maybeSingle();
+
+  if (!emp) return null;
+
+  const title = emp.meta_title || `${emp.nome} — ${emp.bairro || "Porto Alegre"} | Uhome`;
+  const desc = emp.meta_description || `${emp.nome} em ${emp.bairro || "Porto Alegre"}. ${emp.preco_a_partir ? `A partir de ${formatBRL(emp.preco_a_partir)}.` : ""} Detalhes, tipologias e condições.`;
+  const canonical = `${SITE}/empreendimentos/${slug}`;
+
+  return html(title, desc, emp.imagem_principal || LOGO, canonical, [orgJsonLd()],
+    `<h1>${esc(emp.nome)}</h1><p>${esc(desc)}</p>${emp.imagem_principal ? `<img src="${esc(emp.imagem_principal)}" alt="${esc(emp.nome)}" width="800" height="600" />` : ""}`);
+}
+
+/* ── bairros list page ───────────────────────────────── */
+
+async function renderBairros() {
+  const title = "Bairros de Porto Alegre — Imóveis à Venda | Uhome";
+  const desc = "Explore os principais bairros de Porto Alegre para comprar seu imóvel. Compare preços, infraestrutura e qualidade de vida.";
+  const canonical = `${SITE}/bairros`;
+
+  const bairroLinks = Object.entries(BAIRROS).map(([slug, b]) =>
+    `<li><a href="${SITE}/bairros/${slug}">${esc(b.nome)}</a> — ${esc(b.descricao.slice(0, 100))}</li>`
+  ).join("");
+
+  return html(title, desc, LOGO, canonical, [orgJsonLd()],
+    `<h1>Bairros de Porto Alegre</h1><p>${esc(desc)}</p><ul>${bairroLinks}</ul>`);
+}
+
+/* ── condominios list page ───────────────────────────── */
+
+async function renderCondominios() {
+  const title = "Condomínios em Porto Alegre — Imóveis à Venda | Uhome";
+  const desc = "Encontre os melhores condomínios de Porto Alegre com imóveis à venda. Compare opções por bairro, preço e infraestrutura.";
+  const canonical = `${SITE}/condominios`;
+
+  return html(title, desc, LOGO, canonical, [orgJsonLd()],
+    `<h1>Condomínios em Porto Alegre</h1><p>${esc(desc)}</p>`);
 }
 
 /* ── vitrine renderer ────────────────────────────────── */
@@ -398,6 +627,27 @@ async function renderVitrine(vitrineId: string, corretorSlug?: string) {
   return html(title, desc, ogImage, canonical, [orgJsonLd()], `<h1>${esc(title)}</h1>${bodyCards}`);
 }
 
+/* ── intent pages renderer ────────────────────────── */
+
+const INTENT_PAGES: Record<string, { title: string; desc: string }> = {
+  "apartamentos-a-venda-porto-alegre": { title: "Apartamentos à Venda em Porto Alegre", desc: "Encontre apartamentos à venda nos melhores bairros de Porto Alegre. Preços, fotos e detalhes na Uhome." },
+  "casas-a-venda-porto-alegre": { title: "Casas à Venda em Porto Alegre", desc: "Encontre casas à venda em Porto Alegre com jardim, piscina e garagem. Uhome Imóveis." },
+  "coberturas-a-venda-porto-alegre": { title: "Coberturas à Venda em Porto Alegre", desc: "Coberturas duplex e triplex à venda em Porto Alegre. Terraço, churrasqueira e vista privilegiada." },
+  "terrenos-a-venda-porto-alegre": { title: "Terrenos à Venda em Porto Alegre", desc: "Terrenos à venda em Porto Alegre para construção residencial e comercial." },
+  "imoveis-de-luxo-porto-alegre": { title: "Imóveis de Luxo à Venda em Porto Alegre", desc: "Os melhores imóveis de alto padrão em Porto Alegre. Moinhos de Vento, Três Figueiras e mais." },
+  "investimento-imobiliario-porto-alegre": { title: "Investimento Imobiliário em Porto Alegre", desc: "Os melhores imóveis para investir em Porto Alegre. Rentabilidade, valorização e oportunidades." },
+  "lancamentos-porto-alegre": { title: "Lançamentos Imobiliários em Porto Alegre", desc: "Novos empreendimentos e lançamentos em Porto Alegre. Conheça as novidades do mercado." },
+};
+
+function renderIntentPage(slug: string) {
+  const page = INTENT_PAGES[slug];
+  if (!page) return null;
+  const title = `${page.title} | Uhome Imóveis`;
+  const canonical = `${SITE}/${slug}`;
+  return html(title, page.desc, LOGO, canonical, [orgJsonLd()],
+    `<h1>${esc(page.title)}</h1><p>${esc(page.desc)}</p>`);
+}
+
 /* ── main handler ────────────────────────────────────── */
 
 Deno.serve(async (req) => {
@@ -415,6 +665,10 @@ Deno.serve(async (req) => {
       rendered = await renderHome();
     } else if (path === "/faq") {
       rendered = await renderFaq();
+    } else if (path === "/bairros") {
+      rendered = await renderBairros();
+    } else if (path === "/condominios") {
+      rendered = await renderCondominios();
     } else if (path === "/blog") {
       rendered = await renderBlog();
     } else if (path.startsWith("/blog/")) {
@@ -426,13 +680,27 @@ Deno.serve(async (req) => {
     } else if (path.startsWith("/imovel/")) {
       const slug = path.replace("/imovel/", "").replace(/\/$/, "");
       rendered = await renderImovel(slug);
+    } else if (path.startsWith("/condominios/")) {
+      const slug = path.replace("/condominios/", "").replace(/\/$/, "");
+      rendered = await renderCondominio(slug);
+    } else if (path.startsWith("/empreendimentos/")) {
+      const slug = path.replace("/empreendimentos/", "").replace(/\/$/, "");
+      rendered = await renderEmpreendimento(slug);
     } else if (path.match(/\/vitrine\/[a-f0-9-]+/)) {
       const parts = path.split("/").filter(Boolean);
-      // /vitrine/:id or /c/:slug/vitrine/:id
       if (parts[0] === "c" && parts[2] === "vitrine") {
         rendered = await renderVitrine(parts[3], parts[1]);
       } else if (parts[0] === "vitrine") {
         rendered = await renderVitrine(parts[1]);
+      }
+    } else {
+      // Try intent pages
+      const cleanPath = path.replace(/^\//, "").replace(/\/$/, "");
+      rendered = renderIntentPage(cleanPath);
+
+      // Try SEO landing pages (tipo + bairro/quartos/preço)
+      if (!rendered) {
+        rendered = await renderSeoLanding(path);
       }
     }
 

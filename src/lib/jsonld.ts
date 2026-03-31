@@ -169,5 +169,88 @@ export function buildOrganizationJsonLd() {
       },
       "query-input": "required name=search_term_string",
     },
+    sameAs: [
+      "https://www.instagram.com/uhome.imoveis",
+    ],
+  };
+}
+
+/** WebSite schema with sitelinks search box */
+export function buildWebSiteJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Uhome Imóveis",
+    url: "https://uhome.com.br",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: "https://uhome.com.br/busca?q={search_term_string}",
+      },
+      "query-input": "required name=search_term_string",
+    },
+  };
+}
+
+/** AggregateOffer for SEO landing pages */
+export function buildAggregateOfferJsonLd(opts: {
+  name: string;
+  url: string;
+  description: string;
+  count: number;
+  lowPrice?: number;
+  highPrice?: number;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: opts.name,
+    description: opts.description,
+    url: opts.url,
+    numberOfItems: opts.count,
+    itemListOrder: "https://schema.org/ItemListUnordered",
+    ...(opts.lowPrice && {
+      offers: {
+        "@type": "AggregateOffer",
+        lowPrice: opts.lowPrice,
+        highPrice: opts.highPrice || opts.lowPrice,
+        priceCurrency: "BRL",
+        offerCount: opts.count,
+      },
+    }),
+  };
+}
+
+/** LocalBusiness for geo SEO */
+export function buildLocalBusinessJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "RealEstateAgent",
+    name: "Uhome Imóveis",
+    image: "https://uhome.com.br/uhome-logo.svg",
+    "@id": "https://uhome.com.br",
+    url: "https://uhome.com.br",
+    telephone: "+5551991898989",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "Porto Alegre",
+      addressLocality: "Porto Alegre",
+      addressRegion: "RS",
+      postalCode: "90000-000",
+      addressCountry: "BR",
+    },
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: -30.0346,
+      longitude: -51.2177,
+    },
+    openingHoursSpecification: {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      opens: "09:00",
+      closes: "18:00",
+    },
+    priceRange: "$$",
   };
 }

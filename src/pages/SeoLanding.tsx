@@ -65,6 +65,8 @@ const SeoLanding = () => {
       name: config.h1,
       description: config.metaDescription,
       url: `https://uhome.com.br${config.canonicalPath}`,
+      numberOfItems: total || undefined,
+      itemListOrder: "https://schema.org/ItemListUnordered",
     });
 
     setJsonLd("jsonld-seo-breadcrumb", {

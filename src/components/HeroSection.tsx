@@ -187,11 +187,11 @@ export function HeroSection() {
               className="font-body text-[clamp(2rem,5vw,3.25rem)] font-extrabold leading-[1.08] tracking-tight text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.4)]"
               style={{ textWrap: "balance" }}
             >
-              Encontre o imóvel{" "}
-              <span className="text-primary">perfeito</span> para você
+              Imóveis à Venda em{" "}
+              <span className="text-primary">Porto Alegre</span>
             </h1>
             <p className="mt-4 max-w-md font-body text-base leading-relaxed text-white/70">
-              Apartamentos, casas e coberturas com curadoria especializada e busca inteligente por IA.
+              Apartamentos, casas e coberturas nos melhores bairros. Busca inteligente por IA e curadoria especializada.
             </p>
           </div>
 

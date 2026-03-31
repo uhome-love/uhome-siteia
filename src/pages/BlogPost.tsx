@@ -99,7 +99,7 @@ export default function BlogPost() {
   const contentHtml = renderMarkdown(post.conteudo);
 
   // Related posts (same category, excluding current)
-  const relacionados = blogPosts
+  const relacionados = allPosts
     .filter((p) => p.categoria === post.categoria && p.slug !== post.slug)
     .slice(0, 2);
 

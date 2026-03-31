@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Clock, ArrowRight } from "lucide-react";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { useCanonical } from "@/hooks/useCanonical";
@@ -109,6 +110,7 @@ export default function Blog() {
 
       <section className="pt-28 pb-12 sm:pt-32 sm:pb-16">
         <div className="mx-auto max-w-4xl px-5 text-center">
+          <Breadcrumbs items={[{ label: "Blog" }]} className="justify-center mb-6" />
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

@@ -56,6 +56,7 @@ function BlogCard({ post, index }: { post: BlogPost; index: number }) {
 
 export default function Blog() {
   const [categoriaAtiva, setCategoriaAtiva] = useState<string | null>(null);
+  const { data: blogPosts = [] } = useBlogPosts();
   useCanonical("/blog");
 
   useEffect(() => {

@@ -89,12 +89,19 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
     const el = cardRef.current;
     if (!el) return;
     const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setIsVisible(true); observer.disconnect(); } },
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+          // Auto-load full photos on mobile when card enters viewport
+          if (window.innerWidth < 640) loadFullFotos();
+        }
+      },
       { rootMargin: "200px" }
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, []);
+  }, [loadFullFotos]);
 
   // Merge forwarded ref with internal cardRef
   const mergedRef = useCallback((node: HTMLAnchorElement | null) => {

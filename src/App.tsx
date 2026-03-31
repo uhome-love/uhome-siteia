@@ -52,6 +52,8 @@ const EmpreendimentoDetail = lazy(() => import("./pages/EmpreendimentoDetail.tsx
 const MegaCyrela = lazy(() => import("./pages/MegaCyrela.tsx"));
 const SeoLanding = lazy(() => import("./pages/SeoLanding.tsx"));
 const Vitrine = lazy(() => import("./pages/Vitrine.tsx"));
+const Sobre = lazy(() => import("./pages/Sobre.tsx"));
+const GuiaBairros = lazy(() => import("./pages/GuiaBairros.tsx"));
 
 const queryClient = new QueryClient({
   defaultOptions: {

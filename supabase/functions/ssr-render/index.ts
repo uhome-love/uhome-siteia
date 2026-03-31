@@ -216,15 +216,17 @@ async function renderBairro(slug: string) {
   const bairro = BAIRROS[slug];
   if (!bairro) return null;
 
-  const { count } = await supabase
-    .from("imoveis")
-    .select("*", { count: "exact", head: true })
-    .eq("status", "disponivel")
-    .ilike("bairro", `%${bairro.nome}%`);
+  // Fetch count + AI descriptions in parallel
+  const [countResult, descResult] = await Promise.all([
+    supabase.from("imoveis").select("*", { count: "exact", head: true }).eq("status", "disponivel").ilike("bairro", `%${bairro.nome}%`),
+    supabase.from("bairro_descricoes").select("descricao_seo, descricao_curta, infraestrutura, por_que_investir").eq("bairro_nome", bairro.nome).maybeSingle(),
+  ]);
 
-  const total = count ?? 0;
+  const total = countResult.count ?? 0;
+  const aiDesc = descResult.data as any;
+  const longDesc = aiDesc?.descricao_seo || bairro.descricao;
   const title = `Imóveis à Venda em ${bairro.nome} — Porto Alegre | Uhome`;
-  const desc = `${bairro.descricao.slice(0, 140)}. Veja ${total} apartamentos, casas e coberturas à venda em ${bairro.nome} com a Uhome.`;
+  const desc = `${(aiDesc?.descricao_curta || bairro.descricao).slice(0, 140)}. Veja ${total} apartamentos, casas e coberturas à venda em ${bairro.nome} com a Uhome.`;
   const canonical = `${SITE}/bairros/${slug}`;
 
   const breadcrumb = JSON.stringify({
@@ -241,7 +243,7 @@ async function renderBairro(slug: string) {
     "@context": "https://schema.org",
     "@type": "ItemList",
     name: `Imóveis à Venda em ${bairro.nome}, Porto Alegre`,
-    description: bairro.descricao.slice(0, 300),
+    description: longDesc.slice(0, 300),
     url: canonical,
     numberOfItems: total,
     itemListElement: {
@@ -256,8 +258,35 @@ async function renderBairro(slug: string) {
     },
   });
 
-  return html(title, desc, bairro.foto, canonical, [breadcrumb, itemList, orgJsonLd()],
-    `<h1>Imóveis à Venda em ${esc(bairro.nome)}</h1><p>${esc(desc)}</p><p>${total} imóveis disponíveis</p>`);
+  // Build rich body HTML with all available content
+  let bodyHtml = `<h1>Imóveis à Venda em ${esc(bairro.nome)}</h1>`;
+  bodyHtml += `<p>${esc(desc)}</p>`;
+  bodyHtml += `<p>${total} imóveis disponíveis em ${esc(bairro.nome)}, Porto Alegre.</p>`;
+
+  // SEO description
+  bodyHtml += `<h2>Sobre ${esc(bairro.nome)}</h2>`;
+  bodyHtml += longDesc.split("\n\n").map((p: string) => `<p>${esc(p)}</p>`).join("");
+
+  // Infrastructure section
+  if (aiDesc?.infraestrutura) {
+    bodyHtml += `<h2>Infraestrutura de ${esc(bairro.nome)}</h2>`;
+    bodyHtml += aiDesc.infraestrutura.split("\n\n").map((p: string) => `<p>${esc(p)}</p>`).join("");
+  }
+
+  // Investment section
+  if (aiDesc?.por_que_investir) {
+    bodyHtml += `<h2>Por que investir em ${esc(bairro.nome)}?</h2>`;
+    bodyHtml += aiDesc.por_que_investir.split("\n\n").map((p: string) => `<p>${esc(p)}</p>`).join("");
+  }
+
+  // Internal links
+  bodyHtml += `<h2>Buscar por tipo em ${esc(bairro.nome)}</h2><ul>`;
+  bodyHtml += `<li><a href="${SITE}/apartamentos-${slug}">Apartamentos em ${esc(bairro.nome)}</a></li>`;
+  bodyHtml += `<li><a href="${SITE}/casas-${slug}">Casas em ${esc(bairro.nome)}</a></li>`;
+  bodyHtml += `<li><a href="${SITE}/coberturas-${slug}">Coberturas em ${esc(bairro.nome)}</a></li>`;
+  bodyHtml += `</ul>`;
+
+  return html(title, desc, bairro.foto, canonical, [breadcrumb, itemList, orgJsonLd()], bodyHtml);
 }
 
 async function renderImovel(slug: string) {

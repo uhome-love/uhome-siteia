@@ -41,7 +41,8 @@ function renderMarkdown(md: string) {
 
 export default function BlogPost() {
   const { slug } = useParams<{ slug: string }>();
-  const post = blogPosts.find((p) => p.slug === slug);
+  const { data: allPosts = blogPosts } = useBlogPosts();
+  const post = allPosts.find((p) => p.slug === slug);
 
   useCanonical(post ? `/blog/${post.slug}` : undefined);
 

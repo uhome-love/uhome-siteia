@@ -778,6 +778,30 @@ function renderFavoritos() {
     `<h1>Meus Favoritos</h1><p>${esc(desc)}</p>`);
 }
 
+function renderSobre() {
+  const title = "Sobre a Uhome | Imobiliária Digital em Porto Alegre";
+  const desc = "Conheça a Uhome, imobiliária digital de Porto Alegre. Equipe especializada, CRECI-RS 25682J, tecnologia de busca com IA e curadoria de imóveis nos melhores bairros.";
+  return html(title, desc, LOGO, `${SITE}/sobre`, [orgJsonLd()],
+    `<h1>Sobre a Uhome — Imobiliária Digital de Porto Alegre</h1>
+     <p>${esc(desc)}</p>
+     <h2>Nossa história</h2>
+     <p>A Uhome nasceu com a missão de transformar a experiência de comprar imóvel em Porto Alegre. Combinamos tecnologia de busca com inteligência artificial, curadoria especializada e atendimento humanizado.</p>
+     <h2>Dados da empresa</h2>
+     <ul><li>Razão social: Uhome Imóveis LTDA</li><li>CRECI: RS 25682J</li><li>Localização: Porto Alegre, RS</li></ul>
+     <h2>Nossos valores</h2>
+     <ul><li>Inovação — Busca inteligente com IA</li><li>Transparência — Preços reais e fotos verificadas</li><li>Curadoria — Qualidade acima de quantidade</li><li>Excelência — Corretores certificados CRECI</li></ul>`);
+}
+
+function renderGuiaBairros() {
+  const title = "Guia de Bairros de Porto Alegre | Comparativo de Preços | Uhome";
+  const desc = "Compare todos os bairros de Porto Alegre: preço médio, quantidade de imóveis, perfil de moradia e infraestrutura. Guia completo para escolher onde morar.";
+  return html(title, desc, LOGO, `${SITE}/guia-bairros`, [orgJsonLd()],
+    `<h1>Guia de Bairros de Porto Alegre</h1>
+     <p>${esc(desc)}</p>
+     <h2>Como escolher o melhor bairro</h2>
+     <p>Porto Alegre conta com mais de 80 bairros, cada um com perfil, infraestrutura e faixa de preço distintos. Use nosso comparativo para analisar preço médio e quantidade de imóveis por bairro.</p>`);
+}
+
 async function renderEmpreendimentos() {
   const title = "Empreendimentos em Porto Alegre | Uhome";
   const desc = "Lançamentos e empreendimentos imobiliários em Porto Alegre. Conheça os melhores projetos com a Uhome.";

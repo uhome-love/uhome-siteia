@@ -118,6 +118,8 @@ const App = () => (
                 <Route path="/lancamentos" element={<Navigate to="/condominios" replace />} />
                 <Route path="/vitrine/:id" element={<Vitrine />} />
                 <Route path="/mega-cyrela" element={<MegaCyrela />} />
+                <Route path="/sobre" element={<Sobre />} />
+                <Route path="/guia-bairros" element={<GuiaBairros />} />
                 <Route path="/casas-porto-alegre" element={<TipoImovel />} />
                 <Route path="/coberturas-porto-alegre" element={<TipoImovel />} />
                 <Route path="/studios-porto-alegre" element={<TipoImovel />} />

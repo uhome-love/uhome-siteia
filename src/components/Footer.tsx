@@ -88,6 +88,8 @@ export function Footer() {
                 <li><Link to={prefixLink("/faq")} className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Perguntas frequentes</Link></li>
                 <li><Link to={prefixLink("/carreiras")} className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Trabalhe conosco</Link></li>
                 <li><Link to={prefixLink("/blog")} className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Blog</Link></li>
+                <li><Link to={prefixLink("/sobre")} className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Sobre a Uhome</Link></li>
+                <li><Link to={prefixLink("/guia-bairros")} className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Guia de Bairros</Link></li>
                 <li><Link to={prefixLink("/politica-de-privacidade")} className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Política de Privacidade</Link></li>
               </ul>
             </nav>

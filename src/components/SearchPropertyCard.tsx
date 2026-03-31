@@ -84,26 +84,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
   })();
   const fotos = lazyFotos && lazyFotos.length > 0 ? lazyFotos : baseFotos;
 
-  // Intersection Observer: detect when card enters viewport
-  useEffect(() => {
-    const el = cardRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setIsVisible(true); observer.disconnect(); } },
-      { rootMargin: "200px" }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  // Merge forwarded ref with internal cardRef
-  const mergedRef = useCallback((node: HTMLAnchorElement | null) => {
-    (cardRef as React.MutableRefObject<HTMLElement | null>).current = node;
-    if (typeof ref === "function") ref(node);
-    else if (ref) (ref as React.MutableRefObject<HTMLAnchorElement | null>).current = node;
-  }, [ref]);
-
-  // Load full photo set on mobile when user swipes (not on visibility)
+  // Load full photo set lazily
   const loadFullFotos = useCallback(() => {
     if (fotosLoadedRef.current || baseFotos.length > 1) return;
     fotosLoadedRef.current = true;
@@ -125,6 +106,32 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
         setLoadingFotos(false);
       });
   }, [imovel.id, baseFotos.length]);
+
+  // Intersection Observer: detect when card enters viewport
+  useEffect(() => {
+    const el = cardRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+          // Auto-load full photos on mobile when card enters viewport
+          if (window.innerWidth < 640) loadFullFotos();
+        }
+      },
+      { rootMargin: "200px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [loadFullFotos]);
+
+  // Merge forwarded ref with internal cardRef
+  const mergedRef = useCallback((node: HTMLAnchorElement | null) => {
+    (cardRef as React.MutableRefObject<HTMLElement | null>).current = node;
+    if (typeof ref === "function") ref(node);
+    else if (ref) (ref as React.MutableRefObject<HTMLAnchorElement | null>).current = node;
+  }, [ref]);
   const price = formatPreco(imovel.preco);
   const area = imovel.area_total ?? imovel.area_util ?? 0;
 

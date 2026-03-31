@@ -213,7 +213,7 @@ async function renderHome() {
 
   const faqHtml = homeFaqs.map((f) => `<h2>${esc(f.q)}</h2><p>${esc(f.a)}</p>`).join("");
 
-  return html(title, desc, OG_DEFAULT, SITE, [orgJsonLd(), websiteJsonLd(), localBusinessJsonLd(), faqSchema],
+  return html(title, desc, OG_HOME, SITE, [orgJsonLd(), websiteJsonLd(), localBusinessJsonLd(), faqSchema],
     `<h1>Imóveis à Venda em Porto Alegre</h1><p>${esc(desc)}</p>${seoText}${faqHtml}`);
 }
 

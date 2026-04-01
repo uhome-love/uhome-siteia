@@ -55,6 +55,8 @@ export const FotoImovel = forwardRef<HTMLImageElement, FotoImovelProps>(function
         sizes={sizes}
         onLoad={handleLoad}
         onError={() => setErro(true)}
+        // Timeout fallback: if image hasn't loaded in 8s, show error state
+        {...(!loaded && { "data-loading": "true" })}
       />
     </div>
   );

@@ -75,7 +75,7 @@ export const SearchCTACard = forwardRef<HTMLDivElement>(function SearchCTACard(_
           onClick={() => setFormOpen(!formOpen)}
           className="flex shrink-0 items-center gap-2 rounded-full bg-primary px-5 py-2.5 font-body text-sm font-bold text-primary-foreground transition-all hover:bg-primary/90 active:scale-[0.97]"
         >
-          <MessageCircle className="h-4 w-4" />
+          <WhatsAppIcon className="h-4 w-4" />
           Falar com corretor
         </button>
       </div>

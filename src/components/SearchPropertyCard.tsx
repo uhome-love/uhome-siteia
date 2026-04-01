@@ -195,8 +195,6 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
     <motion.a
       ref={mergedRef}
       href={prefixLink(`/imovel/${imovel.slug}`)}
-      target="_blank"
-      rel="noopener"
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: Math.min(index * 0.03, 0.15) }}
@@ -214,7 +212,6 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
             onScroll={handleScroll}
             className="flex snap-x snap-mandatory overflow-x-auto scrollbar-hide"
             style={{ aspectRatio: "4/3", WebkitOverflowScrolling: "touch" }}
-            onClick={(e) => e.stopPropagation()}
           >
             {fotos.slice(0, 7).map((foto, i) => (
               <div

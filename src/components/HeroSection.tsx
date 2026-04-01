@@ -259,7 +259,7 @@ export function HeroSection() {
                             }
                           }}
                           placeholder={bairrosSelecionados.length ? "Adicionar bairro..." : "Ex: Moinhos de Vento, Petrópolis..."}
-                          className="w-full bg-transparent font-body text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none"
+                          className="w-full bg-transparent font-body text-base text-foreground placeholder:text-muted-foreground/50 focus:outline-none sm:text-sm"
                           autoComplete="off"
                         />
                       </div>

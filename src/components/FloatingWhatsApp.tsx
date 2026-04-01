@@ -176,6 +176,7 @@ export function FloatingWhatsApp() {
             <MessageCircle className="h-7 w-7" />
           </button>
         </motion.div>
+        </div>
       )}
     </AnimatePresence>
   );

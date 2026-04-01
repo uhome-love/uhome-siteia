@@ -259,7 +259,7 @@ export function HeroSection() {
                             }
                           }}
                           placeholder={bairrosSelecionados.length ? "Adicionar bairro..." : "Ex: Moinhos de Vento, Petrópolis..."}
-                          className="w-full bg-transparent font-body text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none"
+                          className="w-full bg-transparent font-body text-base text-foreground placeholder:text-muted-foreground/50 focus:outline-none sm:text-sm"
                           autoComplete="off"
                         />
                       </div>
@@ -291,8 +291,8 @@ export function HeroSection() {
                   </AnimatePresence>
                 </div>
 
-                {/* Tipo + Preço */}
-                <div className="mb-2 grid grid-cols-3 gap-2 sm:mb-2.5 sm:gap-2.5">
+                {/* Tipo + Preço — 2 cols on mobile, 3 on sm+ */}
+                <div className="mb-2 grid grid-cols-2 gap-2 sm:mb-2.5 sm:grid-cols-3 sm:gap-2.5">
                   {/* Cidade */}
                   <label className="block rounded-xl border-[1.5px] border-border p-3 transition-colors focus-within:border-primary sm:p-3.5">
                     <span className="mb-0.5 block font-body text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
@@ -301,7 +301,7 @@ export function HeroSection() {
                     <select
                       value={cidade}
                       onChange={(e) => setCidade(e.target.value)}
-                      className="w-full appearance-none bg-transparent font-body text-sm text-foreground focus:outline-none"
+                      className="w-full appearance-none bg-transparent font-body text-base text-foreground focus:outline-none sm:text-sm"
                     >
                       {CIDADES_PERMITIDAS.map((c) => (
                         <option key={c} value={c}>{c}</option>
@@ -315,7 +315,7 @@ export function HeroSection() {
                     <select
                       value={tipo}
                       onChange={(e) => setTipo(e.target.value)}
-                      className={`w-full appearance-none bg-transparent font-body text-sm focus:outline-none ${
+                      className={`w-full appearance-none bg-transparent font-body text-base focus:outline-none sm:text-sm ${
                         tipo ? "text-foreground" : "text-muted-foreground"
                       }`}
                     >
@@ -328,14 +328,14 @@ export function HeroSection() {
                     </select>
                   </label>
 
-                  <label className="block rounded-xl border-[1.5px] border-border p-3 transition-colors focus-within:border-primary sm:p-3.5">
+                  <label className="col-span-2 block rounded-xl border-[1.5px] border-border p-3 transition-colors focus-within:border-primary sm:col-span-1 sm:p-3.5">
                     <span className="mb-0.5 block font-body text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                       Valor até
                     </span>
                     <select
                       value={preco}
                       onChange={(e) => setPreco(e.target.value)}
-                      className={`w-full appearance-none bg-transparent font-body text-sm focus:outline-none ${
+                      className={`w-full appearance-none bg-transparent font-body text-base focus:outline-none sm:text-sm ${
                         preco ? "text-foreground" : "text-muted-foreground"
                       }`}
                     >

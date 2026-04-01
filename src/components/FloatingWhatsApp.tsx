@@ -29,23 +29,29 @@ export function FloatingWhatsApp() {
     return () => clearTimeout(t);
   }, [tooltip]);
 
-  // Retargeting popup: show after user viewed 3+ properties
+  // Retargeting popup: show once after user viewed 3+ properties
   useEffect(() => {
     if (sessionStorage.getItem("uhome_retargeting_dismissed") === "1") return;
 
     const check = () => {
+      // Re-check dismiss state inside callback to prevent re-showing
+      if (sessionStorage.getItem("uhome_retargeting_dismissed") === "1") {
+        clearInterval(interval);
+        return;
+      }
       const viewedRaw = localStorage.getItem("imoveis_vistos");
       if (!viewedRaw) return;
       try {
         const viewed = JSON.parse(viewedRaw);
         if (Array.isArray(viewed) && viewed.length >= 3) {
-          setTooltip(false); // hide default tooltip
+          setTooltip(false);
           setRetargetingPopup(true);
+          // Stop checking once shown
+          clearInterval(interval);
         }
       } catch { /* ignore */ }
     };
 
-    // Check after delay and periodically
     const t = setTimeout(check, 5000);
     const interval = setInterval(check, 8000);
     return () => { clearTimeout(t); clearInterval(interval); };

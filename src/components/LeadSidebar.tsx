@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Send, Loader2, Check, MessageCircle } from "lucide-react";
+import { Send, Loader2, Check } from "lucide-react";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { formatPhone } from "@/lib/phoneMask";
 import { submitLead } from "@/services/leads";
 import { trackWhatsAppClick } from "@/services/whatsappTracker";
@@ -107,7 +108,7 @@ export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, 
           className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg py-3.5 font-body text-sm font-semibold text-white transition-all hover:brightness-110 active:scale-[0.97]"
           style={{ backgroundColor: "#25D366" }}
         >
-          <MessageCircle className="h-5 w-5" />
+          <WhatsAppIcon className="h-5 w-5" />
           Falar com {primeiroNome} no WhatsApp
         </button>
 
@@ -204,7 +205,7 @@ export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, 
         className="flex w-full items-center justify-center gap-2 rounded-lg py-3 font-body text-sm font-semibold text-white transition-all hover:brightness-110 active:scale-[0.97]"
         style={{ backgroundColor: "#25D366" }}
       >
-        <MessageCircle className="h-4 w-4" />
+        <WhatsAppIcon className="h-4 w-4" />
         Falar via WhatsApp
       </button>
 

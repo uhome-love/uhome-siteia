@@ -1,5 +1,6 @@
 import React, { useState, forwardRef } from "react";
-import { MessageCircle, Send, Check, Loader2, X } from "lucide-react";
+import { Send, Check, Loader2, X } from "lucide-react";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { motion, AnimatePresence } from "framer-motion";
 import { buildWhatsAppUrl, buildCorretorWhatsAppUrl } from "@/lib/whatsapp";
 import { trackWhatsAppClick } from "@/services/whatsappTracker";
@@ -74,7 +75,7 @@ export const SearchCTACard = forwardRef<HTMLDivElement>(function SearchCTACard(_
           onClick={() => setFormOpen(!formOpen)}
           className="flex shrink-0 items-center gap-2 rounded-full bg-primary px-5 py-2.5 font-body text-sm font-bold text-primary-foreground transition-all hover:bg-primary/90 active:scale-[0.97]"
         >
-          <MessageCircle className="h-4 w-4" />
+          <WhatsAppIcon className="h-4 w-4" />
           Falar com corretor
         </button>
       </div>
@@ -149,7 +150,7 @@ export const SearchCTACard = forwardRef<HTMLDivElement>(function SearchCTACard(_
                       onClick={handleWhatsApp}
                       className="flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 py-2.5 font-body text-sm font-bold text-white transition-all hover:bg-[#20bd5a] active:scale-[0.97]"
                     >
-                      <MessageCircle className="h-4 w-4" />
+                      <WhatsAppIcon className="h-4 w-4" />
                       WhatsApp
                     </button>
                   </div>

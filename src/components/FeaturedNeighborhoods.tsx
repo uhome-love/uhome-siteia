@@ -8,7 +8,7 @@ import { useCorretor } from "@/contexts/CorretorContext";
 
 const bairrosConfig = bairrosData.slice(0, 6);
 
-export function FeaturedNeighborhoods() {
+export default function FeaturedNeighborhoods() {
   const [contagens, setContagens] = useState<number[]>(bairrosConfig.map(() => 0));
   const { prefixLink } = useCorretor();
 

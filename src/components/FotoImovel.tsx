@@ -1,4 +1,4 @@
-import { useState, forwardRef, useCallback } from "react";
+import { useState, useEffect, forwardRef, useCallback } from "react";
 import { Home } from "lucide-react";
 
 interface FotoImovelProps {
@@ -21,6 +21,15 @@ export const FotoImovel = forwardRef<HTMLImageElement, FotoImovelProps>(function
   const [loaded, setLoaded] = useState(false);
 
   const handleLoad = useCallback(() => setLoaded(true), []);
+
+  // Timeout: if image takes > 10s, show fallback
+  useEffect(() => {
+    if (loaded || erro) return;
+    const t = setTimeout(() => {
+      if (!loaded) setErro(true);
+    }, 10000);
+    return () => clearTimeout(t);
+  }, [loaded, erro, src]);
 
   if (erro) {
     return (
@@ -55,6 +64,8 @@ export const FotoImovel = forwardRef<HTMLImageElement, FotoImovelProps>(function
         sizes={sizes}
         onLoad={handleLoad}
         onError={() => setErro(true)}
+        // Timeout fallback: if image hasn't loaded in 8s, show error state
+        {...(!loaded && { "data-loading": "true" })}
       />
     </div>
   );

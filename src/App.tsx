@@ -8,7 +8,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { CorretorProvider } from "@/contexts/CorretorContext";
 
 const ExitIntentModal = lazy(() => import("@/components/ExitIntentModal").then(m => ({ default: m.ExitIntentModal })));
-const FloatingWhatsApp = lazy(() => import("@/components/FloatingWhatsApp").then(m => ({ default: m.FloatingWhatsApp })));
+const FloatingWhatsApp = lazy(() => import("@/components/FloatingWhatsApp"));
 
 import { BannerCorretor } from "@/components/BannerCorretor";
 

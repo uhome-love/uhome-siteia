@@ -172,7 +172,7 @@ export function FloatingWhatsApp() {
         aria-label="Falar no WhatsApp"
         className="flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-xl transition-transform hover:scale-105 active:scale-95"
       >
-        <MessageCircle className="h-7 w-7" />
+        <WhatsAppIcon className="h-7 w-7" />
       </button>
     </div>
   ) : null;

@@ -139,7 +139,7 @@ export function StickyPropertyCTA({ imovelId, imovelSlug, imovelTitulo, imovelBa
                     onClick={handleWhatsApp}
                     className="flex items-center gap-1.5 rounded-full bg-[#25D366] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#20bd5a]"
                   >
-                    <MessageCircle className="h-4 w-4" />
+                    <WhatsAppIcon className="h-4 w-4" />
                     WhatsApp
                   </button>
                 </motion.div>

@@ -475,7 +475,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
     });
 
     mapRef.current = map;
-    }); // end mapboxReady.then
+    }); // end getMapboxReady().then
 
     return () => {
       mapReadyRef.current = false;

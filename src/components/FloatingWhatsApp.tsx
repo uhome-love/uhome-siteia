@@ -171,3 +171,5 @@ export function FloatingWhatsApp() {
     </div>
   ) : null;
 }
+
+export default FloatingWhatsApp;

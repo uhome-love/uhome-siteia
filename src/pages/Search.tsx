@@ -746,56 +746,18 @@ const Search = () => {
               )}
             </div>
           ) : (
-            <>
-              <div className="grid content-start items-start grid-cols-1 gap-y-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
-                {imoveis.map((imovel, i) => (
-                  <React.Fragment key={imovel.id}>
-                    <SearchPropertyCard
-                      imovel={imovel}
-                      index={i}
-                      highlighted={hoveredId === imovel.id}
-                      onHover={setHoveredId}
-                      isFavorito={isFavorito}
-                      toggleFavorito={toggleFavorito}
-                    />
-                    {i === 5 && (
-                      <SearchCTACard />
-                    )}
-                  </React.Fragment>
-                ))}
-              </div>
-              {/* Load more — button on desktop, infinite scroll on mobile */}
-              {imoveis.length < total && (
-                <>
-                  {/* Desktop: manual button */}
-                  <div className="hidden sm:flex justify-center pb-4 pt-6">
-                    <button
-                      onClick={loadMore}
-                      disabled={loadingMore}
-                      className="rounded-full border-[1.5px] border-border px-8 py-3 font-body text-sm font-semibold text-foreground transition-all hover:border-foreground active:scale-[0.97] disabled:opacity-50"
-                    >
-                      {loadingMore ? (
-                        <span className="flex items-center gap-2">
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          Carregando...
-                        </span>
-                      ) : (
-                        `Ver mais imóveis (${imoveis.length} de ${total.toLocaleString("pt-BR")})`
-                      )}
-                    </button>
-                  </div>
-                  {/* Mobile: infinite scroll sentinel + loading indicator */}
-                  <div className="sm:hidden">
-                    <div ref={sentinelRef} className="h-1" />
-                    {loadingMore && (
-                      <div className="flex justify-center py-6">
-                        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-                      </div>
-                    )}
-                  </div>
-                </>
-              )}
-            </>
+            <ProgressiveGrid
+              imoveis={imoveis}
+              total={total}
+              hoveredId={hoveredId}
+              setHoveredId={setHoveredId}
+              isFavorito={isFavorito}
+              toggleFavorito={toggleFavorito}
+              loadMore={loadMore}
+              loadingMore={loadingMore}
+              isMobile={isMobile}
+              sentinelRef={sentinelRef}
+            />
           )}
 
           {/* Bairros recomendados — QuintoAndar style */}

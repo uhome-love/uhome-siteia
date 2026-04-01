@@ -233,7 +233,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
     if (initRef.current || !containerRef.current) return;
     initRef.current = true;
 
-    mapboxReady.then((mb) => {
+    getMapboxReady().then((mb) => {
       if (!containerRef.current) return;
       mb.default.accessToken = MAPBOX_TOKEN;
 

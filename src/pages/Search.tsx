@@ -56,7 +56,116 @@ function describeFilters(filters: Record<string, any>): string {
   return parts.length > 0 ? parts.join(", ") : "Todos os imóveis";
 }
 
-const Search = () => {
+/** Progressive rendering — only mounts cards that are near the viewport.
+ *  Initial batch = 12, grows by 6 as user scrolls. Keeps DOM light. */
+function ProgressiveGrid({
+  imoveis,
+  total,
+  hoveredId,
+  setHoveredId,
+  isFavorito,
+  toggleFavorito,
+  loadMore,
+  loadingMore,
+  isMobile,
+  sentinelRef,
+}: {
+  imoveis: Imovel[];
+  total: number;
+  hoveredId: string | null;
+  setHoveredId: (id: string | null) => void;
+  isFavorito?: (id: string) => boolean;
+  toggleFavorito?: (id: string) => Promise<"needs_auth" | void>;
+  loadMore: () => void;
+  loadingMore: boolean;
+  isMobile: boolean;
+  sentinelRef: React.RefObject<HTMLDivElement>;
+}) {
+  const INITIAL_VISIBLE = 12;
+  const BATCH = 6;
+  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE);
+  const growRef = useRef<HTMLDivElement>(null);
+
+  // Reset visible count when imoveis change (new search)
+  useEffect(() => {
+    setVisibleCount(INITIAL_VISIBLE);
+  }, [imoveis.length]);
+
+  // Grow visible count as user scrolls near the bottom of rendered cards
+  useEffect(() => {
+    const el = growRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setVisibleCount((prev) => Math.min(prev + BATCH, imoveis.length));
+        }
+      },
+      { rootMargin: "600px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [imoveis.length, visibleCount]);
+
+  const visible = imoveis.slice(0, visibleCount);
+
+  return (
+    <>
+      <div className="grid content-start items-start grid-cols-1 gap-y-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
+        {visible.map((imovel, i) => (
+          <React.Fragment key={imovel.id}>
+            <SearchPropertyCard
+              imovel={imovel}
+              index={i}
+              highlighted={hoveredId === imovel.id}
+              onHover={setHoveredId}
+              isFavorito={isFavorito}
+              toggleFavorito={toggleFavorito}
+            />
+            {i === 5 && <SearchCTACard />}
+          </React.Fragment>
+        ))}
+      </div>
+
+      {/* Sentinel to grow visible cards */}
+      {visibleCount < imoveis.length && (
+        <div ref={growRef} className="h-1" />
+      )}
+
+      {/* Load more from server — button on desktop, infinite scroll on mobile */}
+      {imoveis.length < total && visibleCount >= imoveis.length && (
+        <>
+          <div className="hidden sm:flex justify-center pb-4 pt-6">
+            <button
+              onClick={loadMore}
+              disabled={loadingMore}
+              className="rounded-full border-[1.5px] border-border px-8 py-3 font-body text-sm font-semibold text-foreground transition-all hover:border-foreground active:scale-[0.97] disabled:opacity-50"
+            >
+              {loadingMore ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Carregando...
+                </span>
+              ) : (
+                `Ver mais imóveis (${imoveis.length} de ${total.toLocaleString("pt-BR")})`
+              )}
+            </button>
+          </div>
+          <div className="sm:hidden">
+            <div ref={sentinelRef} className="h-1" />
+            {loadingMore && (
+              <div className="flex justify-center py-6">
+                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+              </div>
+            )}
+          </div>
+        </>
+      )}
+    </>
+  );
+}
+
+
   const isMobile = useIsMobile();
   const { user } = useAuth();
   const { isFavorito, toggleFavorito } = useFavoritos();

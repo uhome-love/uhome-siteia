@@ -142,10 +142,10 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
   ].filter(Boolean);
   const stats = statsArr.join(" · ");
 
-  // Smart badges: base + price-based (loaded async)
+  // Smart badges: base + price-based (loaded async, only when visible)
   const [smartBadges, setSmartBadges] = useState<SmartBadge[]>(() => getBaseBadges(imovel));
   useEffect(() => {
-    if (area <= 0 || imovel.preco <= 0) return;
+    if (!isVisible || area <= 0 || imovel.preco <= 0) return;
     const precoM2 = imovel.preco / area;
     getBairroStats().then((stats) => {
       const bairroStat = stats.get(imovel.bairro);
@@ -159,7 +159,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
       }
       setSmartBadges(newBadges);
     });
-  }, [imovel.id, imovel.preco, imovel.bairro, area]);
+  }, [isVisible, imovel.id, imovel.preco, imovel.bairro, area]);
 
   // Build a short description
   const tipoCapitalized = imovel.tipo.charAt(0).toUpperCase() + imovel.tipo.slice(1);

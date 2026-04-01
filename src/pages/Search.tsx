@@ -808,11 +808,13 @@ const Search = () => {
 
         {/* Map — desktop only (skip render on mobile to avoid loading Mapbox 517KB) */}
         {!isMobile && (
-          <div className="relative hidden w-[45%] shrink-0 border-l border-border lg:block overflow-hidden">
-            <Suspense fallback={<div className="flex h-full w-full items-center justify-center bg-muted"><div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" /></div>}>
-              <SearchMap pins={mapPins} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} onBoundsChange={handleMapBoundsChange} onPertoDeVoce={handlePertoDeVoce} />
-            </Suspense>
-          </div>
+          {!isMobile && (
+            <div className="relative hidden w-[45%] shrink-0 border-l border-border lg:block overflow-hidden">
+              <Suspense fallback={<div className="flex h-full w-full items-center justify-center bg-muted"><div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" /></div>}>
+                <SearchMap pins={mapPins} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} onBoundsChange={handleMapBoundsChange} onPertoDeVoce={handlePertoDeVoce} />
+              </Suspense>
+            </div>
+          )}
         )}
       </div>
 

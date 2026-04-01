@@ -134,7 +134,7 @@ export function FloatingWhatsApp() {
               onClick={handleRetargetingClick}
               className="flex w-full items-center justify-center gap-1.5 rounded-full bg-[#25D366] px-4 py-2 text-sm font-bold text-white transition-transform hover:bg-[#20bd5a] active:scale-95"
             >
-              <MessageCircle className="h-4 w-4" />
+              <WhatsAppIcon className="h-4 w-4" />
               Receber lista
             </button>
 

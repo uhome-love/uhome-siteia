@@ -7,7 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
 import { CorretorProvider } from "@/contexts/CorretorContext";
 
-const ExitIntentModal = lazy(() => import("@/components/ExitIntentModal").then(m => ({ default: m.ExitIntentModal })));
+const ExitIntentModal = lazy(() => import("@/components/ExitIntentModal"));
 const FloatingWhatsApp = lazy(() => import("@/components/FloatingWhatsApp"));
 
 import { BannerCorretor } from "@/components/BannerCorretor";

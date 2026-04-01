@@ -150,7 +150,7 @@ export const SearchCTACard = forwardRef<HTMLDivElement>(function SearchCTACard(_
                       onClick={handleWhatsApp}
                       className="flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 py-2.5 font-body text-sm font-bold text-white transition-all hover:bg-[#20bd5a] active:scale-[0.97]"
                     >
-                      <MessageCircle className="h-4 w-4" />
+                      <WhatsAppIcon className="h-4 w-4" />
                       WhatsApp
                     </button>
                   </div>

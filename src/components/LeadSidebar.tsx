@@ -205,7 +205,7 @@ export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, 
         className="flex w-full items-center justify-center gap-2 rounded-lg py-3 font-body text-sm font-semibold text-white transition-all hover:brightness-110 active:scale-[0.97]"
         style={{ backgroundColor: "#25D366" }}
       >
-        <MessageCircle className="h-4 w-4" />
+        <WhatsAppIcon className="h-4 w-4" />
         Falar via WhatsApp
       </button>
 

@@ -165,7 +165,7 @@ function ProgressiveGrid({
   );
 }
 
-
+const Search = () => {
   const isMobile = useIsMobile();
   const { user } = useAuth();
   const { isFavorito, toggleFavorito } = useFavoritos();

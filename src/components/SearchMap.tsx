@@ -4,20 +4,27 @@ import { Search, X, Bed, Maximize, ToggleLeft, ToggleRight, PenTool, Navigation,
 import { motion, AnimatePresence } from "framer-motion";
 import type mapboxgl from "mapbox-gl";
 
-// Lazy-loaded mapbox reference — filled on first mount
+// Lazy-loaded mapbox reference — filled on first mount, NOT at module parse time
 let mapboxModule: typeof import("mapbox-gl") | null = null;
-const mapboxReady = import("mapbox-gl").then((m) => {
-  mapboxModule = m;
-  // Load CSS dynamically to avoid blocking render
-  if (typeof document !== "undefined" && !document.getElementById("mapbox-css")) {
-    const link = document.createElement("link");
-    link.id = "mapbox-css";
-    link.rel = "stylesheet";
-    link.href = "https://api.mapbox.com/mapbox-gl-js/v3.20.0/mapbox-gl.css";
-    document.head.appendChild(link);
+let mapboxReadyPromise: Promise<typeof import("mapbox-gl")> | null = null;
+
+function getMapboxReady(): Promise<typeof import("mapbox-gl")> {
+  if (!mapboxReadyPromise) {
+    mapboxReadyPromise = import("mapbox-gl").then((m) => {
+      mapboxModule = m;
+      // Load CSS dynamically to avoid blocking render
+      if (typeof document !== "undefined" && !document.getElementById("mapbox-css")) {
+        const link = document.createElement("link");
+        link.id = "mapbox-css";
+        link.rel = "stylesheet";
+        link.href = "https://api.mapbox.com/mapbox-gl-js/v3.20.0/mapbox-gl.css";
+        document.head.appendChild(link);
+      }
+      return m;
+    });
   }
-  return m;
-});
+  return mapboxReadyPromise;
+}
 
 import { type MapPin as MapPinData } from "@/services/imoveis";
 import { useCorretor } from "@/contexts/CorretorContext";

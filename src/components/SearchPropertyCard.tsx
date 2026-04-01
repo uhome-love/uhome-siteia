@@ -195,9 +195,9 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
     <motion.a
       ref={mergedRef}
       href={prefixLink(`/imovel/${imovel.slug}`)}
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: Math.min(index * 0.03, 0.15) }}
+      initial={index < 6 ? { opacity: 0, y: 8 } : false}
+      animate={index < 6 ? { opacity: 1, y: 0 } : undefined}
+      transition={index < 6 ? { duration: 0.3, delay: Math.min(index * 0.03, 0.15) } : undefined}
       className={`relative block w-full min-w-0 cursor-pointer select-none outline-none [&_*]:outline-none [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] no-underline text-inherit ${highlighted ? "sm:rounded-xl sm:ring-2 sm:ring-primary" : ""}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}

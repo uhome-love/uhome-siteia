@@ -1,5 +1,6 @@
 import React, { useState, forwardRef } from "react";
-import { MessageCircle, Send, Check, Loader2, X } from "lucide-react";
+import { Send, Check, Loader2, X } from "lucide-react";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { motion, AnimatePresence } from "framer-motion";
 import { buildWhatsAppUrl, buildCorretorWhatsAppUrl } from "@/lib/whatsapp";
 import { trackWhatsAppClick } from "@/services/whatsappTracker";

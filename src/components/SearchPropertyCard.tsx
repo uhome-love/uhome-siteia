@@ -212,7 +212,6 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
             onScroll={handleScroll}
             className="flex snap-x snap-mandatory overflow-x-auto scrollbar-hide"
             style={{ aspectRatio: "4/3", WebkitOverflowScrolling: "touch" }}
-            onClick={(e) => e.stopPropagation()}
           >
             {fotos.slice(0, 7).map((foto, i) => (
               <div

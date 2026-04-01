@@ -22,6 +22,15 @@ export const FotoImovel = forwardRef<HTMLImageElement, FotoImovelProps>(function
 
   const handleLoad = useCallback(() => setLoaded(true), []);
 
+  // Timeout: if image takes > 10s, show fallback
+  useEffect(() => {
+    if (loaded || erro) return;
+    const t = setTimeout(() => {
+      if (!loaded) setErro(true);
+    }, 10000);
+    return () => clearTimeout(t);
+  }, [loaded, erro, src]);
+
   if (erro) {
     return (
       <div

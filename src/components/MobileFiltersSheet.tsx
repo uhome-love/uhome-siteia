@@ -31,7 +31,14 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
     getBairrosDisponiveis().then(data => {
       setDbBairros(data.map(d => d.bairro));
     });
+    getCondominiosDisponiveis().then(setCondoList);
   }, []);
+
+  const condoSuggestions = useMemo(() => {
+    if (!condoInput.trim()) return condoList.slice(0, 8);
+    const q = condoInput.toLowerCase();
+    return condoList.filter(c => c.toLowerCase().includes(q)).slice(0, 10);
+  }, [condoInput, condoList]);
 
   const bairrosSelecionados = useMemo(() => {
     const bairroStr = filters.bairro || "";

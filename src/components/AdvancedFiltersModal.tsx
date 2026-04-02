@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { X, Hash, Building2, DollarSign, Sparkles } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { X, Hash, Building2, DollarSign, Sparkles, Search } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSearchStore } from "@/stores/searchStore";
 import { featureOptions } from "@/data/properties";
+import { getCondominiosDisponiveis } from "@/services/condominiosCache";
 
 const banheiroOptions = [1, 2, 3, 4];
 const andarOptions = [

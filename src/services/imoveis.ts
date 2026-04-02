@@ -106,6 +106,7 @@ export interface BuscaFilters {
   andarMin?: number;
   condominioMax?: number;
   iptuMax?: number;
+  condominio?: string;
   limit?: number;
   offset?: number;
   bounds?: {

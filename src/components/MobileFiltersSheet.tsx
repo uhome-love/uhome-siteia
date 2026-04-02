@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useSearchStore } from "@/stores/searchStore";
 import { propertyTypes, featureOptions } from "@/data/properties";
 import { getBairrosDisponiveis } from "@/services/bairrosCache";
+import { getCondominiosDisponiveis } from "@/services/condominiosCache";
 
 const quartoOptions = [1, 2, 3, 4];
 const vagaOptions = [0, 1, 2, 3];

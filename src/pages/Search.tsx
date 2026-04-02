@@ -240,6 +240,7 @@ const Search = () => {
       const urlCondominioMax = searchParams.get("condominio_max");
       const urlIptuMax = searchParams.get("iptu_max");
       const urlDiferenciais = searchParams.get("diferenciais");
+      const urlCondominio = searchParams.get("condominio");
       if (urlTipo) f.tipo = urlTipo;
       if (urlCidade) f.cidade = urlCidade;
       if (urlQuartos) f.quartos = Number(urlQuartos);

@@ -97,11 +97,13 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
     filters.bairro,
     filters.areaMin || filters.areaMax,
     filters.codigo,
+    filters.condominio,
   ].filter(Boolean).length + filters.diferenciais.length;
 
   const handleReset = () => {
     resetFilters();
     setLocationInput("");
+    setCondoInput("");
   };
 
   const locationDisplay = bairrosSelecionados.length > 0

@@ -183,7 +183,7 @@ export function SearchFiltersBar({ onOpenMobileFilters, onOpenAdvancedFilters }:
   const cidadeLabel = filters.cidade || "Todas";
 
   const advancedCount = [
-    filters.banheiros, filters.andarMin, filters.condominioMax, filters.iptuMax, filters.codigo,
+    filters.banheiros, filters.andarMin, filters.condominioMax, filters.iptuMax, filters.codigo, filters.condominio,
   ].filter(Boolean).length + filters.diferenciais.length;
   const advancedActive = advancedCount > 0;
 

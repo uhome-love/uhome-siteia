@@ -236,6 +236,8 @@ export function AdvancedFiltersModal({ open, onClose }: Props) {
                   setFilter("condominioMax", 0);
                   setFilter("iptuMax", 0);
                   setFilter("codigo", "");
+                  setFilter("condominio", "");
+                  setCondoInput("");
                   setFilter("diferenciais", []);
                 }}
                 className="font-body text-sm font-semibold text-primary transition-colors active:opacity-70"

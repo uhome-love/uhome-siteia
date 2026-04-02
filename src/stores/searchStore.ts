@@ -58,6 +58,7 @@ const defaultFilters: SearchFilters = {
   andarMin: 0,
   condominioMax: 0,
   iptuMax: 0,
+  condominio: "",
   bounds: null,
 };
 

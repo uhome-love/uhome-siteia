@@ -23,6 +23,9 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
   const [subPage, setSubPage] = useState<SubPage>(null);
   const [locationInput, setLocationInput] = useState("");
   const [dbBairros, setDbBairros] = useState<string[]>([]);
+  const [condoInput, setCondoInput] = useState(filters.condominio || "");
+  const [condoList, setCondoList] = useState<string[]>([]);
+  const [condoOpen, setCondoOpen] = useState(false);
 
   useEffect(() => {
     getBairrosDisponiveis().then(data => {

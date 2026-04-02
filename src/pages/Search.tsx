@@ -53,6 +53,7 @@ function describeFilters(filters: Record<string, any>): string {
     else parts.push(`até ${max}`);
   }
   if (filters.quartos) parts.push(`${filters.quartos}+ quartos`);
+  if (filters.condominio) parts.push(`cond. ${filters.condominio}`);
   return parts.length > 0 ? parts.join(", ") : "Todos os imóveis";
 }
 

@@ -145,6 +145,44 @@ export function AdvancedFiltersModal({ open, onClose }: Props) {
                 </div>
               </section>
 
+              {/* Condomínio / Empreendimento */}
+              <section>
+                <p className="font-body text-sm font-bold text-foreground">Condomínio / Empreendimento</p>
+                <div className="mt-3 relative">
+                  <div className="flex items-center gap-3 rounded-xl border border-border bg-background px-4 py-3">
+                    <Building2 className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <input
+                      type="text"
+                      placeholder="Ex: Esplêndido Palace"
+                      value={condoInput}
+                      onChange={(e) => { setCondoInput(e.target.value); setCondoOpen(true); }}
+                      onFocus={() => setCondoOpen(true)}
+                      className="w-full bg-transparent font-body text-sm text-foreground outline-none placeholder:text-muted-foreground"
+                    />
+                    {filters.condominio && (
+                      <X
+                        className="h-4 w-4 shrink-0 cursor-pointer text-muted-foreground hover:text-foreground"
+                        onClick={() => { setFilter("condominio", ""); setCondoInput(""); }}
+                      />
+                    )}
+                  </div>
+                  {condoOpen && condoSuggestions.length > 0 && (
+                    <div className="absolute left-0 right-0 top-full z-10 mt-1 max-h-48 overflow-y-auto rounded-xl border border-border bg-card shadow-lg">
+                      {condoSuggestions.map(c => (
+                        <button
+                          key={c}
+                          onClick={() => { setFilter("condominio", c); setCondoInput(c); setCondoOpen(false); }}
+                          className="flex w-full items-center gap-3 px-4 py-2.5 font-body text-sm text-foreground transition-colors hover:bg-accent/50"
+                        >
+                          <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
+                          {c}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </section>
+
               {/* Código do imóvel */}
               <section>
                 <p className="font-body text-sm font-bold text-foreground">Código do imóvel</p>

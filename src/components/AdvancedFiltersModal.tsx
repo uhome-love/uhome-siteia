@@ -21,6 +21,19 @@ interface Props {
 
 export function AdvancedFiltersModal({ open, onClose }: Props) {
   const { filters, setFilter } = useSearchStore();
+  const [condoInput, setCondoInput] = useState(filters.condominio || "");
+  const [condoList, setCondoList] = useState<string[]>([]);
+  const [condoOpen, setCondoOpen] = useState(false);
+
+  useEffect(() => {
+    getCondominiosDisponiveis().then(setCondoList);
+  }, []);
+
+  const condoSuggestions = useMemo(() => {
+    if (!condoInput.trim()) return condoList.slice(0, 8);
+    const q = condoInput.toLowerCase();
+    return condoList.filter(c => c.toLowerCase().includes(q)).slice(0, 10);
+  }, [condoInput, condoList]);
 
   const advancedCount = [
     filters.banheiros,
@@ -28,6 +41,7 @@ export function AdvancedFiltersModal({ open, onClose }: Props) {
     filters.condominioMax,
     filters.iptuMax,
     filters.codigo,
+    filters.condominio,
   ].filter(Boolean).length + filters.diferenciais.length;
 
   return (

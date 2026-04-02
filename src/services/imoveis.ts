@@ -106,6 +106,7 @@ export interface BuscaFilters {
   andarMin?: number;
   condominioMax?: number;
   iptuMax?: number;
+  condominio?: string;
   limit?: number;
   offset?: number;
   bounds?: {
@@ -173,6 +174,7 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
   if (filters.andarMin) query = query.gte("andar", filters.andarMin);
   if (filters.condominioMax) query = query.lte("preco_condominio", filters.condominioMax);
   if (filters.iptuMax) query = query.lte("preco_iptu", filters.iptuMax);
+  if (filters.condominio) query = query.ilike("condominio_nome", `%${filters.condominio}%`);
   if (filters.q) query = query.or(`titulo.ilike.%${filters.q}%,bairro.ilike.%${filters.q}%,tipo.ilike.%${filters.q}%`);
   if (filters.codigo) query = query.or(`jetimob_id.ilike.%${filters.codigo}%,slug.ilike.%${filters.codigo}%`);
   if (filters.bounds) {
@@ -197,7 +199,7 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
   query = query.range(offset, offset + limit - 1);
 
   // Detect if advanced filters are active (not supported by count_imoveis RPC)
-  const hasAdvancedFilters = !!(filters.codigo || filters.andarMin || filters.condominioMax || filters.iptuMax || filters.diferenciais?.length);
+  const hasAdvancedFilters = !!(filters.codigo || filters.andarMin || filters.condominioMax || filters.iptuMax || filters.diferenciais?.length || filters.condominio);
 
   // Build count — either via RPC or via a parallel filtered count query
   const bairroStr = filters.bairro || undefined;
@@ -242,6 +244,7 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
     if (filters.andarMin) countQuery = countQuery.gte("andar", filters.andarMin);
     if (filters.condominioMax) countQuery = countQuery.lte("preco_condominio", filters.condominioMax);
     if (filters.iptuMax) countQuery = countQuery.lte("preco_iptu", filters.iptuMax);
+    if (filters.condominio) countQuery = countQuery.ilike("condominio_nome", `%${filters.condominio}%`);
     if (filters.q) countQuery = countQuery.or(`titulo.ilike.%${filters.q}%,bairro.ilike.%${filters.q}%,tipo.ilike.%${filters.q}%`);
     if (filters.codigo) countQuery = countQuery.or(`jetimob_id.ilike.%${filters.codigo}%,slug.ilike.%${filters.codigo}%`);
     if (filters.bounds) {

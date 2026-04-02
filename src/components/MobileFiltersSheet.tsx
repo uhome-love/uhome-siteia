@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useSearchStore } from "@/stores/searchStore";
 import { propertyTypes, featureOptions } from "@/data/properties";
 import { getBairrosDisponiveis } from "@/services/bairrosCache";
+import { getCondominiosDisponiveis } from "@/services/condominiosCache";
 
 const quartoOptions = [1, 2, 3, 4];
 const vagaOptions = [0, 1, 2, 3];
@@ -22,12 +23,22 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
   const [subPage, setSubPage] = useState<SubPage>(null);
   const [locationInput, setLocationInput] = useState("");
   const [dbBairros, setDbBairros] = useState<string[]>([]);
+  const [condoInput, setCondoInput] = useState(filters.condominio || "");
+  const [condoList, setCondoList] = useState<string[]>([]);
+  const [condoOpen, setCondoOpen] = useState(false);
 
   useEffect(() => {
     getBairrosDisponiveis().then(data => {
       setDbBairros(data.map(d => d.bairro));
     });
+    getCondominiosDisponiveis().then(setCondoList);
   }, []);
+
+  const condoSuggestions = useMemo(() => {
+    if (!condoInput.trim()) return condoList.slice(0, 8);
+    const q = condoInput.toLowerCase();
+    return condoList.filter(c => c.toLowerCase().includes(q)).slice(0, 10);
+  }, [condoInput, condoList]);
 
   const bairrosSelecionados = useMemo(() => {
     const bairroStr = filters.bairro || "";
@@ -86,11 +97,13 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
     filters.bairro,
     filters.areaMin || filters.areaMax,
     filters.codigo,
+    filters.condominio,
   ].filter(Boolean).length + filters.diferenciais.length;
 
   const handleReset = () => {
     resetFilters();
     setLocationInput("");
+    setCondoInput("");
   };
 
   const locationDisplay = bairrosSelecionados.length > 0
@@ -373,6 +386,44 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
                     />
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 font-body text-sm text-muted-foreground">m²</span>
                   </div>
+                </div>
+              </section>
+
+              {/* Condomínio / Empreendimento */}
+              <section className="mt-8">
+                <p className="font-body text-base font-bold text-foreground">Condomínio</p>
+                <div className="mt-3 relative">
+                  <div className="flex items-center gap-3 rounded-xl border border-border bg-background px-4 py-3.5">
+                    <Building2 className="h-5 w-5 shrink-0 text-muted-foreground" />
+                    <input
+                      type="text"
+                      placeholder="Ex: Esplêndido Palace"
+                      value={condoInput}
+                      onChange={(e) => { setCondoInput(e.target.value); setCondoOpen(true); }}
+                      onFocus={() => setCondoOpen(true)}
+                      className="w-full bg-transparent font-body text-sm text-foreground outline-none placeholder:text-muted-foreground"
+                    />
+                    {filters.condominio && (
+                      <X
+                        className="h-4 w-4 shrink-0 cursor-pointer text-muted-foreground hover:text-foreground"
+                        onClick={() => { setFilter("condominio", ""); setCondoInput(""); }}
+                      />
+                    )}
+                  </div>
+                  {condoOpen && condoSuggestions.length > 0 && (
+                    <div className="absolute left-0 right-0 top-full z-10 mt-1 max-h-48 overflow-y-auto rounded-xl border border-border bg-card shadow-lg">
+                      {condoSuggestions.map(c => (
+                        <button
+                          key={c}
+                          onClick={() => { setFilter("condominio", c); setCondoInput(c); setCondoOpen(false); }}
+                          className="flex w-full items-center gap-3 px-4 py-2.5 font-body text-sm text-foreground transition-colors hover:bg-accent/50"
+                        >
+                          <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
+                          {c}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </section>
 

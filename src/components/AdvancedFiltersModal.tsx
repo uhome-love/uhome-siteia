@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { X, Hash, Building2, DollarSign, Sparkles } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { X, Hash, Building2, DollarSign, Sparkles, Search } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSearchStore } from "@/stores/searchStore";
 import { featureOptions } from "@/data/properties";
+import { getCondominiosDisponiveis } from "@/services/condominiosCache";
 
 const banheiroOptions = [1, 2, 3, 4];
 const andarOptions = [
@@ -20,6 +21,19 @@ interface Props {
 
 export function AdvancedFiltersModal({ open, onClose }: Props) {
   const { filters, setFilter } = useSearchStore();
+  const [condoInput, setCondoInput] = useState(filters.condominio || "");
+  const [condoList, setCondoList] = useState<string[]>([]);
+  const [condoOpen, setCondoOpen] = useState(false);
+
+  useEffect(() => {
+    getCondominiosDisponiveis().then(setCondoList);
+  }, []);
+
+  const condoSuggestions = useMemo(() => {
+    if (!condoInput.trim()) return condoList.slice(0, 8);
+    const q = condoInput.toLowerCase();
+    return condoList.filter(c => c.toLowerCase().includes(q)).slice(0, 10);
+  }, [condoInput, condoList]);
 
   const advancedCount = [
     filters.banheiros,
@@ -27,6 +41,7 @@ export function AdvancedFiltersModal({ open, onClose }: Props) {
     filters.condominioMax,
     filters.iptuMax,
     filters.codigo,
+    filters.condominio,
   ].filter(Boolean).length + filters.diferenciais.length;
 
   return (
@@ -130,6 +145,44 @@ export function AdvancedFiltersModal({ open, onClose }: Props) {
                 </div>
               </section>
 
+              {/* Condomínio / Empreendimento */}
+              <section>
+                <p className="font-body text-sm font-bold text-foreground">Condomínio / Empreendimento</p>
+                <div className="mt-3 relative">
+                  <div className="flex items-center gap-3 rounded-xl border border-border bg-background px-4 py-3">
+                    <Building2 className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <input
+                      type="text"
+                      placeholder="Ex: Esplêndido Palace"
+                      value={condoInput}
+                      onChange={(e) => { setCondoInput(e.target.value); setCondoOpen(true); }}
+                      onFocus={() => setCondoOpen(true)}
+                      className="w-full bg-transparent font-body text-sm text-foreground outline-none placeholder:text-muted-foreground"
+                    />
+                    {filters.condominio && (
+                      <X
+                        className="h-4 w-4 shrink-0 cursor-pointer text-muted-foreground hover:text-foreground"
+                        onClick={() => { setFilter("condominio", ""); setCondoInput(""); }}
+                      />
+                    )}
+                  </div>
+                  {condoOpen && condoSuggestions.length > 0 && (
+                    <div className="absolute left-0 right-0 top-full z-10 mt-1 max-h-48 overflow-y-auto rounded-xl border border-border bg-card shadow-lg">
+                      {condoSuggestions.map(c => (
+                        <button
+                          key={c}
+                          onClick={() => { setFilter("condominio", c); setCondoInput(c); setCondoOpen(false); }}
+                          className="flex w-full items-center gap-3 px-4 py-2.5 font-body text-sm text-foreground transition-colors hover:bg-accent/50"
+                        >
+                          <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
+                          {c}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </section>
+
               {/* Código do imóvel */}
               <section>
                 <p className="font-body text-sm font-bold text-foreground">Código do imóvel</p>
@@ -183,6 +236,8 @@ export function AdvancedFiltersModal({ open, onClose }: Props) {
                   setFilter("condominioMax", 0);
                   setFilter("iptuMax", 0);
                   setFilter("codigo", "");
+                  setFilter("condominio", "");
+                  setCondoInput("");
                   setFilter("diferenciais", []);
                 }}
                 className="font-body text-sm font-semibold text-primary transition-colors active:opacity-70"

@@ -53,6 +53,7 @@ function describeFilters(filters: Record<string, any>): string {
     else parts.push(`até ${max}`);
   }
   if (filters.quartos) parts.push(`${filters.quartos}+ quartos`);
+  if (filters.condominio) parts.push(`cond. ${filters.condominio}`);
   return parts.length > 0 ? parts.join(", ") : "Todos os imóveis";
 }
 
@@ -240,6 +241,7 @@ const Search = () => {
       const urlCondominioMax = searchParams.get("condominio_max");
       const urlIptuMax = searchParams.get("iptu_max");
       const urlDiferenciais = searchParams.get("diferenciais");
+      const urlCondominio = searchParams.get("condominio");
       if (urlTipo) f.tipo = urlTipo;
       if (urlCidade) f.cidade = urlCidade;
       if (urlQuartos) f.quartos = Number(urlQuartos);
@@ -253,6 +255,7 @@ const Search = () => {
       if (urlCondominioMax) f.condominioMax = Number(urlCondominioMax);
       if (urlIptuMax) f.iptuMax = Number(urlIptuMax);
       if (urlDiferenciais) f.diferenciais = urlDiferenciais.split(",").map((s: string) => s.trim()).filter(Boolean);
+      if (urlCondominio) f.condominio = urlCondominio;
       if (urlBairro) {
         f.bairro = urlBairro;
       } else if (urlQ) {
@@ -318,6 +321,7 @@ const Search = () => {
       andarMin: filters.andarMin || undefined,
       condominioMax: filters.condominioMax || undefined,
       iptuMax: filters.iptuMax || undefined,
+      condominio: filters.condominio || undefined,
     };
   }, [filters]);
 
@@ -487,10 +491,11 @@ const Search = () => {
     if (filters.condominioMax) params.set("condominio_max", String(filters.condominioMax));
     if (filters.iptuMax) params.set("iptu_max", String(filters.iptuMax));
     if (filters.diferenciais.length) params.set("diferenciais", filters.diferenciais.join(","));
+    if (filters.condominio) params.set("condominio", filters.condominio);
     const qs = params.toString();
     const basePath = prefixLink("/busca");
     window.history.replaceState(null, "", qs ? `${basePath}?${qs}` : basePath);
-  }, [filters.tipo, filters.bairro, filters.cidade, filters.quartos, filters.banheiros, filters.vagas, filters.precoMin, filters.precoMax, filters.areaMin, filters.q, filters.codigo, filters.andarMin, filters.condominioMax, filters.iptuMax, filters.diferenciais, modoIA]);
+  }, [filters.tipo, filters.bairro, filters.cidade, filters.quartos, filters.banheiros, filters.vagas, filters.precoMin, filters.precoMax, filters.areaMin, filters.q, filters.codigo, filters.andarMin, filters.condominioMax, filters.iptuMax, filters.diferenciais, filters.condominio, modoIA]);
 
   // AI search handler with throttle
   const buscarComIA = useCallback(async (query?: string) => {

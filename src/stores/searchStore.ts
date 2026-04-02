@@ -25,6 +25,7 @@ export interface SearchFilters {
   andarMin: number;
   condominioMax: number;
   iptuMax: number;
+  condominio: string;
   bounds: MapBounds | null;
 }
 

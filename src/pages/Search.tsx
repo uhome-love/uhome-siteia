@@ -254,6 +254,7 @@ const Search = () => {
       if (urlCondominioMax) f.condominioMax = Number(urlCondominioMax);
       if (urlIptuMax) f.iptuMax = Number(urlIptuMax);
       if (urlDiferenciais) f.diferenciais = urlDiferenciais.split(",").map((s: string) => s.trim()).filter(Boolean);
+      if (urlCondominio) f.condominio = urlCondominio;
       if (urlBairro) {
         f.bairro = urlBairro;
       } else if (urlQ) {

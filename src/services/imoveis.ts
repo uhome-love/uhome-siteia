@@ -199,7 +199,7 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
   query = query.range(offset, offset + limit - 1);
 
   // Detect if advanced filters are active (not supported by count_imoveis RPC)
-  const hasAdvancedFilters = !!(filters.codigo || filters.andarMin || filters.condominioMax || filters.iptuMax || filters.diferenciais?.length);
+  const hasAdvancedFilters = !!(filters.codigo || filters.andarMin || filters.condominioMax || filters.iptuMax || filters.diferenciais?.length || filters.condominio);
 
   // Build count — either via RPC or via a parallel filtered count query
   const bairroStr = filters.bairro || undefined;

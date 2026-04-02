@@ -320,6 +320,7 @@ const Search = () => {
       andarMin: filters.andarMin || undefined,
       condominioMax: filters.condominioMax || undefined,
       iptuMax: filters.iptuMax || undefined,
+      condominio: filters.condominio || undefined,
     };
   }, [filters]);
 

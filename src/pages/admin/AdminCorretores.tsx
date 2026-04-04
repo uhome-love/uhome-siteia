@@ -6,11 +6,20 @@ import {
   Loader2, Users, MousePointerClick, CalendarCheck, MessageCircle, Eye,
   TrendingUp, ArrowUpRight, ArrowDownRight, Minus,
 } from "lucide-react";
-import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, CartesianGrid,
-  AreaChart, Area,
-} from "recharts";
+import { useEffect as useEffectReact, useState as useStateReact, useRef } from "react";
+
+const useRechartsLazy = () => {
+  const [mod, setMod] = useStateReact<typeof import("recharts") | null>(null);
+  const loaded = useRef(false);
+  useEffectReact(() => {
+    if (!loaded.current) {
+      loaded.current = true;
+      import("recharts").then(setMod);
+    }
+  }, []);
+  return mod;
+};
+
 import { format, subDays, startOfDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 

@@ -78,7 +78,7 @@ const ChartContainer = React.forwardRef<
         {...props}
       >
         <ChartStyle id={chartId} config={config} />
-        <RC>{children}</RC>
+        <RC>{children as React.ReactElement}</RC>
       </div>
     </ChartContext.Provider>
   );

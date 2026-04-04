@@ -31,10 +31,14 @@ export function BannerCorretor() {
   if (!corretor || !isDirectAccess || fechado) return null;
 
   const primeiroNome = corretor.nome.split(" ")[0];
-  const telefone = corretor.telefone?.replace(/\D/g, "") || "";
-  const whatsappUrl = telefone
-    ? `https://wa.me/55${telefone}?text=${encodeURIComponent(`Olá ${corretor.nome}, vim pelo site Uhome e gostaria de informações sobre imóveis.`)}`
-    : "#";
+
+  const handleFalarComCorretor = () => {
+    const url = buildCorretorWhatsAppUrl(corretor.nome, corretor.telefone);
+    openLeadModal({
+      whatsappUrl: url,
+      origem_componente: "banner_corretor",
+    });
+  };
 
   return (
     <>

@@ -358,6 +358,7 @@ export function HeroSection() {
                         <button
                           key={q}
                           onClick={() => setQuartos(val)}
+                          aria-label={`Filtrar por ${q === "Qualquer" ? "qualquer número de" : q} quartos`}
                           className={`rounded-full border-[1.5px] px-3 py-1.5 font-body text-xs transition-all active:scale-[0.96] sm:px-4 ${
                             active
                               ? "border-primary bg-primary/10 font-semibold text-primary"

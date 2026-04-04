@@ -489,13 +489,14 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
               <section className="mt-8">
                 <p className="font-body text-base font-bold text-foreground">IPTU máximo</p>
                 <div className="mt-3 relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 font-body text-sm text-muted-foreground">R$</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 font-body text-base text-muted-foreground">R$</span>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
                     placeholder="Ex: 500"
-                    value={filters.iptuMax || ""}
-                    onChange={(e) => setFilter("iptuMax", Number(e.target.value) || 0)}
-                    className="w-full rounded-xl border border-border bg-background py-3.5 pl-10 pr-4 font-body text-sm text-foreground outline-none transition-colors focus:border-primary"
+                    value={filters.iptuMax ? formatCurrency(filters.iptuMax) : ""}
+                    onChange={(e) => setFilter("iptuMax", rawCurrency(e.target.value))}
+                    className="w-full rounded-xl border border-border bg-background py-3.5 pl-10 pr-4 font-body text-base text-foreground outline-none transition-colors focus:border-primary"
                   />
                 </div>
               </section>

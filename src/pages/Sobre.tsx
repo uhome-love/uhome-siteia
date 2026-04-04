@@ -10,6 +10,7 @@ import { motion } from "framer-motion";
 import { useWhatsAppLeadStore } from "@/stores/whatsappLeadStore";
 
 const Sobre = () => {
+  const openLeadModal = useWhatsAppLeadStore((s) => s.openModal);
   useCanonical("/sobre");
 
   useEffect(() => {

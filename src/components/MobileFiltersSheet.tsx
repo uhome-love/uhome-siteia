@@ -371,23 +371,25 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
                 <div className="mt-3 flex items-center gap-3">
                   <div className="relative flex-1">
                     <input
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
                       placeholder="Mínimo"
                       value={filters.areaMin || ""}
-                      onChange={(e) => setFilter("areaMin", Number(e.target.value) || 0)}
-                      className="w-full rounded-xl border border-border bg-background py-3.5 pl-4 pr-10 font-body text-sm text-foreground outline-none transition-colors focus:border-primary"
+                      onChange={(e) => setFilter("areaMin", Number(e.target.value.replace(/\D/g, "")) || 0)}
+                      className="w-full rounded-xl border border-border bg-background py-3.5 pl-4 pr-10 font-body text-base text-foreground outline-none transition-colors focus:border-primary"
                     />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 font-body text-sm text-muted-foreground">m²</span>
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 font-body text-base text-muted-foreground">m²</span>
                   </div>
                   <div className="relative flex-1">
                     <input
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
                       placeholder="Máximo"
                       value={filters.areaMax || ""}
-                      onChange={(e) => setFilter("areaMax", Number(e.target.value) || 0)}
-                      className="w-full rounded-xl border border-border bg-background py-3.5 pl-4 pr-10 font-body text-sm text-foreground outline-none transition-colors focus:border-primary"
+                      onChange={(e) => setFilter("areaMax", Number(e.target.value.replace(/\D/g, "")) || 0)}
+                      className="w-full rounded-xl border border-border bg-background py-3.5 pl-4 pr-10 font-body text-base text-foreground outline-none transition-colors focus:border-primary"
                     />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 font-body text-sm text-muted-foreground">m²</span>
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 font-body text-base text-muted-foreground">m²</span>
                   </div>
                 </div>
               </section>

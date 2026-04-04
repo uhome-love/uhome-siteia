@@ -68,6 +68,7 @@ const PIE_COLORS = [
 
 /* ── Component ───────────────────────────────────────────────── */
 export default function AdminCorretores() {
+  const recharts = useRechartsLazy();
   const [loading, setLoading] = useState(true);
   const [corretores, setCorretores] = useState<CorretorRow[]>([]);
   const [metrics, setMetrics] = useState<CorretorMetrics[]>([]);

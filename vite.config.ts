@@ -24,19 +24,39 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (id.includes("mapbox-gl")) return "vendor-mapbox";
-          if (id.includes("node_modules/react-dom") || id.includes("node_modules/react/")) return "vendor-react";
-          if (id.includes("react-router-dom")) return "vendor-router";
-          if (id.includes("@tanstack/react-query")) return "vendor-query";
-          if (id.includes("framer-motion")) return "vendor-motion";
-          if (id.includes("@supabase/supabase-js")) return "vendor-supabase";
-          // recharts only used in admin — isolate it
-          if (id.includes("recharts") || id.includes("d3-")) return "vendor-charts";
-          // cmdk + vaul are lazy-loaded components
-          // Core UI primitives (Radix + sonner + cmdk + vaul)
-          if (id.includes("@radix-ui") || id.includes("sonner") || id.includes("cmdk") || id.includes("vaul")) return "vendor-ui";
-          if (id.includes("@fontsource")) return "vendor-fonts";
-          if (id.includes("lucide-react")) return "vendor-icons";
+          if (id.includes("node_modules/react/") || id.includes("node_modules/react-dom/")) {
+            return "vendor-react";
+          }
+          if (id.includes("node_modules/recharts") || id.includes("node_modules/d3")) {
+            return "vendor-charts";
+          }
+          if (id.includes("node_modules/@supabase") || id.includes("node_modules/supabase")) {
+            return "vendor-supabase";
+          }
+          if (id.includes("node_modules/@tanstack") || id.includes("node_modules/react-query")) {
+            return "vendor-query";
+          }
+          if (id.includes("node_modules/react-router")) {
+            return "vendor-router";
+          }
+          if (id.includes("node_modules/framer-motion")) {
+            return "vendor-motion";
+          }
+          if (id.includes("node_modules/mapbox-gl")) {
+            return "vendor-mapbox";
+          }
+          if (id.includes("node_modules/lucide-react")) {
+            return "vendor-icons";
+          }
+          if (id.includes("node_modules/@radix-ui") || id.includes("node_modules/sonner") || id.includes("node_modules/cmdk") || id.includes("node_modules/vaul")) {
+            return "vendor-ui";
+          }
+          if (id.includes("node_modules/@fontsource")) {
+            return "vendor-fonts";
+          }
+          if (id.includes("node_modules/")) {
+            return "vendor-misc";
+          }
         },
         assetFileNames: "assets/[name]-[hash][extname]",
         chunkFileNames: "assets/[name]-[hash].js",

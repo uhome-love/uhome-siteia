@@ -35,6 +35,7 @@ const PropertyDetail = () => {
   const [viewCount, setViewCount] = useState(0);
   const { isFavorito, toggleFavorito } = useFavoritos();
   const { corretor, prefixLink } = useCorretor();
+  const openLeadModal = useWhatsAppLeadStore((s) => s.openModal);
   const [showAuth, setShowAuth] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [imovel, setImovel] = useState<Imovel | null>(null);

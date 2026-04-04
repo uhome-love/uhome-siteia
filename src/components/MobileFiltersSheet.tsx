@@ -5,6 +5,7 @@ import { useSearchStore } from "@/stores/searchStore";
 import { propertyTypes, featureOptions } from "@/data/properties";
 import { getBairrosDisponiveis } from "@/services/bairrosCache";
 import { getCondominiosDisponiveis } from "@/services/condominiosCache";
+import { formatCurrency, rawCurrency } from "@/lib/currencyMask";
 
 const quartoOptions = [1, 2, 3, 4];
 const vagaOptions = [0, 1, 2, 3];

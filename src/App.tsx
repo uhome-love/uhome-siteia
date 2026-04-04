@@ -194,6 +194,7 @@ const App = () => (
       </AuthProvider>
     </QueryClientProvider>
   </BrowserRouter>
+  </ErrorBoundary>
 );
 
 export default App;

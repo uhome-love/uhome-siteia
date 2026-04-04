@@ -242,23 +242,25 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
                 <p className="font-body text-base font-bold text-foreground">Valor</p>
                 <div className="mt-3 flex items-center gap-3">
                   <div className="relative flex-1">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 font-body text-sm text-muted-foreground">R$</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 font-body text-base text-muted-foreground">R$</span>
                     <input
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
                       placeholder="Mínimo"
-                      value={filters.precoMin || ""}
-                      onChange={(e) => setFilter("precoMin", Number(e.target.value) || 0)}
-                      className="w-full rounded-xl border border-border bg-background py-3.5 pl-10 pr-3 font-body text-sm text-foreground outline-none transition-colors focus:border-primary"
+                      value={filters.precoMin ? formatCurrency(filters.precoMin) : ""}
+                      onChange={(e) => setFilter("precoMin", rawCurrency(e.target.value))}
+                      className="w-full rounded-xl border border-border bg-background py-3.5 pl-10 pr-3 font-body text-base text-foreground outline-none transition-colors focus:border-primary"
                     />
                   </div>
                   <div className="relative flex-1">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 font-body text-sm text-muted-foreground">R$</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 font-body text-base text-muted-foreground">R$</span>
                     <input
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
                       placeholder="Máximo"
-                      value={filters.precoMax || ""}
-                      onChange={(e) => setFilter("precoMax", Number(e.target.value) || 0)}
-                      className="w-full rounded-xl border border-border bg-background py-3.5 pl-10 pr-3 font-body text-sm text-foreground outline-none transition-colors focus:border-primary"
+                      value={filters.precoMax ? formatCurrency(filters.precoMax) : ""}
+                      onChange={(e) => setFilter("precoMax", rawCurrency(e.target.value))}
+                      className="w-full rounded-xl border border-border bg-background py-3.5 pl-10 pr-3 font-body text-base text-foreground outline-none transition-colors focus:border-primary"
                     />
                   </div>
                 </div>

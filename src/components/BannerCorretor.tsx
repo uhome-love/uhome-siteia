@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useCorretor } from "@/contexts/CorretorContext";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useLocation } from "react-router-dom";
+import { buildCorretorWhatsAppUrl } from "@/lib/whatsapp";
+import { useWhatsAppLeadStore } from "@/stores/whatsappLeadStore";
 
 export function BannerCorretor() {
   const { corretor, isDirectAccess } = useCorretor();

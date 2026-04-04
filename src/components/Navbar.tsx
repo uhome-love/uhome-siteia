@@ -1,6 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
-import { Menu, X, Sparkles, BarChart3, Building2, MapPin, HelpCircle, Megaphone } from "lucide-react";
+import Menu from "lucide-react/dist/esm/icons/menu";
+import X from "lucide-react/dist/esm/icons/x";
+import Sparkles from "lucide-react/dist/esm/icons/sparkles";
+import BarChart3 from "lucide-react/dist/esm/icons/bar-chart-3";
+import Building2 from "lucide-react/dist/esm/icons/building-2";
+import MapPin from "lucide-react/dist/esm/icons/map-pin";
+import HelpCircle from "lucide-react/dist/esm/icons/help-circle";
+import Megaphone from "lucide-react/dist/esm/icons/megaphone";
 
 import { UhomeLogo } from "@/components/UhomeLogo";
 import { UserMenu } from "@/components/UserMenu";

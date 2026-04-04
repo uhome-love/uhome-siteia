@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { X, Sparkles } from "lucide-react";
 
 const WhatsAppIcon = ({ className }: { className?: string }) => (
@@ -18,6 +19,10 @@ export function FloatingWhatsApp() {
   const [retargetingPopup, setRetargetingPopup] = useState(false);
   const { corretor } = useCorretor();
   const openModal = useWhatsAppLeadStore((s) => s.openModal);
+  const location = useLocation();
+
+  // Pages with sticky bottom bars need extra offset
+  const hasBottomBar = location.pathname === "/busca" || location.pathname.startsWith("/imovel/");
 
   useEffect(() => {
     const timer = setTimeout(() => setVisible(true), 3000);
@@ -89,7 +94,7 @@ export function FloatingWhatsApp() {
   if (window.location.pathname.startsWith("/admin")) return null;
 
   return visible ? (
-    <div className="fixed bottom-[4.5rem] right-3 z-[60] sm:bottom-6 sm:right-6 flex flex-col items-end gap-2">
+    <div className={`fixed right-3 z-[60] flex flex-col items-end gap-2 transition-[bottom] duration-300 sm:bottom-6 sm:right-6 ${hasBottomBar ? "bottom-[7.5rem]" : "bottom-[4.5rem]"}`}>
       {retargetingPopup && (
         <div
           className="relative mr-1 w-[240px] rounded-2xl bg-card p-4 shadow-xl border border-border animate-in fade-in slide-in-from-bottom-2 duration-300"

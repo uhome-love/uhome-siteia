@@ -37,7 +37,7 @@ export function UserMenu() {
           <User className="h-4 w-4" />
           <span className="hidden sm:inline">Entrar</span>
         </button>
-        <AuthModal open={showModal} onClose={() => setShowModal(false)} />
+        {showModal && <Suspense fallback={null}><AuthModal open={showModal} onClose={() => setShowModal(false)} /></Suspense>}
       </>
     );
   }

@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,12 +6,11 @@ import {
   Loader2, Users, MousePointerClick, CalendarCheck, MessageCircle, Eye,
   TrendingUp, ArrowUpRight, ArrowDownRight, Minus,
 } from "lucide-react";
-import { useEffect as useEffectReact, useState as useStateReact, useRef } from "react";
 
 const useRechartsLazy = () => {
-  const [mod, setMod] = useStateReact<typeof import("recharts") | null>(null);
+  const [mod, setMod] = useState<typeof import("recharts") | null>(null);
   const loaded = useRef(false);
-  useEffectReact(() => {
+  useEffect(() => {
     if (!loaded.current) {
       loaded.current = true;
       import("recharts").then(setMod);

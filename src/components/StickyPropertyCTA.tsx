@@ -3,12 +3,12 @@ import { Send, Loader2, Check, X } from "lucide-react";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { motion, AnimatePresence } from "framer-motion";
 import { buildWhatsAppUrl, buildCorretorWhatsAppUrl } from "@/lib/whatsapp";
-import { trackWhatsAppClick } from "@/services/whatsappTracker";
 import { trackClickWhatsapp, trackGenerateLead } from "@/lib/gtag";
 import { useCorretor } from "@/contexts/CorretorContext";
 import { submitLead } from "@/services/leads";
 import { formatPhone } from "@/lib/phoneMask";
 import { toast } from "sonner";
+import { useWhatsAppLeadStore } from "@/stores/whatsappLeadStore";
 
 interface Props {
   imovelId?: string;
@@ -26,6 +26,7 @@ export function StickyPropertyCTA({ imovelId, imovelSlug, imovelTitulo, imovelBa
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const { corretor } = useCorretor();
+  const openLeadModal = useWhatsAppLeadStore((s) => s.openModal);
 
   useEffect(() => {
     const onScroll = () => {
@@ -42,9 +43,15 @@ export function StickyPropertyCTA({ imovelId, imovelSlug, imovelTitulo, imovelBa
       ? buildCorretorWhatsAppUrl(corretor.nome, corretor.telefone, imovelData)
       : buildWhatsAppUrl(undefined, imovelData);
 
-    trackWhatsAppClick({ imovel_id: imovelId, imovel_titulo: imovelTitulo, imovel_slug: imovelSlug });
-    trackClickWhatsapp({ origem_componente: "sticky_cta", imovel_titulo: imovelTitulo, imovel_slug: imovelSlug });
-    window.open(url, "_blank", "noopener");
+    openLeadModal({
+      whatsappUrl: url,
+      origem_componente: "sticky_cta",
+      imovel_id: imovelId,
+      imovel_slug: imovelSlug,
+      imovel_titulo: imovelTitulo,
+      imovel_bairro: imovelBairro,
+      imovel_preco: imovelPreco,
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

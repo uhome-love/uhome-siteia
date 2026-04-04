@@ -3,11 +3,11 @@ import { Send, Loader2, Check } from "lucide-react";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { formatPhone } from "@/lib/phoneMask";
 import { submitLead } from "@/services/leads";
-import { trackWhatsAppClick } from "@/services/whatsappTracker";
 import { toast } from "sonner";
 import { formatPreco } from "@/services/imoveis";
 import { buildWhatsAppUrl, buildCorretorWhatsAppUrl } from "@/lib/whatsapp";
 import { useCorretor } from "@/contexts/CorretorContext";
+import { useWhatsAppLeadStore } from "@/stores/whatsappLeadStore";
 
 interface LeadSidebarProps {
   imovelId?: string;
@@ -25,6 +25,7 @@ export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const { corretor } = useCorretor();
+  const openModal = useWhatsAppLeadStore((s) => s.openModal);
 
   const imovelData = { titulo: imovelTitulo, bairro: imovelBairro, slug: imovelSlug };
 
@@ -57,21 +58,24 @@ export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, 
   };
 
   const handleWhatsApp = () => {
-    trackWhatsAppClick({
-      imovel_id: imovelId,
-      imovel_titulo: imovelTitulo,
-      imovel_slug: imovelSlug,
-    });
     const url = corretor
       ? buildCorretorWhatsAppUrl(corretor.nome, corretor.telefone, imovelData)
       : buildWhatsAppUrl(undefined, imovelData);
-    window.open(url, "_blank");
+
+    openModal({
+      whatsappUrl: url,
+      origem_componente: "detalhe_sidebar",
+      imovel_id: imovelId,
+      imovel_slug: imovelSlug,
+      imovel_titulo: imovelTitulo,
+      imovel_bairro: imovelBairro,
+      imovel_preco: imovelPreco,
+    });
   };
 
   const priceLabel = imovelPreco ? formatPreco(imovelPreco) : null;
   const viewsText = viewCount === 1 ? "1 pessoa viu hoje" : `${viewCount > 0 ? viewCount : 5} pessoas viram hoje`;
 
-  // When corretor is active, show a simplified WhatsApp-first sidebar
   if (corretor) {
     const primeiroNome = corretor.nome.split(" ")[0];
     return (
@@ -85,7 +89,6 @@ export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, 
 
         <div className="my-5 h-px bg-border" />
 
-        {/* Corretor info */}
         <div className="flex items-center gap-3">
           {corretor.foto_url ? (
             <img src={corretor.foto_url} alt={corretor.nome} className="h-12 w-12 rounded-full object-cover" />
@@ -126,7 +129,6 @@ export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, 
     );
   }
 
-  // Default: form-based sidebar
   return (
     <div data-lead-sidebar className="rounded-2xl border border-border bg-card p-6 shadow-sm">
       {priceLabel && (

@@ -8,9 +8,8 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
 );
 import { motion, AnimatePresence } from "framer-motion";
 import { buildWhatsAppUrl, buildCorretorWhatsAppUrl } from "@/lib/whatsapp";
-import { trackWhatsAppClick } from "@/services/whatsappTracker";
-import { trackClickWhatsapp } from "@/lib/gtag";
 import { useCorretor } from "@/contexts/CorretorContext";
+import { useWhatsAppLeadStore } from "@/stores/whatsappLeadStore";
 
 export function FloatingWhatsApp() {
   const [visible, setVisible] = useState(false);
@@ -19,13 +18,13 @@ export function FloatingWhatsApp() {
   });
   const [retargetingPopup, setRetargetingPopup] = useState(false);
   const { corretor } = useCorretor();
+  const openModal = useWhatsAppLeadStore((s) => s.openModal);
 
   useEffect(() => {
     const timer = setTimeout(() => setVisible(true), 3000);
     return () => clearTimeout(timer);
   }, []);
 
-  // Hide initial tooltip after 8s and persist
   useEffect(() => {
     if (!tooltip) return;
     const t = setTimeout(() => {
@@ -35,12 +34,10 @@ export function FloatingWhatsApp() {
     return () => clearTimeout(t);
   }, [tooltip]);
 
-  // Retargeting popup: show once after user viewed 3+ properties
   useEffect(() => {
     if (sessionStorage.getItem("uhome_retargeting_dismissed") === "1") return;
 
     const check = () => {
-      // Re-check dismiss state inside callback to prevent re-showing
       if (sessionStorage.getItem("uhome_retargeting_dismissed") === "1") {
         clearInterval(interval);
         return;
@@ -52,7 +49,6 @@ export function FloatingWhatsApp() {
         if (Array.isArray(viewed) && viewed.length >= 3) {
           setTooltip(false);
           setRetargetingPopup(true);
-          // Stop checking once shown
           clearInterval(interval);
         }
       } catch { /* ignore */ }
@@ -68,13 +64,10 @@ export function FloatingWhatsApp() {
       ? buildCorretorWhatsAppUrl(corretor.nome, corretor.telefone)
       : buildWhatsAppUrl("Olá! Vim pelo site da Uhome e gostaria de falar com um corretor.");
 
-    trackWhatsAppClick({ origem_pagina: window.location.pathname });
-    trackClickWhatsapp({
+    openModal({
+      whatsappUrl: url,
       origem_componente: "floating_whatsapp",
-      origem_pagina: window.location.pathname,
     });
-
-    window.open(url, "_blank", "noopener");
   };
 
   const handleRetargetingClick = () => {
@@ -82,9 +75,10 @@ export function FloatingWhatsApp() {
       ? buildCorretorWhatsAppUrl(corretor.nome, corretor.telefone)
       : buildWhatsAppUrl("Olá! Estou vendo vários imóveis no site e gostaria de receber uma seleção personalizada.");
 
-    trackWhatsAppClick({ origem_pagina: window.location.pathname });
-    trackClickWhatsapp({ origem_componente: "retargeting_popup" });
-    window.open(url, "_blank", "noopener");
+    openModal({
+      whatsappUrl: url,
+      origem_componente: "retargeting_popup",
+    });
     dismissRetargeting();
   };
 
@@ -95,11 +89,8 @@ export function FloatingWhatsApp() {
 
   if (window.location.pathname.startsWith("/admin")) return null;
 
-  const showBubble = retargetingPopup || tooltip;
-
   return visible ? (
     <div className="fixed bottom-[4.5rem] right-3 z-[60] sm:bottom-6 sm:right-6 flex flex-col items-end gap-2">
-      {/* Retargeting popup (priority over tooltip) */}
       <AnimatePresence>
         {retargetingPopup && (
           <motion.div
@@ -138,13 +129,11 @@ export function FloatingWhatsApp() {
               Receber lista
             </button>
 
-            {/* Speech bubble tail */}
             <div className="absolute -bottom-2 right-6 h-0 w-0 border-l-[8px] border-r-[8px] border-t-[8px] border-l-transparent border-r-transparent border-t-card drop-shadow-sm" />
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Default tooltip (only if no retargeting) */}
       <AnimatePresence>
         {tooltip && !retargetingPopup && (
           <motion.div
@@ -166,7 +155,6 @@ export function FloatingWhatsApp() {
         )}
       </AnimatePresence>
 
-      {/* WhatsApp Button */}
       <button
         onClick={handleClick}
         aria-label="Falar no WhatsApp"

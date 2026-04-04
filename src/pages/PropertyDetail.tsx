@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { buildWhatsAppUrl, buildCorretorWhatsAppUrl } from "@/lib/whatsapp";
 import { useCorretor } from "@/contexts/CorretorContext";
 import { submitLead } from "@/services/leads";
+import { useWhatsAppLeadStore } from "@/stores/whatsappLeadStore";
 import { motion } from "framer-motion";
 import { trackEvent } from "@/lib/trackEvent";
 import { trackView, getViewCount } from "@/services/leads";
@@ -34,6 +35,7 @@ const PropertyDetail = () => {
   const [viewCount, setViewCount] = useState(0);
   const { isFavorito, toggleFavorito } = useFavoritos();
   const { corretor, prefixLink } = useCorretor();
+  const openLeadModal = useWhatsAppLeadStore((s) => s.openModal);
   const [showAuth, setShowAuth] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [imovel, setImovel] = useState<Imovel | null>(null);
@@ -697,10 +699,9 @@ const PropertyDetail = () => {
             variant="whatsapp"
             size="sm"
             className="shrink-0 text-[13px] px-4 py-2.5 h-auto"
-            asChild
-          >
-            <a
-              href={corretor
+            onClick={() => {
+              if (!imovel) return;
+              const url = corretor
                 ? buildCorretorWhatsAppUrl(corretor.nome, corretor.telefone, {
                     titulo: imovel.titulo,
                     bairro: imovel.bairro,
@@ -710,20 +711,20 @@ const PropertyDetail = () => {
                     titulo: imovel.titulo,
                     bairro: imovel.bairro,
                     slug: imovel.slug,
-                  })
-              }
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => trackWhatsAppClick({
+                  });
+              openLeadModal({
+                whatsappUrl: url,
+                origem_componente: "detalhe_mobile_bar",
                 imovel_id: imovel.id,
-                imovel_titulo: imovel.titulo,
                 imovel_slug: imovel.slug,
-                origem_pagina: window.location.pathname,
-              })}
-            >
-              <MessageCircle className="h-4 w-4 mr-1.5" />
-              WhatsApp
-            </a>
+                imovel_titulo: imovel.titulo,
+                imovel_bairro: imovel.bairro,
+                imovel_preco: imovel.preco,
+              });
+            }}
+          >
+            <MessageCircle className="h-4 w-4 mr-1.5" />
+            WhatsApp
           </Button>
         </div>
       </div>

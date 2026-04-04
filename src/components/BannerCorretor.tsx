@@ -2,12 +2,15 @@ import { useState, useEffect } from "react";
 import { useCorretor } from "@/contexts/CorretorContext";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useLocation } from "react-router-dom";
+import { buildCorretorWhatsAppUrl } from "@/lib/whatsapp";
+import { useWhatsAppLeadStore } from "@/stores/whatsappLeadStore";
 
 export function BannerCorretor() {
   const { corretor, isDirectAccess } = useCorretor();
   const { isAdmin } = useAdmin();
   const [fechado, setFechado] = useState(false);
   const location = useLocation();
+  const openLeadModal = useWhatsAppLeadStore((s) => s.openModal);
 
   // Auto-clear via ?clear_ref=1 URL param
   useEffect(() => {
@@ -28,10 +31,14 @@ export function BannerCorretor() {
   if (!corretor || !isDirectAccess || fechado) return null;
 
   const primeiroNome = corretor.nome.split(" ")[0];
-  const telefone = corretor.telefone?.replace(/\D/g, "") || "";
-  const whatsappUrl = telefone
-    ? `https://wa.me/55${telefone}?text=${encodeURIComponent(`Olá ${corretor.nome}, vim pelo site Uhome e gostaria de informações sobre imóveis.`)}`
-    : "#";
+
+  const handleFalarComCorretor = () => {
+    const url = buildCorretorWhatsAppUrl(corretor.nome, corretor.telefone);
+    openLeadModal({
+      whatsappUrl: url,
+      origem_componente: "banner_corretor",
+    });
+  };
 
   return (
     <>
@@ -61,15 +68,13 @@ export function BannerCorretor() {
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
-          {telefone && (
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+          {corretor.telefone && (
+            <button
+              onClick={handleFalarComCorretor}
               className="font-body text-xs font-semibold text-primary transition-colors hover:text-primary/80"
             >
               💬 Falar com {primeiroNome}
-            </a>
+            </button>
           )}
 
           {/* Admin: clear corretor reference */}

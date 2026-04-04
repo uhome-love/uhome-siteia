@@ -64,7 +64,7 @@ const ChartContainer = React.forwardRef<
     );
   }
 
-  const { ResponsiveContainer } = recharts;
+  const RC = recharts.ResponsiveContainer;
 
   return (
     <ChartContext.Provider value={{ config }}>

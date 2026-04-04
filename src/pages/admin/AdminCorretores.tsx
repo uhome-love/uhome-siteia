@@ -297,71 +297,121 @@ export default function AdminCorretores() {
       </div>
 
       {/* Charts row */}
-      <div className="grid gap-4 lg:grid-cols-3">
-        {/* Timeline */}
-        <Card className="lg:col-span-2">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold">Atividade diária</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[260px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={daily} margin={{ top: 8, right: 4, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                  <XAxis
-                    dataKey="label"
-                    tick={{ fontSize: 10 }}
-                    interval={period === 30 ? 4 : 0}
-                    className="fill-muted-foreground"
-                  />
-                  <YAxis tick={{ fontSize: 10 }} className="fill-muted-foreground" allowDecimals={false} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
-                      borderRadius: 8,
-                      fontSize: 12,
-                    }}
-                  />
-                  <Area type="monotone" dataKey="visitas" name="Visitas" stackId="1" stroke="hsl(199 89% 48%)" fill="hsl(199 89% 48% / 0.15)" />
-                  <Area type="monotone" dataKey="leads" name="Leads" stackId="1" stroke="hsl(var(--primary))" fill="hsl(var(--primary) / 0.15)" />
-                  <Area type="monotone" dataKey="agendamentos" name="Agendamentos" stackId="1" stroke="hsl(142 71% 45%)" fill="hsl(142 71% 45% / 0.15)" />
-                  <Area type="monotone" dataKey="whatsapp" name="WhatsApp" stackId="1" stroke="hsl(142 71% 45%)" fill="hsl(142 71% 45% / 0.08)" />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
+      {recharts ? (() => {
+        const { ResponsiveContainer, AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, BarChart, Bar } = recharts;
+        return (
+          <>
+          <div className="grid gap-4 lg:grid-cols-3">
+            {/* Timeline */}
+            <Card className="lg:col-span-2">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-semibold">Atividade diária</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[260px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={daily} margin={{ top: 8, right: 4, left: -20, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                      <XAxis
+                        dataKey="label"
+                        tick={{ fontSize: 10 }}
+                        interval={period === 30 ? 4 : 0}
+                        className="fill-muted-foreground"
+                      />
+                      <YAxis tick={{ fontSize: 10 }} className="fill-muted-foreground" allowDecimals={false} />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "hsl(var(--card))",
+                          border: "1px solid hsl(var(--border))",
+                          borderRadius: 8,
+                          fontSize: 12,
+                        }}
+                      />
+                      <Area type="monotone" dataKey="visitas" name="Visitas" stackId="1" stroke="hsl(199 89% 48%)" fill="hsl(199 89% 48% / 0.15)" />
+                      <Area type="monotone" dataKey="leads" name="Leads" stackId="1" stroke="hsl(var(--primary))" fill="hsl(var(--primary) / 0.15)" />
+                      <Area type="monotone" dataKey="agendamentos" name="Agendamentos" stackId="1" stroke="hsl(142 71% 45%)" fill="hsl(142 71% 45% / 0.15)" />
+                      <Area type="monotone" dataKey="whatsapp" name="WhatsApp" stackId="1" stroke="hsl(142 71% 45%)" fill="hsl(142 71% 45% / 0.08)" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
 
-        {/* Pie */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold">Distribuição de ações</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {pieData.length === 0 ? (
-              <div className="flex h-[260px] items-center justify-center text-sm text-muted-foreground">
-                Sem dados no período
-              </div>
-            ) : (
-              <div className="h-[260px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={pieData}
-                      dataKey="value"
-                      nameKey="name"
-                      cx="50%"
-                      cy="45%"
-                      innerRadius={50}
-                      outerRadius={80}
-                      paddingAngle={3}
-                      strokeWidth={0}
-                    >
-                      {pieData.map((_, i) => (
-                        <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+            {/* Pie */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-semibold">Distribuição de ações</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {pieData.length === 0 ? (
+                  <div className="flex h-[260px] items-center justify-center text-sm text-muted-foreground">
+                    Sem dados no período
+                  </div>
+                ) : (
+                  <div className="h-[260px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={pieData}
+                          dataKey="value"
+                          nameKey="name"
+                          cx="50%"
+                          cy="45%"
+                          innerRadius={50}
+                          outerRadius={80}
+                          paddingAngle={3}
+                          strokeWidth={0}
+                        >
+                          {pieData.map((_, i) => (
+                            <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: "hsl(var(--card))",
+                            border: "1px solid hsl(var(--border))",
+                            borderRadius: 8,
+                            fontSize: 12,
+                          }}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                    <div className="mt-1 flex flex-wrap justify-center gap-x-4 gap-y-1">
+                      {pieData.map((d, i) => (
+                        <div key={d.name} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <div className="h-2.5 w-2.5 rounded-full" style={{ background: PIE_COLORS[i % PIE_COLORS.length] }} />
+                          {d.name}
+                        </div>
                       ))}
-                    </Pie>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Bar chart — per corretor */}
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-semibold">Desempenho por corretor</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={metrics.filter((m) => m.total > 0).slice(0, 10)}
+                    margin={{ top: 8, right: 4, left: -10, bottom: 0 }}
+                    layout="vertical"
+                  >
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-border" horizontal={false} />
+                    <XAxis type="number" tick={{ fontSize: 10 }} className="fill-muted-foreground" allowDecimals={false} />
+                    <YAxis
+                      type="category"
+                      dataKey="nome"
+                      tick={{ fontSize: 11 }}
+                      width={120}
+                      className="fill-muted-foreground"
+                    />
                     <Tooltip
                       contentStyle={{
                         backgroundColor: "hsl(var(--card))",
@@ -370,61 +420,22 @@ export default function AdminCorretores() {
                         fontSize: 12,
                       }}
                     />
-                  </PieChart>
+                    <Bar dataKey="visitas" name="Visitas" stackId="a" fill="hsl(199 89% 48%)" radius={[0, 0, 0, 0]} />
+                    <Bar dataKey="leads" name="Leads" stackId="a" fill="hsl(var(--primary))" />
+                    <Bar dataKey="agendamentos" name="Agendamentos" stackId="a" fill="hsl(142 71% 45%)" />
+                    <Bar dataKey="whatsapp" name="WhatsApp" stackId="a" fill="hsl(38 92% 50%)" radius={[0, 4, 4, 0]} />
+                  </BarChart>
                 </ResponsiveContainer>
-                <div className="mt-1 flex flex-wrap justify-center gap-x-4 gap-y-1">
-                  {pieData.map((d, i) => (
-                    <div key={d.name} className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <div className="h-2.5 w-2.5 rounded-full" style={{ background: PIE_COLORS[i % PIE_COLORS.length] }} />
-                      {d.name}
-                    </div>
-                  ))}
-                </div>
               </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Bar chart — per corretor */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-semibold">Desempenho por corretor</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={metrics.filter((m) => m.total > 0).slice(0, 10)}
-                margin={{ top: 8, right: 4, left: -10, bottom: 0 }}
-                layout="vertical"
-              >
-                <CartesianGrid strokeDasharray="3 3" className="stroke-border" horizontal={false} />
-                <XAxis type="number" tick={{ fontSize: 10 }} className="fill-muted-foreground" allowDecimals={false} />
-                <YAxis
-                  type="category"
-                  dataKey="nome"
-                  tick={{ fontSize: 11 }}
-                  width={120}
-                  className="fill-muted-foreground"
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: 8,
-                    fontSize: 12,
-                  }}
-                />
-                <Bar dataKey="visitas" name="Visitas" stackId="a" fill="hsl(199 89% 48%)" radius={[0, 0, 0, 0]} />
-                <Bar dataKey="leads" name="Leads" stackId="a" fill="hsl(var(--primary))" />
-                <Bar dataKey="agendamentos" name="Agendamentos" stackId="a" fill="hsl(142 71% 45%)" />
-                <Bar dataKey="whatsapp" name="WhatsApp" stackId="a" fill="hsl(38 92% 50%)" radius={[0, 4, 4, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+          </>
+        );
+      })() : (
+        <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Carregando gráficos…
+        </div>
+      )}
 
       {/* Table */}
       <Card>

@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { buildWhatsAppUrl, buildCorretorWhatsAppUrl } from "@/lib/whatsapp";
 import { useCorretor } from "@/contexts/CorretorContext";
 import { submitLead } from "@/services/leads";
+import { useWhatsAppLeadStore } from "@/stores/whatsappLeadStore";
 import { motion } from "framer-motion";
 import { trackEvent } from "@/lib/trackEvent";
 import { trackView, getViewCount } from "@/services/leads";

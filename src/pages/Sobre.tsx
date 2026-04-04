@@ -5,10 +5,12 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { useCanonical } from "@/hooks/useCanonical";
 import { setJsonLd, removeJsonLd } from "@/lib/jsonld";
 import { Building2, Users, ShieldCheck, Lightbulb, MapPin, Phone, Mail, Award } from "lucide-react";
-import { WHATSAPP_NUMBER, WHATSAPP_DISPLAY } from "@/lib/whatsapp";
+import { WHATSAPP_NUMBER, WHATSAPP_DISPLAY, buildWhatsAppUrl } from "@/lib/whatsapp";
 import { motion } from "framer-motion";
+import { useWhatsAppLeadStore } from "@/stores/whatsappLeadStore";
 
 const Sobre = () => {
+  const openLeadModal = useWhatsAppLeadStore((s) => s.openModal);
   useCanonical("/sobre");
 
   useEffect(() => {
@@ -219,14 +221,15 @@ const Sobre = () => {
               >
                 Buscar imóveis
               </a>
-              <a
-                href={`https://wa.me/${WHATSAPP_NUMBER}?text=Olá! Gostaria de falar com um corretor da Uhome.`}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={() => {
+                  const url = buildWhatsAppUrl("Olá! Gostaria de falar com um corretor da Uhome.");
+                  openLeadModal({ whatsappUrl: url, origem_componente: "sobre_cta" });
+                }}
                 className="inline-flex items-center justify-center rounded-full border border-border px-8 py-3 font-body text-sm font-semibold text-foreground hover:bg-secondary/50 transition-colors"
               >
                 Falar com corretor
-              </a>
+              </button>
             </div>
           </div>
         </section>

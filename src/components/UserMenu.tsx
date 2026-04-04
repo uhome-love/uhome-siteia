@@ -103,9 +103,8 @@ export function UserMenu() {
               <LogOut className="h-4 w-4" />
               Sair
             </button>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
     </div>
   );
 }

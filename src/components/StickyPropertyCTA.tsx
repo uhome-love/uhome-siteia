@@ -26,6 +26,7 @@ export function StickyPropertyCTA({ imovelId, imovelSlug, imovelTitulo, imovelBa
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const { corretor } = useCorretor();
+  const openLeadModal = useWhatsAppLeadStore((s) => s.openModal);
 
   useEffect(() => {
     const onScroll = () => {

@@ -3,12 +3,12 @@ import { Send, Loader2, Check, X } from "lucide-react";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { motion, AnimatePresence } from "framer-motion";
 import { buildWhatsAppUrl, buildCorretorWhatsAppUrl } from "@/lib/whatsapp";
-import { trackWhatsAppClick } from "@/services/whatsappTracker";
-import { trackClickWhatsapp, trackGenerateLead } from "@/lib/gtag";
+import { trackClickWhatsapp } from "@/lib/gtag";
 import { useCorretor } from "@/contexts/CorretorContext";
 import { submitLead } from "@/services/leads";
 import { formatPhone } from "@/lib/phoneMask";
 import { toast } from "sonner";
+import { useWhatsAppLeadStore } from "@/stores/whatsappLeadStore";
 
 interface Props {
   imovelId?: string;

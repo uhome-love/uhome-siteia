@@ -5,6 +5,7 @@ import { useSearchStore } from "@/stores/searchStore";
 import { propertyTypes, featureOptions } from "@/data/properties";
 import { getBairrosDisponiveis } from "@/services/bairrosCache";
 import { getCondominiosDisponiveis } from "@/services/condominiosCache";
+import { formatCurrency, rawCurrency } from "@/lib/currencyMask";
 
 const quartoOptions = [1, 2, 3, 4];
 const vagaOptions = [0, 1, 2, 3];
@@ -241,23 +242,25 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
                 <p className="font-body text-base font-bold text-foreground">Valor</p>
                 <div className="mt-3 flex items-center gap-3">
                   <div className="relative flex-1">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 font-body text-sm text-muted-foreground">R$</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 font-body text-base text-muted-foreground">R$</span>
                     <input
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
                       placeholder="Mínimo"
-                      value={filters.precoMin || ""}
-                      onChange={(e) => setFilter("precoMin", Number(e.target.value) || 0)}
-                      className="w-full rounded-xl border border-border bg-background py-3.5 pl-10 pr-3 font-body text-sm text-foreground outline-none transition-colors focus:border-primary"
+                      value={filters.precoMin ? formatCurrency(filters.precoMin) : ""}
+                      onChange={(e) => setFilter("precoMin", rawCurrency(e.target.value))}
+                      className="w-full rounded-xl border border-border bg-background py-3.5 pl-10 pr-3 font-body text-base text-foreground outline-none transition-colors focus:border-primary"
                     />
                   </div>
                   <div className="relative flex-1">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 font-body text-sm text-muted-foreground">R$</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 font-body text-base text-muted-foreground">R$</span>
                     <input
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
                       placeholder="Máximo"
-                      value={filters.precoMax || ""}
-                      onChange={(e) => setFilter("precoMax", Number(e.target.value) || 0)}
-                      className="w-full rounded-xl border border-border bg-background py-3.5 pl-10 pr-3 font-body text-sm text-foreground outline-none transition-colors focus:border-primary"
+                      value={filters.precoMax ? formatCurrency(filters.precoMax) : ""}
+                      onChange={(e) => setFilter("precoMax", rawCurrency(e.target.value))}
+                      className="w-full rounded-xl border border-border bg-background py-3.5 pl-10 pr-3 font-body text-base text-foreground outline-none transition-colors focus:border-primary"
                     />
                   </div>
                 </div>
@@ -368,23 +371,25 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
                 <div className="mt-3 flex items-center gap-3">
                   <div className="relative flex-1">
                     <input
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
                       placeholder="Mínimo"
                       value={filters.areaMin || ""}
-                      onChange={(e) => setFilter("areaMin", Number(e.target.value) || 0)}
-                      className="w-full rounded-xl border border-border bg-background py-3.5 pl-4 pr-10 font-body text-sm text-foreground outline-none transition-colors focus:border-primary"
+                      onChange={(e) => setFilter("areaMin", Number(e.target.value.replace(/\D/g, "")) || 0)}
+                      className="w-full rounded-xl border border-border bg-background py-3.5 pl-4 pr-10 font-body text-base text-foreground outline-none transition-colors focus:border-primary"
                     />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 font-body text-sm text-muted-foreground">m²</span>
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 font-body text-base text-muted-foreground">m²</span>
                   </div>
                   <div className="relative flex-1">
                     <input
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
                       placeholder="Máximo"
                       value={filters.areaMax || ""}
-                      onChange={(e) => setFilter("areaMax", Number(e.target.value) || 0)}
-                      className="w-full rounded-xl border border-border bg-background py-3.5 pl-4 pr-10 font-body text-sm text-foreground outline-none transition-colors focus:border-primary"
+                      onChange={(e) => setFilter("areaMax", Number(e.target.value.replace(/\D/g, "")) || 0)}
+                      className="w-full rounded-xl border border-border bg-background py-3.5 pl-4 pr-10 font-body text-base text-foreground outline-none transition-colors focus:border-primary"
                     />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 font-body text-sm text-muted-foreground">m²</span>
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 font-body text-base text-muted-foreground">m²</span>
                   </div>
                 </div>
               </section>
@@ -401,7 +406,7 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
                       value={condoInput}
                       onChange={(e) => { setCondoInput(e.target.value); setCondoOpen(true); }}
                       onFocus={() => setCondoOpen(true)}
-                      className="w-full bg-transparent font-body text-sm text-foreground outline-none placeholder:text-muted-foreground"
+                      className="w-full bg-transparent font-body text-base text-foreground outline-none placeholder:text-muted-foreground"
                     />
                     {filters.condominio && (
                       <X
@@ -438,7 +443,7 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
                       placeholder="Ex: 17485-BT"
                       value={filters.codigo || ""}
                       onChange={(e) => setFilter("codigo", e.target.value.trim())}
-                      className="w-full bg-transparent font-body text-sm text-foreground outline-none placeholder:text-muted-foreground"
+                      className="w-full bg-transparent font-body text-base text-foreground outline-none placeholder:text-muted-foreground"
                     />
                   </div>
                 </div>
@@ -468,13 +473,14 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
               <section className="mt-8">
                 <p className="font-body text-base font-bold text-foreground">Condomínio máximo</p>
                 <div className="mt-3 relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 font-body text-sm text-muted-foreground">R$</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 font-body text-base text-muted-foreground">R$</span>
                   <input
-                    type="number"
-                    placeholder="Ex: 1500"
-                    value={filters.condominioMax || ""}
-                    onChange={(e) => setFilter("condominioMax", Number(e.target.value) || 0)}
-                    className="w-full rounded-xl border border-border bg-background py-3.5 pl-10 pr-4 font-body text-sm text-foreground outline-none transition-colors focus:border-primary"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="Ex: 1.500"
+                    value={filters.condominioMax ? formatCurrency(filters.condominioMax) : ""}
+                    onChange={(e) => setFilter("condominioMax", rawCurrency(e.target.value))}
+                    className="w-full rounded-xl border border-border bg-background py-3.5 pl-10 pr-4 font-body text-base text-foreground outline-none transition-colors focus:border-primary"
                   />
                 </div>
               </section>
@@ -483,13 +489,14 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
               <section className="mt-8">
                 <p className="font-body text-base font-bold text-foreground">IPTU máximo</p>
                 <div className="mt-3 relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 font-body text-sm text-muted-foreground">R$</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 font-body text-base text-muted-foreground">R$</span>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
                     placeholder="Ex: 500"
-                    value={filters.iptuMax || ""}
-                    onChange={(e) => setFilter("iptuMax", Number(e.target.value) || 0)}
-                    className="w-full rounded-xl border border-border bg-background py-3.5 pl-10 pr-4 font-body text-sm text-foreground outline-none transition-colors focus:border-primary"
+                    value={filters.iptuMax ? formatCurrency(filters.iptuMax) : ""}
+                    onChange={(e) => setFilter("iptuMax", rawCurrency(e.target.value))}
+                    className="w-full rounded-xl border border-border bg-background py-3.5 pl-10 pr-4 font-body text-base text-foreground outline-none transition-colors focus:border-primary"
                   />
                 </div>
               </section>

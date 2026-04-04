@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useSearchStore } from "@/stores/searchStore";
 import { featureOptions } from "@/data/properties";
 import { getCondominiosDisponiveis } from "@/services/condominiosCache";
+import { formatCurrency, rawCurrency } from "@/lib/currencyMask";
 
 const banheiroOptions = [1, 2, 3, 4];
 const andarOptions = [
@@ -121,10 +122,11 @@ export function AdvancedFiltersModal({ open, onClose }: Props) {
                 <div className="mt-3 relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 font-body text-sm text-muted-foreground">R$</span>
                   <input
-                    type="number"
-                    placeholder="Ex: 1500"
-                    value={filters.condominioMax || ""}
-                    onChange={(e) => setFilter("condominioMax", Number(e.target.value) || 0)}
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="Ex: 1.500"
+                    value={filters.condominioMax ? formatCurrency(filters.condominioMax) : ""}
+                    onChange={(e) => setFilter("condominioMax", rawCurrency(e.target.value))}
                     className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 font-body text-sm text-foreground outline-none transition-colors focus:border-primary"
                   />
                 </div>
@@ -136,10 +138,11 @@ export function AdvancedFiltersModal({ open, onClose }: Props) {
                 <div className="mt-3 relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 font-body text-sm text-muted-foreground">R$</span>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
                     placeholder="Ex: 500"
-                    value={filters.iptuMax || ""}
-                    onChange={(e) => setFilter("iptuMax", Number(e.target.value) || 0)}
+                    value={filters.iptuMax ? formatCurrency(filters.iptuMax) : ""}
+                    onChange={(e) => setFilter("iptuMax", rawCurrency(e.target.value))}
                     className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 font-body text-sm text-foreground outline-none transition-colors focus:border-primary"
                   />
                 </div>

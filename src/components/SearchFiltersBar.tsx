@@ -9,6 +9,7 @@ import { propertyTypes } from "@/data/properties";
 import { CIDADES_PERMITIDAS } from "@/services/imoveis";
 import { getBairrosDisponiveis } from "@/services/bairrosCache";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { formatCurrency, rawCurrency } from "@/lib/currencyMask";
 
 const quartoOptions = [1, 2, 3, 4];
 const vagaOptions = [1, 2, 3];
@@ -398,10 +399,11 @@ export function SearchFiltersBar({ onOpenMobileFilters, onOpenAdvancedFilters }:
             <div className="relative flex-1">
               <span className="absolute left-2.5 top-1/2 -translate-y-1/2 font-body text-[11px] text-muted-foreground">R$</span>
               <input
-                type="number"
+                type="text"
+                inputMode="numeric"
                 placeholder="Mín"
-                value={filters.precoMin || ""}
-                onChange={(e) => setFilter("precoMin", Number(e.target.value) || 0)}
+                value={filters.precoMin ? formatCurrency(filters.precoMin) : ""}
+                onChange={(e) => setFilter("precoMin", rawCurrency(e.target.value))}
                 className="w-full rounded-lg border border-border bg-background py-2 pl-8 pr-2 font-body text-[13px] text-foreground outline-none transition-colors focus:border-primary"
               />
             </div>
@@ -409,10 +411,11 @@ export function SearchFiltersBar({ onOpenMobileFilters, onOpenAdvancedFilters }:
             <div className="relative flex-1">
               <span className="absolute left-2.5 top-1/2 -translate-y-1/2 font-body text-[11px] text-muted-foreground">R$</span>
               <input
-                type="number"
+                type="text"
+                inputMode="numeric"
                 placeholder="Máx"
-                value={filters.precoMax || ""}
-                onChange={(e) => setFilter("precoMax", Number(e.target.value) || 0)}
+                value={filters.precoMax ? formatCurrency(filters.precoMax) : ""}
+                onChange={(e) => setFilter("precoMax", rawCurrency(e.target.value))}
                 className="w-full rounded-lg border border-border bg-background py-2 pl-8 pr-2 font-body text-[13px] text-foreground outline-none transition-colors focus:border-primary"
               />
             </div>

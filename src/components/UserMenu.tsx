@@ -70,14 +70,9 @@ export function UserMenu() {
         </span>
       </button>
 
-      <AnimatePresence>
-        {menuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.15 }}
-            className="absolute right-0 top-full z-30 mt-2 w-52 rounded-xl border border-border bg-card p-1.5 shadow-xl"
+      {menuOpen && (
+          <div
+            className="absolute right-0 top-full z-30 mt-2 w-52 rounded-xl border border-border bg-card p-1.5 shadow-xl animate-in fade-in slide-in-from-top-1 duration-150"
           >
             <div className="px-3 py-2">
               <p className="truncate font-body text-sm font-semibold text-foreground">{displayName}</p>

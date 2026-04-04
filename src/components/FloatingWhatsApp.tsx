@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { X, Sparkles } from "lucide-react";
 
 const WhatsAppIcon = ({ className }: { className?: string }) => (

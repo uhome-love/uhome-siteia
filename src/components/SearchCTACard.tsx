@@ -3,12 +3,11 @@ import { Send, Check, Loader2, X } from "lucide-react";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { motion, AnimatePresence } from "framer-motion";
 import { buildWhatsAppUrl, buildCorretorWhatsAppUrl } from "@/lib/whatsapp";
-import { trackWhatsAppClick } from "@/services/whatsappTracker";
-import { trackClickWhatsapp } from "@/lib/gtag";
 import { useCorretor } from "@/contexts/CorretorContext";
 import { submitLead } from "@/services/leads";
 import { formatPhone } from "@/lib/phoneMask";
 import { toast } from "sonner";
+import { useWhatsAppLeadStore } from "@/stores/whatsappLeadStore";
 
 export const SearchCTACard = forwardRef<HTMLDivElement>(function SearchCTACard(_props, ref) {
   const [formOpen, setFormOpen] = useState(false);

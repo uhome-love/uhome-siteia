@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import X from "lucide-react/dist/esm/icons/x";
-import Sparkles from "lucide-react/dist/esm/icons/sparkles";
+import { X, Sparkles } from "lucide-react";
 
 const WhatsAppIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className}>

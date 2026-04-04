@@ -7,16 +7,18 @@ import App from "./App.tsx";
 captureUtmParams();
 // Capture ?telefone= and ?email= from URL for lead identity (Radar de Intenção)
 captureLeadIdentity();
-// Critical font weights only — load eagerly
-import "@fontsource/plus-jakarta-sans/400.css";
-import "@fontsource/plus-jakarta-sans/700.css";
+// All fonts lazy-loaded — system font stack covers initial render
 import "./index.css";
 
-// Non-critical font weights — lazy load
-import("@fontsource/plus-jakarta-sans/500.css");
-import("@fontsource/plus-jakarta-sans/600.css");
-import("@fontsource/plus-jakarta-sans/800.css");
-import("@fontsource/dm-mono/400.css");
+// Load fonts after initial paint to avoid render-blocking
+requestIdleCallback(() => {
+  import("@fontsource/plus-jakarta-sans/400.css");
+  import("@fontsource/plus-jakarta-sans/700.css");
+  import("@fontsource/plus-jakarta-sans/500.css");
+  import("@fontsource/plus-jakarta-sans/600.css");
+  import("@fontsource/plus-jakarta-sans/800.css");
+  import("@fontsource/dm-mono/400.css");
+}, { timeout: 2000 });
 
 if (import.meta.env.DEV) {
   import("./utils/testCorretorFlow").then(m => m.setupCorretorFlowTest());

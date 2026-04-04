@@ -31,6 +31,10 @@ export default defineConfig(({ mode }) => ({
           if (id.includes("@tanstack/react-query")) return "vendor-query";
           if (id.includes("framer-motion")) return "vendor-motion";
           if (id.includes("@supabase/supabase-js")) return "vendor-supabase";
+          // Extract heavy UI primitives into shared chunk
+          if (id.includes("@radix-ui") || id.includes("cmdk") || id.includes("vaul") || id.includes("sonner") || id.includes("recharts")) return "vendor-ui";
+          if (id.includes("@fontsource")) return "vendor-fonts";
+          if (id.includes("lucide-react")) return "vendor-icons";
         },
         assetFileNames: "assets/[name]-[hash][extname]",
         chunkFileNames: "assets/[name]-[hash].js",

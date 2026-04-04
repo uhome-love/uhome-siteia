@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { Menu, X, Sparkles, BarChart3, Building2, MapPin, HelpCircle, Megaphone } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+
 import { UhomeLogo } from "@/components/UhomeLogo";
 import { UserMenu } from "@/components/UserMenu";
 import { useCorretor } from "@/contexts/CorretorContext";
@@ -117,14 +117,9 @@ export function Navbar() {
       </div>
 
       {/* Mobile menu */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="overflow-hidden border-t border-border bg-background lg:hidden"
+      {mobileOpen && (
+          <div
+            className="overflow-hidden border-t border-border bg-background lg:hidden animate-in fade-in slide-in-from-top-2 duration-200"
           >
             <div className="flex flex-col gap-1 px-6 py-5">
               {/* Mode pills */}
@@ -194,9 +189,8 @@ export function Navbar() {
                 Anuncie seu imóvel
               </Link>
             </div>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
     </nav>
   );
 }

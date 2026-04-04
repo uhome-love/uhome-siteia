@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { MapPin, Sparkles, X } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+
 import { supabase } from "@/integrations/supabase/client";
 import { getBairrosDisponiveis } from "@/services/bairrosCache";
 import { toast } from "sonner";
@@ -266,29 +266,23 @@ export function HeroSection() {
                     </div>
                   </div>
 
-                  <AnimatePresence>
-                    {bairroOpen && bairroSuggestions.length > 0 && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -4 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -4 }}
-                        transition={{ duration: 0.15 }}
-                        className="absolute left-0 right-0 top-full z-30 mt-1 max-h-48 overflow-y-auto rounded-xl border border-border bg-card shadow-xl"
-                      >
-                        {bairroSuggestions.map((b) => (
-                          <button
-                            key={b}
-                            type="button"
-                            onClick={() => addBairro(b)}
-                            className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left font-body text-sm text-foreground transition-colors hover:bg-secondary"
-                          >
-                            <MapPin className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                            {b}
-                          </button>
-                        ))}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  {bairroOpen && bairroSuggestions.length > 0 && (
+                    <div
+                      className="absolute left-0 right-0 top-full z-30 mt-1 max-h-48 overflow-y-auto rounded-xl border border-border bg-card shadow-xl animate-in fade-in slide-in-from-top-1 duration-150"
+                    >
+                      {bairroSuggestions.map((b) => (
+                        <button
+                          key={b}
+                          type="button"
+                          onClick={() => addBairro(b)}
+                          className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left font-body text-sm text-foreground transition-colors hover:bg-secondary"
+                        >
+                          <MapPin className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                          {b}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Tipo + Preço — 2 cols on mobile, 3 on sm+ */}
@@ -364,6 +358,7 @@ export function HeroSection() {
                         <button
                           key={q}
                           onClick={() => setQuartos(val)}
+                          aria-label={`Filtrar por ${q === "Qualquer" ? "qualquer número de" : q} quartos`}
                           className={`rounded-full border-[1.5px] px-3 py-1.5 font-body text-xs transition-all active:scale-[0.96] sm:px-4 ${
                             active
                               ? "border-primary bg-primary/10 font-semibold text-primary"

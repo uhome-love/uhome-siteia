@@ -9,6 +9,7 @@ import { propertyTypes } from "@/data/properties";
 import { CIDADES_PERMITIDAS } from "@/services/imoveis";
 import { getBairrosDisponiveis } from "@/services/bairrosCache";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { formatCurrency, rawCurrency } from "@/lib/currencyMask";
 
 const quartoOptions = [1, 2, 3, 4];
 const vagaOptions = [1, 2, 3];

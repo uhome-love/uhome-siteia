@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
 import { CorretorProvider } from "@/contexts/CorretorContext";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 const ExitIntentModal = lazy(() => import("@/components/ExitIntentModal").then(m => ({ default: m.ExitIntentModal })));
 const FloatingWhatsApp = lazy(() => import("@/components/FloatingWhatsApp"));
@@ -83,6 +84,7 @@ function PageFallback() {
 const CorretorRefLayout = lazy(() => import("./components/CorretorRef").then(m => ({ default: m.CorretorRefLayout })));
 
 const App = () => (
+  <ErrorBoundary>
   <BrowserRouter>
     
     <QueryClientProvider client={queryClient}>
@@ -192,6 +194,7 @@ const App = () => (
       </AuthProvider>
     </QueryClientProvider>
   </BrowserRouter>
+  </ErrorBoundary>
 );
 
 export default App;

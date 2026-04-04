@@ -33,9 +33,8 @@ export default defineConfig(({ mode }) => ({
           // recharts only used in admin — isolate it
           if (id.includes("recharts") || id.includes("d3-")) return "vendor-charts";
           // cmdk + vaul are lazy-loaded components
-          if (id.includes("cmdk") || id.includes("vaul")) return "vendor-cmdk";
-          // Core UI primitives (Radix + sonner)
-          if (id.includes("@radix-ui") || id.includes("sonner")) return "vendor-ui";
+          // Core UI primitives (Radix + sonner + cmdk + vaul)
+          if (id.includes("@radix-ui") || id.includes("sonner") || id.includes("cmdk") || id.includes("vaul")) return "vendor-ui";
           if (id.includes("@fontsource")) return "vendor-fonts";
           if (id.includes("lucide-react")) return "vendor-icons";
         },

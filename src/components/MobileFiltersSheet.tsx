@@ -443,7 +443,7 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
                       placeholder="Ex: 17485-BT"
                       value={filters.codigo || ""}
                       onChange={(e) => setFilter("codigo", e.target.value.trim())}
-                      className="w-full bg-transparent font-body text-sm text-foreground outline-none placeholder:text-muted-foreground"
+                      className="w-full bg-transparent font-body text-base text-foreground outline-none placeholder:text-muted-foreground"
                     />
                   </div>
                 </div>

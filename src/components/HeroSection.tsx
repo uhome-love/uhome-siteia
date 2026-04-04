@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { MapPin, Sparkles, X } from "lucide-react";
+import MapPin from "lucide-react/dist/esm/icons/map-pin";
+import Sparkles from "lucide-react/dist/esm/icons/sparkles";
+import X from "lucide-react/dist/esm/icons/x";
 
 import { supabase } from "@/integrations/supabase/client";
 import { getBairrosDisponiveis } from "@/services/bairrosCache";

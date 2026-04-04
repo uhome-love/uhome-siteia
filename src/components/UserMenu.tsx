@@ -1,9 +1,12 @@
-import { useState, useRef, useEffect } from "react";
-import { User, Heart, Search, LogOut } from "lucide-react";
+import { useState, useRef, useEffect, lazy, Suspense } from "react";
+import User from "lucide-react/dist/esm/icons/user";
+import Heart from "lucide-react/dist/esm/icons/heart";
+import Search from "lucide-react/dist/esm/icons/search";
+import LogOut from "lucide-react/dist/esm/icons/log-out";
 import { Link } from "react-router-dom";
 
 import { useAuth } from "@/hooks/useAuth";
-import { AuthModal } from "./AuthModal";
+const AuthModal = lazy(() => import("./AuthModal").then(m => ({ default: m.AuthModal })));
 
 export function UserMenu() {
   const { user, signOut } = useAuth();
@@ -34,7 +37,7 @@ export function UserMenu() {
           <User className="h-4 w-4" />
           <span className="hidden sm:inline">Entrar</span>
         </button>
-        <AuthModal open={showModal} onClose={() => setShowModal(false)} />
+        {showModal && <Suspense fallback={null}><AuthModal open={showModal} onClose={() => setShowModal(false)} /></Suspense>}
       </>
     );
   }

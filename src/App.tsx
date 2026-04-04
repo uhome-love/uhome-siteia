@@ -11,7 +11,7 @@ const ExitIntentModal = lazy(() => import("@/components/ExitIntentModal").then(m
 const FloatingWhatsApp = lazy(() => import("@/components/FloatingWhatsApp"));
 
 import { BannerCorretor } from "@/components/BannerCorretor";
-import { WhatsAppLeadModal } from "@/components/WhatsAppLeadModal";
+const WhatsAppLeadModal = lazy(() => import("@/components/WhatsAppLeadModal").then(m => ({ default: m.WhatsAppLeadModal })));
 
 // Eager load homepage
 import Index from "./pages/Index.tsx";

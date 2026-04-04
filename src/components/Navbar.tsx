@@ -189,9 +189,8 @@ export function Navbar() {
                 Anuncie seu imóvel
               </Link>
             </div>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
     </nav>
   );
 }

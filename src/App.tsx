@@ -84,6 +84,7 @@ function PageFallback() {
 const CorretorRefLayout = lazy(() => import("./components/CorretorRef").then(m => ({ default: m.CorretorRefLayout })));
 
 const App = () => (
+  <ErrorBoundary>
   <BrowserRouter>
     
     <QueryClientProvider client={queryClient}>

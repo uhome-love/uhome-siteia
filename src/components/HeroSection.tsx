@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { MapPin, Sparkles, X } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+
 import { supabase } from "@/integrations/supabase/client";
 import { getBairrosDisponiveis } from "@/services/bairrosCache";
 import { toast } from "sonner";

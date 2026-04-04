@@ -92,6 +92,7 @@ const App = () => (
             <Toaster />
             <Sonner />
             <BannerCorretor />
+            <WhatsAppLeadModal />
             <Suspense fallback={<PageFallback />}>
               <Routes>
                 {/* Rotas normais */}

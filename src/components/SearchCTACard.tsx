@@ -23,9 +23,11 @@ export const SearchCTACard = forwardRef<HTMLDivElement>(function SearchCTACard(_
     const url = corretor
       ? buildCorretorWhatsAppUrl(corretor.nome, corretor.telefone)
       : buildWhatsAppUrl("Olá! Estou buscando imóveis no site da Uhome e gostaria de receber uma lista personalizada.");
-    trackWhatsAppClick({ origem_pagina: "/busca" });
-    trackClickWhatsapp({ origem_componente: "busca_cta", origem_pagina: "/busca" });
-    window.open(url, "_blank", "noopener");
+
+    openLeadModal({
+      whatsappUrl: url,
+      origem_componente: "busca_cta",
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

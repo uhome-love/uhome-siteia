@@ -24,15 +24,17 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          // Separate mapbox into its own chunk — only loaded when map is needed
           if (id.includes("mapbox-gl")) return "vendor-mapbox";
           if (id.includes("node_modules/react-dom") || id.includes("node_modules/react/")) return "vendor-react";
           if (id.includes("react-router-dom")) return "vendor-router";
           if (id.includes("@tanstack/react-query")) return "vendor-query";
           if (id.includes("framer-motion")) return "vendor-motion";
           if (id.includes("@supabase/supabase-js")) return "vendor-supabase";
-          // Extract heavy UI primitives into shared chunk
-          if (id.includes("@radix-ui") || id.includes("cmdk") || id.includes("vaul") || id.includes("sonner") || id.includes("recharts")) return "vendor-ui";
+          // recharts only used in admin — isolate it
+          if (id.includes("recharts") || id.includes("d3-")) return "vendor-charts";
+          // cmdk + vaul are lazy-loaded components
+          // Core UI primitives (Radix + sonner + cmdk + vaul)
+          if (id.includes("@radix-ui") || id.includes("sonner") || id.includes("cmdk") || id.includes("vaul")) return "vendor-ui";
           if (id.includes("@fontsource")) return "vendor-fonts";
           if (id.includes("lucide-react")) return "vendor-icons";
         },

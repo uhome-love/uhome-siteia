@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { User, Heart, Search, LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+
 import { useAuth } from "@/hooks/useAuth";
 import { AuthModal } from "./AuthModal";
 

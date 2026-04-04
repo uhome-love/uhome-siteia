@@ -102,6 +102,7 @@ export function FloatingWhatsApp() {
           >
             <button
               onClick={(e) => { e.stopPropagation(); dismissRetargeting(); }}
+              aria-label="Fechar popup"
               className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-muted text-muted-foreground hover:bg-muted/80"
             >
               <X className="h-3 w-3" />

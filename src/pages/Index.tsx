@@ -1,7 +1,8 @@
 import { useEffect, lazy, Suspense } from "react";
 import { Navbar } from "@/components/Navbar";
 import { HeroSection } from "@/components/HeroSection";
-import { Footer } from "@/components/Footer";
+
+const Footer = lazy(() => import("@/components/Footer").then(m => ({ default: m.Footer })));
 import { setJsonLd, removeJsonLd, buildOrganizationJsonLd, buildWebSiteJsonLd, buildLocalBusinessJsonLd } from "@/lib/jsonld";
 import { useCanonical } from "@/hooks/useCanonical";
 

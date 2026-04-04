@@ -5,8 +5,9 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { useCanonical } from "@/hooks/useCanonical";
 import { setJsonLd, removeJsonLd } from "@/lib/jsonld";
 import { Building2, Users, ShieldCheck, Lightbulb, MapPin, Phone, Mail, Award } from "lucide-react";
-import { WHATSAPP_NUMBER, WHATSAPP_DISPLAY } from "@/lib/whatsapp";
+import { WHATSAPP_NUMBER, WHATSAPP_DISPLAY, buildWhatsAppUrl } from "@/lib/whatsapp";
 import { motion } from "framer-motion";
+import { useWhatsAppLeadStore } from "@/stores/whatsappLeadStore";
 
 const Sobre = () => {
   useCanonical("/sobre");

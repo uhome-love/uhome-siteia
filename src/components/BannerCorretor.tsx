@@ -10,6 +10,7 @@ export function BannerCorretor() {
   const { isAdmin } = useAdmin();
   const [fechado, setFechado] = useState(false);
   const location = useLocation();
+  const openLeadModal = useWhatsAppLeadStore((s) => s.openModal);
 
   // Auto-clear via ?clear_ref=1 URL param
   useEffect(() => {

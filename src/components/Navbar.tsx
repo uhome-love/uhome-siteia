@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { Menu, X, Sparkles, BarChart3, Building2, MapPin, HelpCircle, Megaphone } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+
 import { UhomeLogo } from "@/components/UhomeLogo";
 import { UserMenu } from "@/components/UserMenu";
 import { useCorretor } from "@/contexts/CorretorContext";

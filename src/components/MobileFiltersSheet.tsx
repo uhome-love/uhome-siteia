@@ -406,7 +406,7 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
                       value={condoInput}
                       onChange={(e) => { setCondoInput(e.target.value); setCondoOpen(true); }}
                       onFocus={() => setCondoOpen(true)}
-                      className="w-full bg-transparent font-body text-sm text-foreground outline-none placeholder:text-muted-foreground"
+                      className="w-full bg-transparent font-body text-base text-foreground outline-none placeholder:text-muted-foreground"
                     />
                     {filters.condominio && (
                       <X

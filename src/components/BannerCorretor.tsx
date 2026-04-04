@@ -68,15 +68,13 @@ export function BannerCorretor() {
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
-          {telefone && (
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+          {corretor.telefone && (
+            <button
+              onClick={handleFalarComCorretor}
               className="font-body text-xs font-semibold text-primary transition-colors hover:text-primary/80"
             >
               💬 Falar com {primeiroNome}
-            </a>
+            </button>
           )}
 
           {/* Admin: clear corretor reference */}

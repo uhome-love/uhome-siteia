@@ -1,8 +1,5 @@
 import { useState, useRef, useEffect, lazy, Suspense } from "react";
-import User from "lucide-react/dist/esm/icons/user";
-import Heart from "lucide-react/dist/esm/icons/heart";
-import Search from "lucide-react/dist/esm/icons/search";
-import LogOut from "lucide-react/dist/esm/icons/log-out";
+import { User, Heart, Search, LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { useAuth } from "@/hooks/useAuth";

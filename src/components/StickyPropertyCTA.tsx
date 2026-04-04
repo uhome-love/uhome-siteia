@@ -43,9 +43,15 @@ export function StickyPropertyCTA({ imovelId, imovelSlug, imovelTitulo, imovelBa
       ? buildCorretorWhatsAppUrl(corretor.nome, corretor.telefone, imovelData)
       : buildWhatsAppUrl(undefined, imovelData);
 
-    trackWhatsAppClick({ imovel_id: imovelId, imovel_titulo: imovelTitulo, imovel_slug: imovelSlug });
-    trackClickWhatsapp({ origem_componente: "sticky_cta", imovel_titulo: imovelTitulo, imovel_slug: imovelSlug });
-    window.open(url, "_blank", "noopener");
+    openLeadModal({
+      whatsappUrl: url,
+      origem_componente: "sticky_cta",
+      imovel_id: imovelId,
+      imovel_slug: imovelSlug,
+      imovel_titulo: imovelTitulo,
+      imovel_bairro: imovelBairro,
+      imovel_preco: imovelPreco,
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

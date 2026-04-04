@@ -19,6 +19,10 @@ export function FloatingWhatsApp() {
   const [retargetingPopup, setRetargetingPopup] = useState(false);
   const { corretor } = useCorretor();
   const openModal = useWhatsAppLeadStore((s) => s.openModal);
+  const location = useLocation();
+
+  // Pages with sticky bottom bars need extra offset
+  const hasBottomBar = location.pathname === "/busca" || location.pathname.startsWith("/imovel/");
 
   useEffect(() => {
     const timer = setTimeout(() => setVisible(true), 3000);

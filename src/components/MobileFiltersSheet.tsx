@@ -473,13 +473,14 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
               <section className="mt-8">
                 <p className="font-body text-base font-bold text-foreground">Condomínio máximo</p>
                 <div className="mt-3 relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 font-body text-sm text-muted-foreground">R$</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 font-body text-base text-muted-foreground">R$</span>
                   <input
-                    type="number"
-                    placeholder="Ex: 1500"
-                    value={filters.condominioMax || ""}
-                    onChange={(e) => setFilter("condominioMax", Number(e.target.value) || 0)}
-                    className="w-full rounded-xl border border-border bg-background py-3.5 pl-10 pr-4 font-body text-sm text-foreground outline-none transition-colors focus:border-primary"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="Ex: 1.500"
+                    value={filters.condominioMax ? formatCurrency(filters.condominioMax) : ""}
+                    onChange={(e) => setFilter("condominioMax", rawCurrency(e.target.value))}
+                    className="w-full rounded-xl border border-border bg-background py-3.5 pl-10 pr-4 font-body text-base text-foreground outline-none transition-colors focus:border-primary"
                   />
                 </div>
               </section>

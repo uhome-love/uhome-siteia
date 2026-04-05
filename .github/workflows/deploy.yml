@@ -27,26 +27,78 @@ jobs:
 
       - name: Create vercel.json in dist
         run: |
-          cat > dist/vercel.json << 'VEOF'
-          {
-            "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
-            "headers": [
-              {
-                "source": "/assets/(.*)",
-                "headers": [
-                  { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" },
-                  { "key": "Access-Control-Allow-Origin", "value": "*" }
-                ]
-              }
-            ]
-          }
-          VEOF
+          cat > dist/vercel.json << 'EOF'
+          {"rewrites":[{"source":"/(.*)","destination":"/index.html"}],"headers":[{"source":"/assets/(.*)","headers":[{"key":"Cache-Control","value":"public, max-age=31536000, immutable"},{"key":"Access-Control-Allow-Origin","value":"*"}]}]}
+          EOF
 
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: ./dist
-          vercel-args: '--prod'
+      - name: Deploy to Vercel via API
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_TEAM_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          pip install requests -q
+          python3 << 'PYEOF'
+          import requests, os, hashlib, time, datetime
+
+          TOKEN = os.environ["VERCEL_TOKEN"]
+          TEAM_ID = os.environ["VERCEL_TEAM_ID"]
+          PROJECT_ID = os.environ["VERCEL_PROJECT_ID"]
+          DIST_DIR = "dist"
+          headers_auth = {"Authorization": f"Bearer {TOKEN}"}
+
+          # Coletar arquivos
+          files_to_upload = []
+          for root, dirs, files in os.walk(DIST_DIR):
+              dirs[:] = [d for d in dirs if d != 'node_modules']
+              for fname in files:
+                  fpath = os.path.join(root, fname)
+                  rel_path = os.path.relpath(fpath, DIST_DIR).replace("\\", "/")
+                  files_to_upload.append((rel_path, fpath))
+
+          print(f"Total arquivos: {len(files_to_upload)}")
+
+          # Upload
+          uploaded = []
+          for rel_path, fpath in files_to_upload:
+              with open(fpath, 'rb') as f:
+                  content = f.read()
+              sha1 = hashlib.sha1(content).hexdigest()
+              r = requests.post(
+                  f"https://api.vercel.com/v2/files?teamId={TEAM_ID}",
+                  headers={**headers_auth, "Content-Type": "application/octet-stream",
+                           "x-vercel-digest": sha1, "x-vercel-size": str(len(content))},
+                  data=content, timeout=60
+              )
+              uploaded.append({"file": rel_path, "sha": sha1, "size": len(content)})
+
+          print(f"Upload concluido: {len(uploaded)} arquivos")
+
+          # Deploy
+          r = requests.post(
+              f"https://api.vercel.com/v13/deployments?teamId={TEAM_ID}&forceNew=1",
+              headers={**headers_auth, "Content-Type": "application/json"},
+              json={
+                  "name": "uhome-proxy",
+                  "files": uploaded,
+                  "projectSettings": {"framework": None, "buildCommand": "", "outputDirectory": "", "installCommand": ""},
+                  "target": "production",
+              }, timeout=60
+          )
+          d = r.json()
+          deploy_id = d.get("id")
+          print(f"Deploy iniciado: {deploy_id} | {d.get('readyState')}")
+
+          # Aguardar READY
+          for i in range(30):
+              time.sleep(5)
+              r2 = requests.get(f"https://api.vercel.com/v13/deployments/{deploy_id}?teamId={TEAM_ID}", headers=headers_auth, timeout=15)
+              state = r2.json().get("readyState", "?")
+              print(f"  [{datetime.datetime.now().strftime('%H:%M:%S')}] {state}")
+              if state == "READY":
+                  print("Deploy concluido com sucesso!")
+                  break
+              elif state == "ERROR":
+                  print(f"ERRO no deploy: {r2.json().get('errorMessage', '')}")
+                  exit(1)
+          PYEOF

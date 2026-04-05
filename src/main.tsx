@@ -10,15 +10,21 @@ captureLeadIdentity();
 // All fonts lazy-loaded — system font stack covers initial render
 import "./index.css";
 
-// Load fonts after initial paint to avoid render-blocking
-requestIdleCallback(() => {
+const loadDeferredFonts = () => {
   import("@fontsource/plus-jakarta-sans/400.css");
   import("@fontsource/plus-jakarta-sans/700.css");
   import("@fontsource/plus-jakarta-sans/500.css");
   import("@fontsource/plus-jakarta-sans/600.css");
   import("@fontsource/plus-jakarta-sans/800.css");
   import("@fontsource/dm-mono/400.css");
-}, { timeout: 2000 });
+};
+
+// Load fonts after initial paint to avoid render-blocking
+if ("requestIdleCallback" in window) {
+  window.requestIdleCallback(loadDeferredFonts, { timeout: 2000 });
+} else {
+  window.setTimeout(loadDeferredFonts, 1);
+}
 
 if (import.meta.env.DEV) {
   import("./utils/testCorretorFlow").then(m => m.setupCorretorFlowTest());

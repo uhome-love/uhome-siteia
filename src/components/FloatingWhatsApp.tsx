@@ -63,25 +63,37 @@ export function FloatingWhatsApp() {
     return () => { clearTimeout(t); clearInterval(interval); };
   }, []);
 
+  // Extract imovel data from URL when on a property page
+  const imovelMatch = location.pathname.match(/^\/imovel\/([^/]+)/);
+  const currentImovelSlug = imovelMatch ? imovelMatch[1] : undefined;
+
   const handleClick = () => {
+    const imovelData = currentImovelSlug ? { slug: currentImovelSlug } : undefined;
     const url = corretor
-      ? buildCorretorWhatsAppUrl(corretor.nome, corretor.telefone)
-      : buildWhatsAppUrl("Olá! Vim pelo site da Uhome e gostaria de falar com um corretor.");
+      ? buildCorretorWhatsAppUrl(corretor.nome, corretor.telefone, imovelData)
+      : currentImovelSlug
+        ? buildWhatsAppUrl(undefined, imovelData)
+        : buildWhatsAppUrl("Olá! Vim pelo site da Uhome e gostaria de falar com um corretor.");
 
     openModal({
       whatsappUrl: url,
       origem_componente: "floating_whatsapp",
+      imovel_slug: currentImovelSlug,
     });
   };
 
   const handleRetargetingClick = () => {
+    const imovelData = currentImovelSlug ? { slug: currentImovelSlug } : undefined;
     const url = corretor
-      ? buildCorretorWhatsAppUrl(corretor.nome, corretor.telefone)
-      : buildWhatsAppUrl("Olá! Estou vendo vários imóveis no site e gostaria de receber uma seleção personalizada.");
+      ? buildCorretorWhatsAppUrl(corretor.nome, corretor.telefone, imovelData)
+      : currentImovelSlug
+        ? buildWhatsAppUrl(undefined, imovelData)
+        : buildWhatsAppUrl("Olá! Estou vendo vários imóveis no site e gostaria de receber uma seleção personalizada.");
 
     openModal({
       whatsappUrl: url,
       origem_componente: "retargeting_popup",
+      imovel_slug: currentImovelSlug,
     });
     dismissRetargeting();
   };

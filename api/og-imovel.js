@@ -1,7 +1,7 @@
 // Vercel Edge Function — Open Graph dinâmico para imóveis
-// Detecta bots (WhatsApp, Facebook, Telegram, etc.) em /imovel/:slug
-// Bots recebem HTML com meta tags OG corretas do imóvel.
-// Usuários normais recebem o index.html do SPA (sem redirecionamento).
+// APENAS para bots (WhatsApp, Facebook, Telegram, etc.)
+// Usuários normais são servidos pelo arquivo estático index.html via config.json
+// Esta função só é chamada quando o User-Agent contém padrões de bot
 
 export const config = { runtime: "edge" };
 
@@ -13,7 +13,7 @@ const BOT_UA_PATTERNS = [
   "whatsapp", "facebookexternalhit", "facebot", "twitterbot", "telegrambot",
   "linkedinbot", "slackbot", "discordbot", "googlebot", "bingbot",
   "applebot", "ia_archiver", "embedly", "outbrain", "pinterest",
-  "skypeuripreview", "vkshare", "w3c_validator", "curl", "wget",
+  "skypeuripreview", "vkshare", "w3c_validator",
 ];
 
 function isBotUA(ua) {
@@ -40,7 +40,7 @@ function getFotoPrincipal(row) {
       return (principal ?? fotos[0]).url;
     }
   } catch {}
-  return "https://uhome.com.br/og-default.jpg";
+  return "https://www.uhome.com.br/og-default.jpg";
 }
 
 function buildTitle(row) {
@@ -82,23 +82,63 @@ export default async function handler(req) {
   // Extrair slug da URL: /imovel/:slug
   const match = url.pathname.match(/^\/imovel\/([^/]+)/);
   if (!match) {
-    return new Response("Not found", { status: 404 });
+    // Não é uma rota de imóvel — passar para o próximo handler (index.html)
+    return new Response(null, { status: 404 });
   }
   const slug = match[1];
 
-  // Se não for bot, servir o index.html do SPA normalmente
+  // Se não for bot, retornar o index.html do SPA
+  // O fetch para /index.html usa um header especial para evitar loop
   if (!isBotUA(ua)) {
-    // Buscar o index.html estático e retorná-lo
-    const spaUrl = new URL("/index.html", url.origin);
-    const spaRes = await fetch(spaUrl.toString());
-    const spaHtml = await spaRes.text();
-    return new Response(spaHtml, {
-      status: 200,
-      headers: {
-        "Content-Type": "text/html; charset=utf-8",
-        "Cache-Control": "no-cache",
-      },
-    });
+    try {
+      const indexUrl = new URL("/index.html", url.origin);
+      const spaRes = await fetch(indexUrl.toString(), {
+        headers: {
+          // Header especial para identificar requisição interna e evitar loop
+          "x-vercel-skip-og": "1",
+          // User-Agent neutro que não é detectado como bot
+          "user-agent": "Vercel-Edge-SPA/1.0",
+        },
+      });
+      if (spaRes.ok) {
+        const html = await spaRes.text();
+        if (html.includes('id="root"') || html.includes("/assets/")) {
+          return new Response(html, {
+            status: 200,
+            headers: {
+              "Content-Type": "text/html; charset=utf-8",
+              "Cache-Control": "no-store, no-cache",
+              Vary: "User-Agent",
+            },
+          });
+        }
+      }
+    } catch (_e) {
+      // Se o fetch falhar, retornar 404 para o Vercel servir o index.html via fallback
+    }
+
+    // Fallback: redirecionar para o SPA via meta refresh
+    // O Vercel vai servir o index.html via a rota de fallback
+    return new Response(
+      `<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Uhome Imóveis</title>
+  <meta http-equiv="refresh" content="0">
+</head>
+<body><div id="root"></div></body>
+</html>`,
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "text/html; charset=utf-8",
+          "Cache-Control": "no-store",
+          Vary: "User-Agent",
+        },
+      }
+    );
   }
 
   // É um bot — buscar dados do imóvel no Supabase
@@ -122,7 +162,9 @@ export default async function handler(req) {
     if (Array.isArray(data) && data.length > 0) {
       imovel = data[0];
     }
-  } catch {}
+  } catch (_e) {
+    // Continuar com dados padrão
+  }
 
   // Construir meta tags
   const title = imovel
@@ -133,8 +175,8 @@ export default async function handler(req) {
     : "Encontre apartamentos, casas e coberturas em Porto Alegre. Busca inteligente por IA.";
   const image = imovel
     ? getFotoPrincipal(imovel)
-    : "https://uhome.com.br/og-default.jpg";
-  const pageUrl = `https://uhome.com.br/imovel/${slug}`;
+    : "https://www.uhome.com.br/og-default.jpg";
+  const pageUrl = `https://www.uhome.com.br/imovel/${slug}`;
 
   const html = `<!DOCTYPE html>
 <html lang="pt-BR">
@@ -161,7 +203,7 @@ export default async function handler(req) {
 <body>
   <h1>${escapeHtml(title)}</h1>
   <p>${escapeHtml(description)}</p>
-  <a href="${escapeHtml(pageUrl)}">Ver imóvel completo</a>
+  <a href="${escapeHtml(pageUrl)}">Ver imóvel completo na Uhome</a>
 </body>
 </html>`;
 
@@ -170,6 +212,7 @@ export default async function handler(req) {
     headers: {
       "Content-Type": "text/html; charset=utf-8",
       "Cache-Control": "public, max-age=3600, s-maxage=3600",
+      Vary: "User-Agent",
     },
   });
 }

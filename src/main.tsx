@@ -19,11 +19,17 @@ const loadDeferredFonts = () => {
   import("@fontsource/dm-mono/400.css");
 };
 
+const scheduleIdleCallback = (
+  globalThis as typeof globalThis & {
+    requestIdleCallback?: (callback: IdleRequestCallback, options?: IdleRequestOptions) => number;
+  }
+).requestIdleCallback;
+
 // Load fonts after initial paint to avoid render-blocking
-if ("requestIdleCallback" in window) {
-  window.requestIdleCallback(loadDeferredFonts, { timeout: 2000 });
+if (typeof scheduleIdleCallback === "function") {
+  scheduleIdleCallback(loadDeferredFonts, { timeout: 2000 });
 } else {
-  window.setTimeout(loadDeferredFonts, 1);
+  setTimeout(loadDeferredFonts, 1);
 }
 
 if (import.meta.env.DEV) {

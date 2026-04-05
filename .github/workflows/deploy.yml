@@ -19,6 +19,23 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
+      - name: Validate required secrets
+        run: |
+          if [ -z "${{ secrets.VITE_SUPABASE_URL }}" ]; then
+            echo "❌ ERRO: Secret VITE_SUPABASE_URL não está configurado!"
+            echo "Configure em: github.com/uhome-love/uhome-vision/settings/secrets/actions"
+            exit 1
+          fi
+          if [ -z "${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}" ]; then
+            echo "❌ ERRO: Secret VITE_SUPABASE_PUBLISHABLE_KEY não está configurado!"
+            exit 1
+          fi
+          if [ -z "${{ secrets.VERCEL_TOKEN }}" ]; then
+            echo "❌ ERRO: Secret VERCEL_TOKEN não está configurado!"
+            exit 1
+          fi
+          echo "✅ Todos os secrets validados"
+
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
@@ -27,6 +44,23 @@ jobs:
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+
+      - name: Validate build output
+        run: |
+          # Garantir que o build gerou os arquivos necessários
+          if [ ! -f "dist/index.html" ]; then
+            echo "❌ ERRO: dist/index.html não foi gerado!"
+            exit 1
+          fi
+          # Garantir que as env vars foram embutidas no bundle
+          if ! grep -r "huigglwvvzuwwyqvpmec" dist/assets/ > /dev/null 2>&1; then
+            echo "❌ ERRO CRÍTICO: Variáveis de ambiente do Supabase NÃO foram embutidas no bundle!"
+            echo "O site ficaria branco. Deploy cancelado para proteger a produção."
+            exit 1
+          fi
+          echo "✅ Build validado — env vars embutidas corretamente"
+          echo "📦 Arquivos gerados:"
+          ls -lah dist/assets/*.js | awk '{print $5, $9}'
 
       - name: Prepare Vercel Build Output structure
         run: |
@@ -44,7 +78,7 @@ jobs:
           {"runtime":"edge","entrypoint":"index.js"}
           EOF
 
-          # Configuração de rotas — no-store em /imovel/ para evitar cache CDN sem Vary
+          # Configuração de rotas
           cat > .vercel/output/config.json << 'EOF'
           {
             "version": 3,
@@ -74,8 +108,7 @@ jobs:
           }
           EOF
 
-          echo "Estrutura Build Output API criada:"
-          find .vercel/output -type f | grep -v "assets/" | head -20
+          echo "✅ Estrutura Build Output API criada"
 
       - name: Deploy to Vercel via API (Build Output)
         env:
@@ -94,7 +127,7 @@ jobs:
 
           headers_auth = {"Authorization": f"Bearer {TOKEN}"}
 
-          # Coletar todos os arquivos da estrutura .vercel/output/
+          # Coletar todos os arquivos
           files_to_upload = []
           for root, dirs, files in os.walk(OUTPUT_DIR):
               for fname in files:
@@ -146,9 +179,33 @@ jobs:
               state = r2.json().get("readyState", "?")
               print(f"  [{datetime.datetime.now().strftime('%H:%M:%S')}] {state}")
               if state == "READY":
-                  print("Deploy concluido com sucesso!")
+                  print("✅ Deploy concluido com sucesso!")
                   break
               elif state == "ERROR":
-                  print(f"ERRO no deploy: {r2.json().get('errorMessage', '')}")
+                  print(f"❌ ERRO no deploy: {r2.json().get('errorMessage', '')}")
                   sys.exit(1)
           PYEOF
+
+      - name: Smoke test production
+        run: |
+          echo "Aguardando propagação..."
+          sleep 15
+          # Testar se o site está respondendo corretamente
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" -A "Mozilla/5.0 Chrome/120" https://www.uhome.com.br/)
+          if [ "$STATUS" != "200" ]; then
+            echo "❌ ALERTA: Site retornou HTTP $STATUS após deploy!"
+            exit 1
+          fi
+          # Testar se o bundle JS está acessível
+          BUNDLE_URL=$(curl -s -A "Mozilla/5.0" https://www.uhome.com.br/ | grep -o '/assets/index-[^"]*\.js' | head -1)
+          if [ -z "$BUNDLE_URL" ]; then
+            echo "❌ ALERTA: Bundle JS não encontrado no HTML!"
+            exit 1
+          fi
+          BUNDLE_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://www.uhome.com.br${BUNDLE_URL}")
+          if [ "$BUNDLE_STATUS" != "200" ]; then
+            echo "❌ ALERTA: Bundle JS retornou HTTP $BUNDLE_STATUS!"
+            exit 1
+          fi
+          echo "✅ Smoke test passou — site funcionando em produção"
+          echo "   HTTP: $STATUS | Bundle: $BUNDLE_URL ($BUNDLE_STATUS)"

@@ -1,5 +1,5 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, lazy, Suspense } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -7,7 +7,7 @@ import { LeadSidebar } from "@/components/LeadSidebar";
 import { FinancingSimulator } from "@/components/FinancingSimulator";
 import { AgendamentoVisita } from "@/components/AgendamentoVisita";
 import { SimilarProperties } from "@/components/SimilarProperties";
-import { PropertyMap } from "@/components/PropertyMap";
+const PropertyMap = lazy(() => import("@/components/PropertyMap").then(m => ({ default: m.PropertyMap })));
 import { FotoImovel } from "@/components/FotoImovel";
 import { CardUhomePreco } from "@/components/CardUhomePreco";
 import { AuthModal } from "@/components/AuthModal";
@@ -585,12 +585,14 @@ const PropertyDetail = () => {
                   {imovel.bairro}, Porto Alegre — endereço exato após contato
                 </p>
                 <div className="mt-4">
-                  <PropertyMap
-                    neighborhood={imovel.bairro}
-                    city={imovel.cidade}
-                    lat={imovel.latitude}
-                    lng={imovel.longitude}
-                  />
+                  <Suspense fallback={<div className="h-64 w-full rounded-xl bg-muted animate-pulse" />}>
+                    <PropertyMap
+                      neighborhood={imovel.bairro}
+                      city={imovel.cidade}
+                      lat={imovel.latitude}
+                      lng={imovel.longitude}
+                    />
+                  </Suspense>
                 </div>
               </div>
             )}

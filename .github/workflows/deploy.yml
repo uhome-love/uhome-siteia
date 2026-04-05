@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -26,7 +27,7 @@ jobs:
 
       - name: Create vercel.json in dist
         run: |
-          cat > dist/vercel.json << 'EOF'
+          cat > dist/vercel.json << 'VEOF'
           {
             "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
             "headers": [
@@ -39,7 +40,7 @@ jobs:
               }
             ]
           }
-          EOF
+          VEOF
 
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v25

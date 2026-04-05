@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# === PROTEÇÃO UHOME-PROXY ===
+# Estes arquivos pertencem ao projeto uhome-proxy (Next.js/Vercel)
+# e NÃO devem estar neste repositório Vite/Lovable
+middleware.ts
+vercel.json
+next.config.js
+next.config.ts
+.next/

@@ -684,57 +684,39 @@ const PropertyDetail = () => {
 
       {/* Fixed bottom bar — mobile only */}
       <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-md px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:hidden">
-        <div className="flex items-center gap-3">
-          <div className="flex-1 min-w-0">
-            <p className="font-body text-xs text-muted-foreground truncate">{imovel.bairro}</p>
-            <p className="font-body text-base font-bold text-foreground">{priceFormatted}</p>
-          </div>
-          <Button
-            size="sm"
-            className="shrink-0 text-[13px] px-4 py-2.5 h-auto"
-            onClick={() => {
-              const sidebar = document.querySelector('[data-lead-sidebar]');
-              if (sidebar) sidebar.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }}
-          >
-            <Heart className="h-4 w-4 mr-1.5" />
-            Interesse
-          </Button>
-          <Button
-            variant="whatsapp"
-            size="sm"
-            className="shrink-0 text-[13px] px-4 py-2.5 h-auto"
-            onClick={() => {
-              if (!imovel) return;
-              const url = corretor
-                ? buildCorretorWhatsAppUrl(corretor.nome, corretor.telefone, {
-                    titulo: imovel.titulo,
-                    bairro: imovel.bairro,
-                    slug: imovel.slug,
-                  })
-                : buildWhatsAppUrl(undefined, {
-                    titulo: imovel.titulo,
-                    bairro: imovel.bairro,
-                    slug: imovel.slug,
-                  });
-              openLeadModal({
-                whatsappUrl: url,
-                origem_componente: "detalhe_mobile_bar",
-                imovel_id: imovel.id,
-                imovel_slug: imovel.slug,
-                imovel_titulo: imovel.titulo,
-                imovel_bairro: imovel.bairro,
-                imovel_preco: imovel.preco,
-              });
-            }}
-          >
-            <MessageCircle className="h-4 w-4 mr-1.5" />
-            WhatsApp
-          </Button>
-        </div>
+        <Button
+          variant="whatsapp"
+          className="w-full text-base font-bold py-3 h-auto"
+          onClick={() => {
+            if (!imovel) return;
+            const url = corretor
+              ? buildCorretorWhatsAppUrl(corretor.nome, corretor.telefone, {
+                  titulo: imovel.titulo,
+                  bairro: imovel.bairro,
+                  slug: imovel.slug,
+                })
+              : buildWhatsAppUrl(undefined, {
+                  titulo: imovel.titulo,
+                  bairro: imovel.bairro,
+                  slug: imovel.slug,
+                });
+            openLeadModal({
+              whatsappUrl: url,
+              origem_componente: "detalhe_mobile_sticky",
+              imovel_id: imovel.id,
+              imovel_slug: imovel.slug,
+              imovel_titulo: imovel.titulo,
+              imovel_bairro: imovel.bairro,
+              imovel_preco: imovel.preco,
+            });
+          }}
+        >
+          <MessageCircle className="h-5 w-5 mr-2" />
+          Falar no WhatsApp
+        </Button>
       </div>
       {/* Spacer for fixed bottom bar */}
-      <div className="h-16 sm:hidden" />
+      <div className="h-20 sm:hidden" />
       <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
     </div>
   );

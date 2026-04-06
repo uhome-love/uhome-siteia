@@ -156,6 +156,12 @@ async function handleLead(
   const imovelSlug = (record.imovel_slug as string) ?? null
   const imovelCodigo = extractImovelCodigo(imovelSlug)
 
+  // Build observacoes with extra context not in CRM schema
+  const obsLines: string[] = []
+  if (record.origem_pagina) obsLines.push(`Página: ${record.origem_pagina}`)
+  if (record.origem_componente) obsLines.push(`Componente: ${record.origem_componente}`)
+  const observacoes = obsLines.length > 0 ? obsLines.join(' | ') : null
+
   const payload = {
     nome: record.nome,
     telefone: record.telefone,
@@ -166,14 +172,13 @@ async function handleLead(
     imovel_id_site: record.imovel_id ?? null,
     imovel_slug: imovelSlug,
     imovel_codigo: imovelCodigo,
-    pagina_url: record.origem_pagina ?? null,
     bairro_interesse: record.imovel_bairro ?? null,
     status: 'novo',
     atribuido_para: corretorCRMId,
     site_lead_id: record.id,
     utm_source: record.utm_source ?? null,
     utm_campaign: record.utm_campaign ?? null,
-    created_at: record.created_at,
+    observacoes,
   }
 
   let { data: leadCRM, error } = await supabaseCRM
@@ -216,6 +221,8 @@ async function handleAgendamento(
   const imovelSlug = (record.imovel_slug as string) ?? null
   const imovelCodigo = extractImovelCodigo(imovelSlug)
 
+  const obsAgend = `Visita agendada: ${record.data_visita} às ${record.horario}${record.origem_pagina ? ` | Página: ${record.origem_pagina}` : ''}`
+
   const { data: leadCRM, error } = await supabaseCRM
     .from('leads')
     .insert({
@@ -227,11 +234,10 @@ async function handleAgendamento(
       imovel_id_site: record.imovel_id ?? null,
       imovel_slug: imovelSlug,
       imovel_codigo: imovelCodigo,
-      pagina_url: record.origem_pagina ?? null,
       bairro_interesse: record.imovel_bairro ?? null,
       status: 'agendado',
       atribuido_para: corretorCRMId,
-      observacoes: `Visita agendada: ${record.data_visita} às ${record.horario}`,
+      observacoes: obsAgend,
     })
     .select()
     .single()
@@ -282,11 +288,10 @@ async function handleWhatsAppClick(
       imovel_id_site: record.imovel_id ?? null,
       imovel_slug: imovelSlug,
       imovel_codigo: imovelCodigo,
-      pagina_url: record.origem_pagina ?? null,
       bairro_interesse: record.imovel_bairro ?? null,
       status: 'novo',
       atribuido_para: corretorCRMId,
-      observacoes: `Clique no WhatsApp via link do corretor. Página: ${record.origem_pagina ?? '/'}`,
+      observacoes: `Clique no WhatsApp. Página: ${record.origem_pagina ?? '/'}`,
     })
     .select()
     .single()

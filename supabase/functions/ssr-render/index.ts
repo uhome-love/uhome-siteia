@@ -845,6 +845,8 @@ async function renderEmpreendimentos() {
 
 /* ── main handler ────────────────────────────────────── */
 
+const BOT_UA_RE = /whatsapp|telegrambot|facebookexternalhit|facebot|twitterbot|linkedinbot|slackbot|discordbot|googlebot|bingbot|yandexbot|applebot|pinterestbot|embedly|quora|outbrain|vkshare|w3c_validator/i;
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -853,6 +855,17 @@ Deno.serve(async (req) => {
   try {
     const url = new URL(req.url);
     const rawPath = url.searchParams.get("path") ?? "/";
+    const userAgent = req.headers.get("user-agent") ?? "";
+    const isBot = BOT_UA_RE.test(userAgent);
+
+    // If not a bot, redirect to the canonical uhome.com.br URL
+    if (!isBot) {
+      const canonical = `${SITE}${rawPath}`;
+      return new Response(null, {
+        status: 302,
+        headers: { ...corsHeaders, "Location": canonical },
+      });
+    }
 
     // Strip /c/:corretorSlug prefix so all corretor links get proper OG
     const { cleanPath: path, corretorSlug } = stripCorretorPrefix(rawPath);

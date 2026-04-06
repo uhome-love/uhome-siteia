@@ -68,7 +68,7 @@ export function StickyPropertyCTA({ imovelId, imovelSlug, imovelTitulo, imovelBa
         imovel_bairro: imovelBairro,
         imovel_preco: imovelPreco,
         origem_componente: "sticky_cta",
-        origem_pagina: window.location.pathname,
+        origem_pagina: window.location.href,
       });
       trackGenerateLead({ origem_componente: "sticky_cta", imovel_titulo: imovelTitulo, imovel_slug: imovelSlug });
       setSuccess(true);

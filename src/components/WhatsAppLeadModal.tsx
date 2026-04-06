@@ -50,6 +50,7 @@ export function WhatsAppLeadModal() {
         imovel_bairro: data.imovel_bairro,
         imovel_preco: data.imovel_preco,
         origem_componente: data.origem_componente,
+        origem_pagina: window.location.href,
       });
 
       // Track events

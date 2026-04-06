@@ -73,6 +73,7 @@ export const ExitIntentModal = forwardRef<HTMLDivElement>(function ExitIntentMod
         nome: nome.trim(),
         telefone: telefone.trim(),
         origem_componente: "exit_intent",
+        origem_pagina: window.location.href,
       });
       setSuccess(true);
       toast.success("Pronto! Um corretor entrará em contato.");

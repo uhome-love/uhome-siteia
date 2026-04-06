@@ -68,7 +68,7 @@ export async function submitLead(data: LeadData) {
     imovel_titulo: data.imovel_titulo || null,
     imovel_bairro: data.imovel_bairro || null,
     imovel_preco: data.imovel_preco || null,
-    origem_pagina: data.origem_pagina || window.location.pathname,
+    origem_pagina: data.origem_pagina || window.location.href,
     origem_componente: data.origem_componente,
     utm_source: tracking.utm_source || null,
     utm_medium: tracking.utm_medium || null,

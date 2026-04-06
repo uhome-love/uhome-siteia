@@ -47,7 +47,7 @@ export const useWhatsAppLeadStore = create<WhatsAppLeadStore>((set) => ({
         imovel_id: data.imovel_id,
         imovel_titulo: data.imovel_titulo,
         imovel_slug: data.imovel_slug,
-        origem_pagina: window.location.pathname,
+        origem_pagina: window.location.href,
       });
       trackClickWhatsapp({
         origem_componente: data.origem_componente,

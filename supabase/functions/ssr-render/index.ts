@@ -210,7 +210,12 @@ function html(title: string, description: string, rawOgImage: string, canonical:
   height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <!-- End Google Tag Manager (noscript) -->
   ${bodyHtml}
-  
+  <script>
+    // Redirect human visitors to canonical URL (bots don't execute JS)
+    if (window.location.hostname !== 'uhome.com.br') {
+      window.location.replace('${esc(canonical)}');
+    }
+  </script>
 </body>
 </html>`;
 }
@@ -857,15 +862,6 @@ Deno.serve(async (req) => {
     const rawPath = url.searchParams.get("path") ?? "/";
     const userAgent = req.headers.get("user-agent") ?? "";
     const isBot = BOT_UA_RE.test(userAgent);
-
-    // If not a bot, redirect to the canonical uhome.com.br URL
-    if (!isBot) {
-      const canonical = `${SITE}${rawPath}`;
-      return new Response(null, {
-        status: 302,
-        headers: { ...corsHeaders, "Location": canonical },
-      });
-    }
 
     // Strip /c/:corretorSlug prefix so all corretor links get proper OG
     const { cleanPath: path, corretorSlug } = stripCorretorPrefix(rawPath);

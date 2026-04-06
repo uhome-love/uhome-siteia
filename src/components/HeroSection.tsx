@@ -35,7 +35,8 @@ export function HeroSection() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { prefixLink } = useCorretor();
-  const [modo, setModo] = useState<"comprar" | "anunciar">("comprar");
+  const [modo, setModo] = useState<"comprar" | "ia" | "anunciar">("comprar");
+  const [aiQuery, setAiQuery] = useState("");
 
   // Search state
   const [bairroInput, setBairroInput] = useState("");
@@ -200,24 +201,28 @@ export function HeroSection() {
           >
             {/* Toggle */}
             <div className="mb-4 flex gap-2 sm:mb-6">
-              {(["comprar", "anunciar"] as const).map((m) => (
-                <button
-                  key={m}
-                  onClick={() => setModo(m)}
-                  className={`rounded-full border-[1.5px] px-5 py-2 font-body text-sm transition-all active:scale-[0.97] ${
-                    modo === m
-                      ? "border-primary bg-primary/5 font-bold text-primary"
-                      : "border-border font-normal text-foreground/70 hover:border-foreground/30"
-                  }`}
-                >
-                  {m === "comprar" ? "Buscar imóveis" : "Anunciar imóvel"}
-                </button>
-              ))}
+              {(["comprar", "ia", "anunciar"] as const).map((m) => {
+                const label = m === "comprar" ? "Buscar imóveis" : m === "ia" ? "Busca IA" : "Anunciar imóvel";
+                return (
+                  <button
+                    key={m}
+                    onClick={() => setModo(m)}
+                    className={`flex items-center gap-1.5 rounded-full border-[1.5px] px-4 py-2 font-body text-sm transition-all active:scale-[0.97] ${
+                      modo === m
+                        ? "border-primary bg-primary/5 font-bold text-primary"
+                        : "border-border font-normal text-foreground/70 hover:border-foreground/30"
+                    }`}
+                  >
+                    {m === "ia" && <Sparkles className="h-3.5 w-3.5" />}
+                    {label}
+                  </button>
+                );
+              })}
             </div>
 
             {modo === "comprar" ? (
               <>
-                {/* Bairro with autocomplete */}
+                {/* Bairro with autocomplete - comprar mode */}
                 <div ref={bairroRef} className="relative mb-2 sm:mb-2.5">
                   <div className="rounded-xl border-[1.5px] border-border p-3 transition-colors focus-within:border-primary sm:p-3.5">
                     <div className="flex items-start gap-2.5">
@@ -380,13 +385,55 @@ export function HeroSection() {
                   Buscar imóveis
                 </button>
 
+              </>
+            ) : modo === "ia" ? (
+              <>
+                <p className="mb-3 font-body text-sm text-muted-foreground">
+                  Descreva o imóvel dos seus sonhos em linguagem natural
+                </p>
+                <div className="mb-3 flex items-center gap-2 rounded-xl border-[1.5px] border-border p-3 transition-colors focus-within:border-primary">
+                  <Sparkles className="h-5 w-5 shrink-0 text-accent" />
+                  <input
+                    type="text"
+                    value={aiQuery}
+                    onChange={(e) => setAiQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && aiQuery.trim()) {
+                        navigate(prefixLink(`/busca?modo=ia&q=${encodeURIComponent(aiQuery.trim())}`));
+                      }
+                    }}
+                    placeholder="Ex: Apartamento 3 quartos com varanda no Moinhos até R$ 1 milhão..."
+                    className="w-full bg-transparent font-body text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none"
+                  />
+                </div>
                 <button
-                  onClick={() => navigate(prefixLink("/busca?modo=ia"))}
-                  className="mx-auto flex items-center gap-1.5 font-body text-xs font-semibold text-primary transition-colors hover:text-primary/80"
+                  onClick={() => {
+                    if (aiQuery.trim()) {
+                      navigate(prefixLink(`/busca?modo=ia&q=${encodeURIComponent(aiQuery.trim())}`));
+                    } else {
+                      navigate(prefixLink("/busca?modo=ia"));
+                    }
+                  }}
+                  className="mb-4 w-full rounded-xl bg-accent py-3.5 font-body text-sm font-bold text-accent-foreground transition-all hover:brightness-110 active:scale-[0.97]"
                 >
-                  <Sparkles className="h-3.5 w-3.5" />
-                  Busca inteligente por IA
+                  Buscar com IA
                 </button>
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    "Apto 2 quartos perto do Parcão até R$3.000",
+                    "Cobertura com terraço no Moinhos",
+                    "Studio moderno até R$2.500/mês",
+                    "Casa com piscina em Três Figueiras",
+                  ].map((ex) => (
+                    <button
+                      key={ex}
+                      onClick={() => navigate(prefixLink(`/busca?modo=ia&q=${encodeURIComponent(ex)}`))}
+                      className="rounded-full border border-border px-2.5 py-1 font-body text-[11px] text-muted-foreground transition-colors hover:border-accent/40 hover:text-foreground"
+                    >
+                      "{ex}"
+                    </button>
+                  ))}
+                </div>
               </>
             ) : enviado ? (
               <div className="py-8 text-center">

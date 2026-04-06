@@ -206,7 +206,11 @@ const PropertyDetail = () => {
   ].filter(Boolean) as { icon: any; value: string; label: string }[];
 
   const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
+    const slug = imovel?.slug;
+    const url = slug
+      ? `https://uhome.com.br/imovel/${slug}`
+      : window.location.href;
+    navigator.clipboard.writeText(url);
     import("sonner").then(({ toast }) => toast.success("Link copiado!"));
   };
 

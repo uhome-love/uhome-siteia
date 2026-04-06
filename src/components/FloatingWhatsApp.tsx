@@ -108,7 +108,7 @@ export function FloatingWhatsApp() {
   if (window.location.pathname.startsWith("/admin")) return null;
 
   return visible ? (
-    <div className={`fixed right-3 z-[60] flex flex-col items-end gap-2 transition-[bottom] duration-300 sm:bottom-6 sm:right-6 ${hasBottomBar ? "bottom-[7.5rem]" : "bottom-[4.5rem]"}`}>
+    <div className={`fixed right-3 z-[60] flex flex-col items-end gap-2 transition-[bottom] duration-300 sm:bottom-6 sm:right-6 ${isPropertyPage ? "hidden sm:flex" : ""} ${hasBottomBar ? "bottom-[7.5rem]" : "bottom-[4.5rem]"}`}>
       {retargetingPopup && (
         <div
           className="relative mr-1 w-[240px] rounded-2xl bg-card p-4 shadow-xl border border-border animate-in fade-in slide-in-from-bottom-2 duration-300"

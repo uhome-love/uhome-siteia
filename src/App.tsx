@@ -29,7 +29,7 @@ const Onboarding = lazy(() => import("./pages/Onboarding.tsx"));
 const Blog = lazy(() => import("./pages/Blog.tsx"));
 const BlogPostPage = lazy(() => import("./pages/BlogPost.tsx"));
 const Favoritos = lazy(() => import("./pages/Favoritos.tsx"));
-const NotFound = lazy(() => import("./pages/NotFound.tsx"));
+const SeoOrNotFound = lazy(() => import("./components/SeoOrNotFound"));
 const TipoImovel = lazy(() => import("./pages/TipoImovel.tsx"));
 const Condominios = lazy(() => import("./pages/Condominios.tsx"));
 const CondominioDetail = lazy(() => import("./pages/CondominioDetail.tsx"));
@@ -132,22 +132,7 @@ const App = () => (
                 <Route path="/studios-porto-alegre" element={<TipoImovel />} />
                 <Route path="/comerciais-porto-alegre" element={<TipoImovel />} />
 
-                {/* SEO landing pages: intent pages */}
-                <Route path="/apartamentos-a-venda-porto-alegre" element={<SeoLanding />} />
-                <Route path="/casas-a-venda-porto-alegre" element={<SeoLanding />} />
-                <Route path="/coberturas-a-venda-porto-alegre" element={<SeoLanding />} />
-                <Route path="/terrenos-a-venda-porto-alegre" element={<SeoLanding />} />
-                <Route path="/imoveis-de-luxo-porto-alegre" element={<SeoLanding />} />
-                <Route path="/investimento-imobiliario-porto-alegre" element={<SeoLanding />} />
-                <Route path="/lancamentos-porto-alegre" element={<SeoLanding />} />
-                {/* Dynamic SEO: tipo+bairro e tipo+quartos+bairro */}
-                <Route path="/apartamentos-/*" element={<SeoLanding />} />
-                <Route path="/casas-/*" element={<SeoLanding />} />
-                <Route path="/coberturas-/*" element={<SeoLanding />} />
-                <Route path="/studios-/*" element={<SeoLanding />} />
-                <Route path="/terrenos-/*" element={<SeoLanding />} />
-                <Route path="/comerciais-/*" element={<SeoLanding />} />
-                <Route path="/imoveis-/*" element={<SeoLanding />} />
+                {/* SEO landing pages are handled by the catch-all SeoOrNotFound below */}
 
                 {/* Rotas do corretor — mesmas páginas, mantendo /c/:slug na URL */}
                 <Route path="/c/:corretorSlug" element={<CorretorRefLayout />}>
@@ -186,7 +171,7 @@ const App = () => (
                   <Route path="corretores" element={<AdminCorretores />} />
                   <Route path="empreendimentos" element={<AdminEmpreendimentos />} />
                 </Route>
-                <Route path="*" element={<NotFound />} />
+                <Route path="*" element={<SeoOrNotFound />} />
               </Routes>
             </Suspense>
             <ExitIntentModal />

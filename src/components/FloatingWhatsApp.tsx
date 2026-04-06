@@ -21,8 +21,10 @@ export function FloatingWhatsApp() {
   const openModal = useWhatsAppLeadStore((s) => s.openModal);
   const location = useLocation();
 
+  // Hide on property detail pages in mobile — the sticky bottom CTA handles it
+  const isPropertyPage = location.pathname.startsWith("/imovel/");
   // Pages with sticky bottom bars need extra offset
-  const hasBottomBar = location.pathname === "/busca" || location.pathname.startsWith("/imovel/");
+  const hasBottomBar = location.pathname === "/busca" || isPropertyPage;
 
   useEffect(() => {
     const timer = setTimeout(() => setVisible(true), 3000);

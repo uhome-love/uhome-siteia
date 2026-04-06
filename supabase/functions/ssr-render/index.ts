@@ -858,15 +858,6 @@ Deno.serve(async (req) => {
     const userAgent = req.headers.get("user-agent") ?? "";
     const isBot = BOT_UA_RE.test(userAgent);
 
-    // If not a bot, redirect to the canonical uhome.com.br URL
-    if (!isBot) {
-      const canonical = `${SITE}${rawPath}`;
-      return new Response(null, {
-        status: 302,
-        headers: { ...corsHeaders, "Location": canonical },
-      });
-    }
-
     // Strip /c/:corretorSlug prefix so all corretor links get proper OG
     const { cleanPath: path, corretorSlug } = stripCorretorPrefix(rawPath);
 

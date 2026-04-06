@@ -1,14 +1,5 @@
 import { getCorretorRef } from "./session";
-
-/** Gera o prefixo de URL do corretor ativo, se houver */
-function getCorretorUrlPrefix(): string {
-  const slug = localStorage.getItem("corretor_ref_slug") || localStorage.getItem("uhome_corretor_ref");
-  if (!slug) return "";
-  // Check TTL
-  const ts = localStorage.getItem("corretor_ref_ts");
-  if (ts && Date.now() - Number(ts) > 30 * 24 * 60 * 60 * 1000) return "";
-  return `/c/${slug}`;
-}
+import { getShareUrl } from "@/utils/shareUrl";
 
 /** Número do WhatsApp da Uhome — lido de env var ou fallback padrão */
 export const WHATSAPP_NUMBER =
@@ -42,8 +33,7 @@ export function buildWhatsAppUrl(
     if (imovel.bairro) msg += ` em ${imovel.bairro}`;
     msg += ".";
     if (imovel.slug) {
-      const prefix = getCorretorUrlPrefix();
-      msg += `\nLink: https://uhome.com.br${prefix}/imovel/${imovel.slug}`;
+      msg += `\nLink: ${getShareUrl(imovel.slug)}`;
     }
   } else {
     msg =
@@ -78,8 +68,7 @@ export function buildCorretorWhatsAppUrl(
     if (imovel.bairro) msg += ` em ${imovel.bairro}`;
     msg += ` no site Uhome e tenho interesse. Pode me ajudar?`;
     if (imovel.slug) {
-      const prefix = getCorretorUrlPrefix();
-      msg += `\nLink: https://uhome.com.br${prefix}/imovel/${imovel.slug}`;
+      msg += `\nLink: ${getShareUrl(imovel.slug)}`;
     }
   } else {
     msg = `Olá ${corretorNome}, vim pelo site Uhome e gostaria de informações sobre imóveis.`;

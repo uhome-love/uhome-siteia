@@ -139,6 +139,13 @@ Deno.serve(async (req) => {
   })
 })
 
+// ─── Helpers ─────────────────────────────────────────────────────
+function extractImovelCodigo(slug: string | null | undefined): string | null {
+  if (!slug) return null
+  const match = slug.match(/(\d+)(?:-[A-Z]{0,3})?$/)
+  return match ? match[1] : null
+}
+
 // ─── Lead handler (existing flow) ────────────────────────────────
 async function handleLead(
   supabaseSite: any,
@@ -146,14 +153,20 @@ async function handleLead(
   record: Record<string, unknown>,
   corretorCRMId: string | null
 ) {
+  const imovelSlug = (record.imovel_slug as string) ?? null
+  const imovelCodigo = extractImovelCodigo(imovelSlug)
+
   const payload = {
     nome: record.nome,
     telefone: record.telefone,
     email: record.email ?? null,
     origem: 'site_uhome',
-    origem_detalhe: record.origem_componente,
+    origem_detalhe: record.origem_componente ?? null,
     imovel_interesse: record.imovel_titulo ?? null,
     imovel_id_site: record.imovel_id ?? null,
+    imovel_slug: imovelSlug,
+    imovel_codigo: imovelCodigo,
+    pagina_url: record.origem_pagina ?? null,
     bairro_interesse: record.imovel_bairro ?? null,
     status: 'novo',
     atribuido_para: corretorCRMId,

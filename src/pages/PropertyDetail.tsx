@@ -1,4 +1,5 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { getShareUrl } from "@/utils/shareUrl";
 import { useEffect, useState, useRef, useCallback, lazy, Suspense } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { Navbar } from "@/components/Navbar";
@@ -207,9 +208,7 @@ const PropertyDetail = () => {
 
   const handleShare = () => {
     const slug = imovel?.slug;
-    const url = slug
-      ? `https://uhome.com.br/imovel/${slug}`
-      : window.location.href;
+    const url = slug ? getShareUrl(slug) : window.location.href;
     navigator.clipboard.writeText(url);
     import("sonner").then(({ toast }) => toast.success("Link copiado!"));
   };

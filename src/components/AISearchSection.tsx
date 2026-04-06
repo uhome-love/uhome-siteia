@@ -40,8 +40,7 @@ export function AISearchSection() {
               <Sparkles className="h-5 w-5 shrink-0 text-accent" />
               <input
                 type="text"
-                placeholder="Descreva o que você procura..."
-                className="flex-1 bg-transparent font-body text-base text-foreground placeholder:text-muted-foreground focus:outline-none sm:text-sm"
+                placeholder="Ex: Apartamento 3 quartos com varanda no Moinhos até R$ 1 milhão..."
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     navigate(prefixLink(`/busca?modo=ia&q=${encodeURIComponent((e.target as HTMLInputElement).value)}`));

@@ -104,10 +104,28 @@ const NotFound = () => {
             navigate(`/imovel/${rows[0].slug}`, { replace: true });
             return;
           }
+          // Se parece ser uma URL de imóvel que não existe mais, redireciona para busca
+          if (location.pathname.startsWith("/imovel/")) {
+            navigate("/busca", { replace: true });
+            return;
+          }
+          setChecking(false);
+          log404();
+        })
+        .catch(() => {
+          if (location.pathname.startsWith("/imovel/")) {
+            navigate("/busca", { replace: true });
+            return;
+          }
           setChecking(false);
           log404();
         });
     } else {
+      // URLs de imóvel sem slug válido
+      if (location.pathname.startsWith("/imovel/")) {
+        navigate("/busca", { replace: true });
+        return;
+      }
       setChecking(false);
       log404();
     }

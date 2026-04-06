@@ -8,13 +8,14 @@ import { formatPhone } from "@/lib/phoneMask";
 interface LeadFormInlineProps {
   isOpen: boolean;
   imovelId?: string;
+  imovelSlug?: string;
   imovelTitulo?: string;
   imovelBairro?: string;
   imovelPreco?: number;
   onClose: () => void;
 }
 
-export function LeadFormInline({ isOpen, imovelId, imovelTitulo, imovelBairro, imovelPreco, onClose }: LeadFormInlineProps) {
+export function LeadFormInline({ isOpen, imovelId, imovelSlug, imovelTitulo, imovelBairro, imovelPreco, onClose }: LeadFormInlineProps) {
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
   const [email, setEmail] = useState("");
@@ -34,10 +35,12 @@ export function LeadFormInline({ isOpen, imovelId, imovelTitulo, imovelBairro, i
         telefone: telefone.trim(),
         email: email.trim() || undefined,
         imovel_id: imovelId,
+        imovel_slug: imovelSlug,
         imovel_titulo: imovelTitulo,
         imovel_bairro: imovelBairro,
         imovel_preco: imovelPreco,
         origem_componente: "card_cta",
+        origem_pagina: window.location.href,
       });
       setSuccess(true);
       toast.success("Recebemos seu contato! Um corretor falará com você em breve.");

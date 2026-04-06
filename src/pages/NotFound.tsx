@@ -36,6 +36,14 @@ function tryRedirect(pathname: string): string | null {
     return p.replace("/condominio/", "/condominios/");
   }
 
+  // /condominios/slug/id → /condominios/slug (old URL format with numeric ID)
+  const condoMatch = p.match(/^\/condominios\/([^/]+)\/\d+$/);
+  if (condoMatch) return `/condominios/${condoMatch[1]}`;
+
+  // /lancamento/slug/id → /condominios/slug
+  const lancMatch = p.match(/^\/lancamento\/([^/]+)(?:\/\d+)?$/);
+  if (lancMatch) return `/condominios/${lancMatch[1]}`;
+
   // Common misspellings / old URLs
   if (p === "/pesquisa" || p === "/search") return "/busca";
   if (p === "/lancamentos") return "/condominios";

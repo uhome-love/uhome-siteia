@@ -28,18 +28,10 @@ export default defineConfig(({ mode }) => ({
         chunkFileNames: "assets/[name]-[hash].js",
         entryFileNames: "assets/[name]-[hash].js",
         manualChunks(id) {
-          // Mapbox — chunk isolado, sem dependências circulares
+          // Mapbox — chunk isolado, carregado apenas quando mapa é exibido
           if (id.includes("mapbox-gl")) return "mapbox-gl";
-          // Recharts/D3 — gráficos, só usados em admin
-          if (
-            id.includes("node_modules/recharts") ||
-            id.includes("node_modules/d3-") ||
-            id.includes("node_modules/victory-")
-          )
-            return "charts";
-          // Todos os outros node_modules vão para vendor único
-          // (evita circular dependencies entre chunks)
-          if (id.includes("node_modules/")) return "vendor";
+          // Recharts + D3 — só usado em admin
+          if (id.includes("node_modules/recharts") || id.includes("node_modules/d3-") || id.includes("node_modules/victory-")) return "charts";
         },
       },
     },

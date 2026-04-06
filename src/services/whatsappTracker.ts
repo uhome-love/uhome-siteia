@@ -24,7 +24,7 @@ export async function trackWhatsAppClick(data: WhatsAppClickData = {}) {
       imovel_id: data.imovel_id || null,
       imovel_titulo: data.imovel_titulo || null,
       imovel_slug: data.imovel_slug || null,
-      origem_pagina: data.origem_pagina || window.location.pathname,
+      origem_pagina: data.origem_pagina || window.location.href,
       corretor_ref_id: refId || null,
       corretor_ref_slug: refSlug || null,
       origem_ref: refSlug ? 'link_corretor' : 'organico',

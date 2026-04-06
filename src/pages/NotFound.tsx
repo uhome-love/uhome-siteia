@@ -45,6 +45,9 @@ function tryRedirect(pathname: string): string | null {
   if (p === "/home") return "/";
   if (p === "/privacidade") return "/politica-de-privacidade";
   if (p === "/avaliacao" || p === "/avaliar") return "/avaliar-imovel";
+  if (p === "/imoveis") return "/busca";
+  if (p === "/comprar") return "/busca";
+  if (p === "/venda") return "/busca?finalidade=venda";
 
   return null;
 }

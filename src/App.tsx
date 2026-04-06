@@ -120,6 +120,9 @@ const App = () => (
                 <Route path="/empreendimentos" element={<Condominios />} />
                 <Route path="/empreendimentos/:slug" element={<EmpreendimentoDetail />} />
                 <Route path="/lancamentos" element={<Navigate to="/condominios" replace />} />
+                <Route path="/imoveis" element={<Navigate to="/busca" replace />} />
+                <Route path="/comprar" element={<Navigate to="/busca" replace />} />
+                <Route path="/venda" element={<Navigate to="/busca?finalidade=venda" replace />} />
                 <Route path="/vitrine/:id" element={<Vitrine />} />
                 <Route path="/mega-cyrela" element={<MegaCyrela />} />
                 <Route path="/sobre" element={<Sobre />} />

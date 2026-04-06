@@ -51,6 +51,7 @@ const Index = () => {
       <Navbar />
       <main>
         <HeroSection />
+        <AISearchSection />
         <Suspense fallback={null}>
           <EmpreendimentosDestaque />
           <FeaturedNeighborhoods />

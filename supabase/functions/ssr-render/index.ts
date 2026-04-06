@@ -210,7 +210,12 @@ function html(title: string, description: string, rawOgImage: string, canonical:
   height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <!-- End Google Tag Manager (noscript) -->
   ${bodyHtml}
-  
+  <script>
+    // Redirect human visitors to canonical URL (bots don't execute JS)
+    if (window.location.hostname !== 'uhome.com.br') {
+      window.location.replace('${esc(canonical)}');
+    }
+  </script>
 </body>
 </html>`;
 }

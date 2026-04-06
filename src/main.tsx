@@ -1,4 +1,5 @@
 import { createRoot } from "react-dom/client";
+// Build trigger: env vars injection v2
 import { HelmetProvider } from "react-helmet-async";
 import { captureUtmParams, captureLeadIdentity } from "./lib/session";
 import App from "./App.tsx";

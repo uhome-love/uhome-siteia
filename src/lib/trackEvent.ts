@@ -97,7 +97,7 @@ export async function trackEvent(params: TrackEventParams) {
       tipo: params.tipo,
       corretor_slug: corretor_slug || null,
       corretor_id: corretor_id || null,
-      pagina: window.location.pathname,
+      pagina: window.location.href,
       imovel_slug: params.imovel_slug || null,
       imovel_titulo: params.imovel_titulo || null,
       busca_query: params.busca_query || null,

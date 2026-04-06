@@ -139,6 +139,13 @@ Deno.serve(async (req) => {
   })
 })
 
+// ─── Helpers ─────────────────────────────────────────────────────
+function extractImovelCodigo(slug: string | null | undefined): string | null {
+  if (!slug) return null
+  const match = slug.match(/(\d+)(?:-[A-Z]{0,3})?$/)
+  return match ? match[1] : null
+}
+
 // ─── Lead handler (existing flow) ────────────────────────────────
 async function handleLead(
   supabaseSite: any,
@@ -146,14 +153,20 @@ async function handleLead(
   record: Record<string, unknown>,
   corretorCRMId: string | null
 ) {
+  const imovelSlug = (record.imovel_slug as string) ?? null
+  const imovelCodigo = extractImovelCodigo(imovelSlug)
+
   const payload = {
     nome: record.nome,
     telefone: record.telefone,
     email: record.email ?? null,
     origem: 'site_uhome',
-    origem_detalhe: record.origem_componente,
+    origem_detalhe: record.origem_componente ?? null,
     imovel_interesse: record.imovel_titulo ?? null,
     imovel_id_site: record.imovel_id ?? null,
+    imovel_slug: imovelSlug,
+    imovel_codigo: imovelCodigo,
+    pagina_url: record.origem_pagina ?? null,
     bairro_interesse: record.imovel_bairro ?? null,
     status: 'novo',
     atribuido_para: corretorCRMId,
@@ -200,7 +213,9 @@ async function handleAgendamento(
   record: Record<string, unknown>,
   corretorCRMId: string | null
 ) {
-  // Create/update lead in CRM pipeline with agendamento info
+  const imovelSlug = (record.imovel_slug as string) ?? null
+  const imovelCodigo = extractImovelCodigo(imovelSlug)
+
   const { data: leadCRM, error } = await supabaseCRM
     .from('leads')
     .insert({
@@ -210,6 +225,10 @@ async function handleAgendamento(
       origem_detalhe: 'agendamento_visita',
       imovel_interesse: record.imovel_titulo ?? null,
       imovel_id_site: record.imovel_id ?? null,
+      imovel_slug: imovelSlug,
+      imovel_codigo: imovelCodigo,
+      pagina_url: record.origem_pagina ?? null,
+      bairro_interesse: record.imovel_bairro ?? null,
       status: 'agendado',
       atribuido_para: corretorCRMId,
       observacoes: `Visita agendada: ${record.data_visita} às ${record.horario}`,
@@ -249,7 +268,9 @@ async function handleWhatsAppClick(
   record: Record<string, unknown>,
   corretorCRMId: string | null
 ) {
-  // Create a lightweight lead entry for the WhatsApp click
+  const imovelSlug = (record.imovel_slug as string) ?? null
+  const imovelCodigo = extractImovelCodigo(imovelSlug)
+
   const { data: leadCRM, error } = await supabaseCRM
     .from('leads')
     .insert({
@@ -259,6 +280,10 @@ async function handleWhatsAppClick(
       origem_detalhe: 'whatsapp_click',
       imovel_interesse: record.imovel_titulo ?? null,
       imovel_id_site: record.imovel_id ?? null,
+      imovel_slug: imovelSlug,
+      imovel_codigo: imovelCodigo,
+      pagina_url: record.origem_pagina ?? null,
+      bairro_interesse: record.imovel_bairro ?? null,
       status: 'novo',
       atribuido_para: corretorCRMId,
       observacoes: `Clique no WhatsApp via link do corretor. Página: ${record.origem_pagina ?? '/'}`,

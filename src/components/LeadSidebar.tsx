@@ -47,6 +47,7 @@ export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, 
         imovel_bairro: imovelBairro,
         imovel_preco: imovelPreco,
         origem_componente: "detalhe_sidebar",
+        origem_pagina: window.location.href,
       });
       setSuccess(true);
       toast.success("Interesse registrado! Falaremos com você em breve.");

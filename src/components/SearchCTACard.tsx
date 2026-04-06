@@ -43,7 +43,7 @@ export const SearchCTACard = forwardRef<HTMLDivElement>(function SearchCTACard(_
         telefone: telefone.trim(),
         email: email.trim() || undefined,
         origem_componente: "busca_cta",
-        origem_pagina: "/busca",
+        origem_pagina: window.location.href,
       });
       setSuccess(true);
       toast.success("Recebemos seu contato! Um corretor falará com você em breve.");

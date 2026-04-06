@@ -4,9 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { useCorretor } from "@/contexts/CorretorContext";
 
 const examples = [
-  "Apartamento 2 quartos perto do Parcão até R$3.000",
+  "Apartamento 2 quartos perto do Parcão até R$ 500 mil",
   "Cobertura com terraço no Moinhos",
-  "Studio moderno até R$2.500/mês",
+  "Studio moderno até R$ 350 mil",
   "Casa com jardim e piscina em Três Figueiras",
 ];
 

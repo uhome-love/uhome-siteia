@@ -64,11 +64,11 @@ export function AdvancedFiltersModal({ open, onClose }: Props) {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed right-0 top-0 z-50 flex h-full w-full max-w-md flex-col bg-background shadow-2xl"
+            className="fixed right-0 top-0 z-50 flex h-full w-full flex-col bg-background shadow-2xl sm:w-[400px]"
           >
             {/* Header */}
             <div className="flex items-center justify-between border-b border-border px-5 py-4">
-              <h2 className="font-body text-lg font-bold text-foreground">+ Filtros</h2>
+              <h2 className="font-body text-lg font-bold text-foreground">Filtros</h2>
               <button onClick={onClose} aria-label="Fechar filtros" className="rounded-full p-1.5 transition-colors hover:bg-muted">
                 <X className="h-5 w-5 text-foreground" />
               </button>
@@ -251,7 +251,7 @@ export function AdvancedFiltersModal({ open, onClose }: Props) {
                 onClick={onClose}
                 className="rounded-full bg-primary px-6 py-3 font-body text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90 active:scale-[0.97]"
               >
-                Aplicar
+                Ver resultados
               </button>
             </div>
           </motion.div>

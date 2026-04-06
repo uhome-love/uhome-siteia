@@ -1,6 +1,7 @@
 import { useEffect, lazy, Suspense } from "react";
 import { Navbar } from "@/components/Navbar";
 import { HeroSection } from "@/components/HeroSection";
+import { AISearchSection } from "@/components/AISearchSection";
 
 const Footer = lazy(() => import("@/components/Footer").then(m => ({ default: m.Footer })));
 import { setJsonLd, removeJsonLd, buildOrganizationJsonLd, buildWebSiteJsonLd, buildLocalBusinessJsonLd } from "@/lib/jsonld";

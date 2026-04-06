@@ -192,6 +192,7 @@ export const AuthModal = forwardRef<HTMLDivElement, Props>(function AuthModal({ 
                 {tab === "forgot" && (
                   <button
                     onClick={() => setTab("login")}
+                    aria-label="Voltar para login"
                     className="rounded-full p-1 text-muted-foreground transition-colors hover:text-foreground"
                   >
                     <ArrowLeft className="h-4 w-4" />
@@ -203,6 +204,7 @@ export const AuthModal = forwardRef<HTMLDivElement, Props>(function AuthModal({ 
               </div>
               <button
                 onClick={onClose}
+                aria-label="Fechar"
                 className="rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
               >
                 <X className="h-5 w-5" />

@@ -69,7 +69,7 @@ export function AdvancedFiltersModal({ open, onClose }: Props) {
             {/* Header */}
             <div className="flex items-center justify-between border-b border-border px-5 py-4">
               <h2 className="font-body text-lg font-bold text-foreground">+ Filtros</h2>
-              <button onClick={onClose} className="rounded-full p-1.5 transition-colors hover:bg-muted">
+              <button onClick={onClose} aria-label="Fechar filtros" className="rounded-full p-1.5 transition-colors hover:bg-muted">
                 <X className="h-5 w-5 text-foreground" />
               </button>
             </div>

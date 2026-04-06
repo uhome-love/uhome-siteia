@@ -222,6 +222,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
                   src={foto}
                   alt={`${imovel.titulo} - foto ${i + 1}`}
                   loading={index < 4 && i === 0 ? "eager" : "lazy"}
+                  fetchPriority={index === 0 && i === 0 ? "high" : "auto"}
                   decoding="async"
                   className="h-full w-full object-cover"
                   style={{ aspectRatio: "4/3" }}
@@ -325,6 +326,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
             src={fotos[fotoAtiva]}
             alt={imovel.titulo}
             loading={index < 6 ? "eager" : "lazy"}
+            fetchPriority={index === 0 ? "high" : "auto"}
             decoding="async"
             className="h-full w-full object-cover transition-transform duration-500"
             style={{ transform: hovering ? "scale(1.03)" : "scale(1)" }}

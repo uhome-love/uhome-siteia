@@ -36,12 +36,14 @@ export function AISearchBar({ onSearch, loading = false }: AISearchBarProps) {
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
           placeholder="Ex: apartamento 2 quartos no Moinhos até R$ 3.000/mês..."
+          aria-label="Busca inteligente por IA"
           className="flex-1 bg-transparent font-body text-base text-foreground placeholder:text-muted-foreground focus:outline-none sm:text-sm"
           disabled={loading}
         />
         <button
           onClick={handleSubmit}
           disabled={loading || !query.trim()}
+          aria-label="Buscar imóveis com IA"
           className="flex items-center gap-2 rounded-xl bg-accent px-4 py-2 font-body text-sm font-semibold text-accent-foreground transition-all hover:brightness-110 active:scale-[0.97] disabled:opacity-50"
         >
           {loading ? (

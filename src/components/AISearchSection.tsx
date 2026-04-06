@@ -50,6 +50,7 @@ export function AISearchSection() {
               />
               <button
                 onClick={() => navigate(prefixLink("/busca?modo=ia"))}
+                aria-label="Buscar com IA"
                 className="flex items-center gap-2 rounded-lg bg-accent px-4 py-2 font-body text-sm font-semibold text-accent-foreground transition-all hover:brightness-110 active:scale-[0.97]"
               >
                 <ArrowRight className="h-4 w-4" />

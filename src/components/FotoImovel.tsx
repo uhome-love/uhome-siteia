@@ -8,13 +8,14 @@ interface FotoImovelProps {
   style?: React.CSSProperties;
   loading?: "eager" | "lazy";
   decoding?: "async" | "auto" | "sync";
+  fetchPriority?: "high" | "low" | "auto";
   width?: number;
   height?: number;
   sizes?: string;
 }
 
 export const FotoImovel = forwardRef<HTMLImageElement, FotoImovelProps>(function FotoImovel(
-  { src, alt, className = "", style, loading = "lazy", decoding = "async", width, height, sizes },
+  { src, alt, className = "", style, loading = "lazy", decoding = "async", fetchPriority, width, height, sizes },
   ref
 ) {
   const [erro, setErro] = useState(false);
@@ -57,6 +58,7 @@ export const FotoImovel = forwardRef<HTMLImageElement, FotoImovelProps>(function
         alt={alt}
         loading={loading}
         decoding={decoding}
+        fetchPriority={fetchPriority}
         className={`${className} transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"}`}
         style={{ ...style, willChange: loaded ? undefined : "opacity" }}
         width={width}
@@ -64,7 +66,6 @@ export const FotoImovel = forwardRef<HTMLImageElement, FotoImovelProps>(function
         sizes={sizes}
         onLoad={handleLoad}
         onError={() => setErro(true)}
-        // Timeout fallback: if image hasn't loaded in 8s, show error state
         {...(!loaded && { "data-loading": "true" })}
       />
     </div>

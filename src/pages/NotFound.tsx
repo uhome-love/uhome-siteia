@@ -36,6 +36,14 @@ function tryRedirect(pathname: string): string | null {
     return p.replace("/condominio/", "/condominios/");
   }
 
+  // /condominios/slug/id → /condominios/slug (old URL format with numeric ID)
+  const condoMatch = p.match(/^\/condominios\/([^/]+)\/\d+$/);
+  if (condoMatch) return `/condominios/${condoMatch[1]}`;
+
+  // /lancamento/slug/id → /condominios/slug
+  const lancMatch = p.match(/^\/lancamento\/([^/]+)(?:\/\d+)?$/);
+  if (lancMatch) return `/condominios/${lancMatch[1]}`;
+
   // Common misspellings / old URLs
   if (p === "/pesquisa" || p === "/search") return "/busca";
   if (p === "/lancamentos") return "/condominios";
@@ -96,10 +104,28 @@ const NotFound = () => {
             navigate(`/imovel/${rows[0].slug}`, { replace: true });
             return;
           }
+          // Se parece ser uma URL de imóvel que não existe mais, redireciona para busca
+          if (location.pathname.startsWith("/imovel/")) {
+            navigate("/busca", { replace: true });
+            return;
+          }
+          setChecking(false);
+          log404();
+        })
+        .catch(() => {
+          if (location.pathname.startsWith("/imovel/")) {
+            navigate("/busca", { replace: true });
+            return;
+          }
           setChecking(false);
           log404();
         });
     } else {
+      // URLs de imóvel sem slug válido
+      if (location.pathname.startsWith("/imovel/")) {
+        navigate("/busca", { replace: true });
+        return;
+      }
       setChecking(false);
       log404();
     }

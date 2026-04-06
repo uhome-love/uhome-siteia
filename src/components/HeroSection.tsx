@@ -420,9 +420,9 @@ export function HeroSection() {
                 </button>
                 <div className="flex flex-wrap gap-1.5">
                   {[
-                    "Apto 2 quartos perto do Parcão até R$3.000",
+                    "Apto 2 quartos perto do Parcão até R$ 500 mil",
                     "Cobertura com terraço no Moinhos",
-                    "Studio moderno até R$2.500/mês",
+                    "Studio moderno até R$ 350 mil",
                     "Casa com piscina em Três Figueiras",
                   ].map((ex) => (
                     <button

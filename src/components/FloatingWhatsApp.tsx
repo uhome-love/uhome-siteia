@@ -71,6 +71,7 @@ export function FloatingWhatsApp() {
 
   const handleClick = () => {
     const imovelData = currentImovelSlug ? { slug: currentImovelSlug } : undefined;
+    const imovelTitulo = document.querySelector("h1")?.textContent || undefined;
     const url = corretor
       ? buildCorretorWhatsAppUrl(corretor.nome, corretor.telefone, imovelData)
       : currentImovelSlug
@@ -81,11 +82,13 @@ export function FloatingWhatsApp() {
       whatsappUrl: url,
       origem_componente: "floating_whatsapp",
       imovel_slug: currentImovelSlug,
+      imovel_titulo: imovelTitulo,
     });
   };
 
   const handleRetargetingClick = () => {
     const imovelData = currentImovelSlug ? { slug: currentImovelSlug } : undefined;
+    const imovelTitulo = document.querySelector("h1")?.textContent || undefined;
     const url = corretor
       ? buildCorretorWhatsAppUrl(corretor.nome, corretor.telefone, imovelData)
       : currentImovelSlug
@@ -96,6 +99,7 @@ export function FloatingWhatsApp() {
       whatsappUrl: url,
       origem_componente: "retargeting_popup",
       imovel_slug: currentImovelSlug,
+      imovel_titulo: imovelTitulo,
     });
     dismissRetargeting();
   };

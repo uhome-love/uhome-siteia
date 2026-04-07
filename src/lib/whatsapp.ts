@@ -1,5 +1,5 @@
 import { getCorretorRef } from "./session";
-import { getShareUrl } from "@/utils/shareUrl";
+import { getImovelUrl } from "@/utils/shareUrl";
 
 /** Número do WhatsApp da Uhome — lido de env var ou fallback padrão */
 export const WHATSAPP_NUMBER =

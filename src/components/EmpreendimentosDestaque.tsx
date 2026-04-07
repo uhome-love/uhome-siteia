@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useCorretor } from "@/contexts/CorretorContext";
 import { Building2, ArrowRight, MapPin } from "lucide-react";
@@ -23,20 +23,22 @@ function formatBRL(value: number) {
 }
 
 export function EmpreendimentosDestaque() {
-  const [items, setItems] = useState<Empreendimento[]>([]);
   const { prefixLink } = useCorretor();
 
-  useEffect(() => {
-    supabase
-      .from("empreendimentos")
-      .select("id, nome, slug, construtora, bairro, cidade, imagem_principal, logo_url, preco_a_partir, previsao_entrega")
-      .eq("ativo", true)
-      .eq("destaque_home", true)
-      .order("ordem", { ascending: true })
-      .then(({ data }) => {
-        if (data) setItems(data as unknown as Empreendimento[]);
-      });
-  }, []);
+  const { data: items = [] } = useQuery<Empreendimento[]>({
+    queryKey: ["empreendimentos", "destaque-home"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("empreendimentos")
+        .select("id, nome, slug, construtora, bairro, cidade, imagem_principal, logo_url, preco_a_partir, previsao_entrega")
+        .eq("ativo", true)
+        .eq("destaque_home", true)
+        .order("ordem", { ascending: true });
+      return (data as unknown as Empreendimento[]) ?? [];
+    },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
+  });
 
   if (items.length === 0) return null;
 

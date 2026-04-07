@@ -197,24 +197,27 @@ export function HeroSection() {
 
           {/* Right — card (CSS animation for instant LCP) */}
           <div
-            className="w-full max-w-md rounded-2xl bg-card p-5 shadow-2xl sm:p-7 lg:ml-auto animate-[heroCardIn_0.6s_0.2s_cubic-bezier(0.16,1,0.3,1)_both]"
+            className="w-full max-w-md rounded-2xl bg-card p-5 shadow-2xl sm:p-7 md:max-w-lg lg:ml-auto animate-[heroCardIn_0.6s_0.2s_cubic-bezier(0.16,1,0.3,1)_both]"
           >
             {/* Toggle */}
             <div className="mb-4 flex gap-2 sm:mb-6">
               {(["comprar", "ia", "anunciar"] as const).map((m) => {
                 const label = m === "comprar" ? "Buscar imóveis" : m === "ia" ? "Busca IA" : "Anunciar imóvel";
+                const mobileLabel = m === "comprar" ? "Buscar" : m === "ia" ? "IA" : "Anunciar";
                 return (
                   <button
                     key={m}
                     onClick={() => setModo(m)}
-                    className={`flex items-center gap-1.5 rounded-full border-[1.5px] px-4 py-2 font-body text-sm transition-all active:scale-[0.97] ${
+                    aria-label={`Modo ${label}`}
+                    className={`flex items-center gap-1 rounded-full border-[1.5px] px-3 py-2 font-body text-xs transition-all active:scale-[0.97] sm:gap-1.5 sm:px-4 sm:text-sm ${
                       modo === m
                         ? "border-primary bg-primary/5 font-bold text-primary"
                         : "border-border font-normal text-foreground/70 hover:border-foreground/30"
                     }`}
                   >
                     {m === "ia" && <Sparkles className="h-3.5 w-3.5" />}
-                    {label}
+                    <span className="hidden sm:inline">{label}</span>
+                    <span className="sm:hidden">{mobileLabel}</span>
                   </button>
                 );
               })}
@@ -480,7 +483,7 @@ export function HeroSection() {
                   {loading ? "Enviando..." : "Quero anunciar →"}
                 </button>
                 <Link
-                  to="/avaliar-imovel"
+                  to={prefixLink("/avaliar-imovel")}
                   className="mt-3 block text-center font-body text-xs font-semibold text-primary transition-colors hover:text-primary/80"
                 >
                   Descobrir o valor do meu imóvel →

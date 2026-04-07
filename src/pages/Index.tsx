@@ -55,9 +55,9 @@ const Index = () => {
           <EmpreendimentosDestaque />
           <FeaturedNeighborhoods />
           <FeaturedProperties />
+          <PorQueUhome />
           <SeoLinksSection />
           <HomeFaqSection faqs={HOME_FAQS} />
-          <PorQueUhome />
         </Suspense>
       </main>
       <Footer />

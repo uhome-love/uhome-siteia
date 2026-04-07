@@ -852,6 +852,14 @@ const Search = () => {
                     Digite o que você procura acima ou clique em uma sugestão.
                   </p>
                 </>
+              ) : modoIA && aiResult ? (
+                <>
+                  <Sparkles className="h-10 w-10 text-muted-foreground/30" />
+                  <p className="mt-4 font-body text-lg font-bold text-foreground">Nenhum imóvel encontrado</p>
+                  <p className="mt-1 font-body text-sm text-muted-foreground">
+                    Tente descrever de outra forma ou ajuste os termos da busca.
+                  </p>
+                </>
               ) : (
                 <>
                   <p className="font-body text-lg font-bold text-foreground">Nenhum imóvel encontrado</p>

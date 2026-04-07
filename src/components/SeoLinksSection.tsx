@@ -63,7 +63,7 @@ export function SeoLinksSection() {
           </p>
         </motion.div>
 
-        <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-10 grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {Object.entries(seoLinks).map(([category, links], catIdx) => (
             <motion.div
               key={category}

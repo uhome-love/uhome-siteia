@@ -28,6 +28,15 @@ import { useFavoritos } from "@/hooks/useFavoritos";
 import { trackWhatsAppClick } from "@/services/whatsappTracker";
 import { StickyPropertyCTA } from "@/components/StickyPropertyCTA";
 
+function extractPropertyCode(slug: string, id: string): string {
+  const parts = slug.split("-");
+  const last = parts[parts.length - 1];
+  const secondLast = parts[parts.length - 2];
+  return secondLast && /^\d+$/.test(secondLast)
+    ? `${secondLast}-${last}`.toUpperCase()
+    : last?.toUpperCase() || id.slice(0, 8).toUpperCase();
+}
+
 const PropertyDetail = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -307,6 +316,7 @@ const PropertyDetail = () => {
           <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 pt-4">
             <button
               onClick={() => navigate(-1)}
+              aria-label="Voltar"
               className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-md active:scale-95"
             >
               <ArrowLeft className="h-5 w-5 text-white" />
@@ -314,11 +324,13 @@ const PropertyDetail = () => {
             <div className="flex items-center gap-2.5">
               <button
                 onClick={handleShare}
+                aria-label="Compartilhar"
                 className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-md active:scale-95"
               >
                 <Share2 className="h-[18px] w-[18px] text-white" />
               </button>
               <button
+                aria-label={imovel && isFavorito(imovel.id) ? "Remover dos favoritos" : "Adicionar aos favoritos"}
                 onClick={async () => {
                   if (!imovel) return;
                   const result = await toggleFavorito(imovel.id);
@@ -383,6 +395,7 @@ const PropertyDetail = () => {
             </div>
             <button
               onClick={(e) => { e.stopPropagation(); setGalleryOpen(false); }}
+              aria-label="Fechar galeria"
               className="rounded-full bg-white/10 px-4 py-2 font-body text-sm font-medium text-white/80 backdrop-blur-sm transition-colors hover:bg-white/20 active:scale-95"
             >
               ✕ Fechar
@@ -406,6 +419,7 @@ const PropertyDetail = () => {
             {currentImage > 0 && (
               <button
                 onClick={(e) => { e.stopPropagation(); prevImage(); }}
+                aria-label="Foto anterior"
                 className="absolute left-3 top-1/2 flex h-[52px] w-[52px] -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-white/[0.12] text-2xl font-light text-white backdrop-blur-xl transition-colors hover:bg-white/25 active:scale-95 sm:left-6"
               >
                 ‹
@@ -416,6 +430,7 @@ const PropertyDetail = () => {
             {currentImage < images.length - 1 && (
               <button
                 onClick={(e) => { e.stopPropagation(); nextImage(); }}
+                aria-label="Próxima foto"
                 className="absolute right-3 top-1/2 flex h-[52px] w-[52px] -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-white/[0.12] text-2xl font-light text-white backdrop-blur-xl transition-colors hover:bg-white/25 active:scale-95 sm:right-6"
               >
                 ›
@@ -461,12 +476,12 @@ const PropertyDetail = () => {
             {/* Property code + Breadcrumb */}
             <div className="space-y-1">
               <span className="font-mono text-[11px] text-muted-foreground/60">
-                Cód. {(() => { const parts = imovel.slug.split("-"); const last = parts[parts.length - 1]; const secondLast = parts[parts.length - 2]; return secondLast && /^\d+$/.test(secondLast) ? `${secondLast}-${last}`.toUpperCase() : last?.toUpperCase() || imovel.id.slice(0, 8).toUpperCase(); })()}
+                Cód. {extractPropertyCode(imovel.slug, imovel.id)}
               </span>
               <nav className="font-body text-xs text-muted-foreground">
-                <Link to="/busca" className="hover:text-foreground">Imóveis</Link>
+                <Link to={prefixLink("/busca")} className="hover:text-foreground">Imóveis</Link>
                 {" › "}
-                <Link to={`/busca?bairro=${encodeURIComponent(imovel.bairro)}`} className="hover:text-foreground">{imovel.bairro}</Link>
+                <Link to={prefixLink(`/busca?bairro=${encodeURIComponent(imovel.bairro)}`)} className="hover:text-foreground">{imovel.bairro}</Link>
                 {imovel.condominio_nome && (
                   <>
                     {" › "}

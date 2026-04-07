@@ -130,9 +130,12 @@ function buildSitemapIndex(today: string) {
 function buildPagesSitemap(today: string) {
   const entries = [
     urlEntry(`${SITE}/`, today, "daily", "1.0"),
+    urlEntry(`${SITE}/imoveis-porto-alegre`, today, "daily", "0.95"),
     urlEntry(`${SITE}/busca`, today, "daily", "0.9"),
     urlEntry(`${SITE}/bairros`, today, "weekly", "0.85"),
     urlEntry(`${SITE}/condominios`, today, "weekly", "0.85"),
+    urlEntry(`${SITE}/guia-bairros`, today, "weekly", "0.85"),
+    urlEntry(`${SITE}/sobre`, today, "monthly", "0.7"),
     urlEntry(`${SITE}/avaliar-imovel`, today, "monthly", "0.7"),
     urlEntry(`${SITE}/faq`, today, "monthly", "0.6"),
     urlEntry(`${SITE}/anunciar`, today, "monthly", "0.6"),

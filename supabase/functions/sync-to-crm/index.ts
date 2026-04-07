@@ -142,7 +142,7 @@ Deno.serve(async (req) => {
 // ─── Helpers ─────────────────────────────────────────────────────
 function extractImovelCodigo(slug: string | null | undefined): string | null {
   if (!slug) return null
-  const match = slug.match(/(\d+)(?:-[A-Z]{0,3})?$/)
+  const match = slug.match(/(\d+(?:-[A-Za-z]+)?)$/)
   return match ? match[1] : null
 }
 
@@ -154,7 +154,7 @@ async function handleLead(
   corretorCRMId: string | null
 ) {
   const imovelSlug = (record.imovel_slug as string) ?? null
-  const imovelCodigo = extractImovelCodigo(imovelSlug)
+  const imovelCodigo = (record.imovel_codigo as string) ?? extractImovelCodigo(imovelSlug)
 
   // Build observacoes with extra context not in CRM schema
   const obsLines: string[] = []
@@ -219,7 +219,7 @@ async function handleAgendamento(
   corretorCRMId: string | null
 ) {
   const imovelSlug = (record.imovel_slug as string) ?? null
-  const imovelCodigo = extractImovelCodigo(imovelSlug)
+  const imovelCodigo = (record.imovel_codigo as string) ?? extractImovelCodigo(imovelSlug)
 
   const obsAgend = `Visita agendada: ${record.data_visita} às ${record.horario}${record.origem_pagina ? ` | Página: ${record.origem_pagina}` : ''}`
 
@@ -275,7 +275,7 @@ async function handleWhatsAppClick(
   corretorCRMId: string | null
 ) {
   const imovelSlug = (record.imovel_slug as string) ?? null
-  const imovelCodigo = extractImovelCodigo(imovelSlug)
+  const imovelCodigo = (record.imovel_codigo as string) ?? extractImovelCodigo(imovelSlug)
 
   const { data: leadCRM, error } = await supabaseCRM
     .from('leads')

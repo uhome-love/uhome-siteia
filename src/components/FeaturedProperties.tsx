@@ -1,19 +1,20 @@
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { SearchPropertyCard } from "@/components/SearchPropertyCard";
 import { fetchImoveisDestaque, type Imovel } from "@/services/imoveis";
 import { useFavoritos } from "@/hooks/useFavoritos";
 import { useCorretor } from "@/contexts/CorretorContext";
+import { useQuery } from "@tanstack/react-query";
 
 export function FeaturedProperties() {
-  const [imoveis, setImoveis] = useState<Imovel[]>([]);
+  const { data: imoveis = [] } = useQuery<Imovel[]>({
+    queryKey: ["imoveis", "destaque"],
+    queryFn: () => fetchImoveisDestaque(6),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
+  });
   const { isFavorito, toggleFavorito } = useFavoritos();
   const { prefixLink } = useCorretor();
-
-  useEffect(() => {
-    fetchImoveisDestaque(6).then(setImoveis).catch(console.error);
-  }, []);
 
   if (imoveis.length === 0) return null;
 

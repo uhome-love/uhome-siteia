@@ -197,7 +197,7 @@ export function HeroSection() {
 
           {/* Right — card (CSS animation for instant LCP) */}
           <div
-            className="w-full max-w-md rounded-2xl bg-card p-5 shadow-2xl sm:p-7 lg:ml-auto animate-[heroCardIn_0.6s_0.2s_cubic-bezier(0.16,1,0.3,1)_both]"
+            className="w-full max-w-md rounded-2xl bg-card p-5 shadow-2xl sm:p-7 md:max-w-lg lg:ml-auto animate-[heroCardIn_0.6s_0.2s_cubic-bezier(0.16,1,0.3,1)_both]"
           >
             {/* Toggle */}
             <div className="mb-4 flex gap-2 sm:mb-6">

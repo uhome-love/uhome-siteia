@@ -142,7 +142,7 @@ Deno.serve(async (req) => {
 // ─── Helpers ─────────────────────────────────────────────────────
 function extractImovelCodigo(slug: string | null | undefined): string | null {
   if (!slug) return null
-  const match = slug.match(/(\d+)(?:-[A-Z]{0,3})?$/)
+  const match = slug.match(/(\d+(?:-[A-Za-z]+)?)$/)
   return match ? match[1] : null
 }
 

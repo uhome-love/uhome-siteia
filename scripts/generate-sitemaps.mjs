@@ -89,9 +89,12 @@ async function main() {
 
   // 1. Páginas principais
   add("/", TODAY, "daily", "1.0");
+  add("/imoveis-porto-alegre", TODAY, "daily", "0.95");
   add("/busca", TODAY, "daily", "0.9");
   add("/bairros", TODAY, "weekly", "0.85");
   add("/condominios", TODAY, "weekly", "0.85");
+  add("/guia-bairros", TODAY, "weekly", "0.85");
+  add("/sobre", TODAY, "monthly", "0.7");
   add("/avaliar-imovel", TODAY, "monthly", "0.7");
   add("/faq", TODAY, "monthly", "0.6");
   add("/anunciar", TODAY, "monthly", "0.6");

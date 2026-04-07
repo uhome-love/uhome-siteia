@@ -33,7 +33,7 @@ export function buildWhatsAppUrl(
     if (imovel.bairro) msg += ` em ${imovel.bairro}`;
     msg += ".";
     if (imovel.slug) {
-      msg += `\nLink: ${getShareUrl(imovel.slug)}`;
+      msg += `\nLink: ${getImovelUrl(imovel.slug)}`;
     }
   } else {
     msg =
@@ -68,7 +68,7 @@ export function buildCorretorWhatsAppUrl(
     if (imovel.bairro) msg += ` em ${imovel.bairro}`;
     msg += ` no site Uhome e tenho interesse. Pode me ajudar?`;
     if (imovel.slug) {
-      msg += `\nLink: ${getShareUrl(imovel.slug)}`;
+      msg += `\nLink: ${getImovelUrl(imovel.slug)}`;
     }
   } else {
     msg = `Olá ${corretorNome}, vim pelo site Uhome e gostaria de informações sobre imóveis.`;

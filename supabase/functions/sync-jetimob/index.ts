@@ -141,7 +141,7 @@ function mapImovel(j: any) {
     latitude: j.endereco_latitude || j.latitude ? Number(j.endereco_latitude || j.latitude) : null,
     longitude: j.endereco_longitude || j.longitude ? Number(j.endereco_longitude || j.longitude) : null,
     titulo,
-    descricao: j.descricao_anuncio || j.descricao || j.description || null,
+    descricao: j.observacoes || j.descricao_anuncio || j.descricao || j.description || null,
     diferenciais: extractDiferenciais(j),
     fotos: extractFotos(j),
     video_url: j.video_url || j.video || null,

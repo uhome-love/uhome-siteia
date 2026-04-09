@@ -570,14 +570,26 @@ const PropertyDetail = () => {
             {/* Mobile CTA moved to fixed bottom bar */}
 
             {/* Description */}
-            {imovel.descricao && imovel.descricao.trim().length > 0 && (
-              <div>
-                <h2 className="font-body text-lg font-bold text-foreground">Sobre o imóvel</h2>
-                <div className="mt-3 font-body text-sm leading-[1.8] text-muted-foreground whitespace-pre-line" style={{ maxWidth: "65ch" }}>
-                  {imovel.descricao}
+            {imovel.descricao && imovel.descricao.trim().length > 0 && (() => {
+              const paragraphs = imovel.descricao.split(/\n\n|\n/).filter((p: string) => p.trim().length > 0);
+              const hasMore = paragraphs.length > 1;
+              return (
+                <div>
+                  <h2 className="font-body text-lg font-bold text-foreground">Sobre o imóvel</h2>
+                  <div className="mt-3 font-body text-sm leading-[1.8] text-muted-foreground whitespace-pre-line" style={{ maxWidth: "65ch" }}>
+                    {showFullDesc ? imovel.descricao : paragraphs[0]}
+                  </div>
+                  {hasMore && (
+                    <button
+                      onClick={() => setShowFullDesc(!showFullDesc)}
+                      className="mt-2 text-primary font-semibold text-sm cursor-pointer hover:underline bg-transparent border-none p-0"
+                    >
+                      {showFullDesc ? "Ver menos ↑" : "Ver mais ↓"}
+                    </button>
+                  )}
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
             {/* Diferenciais */}
             {imovel.diferenciais.length > 0 && (

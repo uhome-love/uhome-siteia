@@ -36,7 +36,7 @@ export default function AdminSync() {
         setLog((prev) => [...prev, `📄 Processando páginas ${startPage}-${startPage + PAGES_PER_CHUNK - 1}...`]);
 
         const { data, error } = await supabase.functions.invoke("sync-jetimob", {
-          body: { start_page: startPage, max_pages: PAGES_PER_CHUNK },
+          body: { start_page: startPage, max_pages: PAGES_PER_CHUNK, auto_chain: false },
         });
 
         if (error) throw error;

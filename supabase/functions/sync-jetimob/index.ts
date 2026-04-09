@@ -164,14 +164,8 @@ function extractItems(data: any): any[] {
 
 function extractTotal(data: any): number | null {
   const candidates = [
-    data?.total,
-    data?.count,
-    data?.totalResults,
-    data?.totalItems,
-    data?.total_items,
-    data?.meta?.total,
-    data?.pagination?.total,
-    data?.paginacao?.total,
+    data?.total, data?.count, data?.totalResults, data?.totalItems,
+    data?.total_items, data?.meta?.total, data?.pagination?.total, data?.paginacao?.total,
   ];
   for (const v of candidates) {
     const n = Number(v);
@@ -181,16 +175,13 @@ function extractTotal(data: any): number | null {
 }
 
 function hasNextPage(data: any, itemsCount: number, pageSize: number, currentPage: number): boolean {
-  // Use totalPages from Jetimob API
   if (data?.totalPages != null && currentPage < Number(data.totalPages)) return true;
   if (data?.totalPages != null && currentPage >= Number(data.totalPages)) return false;
-  // Other explicit indicators
   if (data?.proxima_pagina != null) return !!data.proxima_pagina;
   if (data?.next_page != null) return !!data.next_page;
   if (data?.has_more != null) return !!data.has_more;
   if (data?.meta?.has_next_page != null) return !!data.meta.has_next_page;
   if (data?.pagination?.has_next != null) return !!data.pagination.has_next;
-  // Fallback: if the page came full, there's probably more
   return itemsCount >= pageSize;
 }
 
@@ -209,16 +200,23 @@ serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Accept start_page, max_pages, and auto_chain from body
+    // Parse request body
     let startPage = 1;
-    let maxPagesToProcess = 5;
+    let maxPagesToProcess = 10;
     let autoChain = false;
+    let syncStartedAt: string | null = null;
     try {
       const body = await req.json();
       if (body?.start_page) startPage = Number(body.start_page);
       if (body?.max_pages) maxPagesToProcess = Number(body.max_pages);
       if (body?.auto_chain) autoChain = true;
+      if (body?.sync_started_at) syncStartedAt = body.sync_started_at;
     } catch { /* no body is fine */ }
+
+    // If this is the first chunk of an auto-chain, record the start time
+    if (!syncStartedAt) {
+      syncStartedAt = new Date().toISOString();
+    }
 
     const PAGE_SIZE = 100;
     const MAX_RETRIES = 3;
@@ -230,7 +228,7 @@ serve(async (req) => {
     let expectedTotal: number | null = null;
     let lastPage = startPage;
 
-    console.log(`🔄 Sync started | startPage=${startPage} maxPages=${maxPagesToProcess} key=${JETIMOB_KEY.length}`);
+    console.log(`🔄 Sync started | startPage=${startPage} maxPages=${maxPagesToProcess} autoChain=${autoChain} syncStartedAt=${syncStartedAt}`);
 
     const endPage = startPage + maxPagesToProcess - 1;
 
@@ -312,6 +310,24 @@ serve(async (req) => {
     const morePages = hasNextPage({ totalPages: expectedTotal ? Math.ceil(expectedTotal / PAGE_SIZE) : null }, 0, PAGE_SIZE, lastPage);
     const nextStartPage = lastPage + 1;
 
+    // Log this chunk to sync_log
+    await supabase.from("sync_log").insert({
+      tipo: "jetimob",
+      direcao: "jetimob→uhome",
+      sucesso: totalErrors === 0,
+      erro: totalErrors > 0 ? `${totalErrors} erros de upsert` : null,
+      payload: {
+        start_page: startPage,
+        last_page: lastPage,
+        inseridos: totalInserted,
+        erros: totalErrors,
+        total_fetched: totalFetched,
+        expected_total: expectedTotal,
+        more_pages: morePages,
+        sync_started_at: syncStartedAt,
+      },
+    });
+
     const result = {
       inseridos: totalInserted,
       erros: totalErrors,
@@ -321,6 +337,7 @@ serve(async (req) => {
       next_start_page: nextStartPage,
       more_pages: morePages,
       chained: false,
+      sync_started_at: syncStartedAt,
     };
 
     // Auto-chain: trigger the next chunk if there are more pages
@@ -335,11 +352,50 @@ serve(async (req) => {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${anonKey}`,
           },
-          body: JSON.stringify({ start_page: nextStartPage, max_pages: maxPagesToProcess, auto_chain: true }),
+          body: JSON.stringify({
+            start_page: nextStartPage,
+            max_pages: maxPagesToProcess,
+            auto_chain: true,
+            sync_started_at: syncStartedAt,
+          }),
         }).catch((err) => console.error("Chain fetch error:", err));
         result.chained = true;
       } catch (chainErr) {
         console.error("Chain error:", chainErr);
+      }
+    }
+
+    // If sync is complete (no more pages), deactivate properties not touched during this sync
+    if (!morePages && syncStartedAt && autoChain) {
+      try {
+        console.log(`🧹 Deactivating properties not updated since ${syncStartedAt}...`);
+        const { count, error: deactivateError } = await supabase
+          .from("imoveis")
+          .update({ status: "inativo" })
+          .eq("origem", "jetimob")
+          .eq("status", "disponivel")
+          .lt("updated_at", syncStartedAt)
+          .select("id", { count: "exact", head: true });
+
+        if (deactivateError) {
+          console.error("❌ Deactivation error:", deactivateError.message);
+        } else {
+          console.log(`🧹 Deactivated ${count ?? 0} stale properties`);
+        }
+
+        // Log the final summary
+        await supabase.from("sync_log").insert({
+          tipo: "jetimob",
+          direcao: "jetimob→uhome",
+          sucesso: true,
+          payload: {
+            action: "sync_complete",
+            sync_started_at: syncStartedAt,
+            deactivated: count ?? 0,
+          },
+        });
+      } catch (deactivateErr) {
+        console.error("Deactivation error:", deactivateErr);
       }
     }
 

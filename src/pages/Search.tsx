@@ -242,6 +242,7 @@ const Search = () => {
       const urlIptuMax = searchParams.get("iptu_max");
       const urlDiferenciais = searchParams.get("diferenciais");
       const urlCondominio = searchParams.get("condominio");
+      const urlFase = searchParams.get("fase");
       if (urlTipo) f.tipo = urlTipo;
       if (urlCidade) f.cidade = urlCidade;
       if (urlQuartos) f.quartos = Number(urlQuartos);
@@ -256,6 +257,7 @@ const Search = () => {
       if (urlIptuMax) f.iptuMax = Number(urlIptuMax);
       if (urlDiferenciais) f.diferenciais = urlDiferenciais.split(",").map((s: string) => s.trim()).filter(Boolean);
       if (urlCondominio) f.condominio = urlCondominio;
+      if (urlFase) f.fase = urlFase;
       if (urlBairro) {
         f.bairro = urlBairro;
       } else if (urlQ) {

@@ -1018,54 +1018,30 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      count_imoveis:
-        | {
-            Args: {
-              lat_max?: number
-              lat_min?: number
-              lng_max?: number
-              lng_min?: number
-              p_area_max?: number
-              p_area_min?: number
-              p_bairro?: string
-              p_bairros?: string[]
-              p_banheiros?: number
-              p_cidade?: string
-              p_cidades?: string[]
-              p_preco_max?: number
-              p_preco_min?: number
-              p_q?: string
-              p_quartos?: number
-              p_tipo?: string
-              p_tipos?: string[]
-              p_vagas?: number
-            }
-            Returns: number
-          }
-        | {
-            Args: {
-              lat_max?: number
-              lat_min?: number
-              lng_max?: number
-              lng_min?: number
-              p_area_max?: number
-              p_area_min?: number
-              p_bairro?: string
-              p_bairros?: string[]
-              p_banheiros?: number
-              p_cidade?: string
-              p_cidades?: string[]
-              p_fase?: string
-              p_preco_max?: number
-              p_preco_min?: number
-              p_q?: string
-              p_quartos?: number
-              p_tipo?: string
-              p_tipos?: string[]
-              p_vagas?: number
-            }
-            Returns: number
-          }
+      count_imoveis: {
+        Args: {
+          lat_max?: number
+          lat_min?: number
+          lng_max?: number
+          lng_min?: number
+          p_area_max?: number
+          p_area_min?: number
+          p_bairro?: string
+          p_bairros?: string[]
+          p_banheiros?: number
+          p_cidade?: string
+          p_cidades?: string[]
+          p_fase?: string
+          p_preco_max?: number
+          p_preco_min?: number
+          p_q?: string
+          p_quartos?: number
+          p_tipo?: string
+          p_tipos?: string[]
+          p_vagas?: number
+        }
+        Returns: number
+      }
       get_bairros_disponiveis: {
         Args: never
         Returns: {
@@ -1073,74 +1049,40 @@ export type Database = {
           count: number
         }[]
       }
-      get_map_pins:
-        | {
-            Args: {
-              lat_max?: number
-              lat_min?: number
-              lng_max?: number
-              lng_min?: number
-              p_area_max?: number
-              p_area_min?: number
-              p_bairro?: string
-              p_bairros?: string[]
-              p_banheiros?: number
-              p_cidade?: string
-              p_cidades?: string[]
-              p_limite?: number
-              p_preco_max?: number
-              p_preco_min?: number
-              p_quartos?: number
-              p_tipo?: string
-              p_vagas?: number
-            }
-            Returns: {
-              area_total: number
-              bairro: string
-              foto_principal: string
-              id: string
-              latitude: number
-              longitude: number
-              preco: number
-              quartos: number
-              slug: string
-              tipo: string
-            }[]
-          }
-        | {
-            Args: {
-              lat_max?: number
-              lat_min?: number
-              lng_max?: number
-              lng_min?: number
-              p_area_max?: number
-              p_area_min?: number
-              p_bairro?: string
-              p_bairros?: string[]
-              p_banheiros?: number
-              p_cidade?: string
-              p_cidades?: string[]
-              p_fase?: string
-              p_limite?: number
-              p_preco_max?: number
-              p_preco_min?: number
-              p_quartos?: number
-              p_tipo?: string
-              p_vagas?: number
-            }
-            Returns: {
-              area_total: number
-              bairro: string
-              foto_principal: string
-              id: string
-              latitude: number
-              longitude: number
-              preco: number
-              quartos: number
-              slug: string
-              tipo: string
-            }[]
-          }
+      get_map_pins: {
+        Args: {
+          lat_max?: number
+          lat_min?: number
+          lng_max?: number
+          lng_min?: number
+          p_area_max?: number
+          p_area_min?: number
+          p_bairro?: string
+          p_bairros?: string[]
+          p_banheiros?: number
+          p_cidade?: string
+          p_cidades?: string[]
+          p_fase?: string
+          p_limite?: number
+          p_preco_max?: number
+          p_preco_min?: number
+          p_quartos?: number
+          p_tipo?: string
+          p_vagas?: number
+        }
+        Returns: {
+          area_total: number
+          bairro: string
+          foto_principal: string
+          id: string
+          latitude: number
+          longitude: number
+          preco: number
+          quartos: number
+          slug: string
+          tipo: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

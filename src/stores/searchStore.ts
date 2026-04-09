@@ -26,6 +26,7 @@ export interface SearchFilters {
   condominioMax: number;
   iptuMax: number;
   condominio: string;
+  fase: string;
   bounds: MapBounds | null;
 }
 
@@ -59,6 +60,7 @@ const defaultFilters: SearchFilters = {
   condominioMax: 0,
   iptuMax: 0,
   condominio: "",
+  fase: "",
   bounds: null,
 };
 

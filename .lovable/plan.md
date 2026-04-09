@@ -1,57 +1,45 @@
 
 
-## Fix: "Ver mais" causa scroll bouncing
+## Ocultar imóveis sem fotos do site
 
 ### Problema
+106 imóveis ativos não têm fotos. Quando aparecem na busca, mostram uma imagem genérica do Unsplash — confunde o usuário e prejudica a experiência.
 
-No `ProgressiveGrid` (linhas 91-93 de `Search.tsx`), existe um `useEffect` que reseta `visibleCount` para 12 sempre que `imoveis.length` muda:
+### Solução
+Filtrar imóveis sem fotos diretamente na query do banco, em 3 pontos:
 
-```typescript
-useEffect(() => {
-  setVisibleCount(INITIAL_VISIBLE);
-}, [imoveis.length]);
-```
+### Passo 1 — Filtro na query principal (`src/services/imoveis.ts`)
 
-Quando o usuário clica "Ver mais":
-1. `imoveis` cresce de 40 para 80
-2. `visibleCount` reseta de ~40 para 12
-3. Grid encolhe — scroll pula para cima
-4. IntersectionObserver dispara repetidamente: 12 → 18 → 24 → 30... 
-5. Scroll fica "pulando" até estabilizar
-
-### Correção
-
-**Arquivo: `src/pages/Search.tsx`, linhas 85-109 (dentro de `ProgressiveGrid`)**
-
-Duas mudanças:
-
-1. **Não resetar `visibleCount` em load more** — usar um ref para rastrear o comprimento anterior. Se `imoveis.length` cresceu (load more), não reseta. Se mudou para um valor diferente (nova busca), reseta.
-
-2. **Quando é load more, definir `visibleCount` para o comprimento anterior** — assim os novos cards são revelados progressivamente sem afetar os já visíveis.
+Na função `fetchImoveis`, adicionar filtro após os filtros existentes:
 
 ```typescript
-const prevLengthRef = useRef(imoveis.length);
-
-useEffect(() => {
-  const prev = prevLengthRef.current;
-  prevLengthRef.current = imoveis.length;
-  
-  // New search (length decreased or jumped to a different set)
-  if (imoveis.length < prev || (imoveis.length > 0 && prev === 0)) {
-    setVisibleCount(INITIAL_VISIBLE);
-  }
-  // Load more (length grew) — keep current visible count, 
-  // IntersectionObserver will grow it naturally
-}, [imoveis.length]);
+// After existing filters, add:
+query = query.not('fotos', 'is', null)
+             .neq('fotos', '[]');
 ```
 
-### Resultado
+Mesmo filtro na query de contagem (`count_imoveis` ou inline count).
 
-- "Ver mais" não causa mais scroll bouncing — cards existentes permanecem, novos aparecem conforme o scroll
-- Nova busca (filtros mudam) continua resetando para 12 como antes
-- Zero impacto em outros componentes
+### Passo 2 — Filtro nos map pins (RPC `get_map_pins`)
+
+Adicionar `AND fotos IS NOT NULL AND fotos::text != '[]'` no WHERE da função `get_map_pins` via migration SQL.
+
+### Passo 3 — Filtro na contagem (RPC `count_imoveis`)
+
+Adicionar a mesma condição no WHERE da função `count_imoveis` via migration SQL.
+
+### Passo 4 — Filtro nos destaques e similares
+
+- `fetchImoveisDestaque` — adicionar `.not('fotos', 'is', null)`
+- `SimilarProperties` — já usa `fetchImoveis`, herda o filtro
 
 ### Arquivos afetados
 
-1. **`src/pages/Search.tsx`** — ~10 linhas alteradas no `ProgressiveGrid`
+1. **`src/services/imoveis.ts`** — filtro em `fetchImoveis` e `fetchImoveisDestaque`
+2. **Migration SQL** — atualizar RPCs `get_map_pins` e `count_imoveis`
+
+### Resultado
+- Imóveis sem fotos não aparecem em busca, mapa, destaques nem similares
+- Quando as fotos forem adicionadas no Jetimob e sincronizadas, o imóvel volta a aparecer automaticamente
+- Zero impacto no admin (admin continua vendo todos)
 

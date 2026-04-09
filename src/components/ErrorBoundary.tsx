@@ -10,6 +10,16 @@ interface State {
   error: Error | null;
 }
 
+function isChunkError(error: Error): boolean {
+  const msg = error.message || "";
+  return (
+    msg.includes("Loading chunk") ||
+    msg.includes("Failed to fetch dynamically imported module") ||
+    msg.includes("Importing a module script failed") ||
+    msg.includes("error loading dynamically imported module")
+  );
+}
+
 export class ErrorBoundary extends Component<Props, State> {
   state: State = { hasError: false, error: null };
 
@@ -29,13 +39,17 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       if (this.props.fallback) return this.props.fallback;
 
+      const isChunk = this.state.error && isChunkError(this.state.error);
+
       return (
         <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background px-6 text-center">
           <h1 className="text-2xl font-bold text-foreground">
-            Algo deu errado
+            {isChunk ? "Atualização disponível" : "Algo deu errado"}
           </h1>
           <p className="max-w-md text-sm text-muted-foreground">
-            Ocorreu um erro inesperado. Tente recarregar a página.
+            {isChunk
+              ? "Uma nova versão do site foi publicada. Recarregue a página para continuar."
+              : "Ocorreu um erro inesperado. Tente recarregar a página."}
           </p>
           <div className="flex gap-3">
             <button
@@ -44,12 +58,14 @@ export class ErrorBoundary extends Component<Props, State> {
             >
               Recarregar página
             </button>
-            <button
-              onClick={this.handleRetry}
-              className="rounded-lg border border-border px-6 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-accent"
-            >
-              Tentar novamente
-            </button>
+            {!isChunk && (
+              <button
+                onClick={this.handleRetry}
+                className="rounded-lg border border-border px-6 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+              >
+                Tentar novamente
+              </button>
+            )}
           </div>
         </div>
       );

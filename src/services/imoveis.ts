@@ -140,7 +140,9 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
     .from("imoveis")
     .select(LISTING_COLUMNS)
     .eq("status", "disponivel")
-    .eq("finalidade", "venda");
+    .eq("finalidade", "venda")
+    .not("fotos", "is", null)
+    .neq("fotos", "[]");
 
   // City filter: skip when searching by code to find properties in any city
   if (!filters.codigo) {
@@ -515,6 +517,8 @@ export async function fetchImoveisDestaque(limit = 6): Promise<Imovel[]> {
     .select(LISTING_COLUMNS)
     .eq("destaque", true)
     .eq("status", "disponivel")
+    .not("fotos", "is", null)
+    .neq("fotos", "[]")
     .in("cidade", CIDADES_PERMITIDAS)
     .order("publicado_em", { ascending: false })
     .limit(limit);
@@ -528,6 +532,8 @@ export async function fetchImoveisDestaque(limit = 6): Promise<Imovel[]> {
       .from("imoveis")
       .select(LISTING_COLUMNS)
       .eq("status", "disponivel")
+      .not("fotos", "is", null)
+      .neq("fotos", "[]")
       .in("cidade", CIDADES_PERMITIDAS)
       .order("publicado_em", { ascending: false })
       .limit(limit);

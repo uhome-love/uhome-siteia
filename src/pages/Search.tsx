@@ -86,10 +86,18 @@ function ProgressiveGrid({
   const BATCH = 6;
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE);
   const growRef = useRef<HTMLDivElement>(null);
+  const prevLengthRef = useRef(imoveis.length);
 
-  // Reset visible count when imoveis change (new search)
+  // Reset visible count only on new search, not on "load more"
   useEffect(() => {
-    setVisibleCount(INITIAL_VISIBLE);
+    const prev = prevLengthRef.current;
+    prevLengthRef.current = imoveis.length;
+
+    // New search: length decreased or first results arrived
+    if (imoveis.length < prev || (imoveis.length > 0 && prev === 0)) {
+      setVisibleCount(INITIAL_VISIBLE);
+    }
+    // Load more (length grew): keep current visibleCount — IntersectionObserver will reveal new cards
   }, [imoveis.length]);
 
   // Grow visible count as user scrolls near the bottom of rendered cards

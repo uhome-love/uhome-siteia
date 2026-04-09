@@ -13,10 +13,29 @@ interface PropertyMapProps {
 export function PropertyMap({ neighborhood, city, lat = -30.0277, lng = -51.2287 }: PropertyMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const [mapError, setMapError] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+
+  // Lazy load: only init map when visible in viewport
+  useEffect(() => {
+    const el = wrapperRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
-    if (!mapContainer.current || mapRef.current) return;
+    if (!isVisible || !mapContainer.current || mapRef.current) return;
     if (!MAPBOX_TOKEN) {
       setMapError(true);
       return;
@@ -68,15 +87,19 @@ export function PropertyMap({ neighborhood, city, lat = -30.0277, lng = -51.2287
       mapRef.current?.remove?.();
       mapRef.current = null;
     };
-  }, [lat, lng]);
+  }, [isVisible, lat, lng]);
 
   const fallbackMap = mapError || !MAPBOX_TOKEN;
   const mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.008}%2C${lat - 0.005}%2C${lng + 0.008}%2C${lat + 0.005}&layer=mapnik&marker=${lat}%2C${lng}`;
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-border">
+    <div ref={wrapperRef} className="overflow-hidden rounded-2xl border border-border">
       <div className="aspect-[16/9] w-full">
-        {fallbackMap ? (
+        {!isVisible ? (
+          <div className="flex h-full w-full items-center justify-center bg-muted">
+            <MapPin className="h-8 w-8 text-muted-foreground/40" />
+          </div>
+        ) : fallbackMap ? (
           <iframe title="Mapa do imóvel" src={mapUrl} className="h-full w-full border-0" loading="lazy" referrerPolicy="no-referrer" />
         ) : (
           <div ref={mapContainer} className="h-full w-full" />

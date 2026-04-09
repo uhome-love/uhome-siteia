@@ -322,6 +322,7 @@ const Search = () => {
       condominioMax: filters.condominioMax || undefined,
       iptuMax: filters.iptuMax || undefined,
       condominio: filters.condominio || undefined,
+      fase: filters.fase || undefined,
     };
   }, [filters]);
 

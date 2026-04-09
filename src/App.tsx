@@ -1,12 +1,18 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate, Link } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
-import { CorretorProvider } from "@/contexts/CorretorContext";
+import { CorretorProvider, useCorretor } from "@/contexts/CorretorContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
+import FeaturedNeighborhoods from "@/components/FeaturedNeighborhoods";
+import { HomeFaqSection } from "@/components/HomeFaqSection";
+import { useCanonical } from "@/hooks/useCanonical";
+import { setJsonLd, removeJsonLd, buildLocalBusinessJsonLd } from "@/lib/jsonld";
 
 const ExitIntentModal = lazy(() => import("@/components/ExitIntentModal").then(m => ({ default: m.ExitIntentModal })));
 const FloatingWhatsApp = lazy(() => import("@/components/FloatingWhatsApp"));
@@ -56,14 +62,13 @@ const SeoLanding = lazy(() => import("./pages/SeoLanding.tsx"));
 const Vitrine = lazy(() => import("./pages/Vitrine.tsx"));
 const Sobre = lazy(() => import("./pages/Sobre.tsx"));
 const GuiaBairros = lazy(() => import("./pages/GuiaBairros.tsx"));
-const PortoAlegrePilar = lazy(() => import("./pages/PortoAlegrePillar.tsx"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 min cache
-      gcTime: 10 * 60 * 1000, // 10 min garbage collection
-      retry: 1, // Single retry — faster error recovery
+      staleTime: 5 * 60 * 1000,
+      gcTime: 10 * 60 * 1000,
+      retry: 1,
       retryDelay: 1000,
     },
     mutations: {
@@ -81,8 +86,106 @@ function PageFallback() {
   );
 }
 
+const PORTO_ALEGRE_PILLAR_LINKS = [
+  { href: "/apartamentos-porto-alegre", label: "Apartamentos" },
+  { href: "/casas-porto-alegre", label: "Casas" },
+  { href: "/coberturas-porto-alegre", label: "Coberturas" },
+  { href: "/studios-porto-alegre", label: "Studios" },
+  { href: "/comerciais-porto-alegre", label: "Comerciais" },
+];
+
+const PORTO_ALEGRE_PILLAR_FAQS = [
+  {
+    q: "Quais imóveis estão à venda em Porto Alegre?",
+    a: "Você encontra apartamentos, casas, coberturas, studios e imóveis comerciais à venda em diferentes bairros de Porto Alegre.",
+  },
+  {
+    q: "Como buscar imóveis por bairro em Porto Alegre?",
+    a: "Na Uhome você pode explorar bairros em destaque e filtrar a busca por localização, preço, quartos e tipo de imóvel.",
+  },
+  {
+    q: "Vale a pena comprar imóvel em Porto Alegre?",
+    a: "Porto Alegre reúne bairros valorizados, boa infraestrutura e opções para morar ou investir, com oportunidades em várias faixas de preço.",
+  },
+];
+
+function PortoAlegrePilarPage() {
+  const { prefixLink } = useCorretor();
+
+  useCanonical("/imoveis-porto-alegre");
+
+  useEffect(() => {
+    document.title = "Imóveis à venda em Porto Alegre | Uhome";
+
+    let meta = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
+    if (!meta) {
+      meta = document.createElement("meta");
+      meta.setAttribute("name", "description");
+      document.head.appendChild(meta);
+    }
+
+    meta.setAttribute(
+      "content",
+      "Encontre imóveis à venda em Porto Alegre com busca por tipo, bairro e faixa de preço nos melhores endereços da cidade.",
+    );
+
+    setJsonLd("jsonld-porto-alegre-pilar", buildLocalBusinessJsonLd());
+
+    return () => {
+      removeJsonLd("jsonld-porto-alegre-pilar");
+    };
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <main className="pt-24 sm:pt-28">
+        <section className="border-b border-border bg-muted/30 py-16 sm:py-20">
+          <div className="container-uhome">
+            <h1 className="max-w-4xl text-h1 text-balance text-foreground">
+              Imóveis à venda em Porto Alegre
+            </h1>
+            <p className="mt-4 max-w-2xl font-body text-lg text-muted-foreground">
+              Explore apartamentos, casas, coberturas, studios e imóveis comerciais nos principais bairros de Porto Alegre.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link
+                to={prefixLink("/busca")}
+                className="inline-flex items-center rounded-full bg-primary px-6 py-3 font-body text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+              >
+                Buscar imóveis
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        <section className="py-16 sm:py-20">
+          <div className="container-uhome">
+            <h2 className="text-h2 text-foreground">Explore por tipo</h2>
+            <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {PORTO_ALEGRE_PILLAR_LINKS.map((item) => (
+                <Link
+                  key={item.href}
+                  to={prefixLink(item.href)}
+                  className="rounded-2xl border border-border bg-card px-6 py-5 font-body text-base font-semibold text-foreground transition-colors hover:border-primary hover:text-primary"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <FeaturedNeighborhoods />
+        <HomeFaqSection faqs={PORTO_ALEGRE_PILLAR_FAQS} />
+      </main>
+      <Footer />
+    </div>
+  );
+}
 
 const CorretorRefLayout = lazy(() => import("./components/CorretorRef").then(m => ({ default: m.CorretorRefLayout })));
+const PortoAlegrePilar = PortoAlegrePilarPage;
 
 const App = () => (
   <ErrorBoundary>

@@ -39,6 +39,7 @@ export function buildImovelJsonLd(imovel: Imovel) {
       price: imovel.preco,
       priceCurrency: "BRL",
       availability: "https://schema.org/InStock",
+      itemCondition: imovel.tipo === "terreno" ? "https://schema.org/NewCondition" : "https://schema.org/UsedCondition",
     },
     about: {
       "@type": "Residence",

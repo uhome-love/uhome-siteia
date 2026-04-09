@@ -436,7 +436,7 @@ Deno.serve(async (req) => {
         return xmlResponse(await buildSeoPagesSitemap(today));
 
       case "blog":
-        return xmlResponse(buildBlogSitemap(today));
+        return xmlResponse(await buildBlogSitemap(today));
 
       case "condominios":
         return xmlResponse(await buildCondominiosSitemap(today));

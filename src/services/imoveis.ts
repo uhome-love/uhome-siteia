@@ -249,6 +249,7 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
     if (filters.condominioMax) countQuery = countQuery.lte("preco_condominio", filters.condominioMax);
     if (filters.iptuMax) countQuery = countQuery.lte("preco_iptu", filters.iptuMax);
     if (filters.condominio) countQuery = countQuery.ilike("condominio_nome", `%${filters.condominio}%`);
+    if (filters.fase) countQuery = countQuery.eq("fase", filters.fase);
     if (filters.q) countQuery = countQuery.or(`titulo.ilike.%${filters.q}%,bairro.ilike.%${filters.q}%,tipo.ilike.%${filters.q}%`);
     if (filters.codigo) countQuery = countQuery.or(`jetimob_id.ilike.%${filters.codigo}%,slug.ilike.%${filters.codigo}%`);
     if (filters.bounds) {

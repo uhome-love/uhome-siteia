@@ -69,7 +69,14 @@ function ogImageUrl(rawUrl: string): string {
   if (!rawUrl) return OG_DEFAULT;
   if (rawUrl === OG_DEFAULT) return rawUrl;
   if (rawUrl.endsWith(".svg")) return OG_DEFAULT;
-  return rawUrl;
+  // Proxy through wsrv.nl to serve optimized JPEG for social crawlers
+  // This converts heavy PNGs (1MB+) to ~50-100KB JPEGs at 1200x630
+  try {
+    const encoded = encodeURIComponent(rawUrl);
+    return `https://wsrv.nl/?url=${encoded}&w=1200&h=630&fit=cover&output=jpg&q=80`;
+  } catch {
+    return rawUrl;
+  }
 }
 
 function fotoPrincipal(fotos: ReturnType<typeof parseFotos>): string {
@@ -163,7 +170,7 @@ function localBusinessJsonLd() {
 
 function html(title: string, description: string, rawOgImage: string, canonical: string, jsonLdBlocks: string[], bodyHtml: string) {
   const ogImage = ogImageUrl(rawOgImage);
-  const isJpeg = ogImage.includes(".jpg") || ogImage.includes(".jpeg") || ogImage.includes("unsplash.com");
+  const isJpeg = ogImage.includes(".jpg") || ogImage.includes(".jpeg") || ogImage.includes("unsplash.com") || ogImage.includes("output=jpg");
   const imgType = isJpeg ? "image/jpeg" : "image/png";
   // Sanitize description for meta tags
   const cleanDesc = truncateDesc(description, 160);

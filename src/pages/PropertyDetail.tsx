@@ -51,6 +51,7 @@ const PropertyDetail = () => {
   const [imovel, setImovel] = useState<Imovel | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [showFullDesc, setShowFullDesc] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, dragFree: false });
 

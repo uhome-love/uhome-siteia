@@ -13,55 +13,56 @@ import FeaturedNeighborhoods from "@/components/FeaturedNeighborhoods";
 import { HomeFaqSection } from "@/components/HomeFaqSection";
 import { useCanonical } from "@/hooks/useCanonical";
 import { setJsonLd, removeJsonLd, buildLocalBusinessJsonLd } from "@/lib/jsonld";
+import { lazyRetry } from "@/lib/lazyRetry";
 
-const ExitIntentModal = lazy(() => import("@/components/ExitIntentModal").then(m => ({ default: m.ExitIntentModal })));
-const FloatingWhatsApp = lazy(() => import("@/components/FloatingWhatsApp"));
+const ExitIntentModal = lazyRetry(() => import("@/components/ExitIntentModal").then(m => ({ default: m.ExitIntentModal })));
+const FloatingWhatsApp = lazyRetry(() => import("@/components/FloatingWhatsApp"));
 
 import { BannerCorretor } from "@/components/BannerCorretor";
-const WhatsAppLeadModal = lazy(() => import("@/components/WhatsAppLeadModal").then(m => ({ default: m.WhatsAppLeadModal })));
+const WhatsAppLeadModal = lazyRetry(() => import("@/components/WhatsAppLeadModal").then(m => ({ default: m.WhatsAppLeadModal })));
 
 // Eager load homepage
 import Index from "./pages/Index.tsx";
 
 // Lazy load non-critical pages
-const Search = lazy(() => import("./pages/Search.tsx"));
-const PropertyDetail = lazy(() => import("./pages/PropertyDetail.tsx"));
-const Anunciar = lazy(() => import("./pages/Anunciar.tsx"));
-const Carreiras = lazy(() => import("./pages/Carreiras.tsx"));
-const Bairro = lazy(() => import("./pages/Bairro.tsx"));
-const Bairros = lazy(() => import("./pages/Bairros.tsx"));
-const FAQ = lazy(() => import("./pages/FAQ.tsx"));
-const Onboarding = lazy(() => import("./pages/Onboarding.tsx"));
-const Blog = lazy(() => import("./pages/Blog.tsx"));
-const BlogPostPage = lazy(() => import("./pages/BlogPost.tsx"));
-const Favoritos = lazy(() => import("./pages/Favoritos.tsx"));
-const SeoOrNotFound = lazy(() => import("./components/SeoOrNotFound"));
-const TipoImovel = lazy(() => import("./pages/TipoImovel.tsx"));
-const Condominios = lazy(() => import("./pages/Condominios.tsx"));
-const CondominioDetail = lazy(() => import("./pages/CondominioDetail.tsx"));
-const AvaliacaoPage = lazy(() => import("./pages/AvaliacaoPage.tsx"));
-const Privacidade = lazy(() => import("./pages/Privacidade.tsx"));
-const ResetPassword = lazy(() => import("./pages/ResetPassword.tsx"));
+const Search = lazyRetry(() => import("./pages/Search.tsx"));
+const PropertyDetail = lazyRetry(() => import("./pages/PropertyDetail.tsx"));
+const Anunciar = lazyRetry(() => import("./pages/Anunciar.tsx"));
+const Carreiras = lazyRetry(() => import("./pages/Carreiras.tsx"));
+const Bairro = lazyRetry(() => import("./pages/Bairro.tsx"));
+const Bairros = lazyRetry(() => import("./pages/Bairros.tsx"));
+const FAQ = lazyRetry(() => import("./pages/FAQ.tsx"));
+const Onboarding = lazyRetry(() => import("./pages/Onboarding.tsx"));
+const Blog = lazyRetry(() => import("./pages/Blog.tsx"));
+const BlogPostPage = lazyRetry(() => import("./pages/BlogPost.tsx"));
+const Favoritos = lazyRetry(() => import("./pages/Favoritos.tsx"));
+const SeoOrNotFound = lazyRetry(() => import("./components/SeoOrNotFound"));
+const TipoImovel = lazyRetry(() => import("./pages/TipoImovel.tsx"));
+const Condominios = lazyRetry(() => import("./pages/Condominios.tsx"));
+const CondominioDetail = lazyRetry(() => import("./pages/CondominioDetail.tsx"));
+const AvaliacaoPage = lazyRetry(() => import("./pages/AvaliacaoPage.tsx"));
+const Privacidade = lazyRetry(() => import("./pages/Privacidade.tsx"));
+const ResetPassword = lazyRetry(() => import("./pages/ResetPassword.tsx"));
 
 // Admin
-const AdminLayout = lazy(() => import("./pages/admin/AdminLayout.tsx"));
-const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard.tsx"));
-const AdminImoveis = lazy(() => import("./pages/admin/AdminImoveis.tsx"));
-const AdminLeads = lazy(() => import("./pages/admin/AdminLeads.tsx"));
-const AdminCaptacoes = lazy(() => import("./pages/admin/AdminCaptacoes.tsx"));
-const AdminSync = lazy(() => import("./pages/admin/AdminSync.tsx"));
-const AdminConfig = lazy(() => import("./pages/admin/AdminConfig.tsx"));
-const AdminIntegracao = lazy(() => import("./pages/admin/AdminIntegracao.tsx"));
-const IntegracaoDiagnostico = lazy(() => import("./pages/admin/IntegracaoDiagnostico.tsx"));
-const AdminLinks = lazy(() => import("./pages/admin/AdminLinks.tsx"));
-const AdminCorretores = lazy(() => import("./pages/admin/AdminCorretores.tsx"));
-const AdminEmpreendimentos = lazy(() => import("./pages/admin/AdminEmpreendimentos.tsx"));
-const EmpreendimentoDetail = lazy(() => import("./pages/EmpreendimentoDetail.tsx"));
-const MegaCyrela = lazy(() => import("./pages/MegaCyrela.tsx"));
-const SeoLanding = lazy(() => import("./pages/SeoLanding.tsx"));
-const Vitrine = lazy(() => import("./pages/Vitrine.tsx"));
-const Sobre = lazy(() => import("./pages/Sobre.tsx"));
-const GuiaBairros = lazy(() => import("./pages/GuiaBairros.tsx"));
+const AdminLayout = lazyRetry(() => import("./pages/admin/AdminLayout.tsx"));
+const AdminDashboard = lazyRetry(() => import("./pages/admin/AdminDashboard.tsx"));
+const AdminImoveis = lazyRetry(() => import("./pages/admin/AdminImoveis.tsx"));
+const AdminLeads = lazyRetry(() => import("./pages/admin/AdminLeads.tsx"));
+const AdminCaptacoes = lazyRetry(() => import("./pages/admin/AdminCaptacoes.tsx"));
+const AdminSync = lazyRetry(() => import("./pages/admin/AdminSync.tsx"));
+const AdminConfig = lazyRetry(() => import("./pages/admin/AdminConfig.tsx"));
+const AdminIntegracao = lazyRetry(() => import("./pages/admin/AdminIntegracao.tsx"));
+const IntegracaoDiagnostico = lazyRetry(() => import("./pages/admin/IntegracaoDiagnostico.tsx"));
+const AdminLinks = lazyRetry(() => import("./pages/admin/AdminLinks.tsx"));
+const AdminCorretores = lazyRetry(() => import("./pages/admin/AdminCorretores.tsx"));
+const AdminEmpreendimentos = lazyRetry(() => import("./pages/admin/AdminEmpreendimentos.tsx"));
+const EmpreendimentoDetail = lazyRetry(() => import("./pages/EmpreendimentoDetail.tsx"));
+const MegaCyrela = lazyRetry(() => import("./pages/MegaCyrela.tsx"));
+const SeoLanding = lazyRetry(() => import("./pages/SeoLanding.tsx"));
+const Vitrine = lazyRetry(() => import("./pages/Vitrine.tsx"));
+const Sobre = lazyRetry(() => import("./pages/Sobre.tsx"));
+const GuiaBairros = lazyRetry(() => import("./pages/GuiaBairros.tsx"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -184,7 +185,7 @@ function PortoAlegrePilarPage() {
   );
 }
 
-const CorretorRefLayout = lazy(() => import("./components/CorretorRef").then(m => ({ default: m.CorretorRefLayout })));
+const CorretorRefLayout = lazyRetry(() => import("./components/CorretorRef").then(m => ({ default: m.CorretorRefLayout })));
 const PortoAlegrePilar = PortoAlegrePilarPage;
 
 const App = () => (

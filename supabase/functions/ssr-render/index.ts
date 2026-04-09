@@ -21,6 +21,33 @@ function cap(s: string) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
+/** Strip HTML tags, Jetimob internal codes, and normalize whitespace */
+function stripHtml(text: string): string {
+  if (!text) return "";
+  return text
+    // Remove HTML tags
+    .replace(/<[^>]*>/g, " ")
+    // Remove Jetimob codes like [REF:123], #COD-456, etc.
+    .replace(/\[?(?:REF|COD|ID|cod|ref|id)[:\s#-]*[\w-]+\]?/gi, "")
+    // Remove lone codes that look like property IDs (e.g. "JET-12345", "AP1234")
+    .replace(/\b[A-Z]{2,4}[-]?\d{3,8}\b/g, "")
+    // Remove HTML entities
+    .replace(/&[a-z]+;/gi, " ")
+    .replace(/&#\d+;/g, " ")
+    // Remove excessive whitespace
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/** Truncate text to maxLen chars at word boundary, add ellipsis */
+function truncateDesc(text: string, maxLen = 160): string {
+  const clean = stripHtml(text);
+  if (clean.length <= maxLen) return clean;
+  const truncated = clean.slice(0, maxLen);
+  const lastSpace = truncated.lastIndexOf(" ");
+  return (lastSpace > maxLen * 0.6 ? truncated.slice(0, lastSpace) : truncated) + "…";
+}
+
 function formatBRL(v: number) {
   return v.toLocaleString("pt-BR", {
     style: "currency",
@@ -138,6 +165,8 @@ function html(title: string, description: string, rawOgImage: string, canonical:
   const ogImage = ogImageUrl(rawOgImage);
   const isJpeg = ogImage.includes(".jpg") || ogImage.includes(".jpeg") || ogImage.includes("unsplash.com");
   const imgType = isJpeg ? "image/jpeg" : "image/png";
+  // Sanitize description for meta tags
+  const cleanDesc = truncateDesc(description, 160);
 
   return `<!DOCTYPE html>
 <html lang="pt-BR">
@@ -145,13 +174,15 @@ function html(title: string, description: string, rawOgImage: string, canonical:
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>${esc(title)}</title>
-  <meta name="description" content="${esc(description)}" />
+  <meta name="description" content="${esc(cleanDesc)}" />
   <link rel="canonical" href="${esc(canonical)}" />
+  <link rel="alternate" hreflang="pt-BR" href="${esc(canonical)}" />
+  <link rel="alternate" hreflang="x-default" href="${esc(canonical)}" />
   <meta name="geo.region" content="BR-RS" />
   <meta name="geo.placename" content="Porto Alegre" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="${esc(title)}" />
-  <meta property="og:description" content="${esc(description)}" />
+  <meta property="og:description" content="${esc(cleanDesc)}" />
   <meta property="og:image" content="${esc(ogImage)}" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
@@ -161,7 +192,7 @@ function html(title: string, description: string, rawOgImage: string, canonical:
   <meta property="og:locale" content="pt_BR" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="${esc(title)}" />
-  <meta name="twitter:description" content="${esc(description)}" />
+  <meta name="twitter:description" content="${esc(cleanDesc)}" />
   <meta name="twitter:image" content="${esc(ogImage)}" />
   <meta name="robots" content="index, follow" />
   ${jsonLdBlocks.map((j) => `<script type="application/ld+json">${j}</script>`).join("\n  ")}

@@ -14,7 +14,7 @@ interface Props {
 
 export function HomeFaqSection({ faqs }: Props) {
   return (
-    <section className="border-t border-border bg-background py-14 sm:py-20">
+    <section className="content-auto border-t border-border bg-background py-14 sm:py-20">
       <div className="mx-auto max-w-3xl px-6">
         <motion.div
           initial={{ opacity: 0, y: 16 }}

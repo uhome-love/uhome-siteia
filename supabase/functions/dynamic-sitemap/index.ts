@@ -276,15 +276,38 @@ async function buildEmpreendimentosSitemap(today: string) {
 }
 
 // ══════════════════════════════════════════════════════════
-// BLOG SITEMAP
+// BLOG SITEMAP — dynamic from DB + static fallback
 // ══════════════════════════════════════════════════════════
-function buildBlogSitemap(today: string) {
+async function buildBlogSitemap(today: string) {
+  // Fetch blog posts from DB for real dates
+  const { data: dbPosts } = await supabase
+    .from("blog_posts")
+    .select("slug, publicado_em")
+    .eq("ativo", true)
+    .order("publicado_em", { ascending: false })
+    .limit(200);
+
   const entries = [
     urlEntry(`${SITE}/blog`, today, "weekly", "0.7"),
-    ...BLOG_SLUGS.map((slug) =>
-      urlEntry(`${SITE}/blog/${slug}`, today, "monthly", "0.7")
-    ),
   ];
+
+  // DB posts with real dates
+  const dbSlugs = new Set<string>();
+  if (dbPosts) {
+    for (const p of dbPosts as any[]) {
+      dbSlugs.add(p.slug);
+      const lastmod = p.publicado_em || today;
+      entries.push(urlEntry(`${SITE}/blog/${p.slug}`, lastmod, "monthly", "0.7"));
+    }
+  }
+
+  // Static fallback slugs (only if not already in DB)
+  for (const slug of BLOG_SLUGS) {
+    if (!dbSlugs.has(slug)) {
+      entries.push(urlEntry(`${SITE}/blog/${slug}`, today, "monthly", "0.7"));
+    }
+  }
+
   return wrapUrlset(entries);
 }
 
@@ -413,7 +436,7 @@ Deno.serve(async (req) => {
         return xmlResponse(await buildSeoPagesSitemap(today));
 
       case "blog":
-        return xmlResponse(buildBlogSitemap(today));
+        return xmlResponse(await buildBlogSitemap(today));
 
       case "condominios":
         return xmlResponse(await buildCondominiosSitemap(today));

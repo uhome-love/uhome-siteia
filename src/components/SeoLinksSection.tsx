@@ -44,7 +44,7 @@ export function SeoLinksSection() {
   const { prefixLink } = useCorretor();
 
   return (
-    <section className="border-t border-border bg-secondary/30 py-14 sm:py-20">
+    <section className="content-auto border-t border-border bg-secondary/30 py-14 sm:py-20">
       <div className="mx-auto max-w-7xl px-6">
         <motion.div
           initial={{ opacity: 0, y: 16 }}

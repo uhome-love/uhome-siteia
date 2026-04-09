@@ -3,6 +3,8 @@ import { UhomeLogo } from "@/components/UhomeLogo";
 import { WHATSAPP_NUMBER, WHATSAPP_DISPLAY } from "@/lib/whatsapp";
 import { useCorretor } from "@/contexts/CorretorContext";
 
+// Footer uses content-auto for below-fold performance
+
 export function Footer() {
   const { prefixLink } = useCorretor();
 

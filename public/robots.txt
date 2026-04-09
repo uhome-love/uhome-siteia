@@ -28,4 +28,4 @@ Disallow: /onboarding
 Disallow: /reset-password
 Disallow: /favoritos
 
-Sitemap: https://uhome.com.br/sitemap.xml
+Sitemap: https://huigglwvvzuwwyqvpmec.supabase.co/functions/v1/dynamic-sitemap

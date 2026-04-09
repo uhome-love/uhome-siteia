@@ -56,7 +56,7 @@ const SeoLanding = lazy(() => import("./pages/SeoLanding.tsx"));
 const Vitrine = lazy(() => import("./pages/Vitrine.tsx"));
 const Sobre = lazy(() => import("./pages/Sobre.tsx"));
 const GuiaBairros = lazy(() => import("./pages/GuiaBairros.tsx"));
-const PortoAlegrePilar = lazy(() => import("@/pages/PortoAlegrePilar.tsx"));
+const PortoAlegrePilar = lazy(() => import("./pages/PortoAlegrePillar.tsx"));
 
 const queryClient = new QueryClient({
   defaultOptions: {

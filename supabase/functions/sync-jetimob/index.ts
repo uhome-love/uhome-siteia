@@ -102,6 +102,14 @@ function extractDiferenciais(item: any): string[] {
   return diffs;
 }
 
+function mapFase(s?: string): string {
+  if (!s) return "usado";
+  if (s === "Em construção") return "em_construcao";
+  if (s === "Na planta") return "na_planta";
+  if (s === "Novo") return "novo";
+  return "usado";
+}
+
 function extractPreco(j: any): number {
   const candidates = [j.valor_venda, j.valor_locacao, j.valor_temporada, j.valor, j.preco, j.price, j.valor_total];
   for (const v of candidates) {
@@ -148,6 +156,7 @@ function mapImovel(j: any) {
     origem: "jetimob",
     condominio_nome: j.condominio_nome || null,
     condominio_id: j.id_condominio ? String(j.id_condominio) : null,
+    fase: mapFase(j.status),
     jetimob_raw: j,
   };
 }

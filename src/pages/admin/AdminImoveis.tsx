@@ -21,6 +21,7 @@ interface ImovelRow {
   destaque: boolean | null;
   fotos: any;
   quartos: number | null;
+  fase: string | null;
 }
 
 function fotoUrl(fotos: any): string {
@@ -40,7 +41,7 @@ export default function AdminImoveis() {
   const load = useCallback(async () => {
     let query = supabase
       .from("imoveis")
-      .select("id,slug,titulo,bairro,cidade,preco,tipo,status,destaque,fotos,quartos")
+      .select("id,slug,titulo,bairro,cidade,preco,tipo,status,destaque,fotos,quartos,fase")
       .order("publicado_em", { ascending: false })
       .limit(100);
 
@@ -177,6 +178,7 @@ export default function AdminImoveis() {
                   <th className="p-3 font-medium">Título</th>
                   <th className="p-3 font-medium">Bairro</th>
                   <th className="p-3 font-medium">Preço</th>
+                  <th className="p-3 font-medium">Fase</th>
                   <th className="p-3 font-medium">Status</th>
                   <th className="p-3 font-medium text-center">Destaque</th>
                   <th className="p-3 font-medium">Ver</th>
@@ -195,6 +197,16 @@ export default function AdminImoveis() {
                     <td className="max-w-[220px] truncate p-3 font-medium">{im.titulo}</td>
                     <td className="p-3 text-muted-foreground">{im.bairro}</td>
                     <td className="p-3 font-medium tabular-nums">{formatPreco(im.preco)}</td>
+                    <td className="p-3">
+                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                        im.fase === "em_construcao" ? "bg-amber-100 text-amber-700" :
+                        im.fase === "na_planta" ? "bg-emerald-100 text-emerald-700" :
+                        im.fase === "novo" ? "bg-sky-100 text-sky-700" :
+                        "bg-muted text-muted-foreground"
+                      }`}>
+                        {im.fase === "em_construcao" ? "Em obras" : im.fase === "na_planta" ? "Lançamento" : im.fase === "novo" ? "Novo" : "Usado"}
+                      </span>
+                    </td>
                     <td className="p-3">
                       <Select value={im.status ?? "disponivel"} onValueChange={(v) => updateStatus(im.id, v)}>
                         <SelectTrigger className="h-8 w-32 text-xs">
@@ -224,7 +236,7 @@ export default function AdminImoveis() {
                   </tr>
                 ))}
                 {imoveis.length === 0 && (
-                  <tr><td colSpan={7} className="p-6 text-center text-muted-foreground">Nenhum imóvel encontrado</td></tr>
+                  <tr><td colSpan={8} className="p-6 text-center text-muted-foreground">Nenhum imóvel encontrado</td></tr>
                 )}
               </tbody>
             </table>

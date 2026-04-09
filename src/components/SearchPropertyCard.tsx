@@ -17,7 +17,7 @@ interface Props {
   toggleFavorito?: (id: string) => Promise<"needs_auth" | void>;
 }
 
-type BadgeStyle = "novo" | "exclusivo" | "visto" | "otimo-preco" | "oportunidade" | "destaque";
+type BadgeStyle = "novo" | "exclusivo" | "visto" | "otimo-preco" | "oportunidade" | "destaque" | "em-obras" | "lancamento" | "novo-imovel";
 
 interface SmartBadge {
   label: string;
@@ -28,7 +28,16 @@ interface SmartBadge {
 function getBaseBadges(imovel: Imovel): SmartBadge[] {
   const badges: SmartBadge[] = [];
 
-  // Destaque (admin-selected) — highest priority
+  // Fase badges — highest visual priority
+  if (imovel.fase === "em_construcao") {
+    badges.push({ label: "Em obras", style: "em-obras" });
+  } else if (imovel.fase === "na_planta") {
+    badges.push({ label: "Lançamento", style: "lancamento" });
+  } else if (imovel.fase === "novo") {
+    badges.push({ label: "Novo", style: "novo-imovel" });
+  }
+
+  // Destaque (admin-selected)
   if (imovel.destaque) {
     badges.push({ label: "Destaque", style: "destaque", icon: <Sparkles className="h-3 w-3" /> });
   }
@@ -57,6 +66,9 @@ const badgeClasses: Record<BadgeStyle, string> = {
   visto: "bg-white/90 text-foreground font-semibold shadow-sm backdrop-blur-sm",
   "otimo-preco": "bg-white/95 text-primary font-bold shadow-sm backdrop-blur-sm border border-primary/20",
   oportunidade: "bg-white/95 text-primary font-bold shadow-sm backdrop-blur-sm border border-primary/20",
+  "em-obras": "bg-amber-500/90 text-white font-semibold shadow-sm",
+  lancamento: "bg-emerald-500/90 text-white font-semibold shadow-sm",
+  "novo-imovel": "bg-sky-500/90 text-white font-semibold shadow-sm",
 };
 
 export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavorito: isFavoritoProp, toggleFavorito: toggleFavoritoProp }, ref) {

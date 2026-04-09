@@ -46,6 +46,7 @@ const mockImovel: Imovel = {
   video_url: null,
   condominio_nome: null,
   publicado_em: new Date().toISOString(),
+  fase: "usado",
 };
 
 function renderCard(props?: Partial<React.ComponentProps<typeof SearchPropertyCard>>) {

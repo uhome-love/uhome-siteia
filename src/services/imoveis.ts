@@ -29,6 +29,7 @@ export interface Imovel {
   video_url: string | null;
   condominio_nome: string | null;
   publicado_em: string;
+  fase: string;
 }
 
 function parseFotos(fotos: any): Array<{ url: string; ordem: number; principal: boolean }> {
@@ -64,6 +65,7 @@ function mapRow(row: any): Imovel {
     cidade: row.cidade ?? "Porto Alegre",
     uf: row.uf ?? "RS",
     condominio_nome: row.condominio_nome?.trim() || null,
+    fase: row.fase || "usado",
   };
   // Always override with clean title
   mapped.titulo = tituloLimpo(mapped);
@@ -107,6 +109,7 @@ export interface BuscaFilters {
   condominioMax?: number;
   iptuMax?: number;
   condominio?: string;
+  fase?: string;
   limit?: number;
   offset?: number;
   bounds?: {
@@ -120,7 +123,7 @@ export interface BuscaFilters {
 export const CIDADES_PERMITIDAS = ["Porto Alegre", "Canoas", "Cachoeirinha", "Gravataí", "Guaíba"];
 
 // Minimal columns for listing cards — no fotos/descricao/jetimob_raw/diferenciais
-const LISTING_COLUMNS = "id,slug,tipo,finalidade,status,destaque,preco,preco_condominio,area_total,quartos,banheiros,vagas,bairro,cidade,uf,publicado_em,foto_principal";
+const LISTING_COLUMNS = "id,slug,tipo,finalidade,status,destaque,preco,preco_condominio,area_total,quartos,banheiros,vagas,bairro,cidade,uf,publicado_em,foto_principal,fase";
 
 // Focused detail payload — excludes large sync/debug fields that can slow or stall property pages
 const DETAIL_COLUMNS = "id,slug,tipo,finalidade,status,destaque,preco,preco_condominio,preco_iptu,area_total,area_util,quartos,banheiros,vagas,andar,latitude,longitude,titulo,descricao,diferenciais,fotos,foto_principal,video_url,condominio_nome,publicado_em,bairro,cidade,uf";
@@ -175,6 +178,7 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
   if (filters.condominioMax) query = query.lte("preco_condominio", filters.condominioMax);
   if (filters.iptuMax) query = query.lte("preco_iptu", filters.iptuMax);
   if (filters.condominio) query = query.ilike("condominio_nome", `%${filters.condominio}%`);
+  if (filters.fase) query = query.eq("fase", filters.fase);
   if (filters.q) query = query.or(`titulo.ilike.%${filters.q}%,bairro.ilike.%${filters.q}%,tipo.ilike.%${filters.q}%`);
   if (filters.codigo) query = query.or(`jetimob_id.ilike.%${filters.codigo}%,slug.ilike.%${filters.codigo}%`);
   if (filters.bounds) {
@@ -245,6 +249,7 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
     if (filters.condominioMax) countQuery = countQuery.lte("preco_condominio", filters.condominioMax);
     if (filters.iptuMax) countQuery = countQuery.lte("preco_iptu", filters.iptuMax);
     if (filters.condominio) countQuery = countQuery.ilike("condominio_nome", `%${filters.condominio}%`);
+    if (filters.fase) countQuery = countQuery.eq("fase", filters.fase);
     if (filters.q) countQuery = countQuery.or(`titulo.ilike.%${filters.q}%,bairro.ilike.%${filters.q}%,tipo.ilike.%${filters.q}%`);
     if (filters.codigo) countQuery = countQuery.or(`jetimob_id.ilike.%${filters.codigo}%,slug.ilike.%${filters.codigo}%`);
     if (filters.bounds) {
@@ -281,6 +286,7 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
       countParams.lng_min = filters.bounds.lng_min;
       countParams.lng_max = filters.bounds.lng_max;
     }
+    if (filters.fase) countParams.p_fase = filters.fase;
     countPromise = Promise.resolve(supabase.rpc("count_imoveis", countParams)).then(r => (r.data as number) ?? 0);
   }
 
@@ -397,6 +403,7 @@ export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSig
     rpcParams.lng_min = filters.bounds.lng_min;
     rpcParams.lng_max = filters.bounds.lng_max;
   }
+  if (filters.fase) rpcParams.p_fase = filters.fase;
 
   let query = supabase.rpc("get_map_pins", rpcParams).returns<any[]>();
 

@@ -183,13 +183,21 @@ export function SearchFiltersBar({ onOpenMobileFilters, onOpenAdvancedFilters }:
   )?.label || (filters.areaMin || filters.areaMax ? formatAreaLabel(filters.areaMin, filters.areaMax) : undefined);
   const cidadeLabel = filters.cidade || "Todas";
 
+  const faseOptions = [
+    { value: "usado", label: "Pronto/Usado" },
+    { value: "novo", label: "Novo" },
+    { value: "em_construcao", label: "Em obras" },
+    { value: "na_planta", label: "Lançamento" },
+  ];
+  const faseLabel = faseOptions.find(f => f.value === filters.fase)?.label;
+
   const advancedCount = [
     filters.banheiros, filters.andarMin, filters.condominioMax, filters.iptuMax, filters.codigo, filters.condominio,
   ].filter(Boolean).length + filters.diferenciais.length;
   const advancedActive = advancedCount > 0;
 
   const hasAny =
-    filters.tipo || filters.precoMin || filters.precoMax || filters.areaMin || filters.areaMax || filters.quartos || filters.vagas || filters.q || filters.bairro || advancedActive || (filters.cidade && filters.cidade !== "Porto Alegre");
+    filters.tipo || filters.precoMin || filters.precoMax || filters.areaMin || filters.areaMax || filters.quartos || filters.vagas || filters.q || filters.bairro || filters.fase || advancedActive || (filters.cidade && filters.cidade !== "Porto Alegre");
 
   const hasInput = bairroInput.trim().length > 0;
   const hasChips = bairrosSelecionados.length > 0;
@@ -367,6 +375,24 @@ export function SearchFiltersBar({ onOpenMobileFilters, onOpenAdvancedFilters }:
             onClick={() => setFilter("tipo", filters.tipo === t.value ? "" : t.value)}
           >
             {t.label}
+          </PillOption>
+        ))}
+      </FilterPill>
+
+      {/* Fase */}
+      <FilterPill
+        label="Fase"
+        value={faseLabel}
+        active={!!filters.fase}
+        onClear={() => setFilter("fase", "")}
+      >
+        {faseOptions.map((f) => (
+          <PillOption
+            key={f.value}
+            selected={filters.fase === f.value}
+            onClick={() => setFilter("fase", filters.fase === f.value ? "" : f.value)}
+          >
+            {f.label}
           </PillOption>
         ))}
       </FilterPill>

@@ -405,11 +405,14 @@ async function renderImovel(slug: string) {
     ],
   });
 
+  // Sanitize description for structured data
+  const cleanDescForSchema = truncateDesc(row.descricao ?? desc, 300);
+
   const listing = JSON.stringify({
     "@context": "https://schema.org",
     "@type": "RealEstateListing",
     name: titulo,
-    description: (row.descricao ?? desc).slice(0, 300),
+    description: cleanDescForSchema,
     url: canonical,
     datePosted: row.publicado_em,
     image: fotos.length ? fotos.map((f: any) => f.url) : [imgUrl],
@@ -418,6 +421,7 @@ async function renderImovel(slug: string) {
       price: row.preco,
       priceCurrency: "BRL",
       availability: "https://schema.org/InStock",
+      itemCondition: row.tipo === "terreno" ? "https://schema.org/NewCondition" : "https://schema.org/UsedCondition",
     },
     about: {
       "@type": row.tipo === "apartamento" ? "Apartment" : row.tipo === "casa" ? "House" : "Residence",
@@ -440,12 +444,12 @@ async function renderImovel(slug: string) {
     },
   });
 
-  // GAP 6: Product schema for rich results
+  // Product schema for rich results
   const productSchema = JSON.stringify({
     "@context": "https://schema.org",
     "@type": "Product",
     name: titulo,
-    description: (row.descricao ?? desc).slice(0, 300),
+    description: cleanDescForSchema,
     image: fotos.length ? fotos.map((f: any) => f.url) : [imgUrl],
     url: canonical,
     brand: { "@type": "Organization", name: "Uhome Imóveis" },
@@ -455,6 +459,7 @@ async function renderImovel(slug: string) {
       priceCurrency: "BRL",
       availability: "https://schema.org/InStock",
       seller: { "@type": "Organization", name: "Uhome Imóveis" },
+      itemCondition: row.tipo === "terreno" ? "https://schema.org/NewCondition" : "https://schema.org/UsedCondition",
     },
   });
 

@@ -411,7 +411,7 @@ const Search = () => {
       .finally(() => setMapLoading(false));
     
     return () => { pinAbortRef.current?.abort(); };
-  }, [filters.tipo, filters.bairro, filters.precoMin, filters.precoMax, filters.quartos, filters.areaMin, filters.areaMax, filters.vagas, filters.banheiros, filters.andarMin, filters.condominioMax, filters.iptuMax, filters.diferenciais, filters.codigo]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [filters.tipo, filters.bairro, filters.precoMin, filters.precoMax, filters.quartos, filters.areaMin, filters.areaMax, filters.vagas, filters.banheiros, filters.andarMin, filters.condominioMax, filters.iptuMax, filters.diferenciais, filters.codigo, filters.fase]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadMore = useCallback(async () => {
     if (loadingMore || loading) return;

@@ -495,8 +495,11 @@ async function renderImovel(slug: string) {
   const bairroSlug = slugify(row.bairro);
   const crossLinks = `<p><a href="${SITE}/bairros/${bairroSlug}">Ver todos os imóveis em ${esc(row.bairro)}</a> · <a href="${SITE}/imoveis-porto-alegre">Imóveis em Porto Alegre</a></p>`;
 
+  // Sanitize description for body HTML
+  const bodyDesc = row.descricao ? truncateDesc(row.descricao, 500) : desc;
+
   return html(title, desc, imgUrl, canonical, [breadcrumb, listing, productSchema, orgJsonLd()],
-    `<h1>${esc(titulo)}</h1><p>${esc(preco)} — ${esc(statsHtml)}</p><p>${esc(desc)}</p><img src="${esc(imgUrl)}" alt="${esc(titulo)}" width="800" height="600" />${similarHtml}${crossLinks}`);
+    `<h1>${esc(titulo)}</h1><p>${esc(preco)} — ${esc(statsHtml)}</p><p>${esc(bodyDesc)}</p><img src="${esc(imgUrl)}" alt="${esc(titulo)}" width="800" height="600" />${similarHtml}${crossLinks}`);
 }
 
 /* ── blog data from DB + static fallback ─────────────── */

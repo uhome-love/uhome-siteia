@@ -1,24 +1,37 @@
 
 
-## Fix: Filtro de Fase não atualiza pins e contagem ao limpar
+## Fix: Map Pins and Count Broken — Function Overloading Conflict
 
-### Problema
+### Problem
 
-Na linha 414 de `Search.tsx`, o `useEffect` que recarrega os pins do mapa quando filtros mudam **não inclui `filters.fase`** na lista de dependências. Quando o filtro "Fase" é selecionado e depois limpo, os pins não recarregam e o contador fica em "0 imóveis".
+The `get_map_pins` RPC returns HTTP 300 with error `PGRST203: Could not choose the best candidate function`. This is because the migration used `CREATE OR REPLACE FUNCTION` which created a **second overloaded version** of `get_map_pins` (with `p_fase`), while the **old version** (without `p_fase`) still exists. PostgREST cannot disambiguate between them.
 
-### Correção
+Same issue likely affects `count_imoveis` — it shows "0 imóveis" because the count query also fails.
 
-**Arquivo: `src/pages/Search.tsx`, linha 414**
+### Fix — Single Migration
 
-Adicionar `filters.fase` ao array de dependências do `useEffect` que recarrega os pins:
+Drop the old function signatures (without `p_fase`), then re-create with the new signatures that include `p_fase`:
 
-```typescript
-// Antes (linha 414):
-], [filters.tipo, filters.bairro, filters.precoMin, filters.precoMax, filters.quartos, filters.areaMin, filters.areaMax, filters.vagas, filters.banheiros, filters.andarMin, filters.condominioMax, filters.iptuMax, filters.diferenciais, filters.codigo]);
+```sql
+-- Drop old overloads that conflict
+DROP FUNCTION IF EXISTS public.get_map_pins(
+  numeric, numeric, numeric, numeric, 
+  text, text, text[], 
+  numeric, numeric, integer, integer, integer, 
+  numeric, numeric, text, text[], integer
+);
 
-// Depois:
-], [filters.tipo, filters.bairro, filters.precoMin, filters.precoMax, filters.quartos, filters.areaMin, filters.areaMax, filters.vagas, filters.banheiros, filters.andarMin, filters.condominioMax, filters.iptuMax, filters.diferenciais, filters.codigo, filters.fase]);
+DROP FUNCTION IF EXISTS public.count_imoveis(
+  text, text[], text, text[], 
+  numeric, numeric, integer, integer, integer, 
+  numeric, numeric, text, text, text[], 
+  numeric, numeric, numeric, numeric
+);
 ```
 
-Isso é uma única linha. O `buildFilters()` já inclui `fase` corretamente (linha 327), e o `queryFilters` do React Query também (linha 333). O único lugar que faltou foi esse array de dependências dos pins do mapa.
+### Files Changed
+
+1. **New migration SQL** — drops old function overloads (the new versions with `p_fase` already exist and will remain)
+
+No frontend changes needed — the frontend already sends `p_fase` correctly.
 

@@ -1,24 +1,38 @@
 
 
-## Corrigir link do imóvel no WhatsApp (URL do Supabase → uhome.com.br)
+## Corrigir descrições dos imóveis e erro de build
 
 ### Problema
-O lead recebe no WhatsApp o link técnico do backend (`huigglwvvzuwwyqvpmec.supabase.co/functions/v1/ssr-render?path=...`) em vez do link correto `https://uhome.com.br/imovel/...`.
+- **13.118 imóveis** têm `descricao = NULL` no banco, mas possuem texto no campo `jetimob_raw->>'observacoes'` (onde a Jetimob armazena a descrição real).
+- Isso aconteceu porque a sincronização anterior não incluía o fallback para `observacoes`. O código atual já foi corrigido, mas os dados existentes não foram atualizados.
+- O erro de build do `PortoAlegrePilar.tsx` persiste no sandbox (arquivo existe no projeto).
 
-### Causa
-O arquivo `src/pages/PropertyDetail.tsx` (linha 2 e 220) usa `getShareUrl(slug)` que retorna a URL do SSR. É possível que a versão em produção do `whatsapp.ts` também ainda use a versão antiga.
+### Plano
 
-### Correção
+**1. Backfill das descrições via migration SQL**
 
-**Arquivo: `src/pages/PropertyDetail.tsx`**
-- Linha 2: trocar `import { getShareUrl }` por `import { getImovelUrl }` de `@/utils/shareUrl`
-- Linha 220: trocar `getShareUrl(slug)` por `getImovelUrl(slug)`
+Executar um UPDATE em massa para preencher `descricao` a partir de `jetimob_raw->>'observacoes'` nos 13k registros que estão sem descrição:
 
-Isso garante que tanto o botão "Compartilhar" quanto as mensagens do WhatsApp usem `uhome.com.br/imovel/...`.
+```sql
+UPDATE imoveis
+SET descricao = jetimob_raw->>'observacoes',
+    updated_at = now()
+WHERE descricao IS NULL
+  AND jetimob_raw->>'observacoes' IS NOT NULL
+  AND length(jetimob_raw->>'observacoes') > 10;
+```
 
-**Verificação**: confirmar que `src/lib/whatsapp.ts` já usa `getImovelUrl` (código atual mostra que sim).
+Isso resolve imediatamente o problema sem precisar rodar uma nova sincronização completa (que levaria muito tempo).
 
-### Também: corrigir erro de build
+**2. Garantir que futuras syncs mantenham a descrição**
 
-Recriar `src/pages/PortoAlegrePilar.tsx` que está ausente e causa o erro `TS2307` no build.
+O código em `sync-jetimob/index.ts` linha 144 já usa `j.observacoes || j.descricao_anuncio || ...` — nenhuma mudança necessária no Edge Function.
+
+**3. Fix do build — PortoAlegrePilar**
+
+O arquivo `src/pages/PortoAlegrePilar.tsx` existe e está correto. Vou garantir que o import em `src/App.tsx` use o formato `@/pages/PortoAlegrePilar` (alias path sem extensão), consistente com os demais lazy imports do arquivo.
+
+### Resultado esperado
+- Todos os 13k+ imóveis sem descrição passarão a exibir o texto descritivo na página de detalhes.
+- O build passará sem erros.
 

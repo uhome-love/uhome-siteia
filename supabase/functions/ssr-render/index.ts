@@ -170,7 +170,7 @@ function localBusinessJsonLd() {
 
 function html(title: string, description: string, rawOgImage: string, canonical: string, jsonLdBlocks: string[], bodyHtml: string) {
   const ogImage = ogImageUrl(rawOgImage);
-  const isJpeg = ogImage.includes(".jpg") || ogImage.includes(".jpeg") || ogImage.includes("unsplash.com");
+  const isJpeg = ogImage.includes(".jpg") || ogImage.includes(".jpeg") || ogImage.includes("unsplash.com") || ogImage.includes("output=jpg");
   const imgType = isJpeg ? "image/jpeg" : "image/png";
   // Sanitize description for meta tags
   const cleanDesc = truncateDesc(description, 160);

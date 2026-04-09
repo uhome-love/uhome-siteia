@@ -1,62 +1,57 @@
 
 
-## Diagnóstico: Tela com conteúdo estático (fallback HTML) ao invés do app React
+## Fix: "Ver mais" causa scroll bouncing
 
-### O que está acontecendo
+### Problema
 
-O que você vê na tela ("Imóveis à Venda em Porto Alegre | Uhome Imóveis" com links simples) é o **HTML de fallback** que fica dentro do `<div id="root">` no `index.html` (linhas 64-71). Esse conteúdo existe para SEO — é o que bots veem enquanto o JavaScript não carrega.
-
-Quando o React **não consegue montar** (por erro de JS ou falha de rede ao carregar um chunk), esse HTML estático permanece visível. Como não há nenhum mecanismo de retry para chunks que falham, o app simplesmente "morre" silenciosamente.
-
-### Causa raiz
-
-1. **Chunks dinâmicos falham ao carregar** — O app usa `React.lazy()` para 30+ páginas. Após um novo deploy, os nomes dos chunks mudam (hash diferente). Se o usuário estava com a aba aberta antes do deploy, ao navegar para uma nova rota o browser tenta baixar um chunk com nome antigo que já não existe (HTTP 404). Isso causa um erro não capturado que impede a montagem do React.
-
-2. **Sem recovery de chunk errors** — O `ErrorBoundary` captura erros de render, mas **erros de import dinâmico** (`React.lazy`) acontecem **antes** do render e não são capturados. Não há retry automático.
-
-3. **Inatividade** — Após tempo sem uso, a conexão pode ficar stale e chunks falham ao carregar por timeout.
-
-### Correção (2 arquivos)
-
-**1. `src/lib/lazyRetry.ts` — novo arquivo**
-
-Wrapper para `React.lazy()` que tenta carregar o chunk até 3 vezes. Se falhar por chunk stale (deploy recente), força um reload da página uma única vez (usando sessionStorage para evitar loop infinito).
+No `ProgressiveGrid` (linhas 91-93 de `Search.tsx`), existe um `useEffect` que reseta `visibleCount` para 12 sempre que `imoveis.length` muda:
 
 ```typescript
-export function lazyRetry(importFn: () => Promise<any>) {
-  return lazy(() => 
-    importFn().catch((err) => {
-      // Se já tentou reload, não tenta de novo
-      const hasReloaded = sessionStorage.getItem("chunk_reload");
-      if (!hasReloaded) {
-        sessionStorage.setItem("chunk_reload", "1");
-        window.location.reload();
-        return new Promise(() => {}); // nunca resolve, reload vai acontecer
-      }
-      sessionStorage.removeItem("chunk_reload");
-      throw err; // deixa ErrorBoundary pegar
-    })
-  );
-}
+useEffect(() => {
+  setVisibleCount(INITIAL_VISIBLE);
+}, [imoveis.length]);
 ```
 
-**2. `src/App.tsx` — trocar todos `lazy()` por `lazyRetry()`**
+Quando o usuário clica "Ver mais":
+1. `imoveis` cresce de 40 para 80
+2. `visibleCount` reseta de ~40 para 12
+3. Grid encolhe — scroll pula para cima
+4. IntersectionObserver dispara repetidamente: 12 → 18 → 24 → 30... 
+5. Scroll fica "pulando" até estabilizar
 
-Substituir ~30 chamadas `lazy(() => import(...))` por `lazyRetry(() => import(...))`. Isso garante que qualquer falha de chunk é tratada com retry automático.
+### Correção
 
-**3. `src/components/ErrorBoundary.tsx` — detectar chunk errors**
+**Arquivo: `src/pages/Search.tsx`, linhas 85-109 (dentro de `ProgressiveGrid`)**
 
-Adicionar detecção específica para erros de chunk (`"Loading chunk"`, `"Failed to fetch dynamically imported module"`) no ErrorBoundary, mostrando uma mensagem mais clara com botão de recarregar.
+Duas mudanças:
 
-### Resultado esperado
+1. **Não resetar `visibleCount` em load more** — usar um ref para rastrear o comprimento anterior. Se `imoveis.length` cresceu (load more), não reseta. Se mudou para um valor diferente (nova busca), reseta.
 
-- Após deploy, usuários com aba aberta não verão mais a tela de fallback — o app recarrega automaticamente
-- Erros de rede temporários são retentados automaticamente
-- Se tudo falhar, o ErrorBoundary mostra uma mensagem amigável em vez do HTML cru
+2. **Quando é load more, definir `visibleCount` para o comprimento anterior** — assim os novos cards são revelados progressivamente sem afetar os já visíveis.
+
+```typescript
+const prevLengthRef = useRef(imoveis.length);
+
+useEffect(() => {
+  const prev = prevLengthRef.current;
+  prevLengthRef.current = imoveis.length;
+  
+  // New search (length decreased or jumped to a different set)
+  if (imoveis.length < prev || (imoveis.length > 0 && prev === 0)) {
+    setVisibleCount(INITIAL_VISIBLE);
+  }
+  // Load more (length grew) — keep current visible count, 
+  // IntersectionObserver will grow it naturally
+}, [imoveis.length]);
+```
+
+### Resultado
+
+- "Ver mais" não causa mais scroll bouncing — cards existentes permanecem, novos aparecem conforme o scroll
+- Nova busca (filtros mudam) continua resetando para 12 como antes
+- Zero impacto em outros componentes
 
 ### Arquivos afetados
 
-1. **Novo:** `src/lib/lazyRetry.ts`
-2. **Editado:** `src/App.tsx` (~30 linhas alteradas)
-3. **Editado:** `src/components/ErrorBoundary.tsx` (detecção de chunk errors)
+1. **`src/pages/Search.tsx`** — ~10 linhas alteradas no `ProgressiveGrid`
 

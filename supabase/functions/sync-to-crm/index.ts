@@ -149,12 +149,16 @@ function extractImovelCodigo(slug: string | null | undefined): string | null {
 const ORIGEM_LABELS: Record<string, string> = {
   detalhe_sidebar: 'Página do Imóvel',
   detalhe_mobile_sticky: 'Página do Imóvel (Mobile)',
+  sticky_cta: 'Página do Imóvel (Sticky)',
   busca_cta: 'Página de Busca',
-  floating_whatsapp: 'WhatsApp Flutuante',
+  floating_whatsapp: 'Botão WhatsApp',
   exit_intent: 'Pop-up de Saída',
   retargeting_popup: 'Pop-up de Retargeting',
   banner_corretor: 'Banner do Corretor',
   agendamento_visita: 'Agendamento de Visita',
+  empreendimento_lead: 'Página do Empreendimento',
+  lead_inline: 'Formulário na Página',
+  busca_alerta: 'Alerta de Busca',
 }
 
 function humanizeOrigem(componente: string | null | undefined): string | null {

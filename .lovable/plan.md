@@ -1,87 +1,99 @@
 
 
-## Plano de Melhorias — Velocidade, Loading, Scroll e Preços nos Pins
+## Comparação Uhome vs QuintoAndar — Melhorias Prioritárias
 
-### Análise do Estado Atual
+### O que a Uhome já faz bem (paridade ou superior)
+- Prefetch agressivo no hover (React Query + chunk preload)
+- Progressive rendering com IntersectionObserver
+- Lazy loading de Mapbox (só carrega quando necessário)
+- Scroll position restore via Zustand
+- Transição suave com opacity no refetch
+- Filtros avançados em drawer (padrão QuintoAndar)
+- Badges inteligentes (Novidade, Ótimo preço, Em obras)
+- Pins com preço no mapa
 
-O mapa já mostra preços nos pins individuais (implementado via `preco_label` no GeoJSON + `text-field: ["get", "preco_label"]` no layer `imoveis-pins`). O problema é que com `icon-allow-overlap: false`, muitos pins ficam ocultos em zoom médio, mostrando apenas clusters numéricos. A experiência de preço no pin já existe — precisa ser mais visível.
-
-O scroll restoration salva `scrollY` no Zustand mas a restauração no `useEffect` depende de `loading` e `imoveis.length` — condições que podem não estar prontas no momento certo.
-
-O loading mostra 6 skeleton cards abruptos em vez de manter o conteúdo anterior com indicador sutil.
-
----
-
-### Melhoria 1: Transição suave no loading (eliminar skeletons abruptos)
-
-**Arquivo:** `src/pages/Search.tsx`
-
-Em vez de trocar entre skeletons e cards, manter os cards anteriores visíveis com opacity reduzida + barra de progresso fina no topo da coluna de cards.
-
-- Quando `isFetching && !isLoading` (refetch com dados em cache): mostrar barra de progresso animada no topo + opacity 0.6 nos cards
-- Quando `isLoading` (primeira carga, sem cache): manter skeletons (inevitável)
-- Usar `isFetching` do `useImoveisQuery` que já é exposto
-
-**Mudança concreta:**
-- Adicionar `isFetching` ao destructure de `useImoveisQuery`
-- Envolver a grid em `<div style={{ opacity: isFetching && !loading ? 0.5 : 1, transition: 'opacity 200ms' }}>`
-- Adicionar barra de progresso indeterminada (`<div className="h-0.5 bg-primary animate-pulse">`) quando `isFetching && !loading`
+### Gaps identificados (o que o QuintoAndar faz melhor)
 
 ---
 
-### Melhoria 2: Scroll position restore confiável
+#### 1. Card do imóvel: informação de custos mensais (ALTO IMPACTO)
 
-**Arquivo:** `src/pages/Search.tsx`
+**QuintoAndar mostra:** Preço + "R$ 709 Cond. + IPTU" como soma única abaixo do preço.
+**Uhome mostra (desktop):** Só preço. Cond/IPTU aparecem apenas no card mobile.
 
-O `useEffect` atual restaura scroll apenas no mount, mas os dados podem não estar prontos. Corrigir para restaurar após os dados carregarem:
-
-- Usar um `ref` (`scrollRestoredRef`) para garantir que restaura apenas uma vez
-- Disparar `window.scrollTo(0, scrollY)` quando `!loading && imoveis.length > 0 && !scrollRestoredRef.current`
-- Adicionar `scrollY` e `loading` como dependências
+**Correção:** No card desktop (`SearchPropertyCard.tsx`, linhas 422-433), adicionar a linha de custos mensais (Cond. + IPTU) igual ao mobile. QuintoAndar mostra a soma: `R$ {cond + iptu} Cond. + IPTU`.
 
 ---
 
-### Melhoria 3: Pins com preço mais visíveis no mapa
+#### 2. Card do imóvel: preço acima, título abaixo (layout invertido)
 
-**Arquivo:** `src/components/SearchMap.tsx`
+**QuintoAndar:** Título/descrição → Preço grande → Custos → Stats → Endereço
+**Uhome desktop:** Tipo · Bairro → Stats → Preço (no final)
 
-Os pins já mostram preço, mas o `icon-allow-overlap: false` + `text-allow-overlap: false` esconde a maioria. Ajustar para mostrar mais pins simultaneamente:
-
-- Reduzir `icon-padding` de 4 para 2
-- Reduzir `clusterRadius` de 52 para 40 (desagrupa mais cedo)
-- Reduzir `clusterMaxZoom` de 13 para 12 (mostra pins individuais antes)
-- Aumentar `text-size` de 12 para 11 (pills menores = menos colisão)
-- Reduzir o tamanho da pill image de 80x28 para 72x26
+**Correção:** Reorganizar o card desktop: Preço grande primeiro, custos mensais, stats, endereço. Preço é o dado mais importante — deve estar no topo do bloco de texto.
 
 ---
 
-### Melhoria 4: Prefetch do próximo batch
+#### 3. Endereço com rua no card
 
-**Arquivo:** `src/pages/Search.tsx`
+**QuintoAndar:** "Rua Portugal, Higienópolis · Porto Alegre"
+**Uhome:** "Bairro, Porto Alegre" (sem rua)
 
-Quando o usuário está perto do final da lista (sentinel visível), prefetch o próximo batch em background antes do clique em "Ver mais":
-
-- No `ProgressiveGrid`, quando `visibleCount` se aproxima de `imoveis.length` (resta < BATCH), disparar `loadMore` preemptivamente via `IntersectionObserver` com `rootMargin: "800px"`
-
----
-
-### Melhoria 5: Lazy loading de fotos no card com placeholder blur
-
-**Arquivo:** `src/components/FotoImovel.tsx`
-
-Verificar se já tem placeholder de baixa qualidade. Se não, adicionar `bg-muted` como background enquanto a imagem carrega, evitando layout shift e dando feedback visual instantâneo.
+**Verificação necessária:** Checar se a tabela `imoveis` tem campo de endereço/rua. Se sim, mostrar. Se não, manter como está — sem dados falsos.
 
 ---
 
-### Arquivos afetados
+#### 4. Suspense fallback: spinner genérico
 
-1. `src/pages/Search.tsx` — transição suave + scroll restore + prefetch
-2. `src/components/SearchMap.tsx` — pins mais visíveis (3 constantes)
-3. `src/hooks/useImoveisQuery.ts` — expor `isFetching` (já expõe)
+**QuintoAndar:** Transição entre rotas é instantânea (SSR + streaming)
+**Uhome:** `PageFallback` mostra spinner centralizado em tela cheia — abrupto.
+
+**Correção em `App.tsx`:** Substituir o spinner fullscreen por um skeleton que mantém a navbar visível. O fallback deve mostrar `<Navbar />` + skeleton do conteúdo, não uma tela em branco com spinner.
+
+---
+
+#### 5. Navbar: prefetch no mousedown (não só hover)
+
+**QuintoAndar:** Navegação é quase instantânea.
+**Uhome:** Prefetch no `mouseEnter` do link "Comprar" já existe, mas poderia também prefetchar no `mousedown` de qualquer link interno para ganhar ~100-200ms.
+
+**Correção:** Adicionar `onMouseDown={handlePrefetchBusca}` além do `onMouseEnter` existente. Também prefetchar o chunk da página de destino em links de bairros, tipos, etc.
+
+---
+
+#### 6. View Transitions API (navegação suave entre rotas)
+
+**QuintoAndar:** Transições entre páginas são suaves, sem "flash branco".
+**Uhome:** Cada navegação mostra um flash breve do Suspense fallback.
+
+**Correção:** Usar `document.startViewTransition` (com fallback) no `navigate()` para animar a saída/entrada de páginas. Isso é uma melhoria progressiva — funciona em Chrome/Edge, fallback silencioso em outros.
+
+---
+
+#### 7. Mapa: clusters com contagem vs preço
+
+**QuintoAndar:** Clusters mostram contagem numérica (ex: "227", "65").
+**Uhome:** Igual — clusters com contagem. Mas os pins individuais da Uhome já mostram preço (QuintoAndar não mostra preço nos pins). Uhome está à frente aqui.
+
+---
+
+### Plano de Implementação (4 arquivos)
+
+**Prioridade 1 — Card desktop com preço no topo + custos mensais**
+- `src/components/SearchPropertyCard.tsx` — Reorganizar bloco de texto desktop (linhas 422-433): preço grande primeiro, custos mensais, stats, endereço
+
+**Prioridade 2 — PageFallback com Navbar visível**
+- `src/App.tsx` — Substituir `PageFallback` por skeleton com Navbar, eliminando a tela em branco
+
+**Prioridade 3 — Prefetch no mousedown**
+- `src/components/Navbar.tsx` — Adicionar `onMouseDown` nos links de navegação
+
+**Prioridade 4 — View Transitions API**
+- `src/App.tsx` ou wrapper de navegação — Envolver `navigate()` com `startViewTransition` quando disponível
 
 ### Resultado esperado
-- Zero flash de "0 imóveis" ou skeletons abruptos ao navegar
-- Scroll volta exatamente onde o usuário estava
-- Mais pins com preço visíveis no mapa em zoom médio
-- Carregamento antecipado do próximo batch
+- Cards mostram informação financeira completa como QuintoAndar
+- Zero "tela branca" entre navegações
+- Percepção de velocidade ainda melhor com prefetch antecipado
+- Transições visuais suaves entre rotas
 

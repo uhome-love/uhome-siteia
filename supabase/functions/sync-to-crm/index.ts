@@ -246,7 +246,14 @@ async function handleAgendamento(
   const imovelSlug = (record.imovel_slug as string) ?? null
   const imovelCodigo = (record.imovel_codigo as string) ?? extractImovelCodigo(imovelSlug)
 
-  const obsAgend = `Visita agendada: ${record.data_visita} às ${record.horario}${record.origem_pagina ? ` | Página: ${record.origem_pagina}` : ''}`
+  const agendLines: string[] = ['[Site uhome.com.br] Agendamento de Visita']
+  agendLines.push(`Data: ${record.data_visita} às ${record.horario}`)
+  if (record.imovel_titulo) agendLines.push(`Imóvel: ${record.imovel_titulo}`)
+  if (imovelCodigo) agendLines.push(`Código: ${imovelCodigo}`)
+  if (record.imovel_bairro) agendLines.push(`Bairro: ${record.imovel_bairro}`)
+  if (imovelSlug) agendLines.push(`Link: https://uhome.com.br/imovel/${imovelSlug}`)
+  if (record.origem_pagina) agendLines.push(`Página: ${record.origem_pagina}`)
+  const obsAgend = agendLines.join('\n')
 
   const { data: leadCRM, error } = await supabaseCRM
     .from('leads')

@@ -52,6 +52,7 @@ export function Navbar() {
               <Link
                 to={prefixLink("/busca?finalidade=venda")}
                 onMouseEnter={handlePrefetchBusca}
+                onMouseDown={handlePrefetchBusca}
                 className={`rounded-full px-4 py-1.5 font-body text-[13px] font-semibold transition-all ${
                   isSearchPage && !modoIA
                     ? "bg-foreground text-background shadow-sm"

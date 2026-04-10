@@ -1,66 +1,87 @@
 
 
-## Relatório de Teste End-to-End — Uhome
+## Plano de Melhorias — Velocidade, Loading, Scroll e Preços nos Pins
 
-### Bugs Encontrados
+### Análise do Estado Atual
 
-#### 1. CRÍTICO: Tela de Fallback HTML aparece entre navegações (intermitente)
-**Reprodução:** Home → Busca → Clica imóvel → Clica "Voltar" → Às vezes mostra HTML estático de SEO (títulos e links crus) em vez do app React.
-**Causa raiz:** O `<div id="root">` contém HTML estático de SEO. Em cenários onde o React desmonta e remonta (ex: erro no Suspense durante lazy loading da rota, HMR, ou timing de `navigate(-1)`), o fallback fica exposto. O `ErrorBoundary` não detecta isso porque não é um crash de JavaScript — é uma falha silenciosa do Suspense/lazy.
-**Correção:**
-- No `src/main.tsx`, limpar o conteúdo estático do `#root` antes de montar o React: `document.getElementById("root")!.innerHTML = "";` antes de `createRoot(...).render(...)`.
-- Isso elimina 100% a possibilidade de o HTML estático aparecer depois que o React monta.
+O mapa já mostra preços nos pins individuais (implementado via `preco_label` no GeoJSON + `text-field: ["get", "preco_label"]` no layer `imoveis-pins`). O problema é que com `icon-allow-overlap: false`, muitos pins ficam ocultos em zoom médio, mostrando apenas clusters numéricos. A experiência de preço no pin já existe — precisa ser mais visível.
 
-#### 2. MÉDIO: "0 imóveis" flash ao voltar para /busca
-**Reprodução:** Busca → Imóvel → Voltar → Mostra "0 imóveis" com skeletons por ~1-2s antes de carregar.
-**Causa raiz:** O `queryFilters` inclui `limit: PAGE_SIZE * (page + 1)` e `page` no Zustand pode ser diferente do cache original. A chave de cache muda, invalidando o `placeholderData`.
-**Correção:** Usar `placeholderData: keepPreviousData` do React Query (já parcialmente implementado), mas também considerar estabilizar a query key para não variar com `page` (o page já é 0 ao voltar graças ao `setFilter` resetar page).
+O scroll restoration salva `scrollY` no Zustand mas a restauração no `useEffect` depende de `loading` e `imoveis.length` — condições que podem não estar prontas no momento certo.
 
-#### 3. MENOR: countActive() duplica contagem de "tipo"
-**Localização:** `src/components/SearchFiltersPanel.tsx`, linha 199.
-```typescript
-if (f.tipo) c++;
-if (f.tipo) c++;  // duplicado!
-```
-**Correção:** Remover a linha duplicada.
+O loading mostra 6 skeleton cards abruptos em vez de manter o conteúdo anterior com indicador sutil.
 
-### Pontos Positivos (funcionando bem)
-- Filtro de Fase funciona em desktop e mobile (seleção, badge, contagem, pins do mapa)
-- "Limpar" reseta corretamente todos os filtros
-- Mobile filter sheet (drawer) renderiza corretamente com todas seções
-- Badges nos cards (Novidade, Em obras, Lançamento, Novo, Destaque) aparecem corretamente
-- Mapa carrega pins com clustering
-- Ordenação funciona (Mais recentes, Menor preço, etc.)
-- Fotos reais em todos os cards (nenhum placeholder genérico visível)
-- Favoritos funcionam (coração preenchido)
-- Property detail carrega bem (galeria, formulário de lead, breadcrumbs)
+---
 
-### Melhorias Sugeridas para Nível QuintoAndar
+### Melhoria 1: Transição suave no loading (eliminar skeletons abruptos)
 
-#### 1. Eliminar flash de "0 imóveis" ao navegar
-Na volta da página de detalhe, mostrar os dados do cache imediatamente em vez de piscar "0". Manter o `total` do Zustand como fallback enquanto React Query recarrega.
+**Arquivo:** `src/pages/Search.tsx`
 
-#### 2. Skeleton → Transição suave
-Em vez de mostrar 6 skeleton cards enquanto carrega, manter os cards anteriores com um indicador de loading sutil (barra de progresso no topo ou opacity fade).
+Em vez de trocar entre skeletons e cards, manter os cards anteriores visíveis com opacity reduzida + barra de progresso fina no topo da coluna de cards.
 
-#### 3. Scroll position restore
-O Zustand salva `scrollY`, mas não está restaurando ao voltar. Implementar `window.scrollTo(0, scrollY)` após os dados carregarem.
+- Quando `isFetching && !isLoading` (refetch com dados em cache): mostrar barra de progresso animada no topo + opacity 0.6 nos cards
+- Quando `isLoading` (primeira carga, sem cache): manter skeletons (inevitável)
+- Usar `isFetching` do `useImoveisQuery` que já é exposto
 
-#### 4. Preço no mapa
-Os pins do mapa mostram clusters numerados mas sem indicação de preço individual. Pins com preço (como no QuintoAndar) aumentariam muito a usabilidade.
+**Mudança concreta:**
+- Adicionar `isFetching` ao destructure de `useImoveisQuery`
+- Envolver a grid em `<div style={{ opacity: isFetching && !loading ? 0.5 : 1, transition: 'opacity 200ms' }}>`
+- Adicionar barra de progresso indeterminada (`<div className="h-0.5 bg-primary animate-pulse">`) quando `isFetching && !loading`
 
-### Plano de Implementação (3 correções)
+---
 
-**Arquivo 1: `src/main.tsx`** — Limpar HTML estático antes do React montar
-```typescript
-const root = document.getElementById("root")!;
-root.innerHTML = ""; // Remove SEO fallback
-createRoot(root).render(...)
-```
+### Melhoria 2: Scroll position restore confiável
 
-**Arquivo 2: `src/components/SearchFiltersPanel.tsx`** — Remover duplicação em `countActive()`
-Deletar a segunda `if (f.tipo) c++;` na linha 199.
+**Arquivo:** `src/pages/Search.tsx`
 
-**Arquivo 3: `src/pages/Search.tsx`** — Mostrar total do cache/Zustand enquanto carrega
-Usar o `total` anterior como placeholder em vez de "0 imóveis" durante a transição.
+O `useEffect` atual restaura scroll apenas no mount, mas os dados podem não estar prontos. Corrigir para restaurar após os dados carregarem:
+
+- Usar um `ref` (`scrollRestoredRef`) para garantir que restaura apenas uma vez
+- Disparar `window.scrollTo(0, scrollY)` quando `!loading && imoveis.length > 0 && !scrollRestoredRef.current`
+- Adicionar `scrollY` e `loading` como dependências
+
+---
+
+### Melhoria 3: Pins com preço mais visíveis no mapa
+
+**Arquivo:** `src/components/SearchMap.tsx`
+
+Os pins já mostram preço, mas o `icon-allow-overlap: false` + `text-allow-overlap: false` esconde a maioria. Ajustar para mostrar mais pins simultaneamente:
+
+- Reduzir `icon-padding` de 4 para 2
+- Reduzir `clusterRadius` de 52 para 40 (desagrupa mais cedo)
+- Reduzir `clusterMaxZoom` de 13 para 12 (mostra pins individuais antes)
+- Aumentar `text-size` de 12 para 11 (pills menores = menos colisão)
+- Reduzir o tamanho da pill image de 80x28 para 72x26
+
+---
+
+### Melhoria 4: Prefetch do próximo batch
+
+**Arquivo:** `src/pages/Search.tsx`
+
+Quando o usuário está perto do final da lista (sentinel visível), prefetch o próximo batch em background antes do clique em "Ver mais":
+
+- No `ProgressiveGrid`, quando `visibleCount` se aproxima de `imoveis.length` (resta < BATCH), disparar `loadMore` preemptivamente via `IntersectionObserver` com `rootMargin: "800px"`
+
+---
+
+### Melhoria 5: Lazy loading de fotos no card com placeholder blur
+
+**Arquivo:** `src/components/FotoImovel.tsx`
+
+Verificar se já tem placeholder de baixa qualidade. Se não, adicionar `bg-muted` como background enquanto a imagem carrega, evitando layout shift e dando feedback visual instantâneo.
+
+---
+
+### Arquivos afetados
+
+1. `src/pages/Search.tsx` — transição suave + scroll restore + prefetch
+2. `src/components/SearchMap.tsx` — pins mais visíveis (3 constantes)
+3. `src/hooks/useImoveisQuery.ts` — expor `isFetching` (já expõe)
+
+### Resultado esperado
+- Zero flash de "0 imóveis" ou skeletons abruptos ao navegar
+- Scroll volta exatamente onde o usuário estava
+- Mais pins com preço visíveis no mapa em zoom médio
+- Carregamento antecipado do próximo batch
 

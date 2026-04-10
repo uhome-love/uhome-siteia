@@ -11,6 +11,7 @@ interface Lead {
   nome: string;
   telefone: string;
   imovel_titulo: string | null;
+  imovel_slug: string | null;
   origem_componente: string | null;
   created_at: string;
   status: string | null;
@@ -35,7 +36,7 @@ export default function AdminDashboard() {
       supabase.from("public_leads").select("*", { count: "exact", head: true }).gte("created_at", weekStart),
       supabase.from("imoveis").select("*", { count: "exact", head: true }).eq("status", "disponivel"),
       supabase.from("imovel_views").select("*", { count: "exact", head: true }).gte("viewed_at", todayStart),
-      supabase.from("public_leads").select("id,nome,telefone,imovel_titulo,origem_componente,created_at,status").order("created_at", { ascending: false }).limit(15),
+      supabase.from("public_leads").select("id,nome,telefone,imovel_titulo,imovel_slug,origem_componente,created_at,status").order("created_at", { ascending: false }).limit(15),
     ]);
 
     setKpis({
@@ -111,7 +112,19 @@ export default function AdminDashboard() {
                     </a>
                   </td>
                   <td className="max-w-[200px] truncate py-2.5 pr-4 text-muted-foreground">
-                    {lead.imovel_titulo ?? "—"}
+                    {lead.imovel_slug ? (
+                      <a
+                        href={`https://uhome.com.br/imovel/${lead.imovel_slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 text-foreground hover:text-primary hover:underline"
+                      >
+                        <span className="truncate">{lead.imovel_titulo ?? lead.imovel_slug}</span>
+                        <ExternalLink className="h-3 w-3 flex-shrink-0" />
+                      </a>
+                    ) : (
+                      "—"
+                    )}
                   </td>
                   <td className="py-2.5 pr-4">
                     <Badge variant="outline" className="text-xs">{lead.origem_componente ?? "—"}</Badge>

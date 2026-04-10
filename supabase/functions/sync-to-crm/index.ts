@@ -172,11 +172,20 @@ async function handleLead(
   const imovelSlug = (record.imovel_slug as string) ?? null
   const imovelCodigo = (record.imovel_codigo as string) ?? extractImovelCodigo(imovelSlug)
 
-  // Build observacoes with extra context not in CRM schema
-  const obsLines: string[] = []
+  // Build observacoes with full context for CRM
+  const obsLines: string[] = ['[Site uhome.com.br]']
+  if (record.imovel_titulo) obsLines.push(`Imóvel: ${record.imovel_titulo}`)
+  if (imovelCodigo) obsLines.push(`Código: ${imovelCodigo}`)
+  if (record.imovel_bairro) obsLines.push(`Bairro: ${record.imovel_bairro}`)
+  if (record.imovel_preco) obsLines.push(`Preço: R$ ${Number(record.imovel_preco).toLocaleString('pt-BR')}`)
+  if (imovelSlug) obsLines.push(`Link: https://uhome.com.br/imovel/${imovelSlug}`)
+  if (record.email) obsLines.push(`Email: ${record.email}`)
+  const origemLabel = humanizeOrigem(record.origem_componente as string)
+  if (origemLabel) obsLines.push(`Origem: ${origemLabel}`)
   if (record.origem_pagina) obsLines.push(`Página: ${record.origem_pagina}`)
-  if (record.origem_componente) obsLines.push(`Componente: ${record.origem_componente}`)
-  const observacoes = obsLines.length > 0 ? obsLines.join(' | ') : null
+  if (record.utm_source) obsLines.push(`UTM: ${record.utm_source}${record.utm_campaign ? ` / ${record.utm_campaign}` : ''}`)
+  if (record.device) obsLines.push(`Device: ${record.device}`)
+  const observacoes = obsLines.join('\n')
 
   const payload = {
     nome: record.nome,
@@ -237,7 +246,14 @@ async function handleAgendamento(
   const imovelSlug = (record.imovel_slug as string) ?? null
   const imovelCodigo = (record.imovel_codigo as string) ?? extractImovelCodigo(imovelSlug)
 
-  const obsAgend = `Visita agendada: ${record.data_visita} às ${record.horario}${record.origem_pagina ? ` | Página: ${record.origem_pagina}` : ''}`
+  const agendLines: string[] = ['[Site uhome.com.br] Agendamento de Visita']
+  agendLines.push(`Data: ${record.data_visita} às ${record.horario}`)
+  if (record.imovel_titulo) agendLines.push(`Imóvel: ${record.imovel_titulo}`)
+  if (imovelCodigo) agendLines.push(`Código: ${imovelCodigo}`)
+  if (record.imovel_bairro) agendLines.push(`Bairro: ${record.imovel_bairro}`)
+  if (imovelSlug) agendLines.push(`Link: https://uhome.com.br/imovel/${imovelSlug}`)
+  if (record.origem_pagina) agendLines.push(`Página: ${record.origem_pagina}`)
+  const obsAgend = agendLines.join('\n')
 
   const { data: leadCRM, error } = await supabaseCRM
     .from('leads')

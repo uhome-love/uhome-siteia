@@ -324,7 +324,10 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
 
           {/* Address */}
           <p className="mt-0.5 font-body text-[12px] text-muted-foreground truncate">
-            {imovel.bairro}, {imovel.cidade || "Porto Alegre"}
+            {imovel.endereco_completo
+              ? `${imovel.endereco_completo.split(",")[0]}, ${imovel.bairro}`
+              : `${imovel.bairro}, ${imovel.cidade || "Porto Alegre"}`
+            }
           </p>
         </div>
       </div>

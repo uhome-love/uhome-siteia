@@ -41,7 +41,10 @@ export const useWhatsAppLeadStore = create<WhatsAppLeadStore>((set) => ({
         imovel_bairro: data.imovel_bairro,
         imovel_preco: data.imovel_preco,
         origem_componente: data.origem_componente,
-      }).catch(() => {});
+        origem_pagina: window.location.href,
+      }).catch((err) => {
+        console.error("[WhatsApp bypass] Erro ao submeter lead:", err);
+      });
 
       trackWhatsAppClick({
         imovel_id: data.imovel_id,

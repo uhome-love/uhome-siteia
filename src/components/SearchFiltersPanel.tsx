@@ -255,7 +255,6 @@ function CounterRow({ label, value, onChange }: { label: string; value: number; 
 function countActive(f: SearchFilters): number {
   let c = 0;
   if (f.tipo) c++;
-  if (f.tipo) c++;
   if (f.bairro) c++;
   if (f.precoMin) c++;
   if (f.precoMax) c++;

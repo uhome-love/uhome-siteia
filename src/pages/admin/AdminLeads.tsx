@@ -156,7 +156,20 @@ export default function AdminLeads() {
                         </a>
                       </td>
                       <td className="max-w-[180px] truncate p-3 text-muted-foreground">
-                        {lead.imovel_titulo ?? "—"}
+                        {lead.imovel_slug ? (
+                          <a
+                            href={`https://uhome.com.br/imovel/${lead.imovel_slug}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1 text-foreground hover:text-primary hover:underline"
+                          >
+                            <span className="truncate">{lead.imovel_titulo ?? lead.imovel_slug}</span>
+                            <ExternalLink className="h-3 w-3 flex-shrink-0" />
+                          </a>
+                        ) : (
+                          "—"
+                        )}
+                      </td>
                       </td>
                       <td className="p-3">
                         <Tooltip>

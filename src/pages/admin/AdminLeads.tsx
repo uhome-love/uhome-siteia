@@ -16,6 +16,7 @@ interface Lead {
   telefone: string;
   email: string | null;
   imovel_titulo: string | null;
+  imovel_slug: string | null;
   imovel_bairro: string | null;
   imovel_preco: number | null;
   origem_componente: string | null;

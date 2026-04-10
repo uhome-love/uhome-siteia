@@ -40,12 +40,13 @@ export async function submitLead(data: LeadData) {
   if (digitsOnly.length >= 10) {
     try {
       const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-      const { data: existing } = await supabase
+      const { count } = await supabase
         .from("public_leads")
         .select("id", { count: "exact", head: true })
         .ilike("telefone", `%${digitsOnly.slice(-8)}%`)
         .gte("created_at", since);
-      if (existing !== null) {
+      if (count && count > 0) {
+        console.log("[submitLead] Dedup: lead recente encontrado para este telefone");
         trackEvent({
           tipo: "formulario_enviado",
           imovel_slug: data.imovel_slug,

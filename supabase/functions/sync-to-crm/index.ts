@@ -146,6 +146,22 @@ function extractImovelCodigo(slug: string | null | undefined): string | null {
   return match ? match[1] : null
 }
 
+const ORIGEM_LABELS: Record<string, string> = {
+  detalhe_sidebar: 'Página do Imóvel',
+  detalhe_mobile_sticky: 'Página do Imóvel (Mobile)',
+  busca_cta: 'Página de Busca',
+  floating_whatsapp: 'WhatsApp Flutuante',
+  exit_intent: 'Pop-up de Saída',
+  retargeting_popup: 'Pop-up de Retargeting',
+  banner_corretor: 'Banner do Corretor',
+  agendamento_visita: 'Agendamento de Visita',
+}
+
+function humanizeOrigem(componente: string | null | undefined): string | null {
+  if (!componente) return null
+  return ORIGEM_LABELS[componente] ?? componente
+}
+
 // ─── Lead handler (existing flow) ────────────────────────────────
 async function handleLead(
   supabaseSite: any,

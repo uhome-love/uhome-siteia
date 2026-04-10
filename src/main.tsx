@@ -37,7 +37,9 @@ if (import.meta.env.DEV) {
   import("./utils/testCorretorFlow").then(m => m.setupCorretorFlowTest());
 }
 
-createRoot(document.getElementById("root")!).render(
+const rootEl = document.getElementById("root")!;
+rootEl.innerHTML = ""; // Remove static SEO fallback before React mounts
+createRoot(rootEl).render(
   <HelmetProvider>
     <App />
   </HelmetProvider>

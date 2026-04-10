@@ -337,13 +337,16 @@ const Search = () => {
   }, [filters]);
 
   // React Query — cached listing with 3 min staleTime
+  // Stabilize query key: always use max(page+1, 1) so returning to search
+  // with page=0 reuses the same cache key as the initial load
+  const stableLimit = useMemo(() => PAGE_SIZE * Math.max(page + 1, 1), [page]);
   const queryFilters = useMemo<BuscaFilters>(() => ({
     ...buildFilters(),
     ordem: filters.ordem as any,
     bounds: filters.bounds || undefined,
-    limit: PAGE_SIZE * (page + 1),
+    limit: stableLimit,
     offset: 0,
-  }), [buildFilters, filters.ordem, filters.bounds, page]);
+  }), [buildFilters, filters.ordem, filters.bounds, stableLimit]);
 
   // AI mode can override listing data
   const [aiOverrideData, setAiOverrideData] = useState<{ imoveis: Imovel[]; total: number } | null>(null);

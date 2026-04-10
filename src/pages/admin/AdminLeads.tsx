@@ -170,7 +170,6 @@ export default function AdminLeads() {
                           "—"
                         )}
                       </td>
-                      </td>
                       <td className="p-3">
                         <Tooltip>
                           <TooltipTrigger asChild>

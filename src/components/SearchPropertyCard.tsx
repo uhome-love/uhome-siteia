@@ -324,7 +324,10 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
 
           {/* Address */}
           <p className="mt-0.5 font-body text-[12px] text-muted-foreground truncate">
-            {imovel.bairro}, {imovel.cidade || "Porto Alegre"}
+            {imovel.endereco_completo
+              ? `${imovel.endereco_completo.split(",")[0]}, ${imovel.bairro}`
+              : `${imovel.bairro}, ${imovel.cidade || "Porto Alegre"}`
+            }
           </p>
         </div>
       </div>
@@ -419,17 +422,32 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
           )}
         </div>
 
-        {/* Text */}
+        {/* Text — QuintoAndar style: price first */}
         <div className="px-0.5 pt-2.5">
-          <span className="truncate font-body text-[13px] font-semibold text-foreground">
-            {tipoCapitalized} · {imovel.bairro}
-          </span>
+          <p className="font-body text-[15px] font-bold text-foreground">{price}</p>
 
-          {stats && (
-            <p className="mt-0.5 truncate font-body text-xs text-muted-foreground">{stats}</p>
+          {((imovel.preco_condominio ?? 0) > 0 || (imovel.preco_iptu ?? 0) > 0) && (
+            <p className="mt-0.5 font-body text-[11px] text-muted-foreground">
+              {(() => {
+                const cond = imovel.preco_condominio ?? 0;
+                const iptu = imovel.preco_iptu ?? 0;
+                const total = cond + iptu;
+                if (total > 0) return `R$ ${total.toLocaleString("pt-BR")} Cond. + IPTU`;
+                return null;
+              })()}
+            </p>
           )}
 
-          <p className="mt-1 font-body text-sm font-bold text-foreground">{price}</p>
+          {stats && (
+            <p className="mt-1 truncate font-body text-[12px] text-foreground">{stats}</p>
+          )}
+
+          <p className="mt-0.5 truncate font-body text-[11px] text-muted-foreground">
+            {imovel.endereco_completo
+              ? `${imovel.endereco_completo.split(",")[0]}, ${imovel.bairro}`
+              : `${tipoCapitalized} · ${imovel.bairro}`
+            }
+          </p>
         </div>
       </div>
     </motion.a>

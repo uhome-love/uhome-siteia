@@ -30,6 +30,7 @@ export interface Imovel {
   condominio_nome: string | null;
   publicado_em: string;
   fase: string;
+  endereco_completo: string | null;
 }
 
 function parseFotos(fotos: any): Array<{ url: string; ordem: number; principal: boolean }> {
@@ -66,6 +67,7 @@ function mapRow(row: any): Imovel {
     uf: row.uf ?? "RS",
     condominio_nome: row.condominio_nome?.trim() || null,
     fase: row.fase || "usado",
+    endereco_completo: row.endereco_completo?.trim() || null,
   };
   // Always override with clean title
   mapped.titulo = tituloLimpo(mapped);

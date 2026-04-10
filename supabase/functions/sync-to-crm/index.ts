@@ -269,34 +269,16 @@ async function handleCaptacao(
 }
 
 // ─── WhatsApp click handler ──────────────────────────────────────
+// WhatsApp clicks no longer create a separate CRM lead because the real
+// lead (with name + phone) already flows through public_leads → sync-to-crm.
+// We just log it silently to avoid duplicate "WhatsApp - Geral" entries.
 async function handleWhatsAppClick(
-  supabaseCRM: any,
+  _supabaseCRM: any,
   record: Record<string, unknown>,
-  corretorCRMId: string | null
+  _corretorCRMId: string | null
 ) {
-  const imovelSlug = (record.imovel_slug as string) ?? null
-  const imovelCodigo = (record.imovel_codigo as string) ?? extractImovelCodigo(imovelSlug)
-
-  const { data: leadCRM, error } = await supabaseCRM
-    .from('leads')
-    .insert({
-      nome: `WhatsApp - ${record.imovel_titulo || 'Geral'}`,
-      telefone: 'via_whatsapp',
-      origem: 'site_uhome',
-      origem_detalhe: 'whatsapp_click',
-      imovel_interesse: record.imovel_titulo ?? null,
-      imovel_id_site: record.imovel_id ?? null,
-      imovel_slug: imovelSlug,
-      imovel_codigo: imovelCodigo,
-      bairro_interesse: record.imovel_bairro ?? null,
-      status: 'novo',
-      atribuido_para: corretorCRMId,
-      observacoes: `Clique no WhatsApp. Página: ${record.origem_pagina ?? '/'}`,
-    })
-    .select()
-    .single()
-
-  return { ok: !error, crm_lead_id: leadCRM?.id ?? null, error: error?.message }
+  console.log(`[sync-to-crm] WhatsApp click logged (no CRM lead created): ${record.imovel_slug ?? 'geral'}`)
+  return { ok: true, crm_lead_id: null, error: undefined }
 }
 
 // ─── CRM Notification ────────────────────────────────────────────

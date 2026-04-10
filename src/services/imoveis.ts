@@ -156,7 +156,7 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
   }
 
   if (filters.tipo) {
-    const tipos = filters.tipo.split(",").map(s => s.trim()).filter(Boolean);
+    const tipos = filters.tipo.toLowerCase().split(",").map(s => s.trim()).filter(Boolean);
     if (tipos.length === 1) {
       query = query.eq("tipo", tipos[0]);
     } else if (tipos.length > 1) {

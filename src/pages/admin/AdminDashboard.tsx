@@ -36,7 +36,7 @@ export default function AdminDashboard() {
       supabase.from("public_leads").select("*", { count: "exact", head: true }).gte("created_at", weekStart),
       supabase.from("imoveis").select("*", { count: "exact", head: true }).eq("status", "disponivel"),
       supabase.from("imovel_views").select("*", { count: "exact", head: true }).gte("viewed_at", todayStart),
-      supabase.from("public_leads").select("id,nome,telefone,imovel_titulo,origem_componente,created_at,status").order("created_at", { ascending: false }).limit(15),
+      supabase.from("public_leads").select("id,nome,telefone,imovel_titulo,imovel_slug,origem_componente,created_at,status").order("created_at", { ascending: false }).limit(15),
     ]);
 
     setKpis({

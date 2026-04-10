@@ -352,7 +352,7 @@ const Search = () => {
   const [aiOverrideData, setAiOverrideData] = useState<{ imoveis: Imovel[]; total: number } | null>(null);
 
   const enableQuery = !(modoIA && !aiResult && queryIA.trim() !== "");
-  const { imoveis: queryImoveis, total: queryTotal, isLoading: queryLoading, fetchNextPage } = useImoveisQuery({
+  const { imoveis: queryImoveis, total: queryTotal, isLoading: queryLoading, isFetching: queryFetching, fetchNextPage } = useImoveisQuery({
     filters: queryFilters,
     enabled: enableQuery && !aiOverrideData && !buscandoIA,
   });
@@ -360,12 +360,18 @@ const Search = () => {
   const imoveis = aiOverrideData?.imoveis ?? queryImoveis;
   const total = aiOverrideData?.total ?? queryTotal;
   const loading = aiOverrideData ? false : queryLoading;
+  const isFetchingOverlay = !loading && queryFetching && !aiOverrideData;
 
-  // Save scroll position on unmount & restore on mount
+  // Save scroll position on unmount & restore on mount (after data loads)
+  const scrollRestoredRef = useRef(false);
   useEffect(() => {
-    if (scrollY > 0 && !loading && imoveis.length > 0) {
-      window.scrollTo(0, scrollY);
+    if (!loading && imoveis.length > 0 && !scrollRestoredRef.current && scrollY > 0) {
+      scrollRestoredRef.current = true;
+      requestAnimationFrame(() => window.scrollTo(0, scrollY));
     }
+  }, [loading, imoveis.length]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
     return () => { setScrollY(window.scrollY); };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -851,6 +857,12 @@ const Search = () => {
       <div className="flex flex-1 min-h-0 lg:overflow-hidden overflow-visible">
         {/* Cards column */}
         <div className="flex-1 lg:overflow-y-auto px-3 pt-2 pb-24 sm:px-6 sm:pt-3 sm:pb-5" style={{ minWidth: 0 }}>
+          {/* Refetch progress bar */}
+          {isFetchingOverlay && (
+            <div className="mb-2 h-0.5 w-full overflow-hidden rounded-full bg-primary/10">
+              <div className="h-full w-1/3 animate-pulse rounded-full bg-primary" style={{ animation: "shimmer 1.2s ease-in-out infinite" }} />
+            </div>
+          )}
           {loading ? (
             <div className="grid grid-cols-1 gap-4 pb-20 sm:grid-cols-2 sm:gap-6 sm:pb-4 xl:grid-cols-3">
               {Array.from({ length: 6 }).map((_, i) => (
@@ -882,18 +894,20 @@ const Search = () => {
               )}
             </div>
           ) : (
-            <ProgressiveGrid
-              imoveis={imoveis}
-              total={total}
-              hoveredId={hoveredId}
-              setHoveredId={setHoveredId}
-              isFavorito={isFavorito}
-              toggleFavorito={toggleFavorito}
-              loadMore={loadMore}
-              loadingMore={loadingMore}
-              isMobile={isMobile}
-              sentinelRef={sentinelRef}
-            />
+            <div style={{ opacity: isFetchingOverlay ? 0.5 : 1, transition: "opacity 200ms ease" }}>
+              <ProgressiveGrid
+                imoveis={imoveis}
+                total={total}
+                hoveredId={hoveredId}
+                setHoveredId={setHoveredId}
+                isFavorito={isFavorito}
+                toggleFavorito={toggleFavorito}
+                loadMore={loadMore}
+                loadingMore={loadingMore}
+                isMobile={isMobile}
+                sentinelRef={sentinelRef}
+              />
+            </div>
           )}
 
           {/* Bairros recomendados — QuintoAndar style */}

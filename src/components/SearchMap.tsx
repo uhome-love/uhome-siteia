@@ -82,27 +82,27 @@ function toGeoJSON(pins: MapPinData[]): GeoJSON.FeatureCollection {
 
 function createPillImage(fillColor: string, strokeColor: string): ImageData {
   const canvas = document.createElement("canvas");
-  canvas.width = 80;
-  canvas.height = 28;
+  canvas.width = 72;
+  canvas.height = 26;
   const ctx = canvas.getContext("2d")!;
   ctx.fillStyle = fillColor;
   ctx.strokeStyle = strokeColor;
   ctx.lineWidth = 1.5;
-  const r = 14;
+  const w = 72, h = 26, r = 13;
   ctx.beginPath();
   ctx.moveTo(r, 0);
-  ctx.lineTo(80 - r, 0);
-  ctx.quadraticCurveTo(80, 0, 80, r);
-  ctx.lineTo(80, 28 - r);
-  ctx.quadraticCurveTo(80, 28, 80 - r, 28);
-  ctx.lineTo(r, 28);
-  ctx.quadraticCurveTo(0, 28, 0, 28 - r);
+  ctx.lineTo(w - r, 0);
+  ctx.quadraticCurveTo(w, 0, w, r);
+  ctx.lineTo(w, h - r);
+  ctx.quadraticCurveTo(w, h, w - r, h);
+  ctx.lineTo(r, h);
+  ctx.quadraticCurveTo(0, h, 0, h - r);
   ctx.lineTo(0, r);
   ctx.quadraticCurveTo(0, 0, r, 0);
   ctx.closePath();
   ctx.fill();
   ctx.stroke();
-  return ctx.getImageData(0, 0, 80, 28);
+  return ctx.getImageData(0, 0, w, h);
 }
 
 function pointInPolygon(point: [number, number], polygon: [number, number][]): boolean {
@@ -249,13 +249,13 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       map.addControl(new mb.default.NavigationControl({ showCompass: false }), "top-right");
 
     map.on("load", () => {
-      // FIX 8 — clusterMaxZoom reduced to 13 (neighborhood level)
+      // Cluster settings — lower maxZoom/radius to show price pins earlier
       map.addSource("imoveis", {
         type: "geojson",
         data: { type: "FeatureCollection", features: [] },
         cluster: true,
-        clusterMaxZoom: 13,
-        clusterRadius: 52,
+        clusterMaxZoom: 12,
+        clusterRadius: 40,
         buffer: 64,
         tolerance: 0.4,
       });
@@ -315,10 +315,10 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
           "icon-text-fit-padding": [5, 10, 5, 10],
           "icon-allow-overlap": false,
           "icon-ignore-placement": false,
-          "icon-padding": 4,
+          "icon-padding": 2,
           "text-field": ["get", "preco_label"],
           "text-font": ["DIN Pro Bold", "Arial Unicode MS Bold"],
-          "text-size": 12,
+          "text-size": 11,
           "text-allow-overlap": false,
           "text-optional": true,
           "text-anchor": "center",

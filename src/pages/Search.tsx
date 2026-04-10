@@ -251,7 +251,7 @@ const Search = () => {
       const urlDiferenciais = searchParams.get("diferenciais");
       const urlCondominio = searchParams.get("condominio");
       const urlFase = searchParams.get("fase");
-      if (urlTipo) f.tipo = urlTipo;
+      if (urlTipo) f.tipo = urlTipo.toLowerCase();
       if (urlCidade) f.cidade = urlCidade;
       if (urlQuartos) f.quartos = Number(urlQuartos);
       if (urlBanheiros) f.banheiros = Number(urlBanheiros);

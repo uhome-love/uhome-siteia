@@ -183,7 +183,7 @@ async function handleLead(
     telefone: record.telefone,
     email: record.email ?? null,
     origem: 'site_uhome',
-    origem_detalhe: record.origem_componente ?? null,
+    origem_detalhe: humanizeOrigem(record.origem_componente as string) ?? null,
     imovel_interesse: record.imovel_titulo ?? null,
     imovel_id_site: record.imovel_id ?? null,
     imovel_slug: imovelSlug,

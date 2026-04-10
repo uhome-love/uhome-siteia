@@ -191,13 +191,19 @@ async function handleLead(
   if (record.device) obsLines.push(`Device: ${record.device}`)
   const observacoes = obsLines.join('\n')
 
+  // Build imovel_interesse with code for easy identification in CRM
+  const tituloBase = (record.imovel_titulo as string) ?? null
+  const imovelInteresse = tituloBase && imovelCodigo
+    ? `${tituloBase} (${imovelCodigo})`
+    : tituloBase
+
   const payload = {
     nome: record.nome,
     telefone: record.telefone,
     email: record.email ?? null,
     origem: 'site_uhome',
     origem_detalhe: humanizeOrigem(record.origem_componente as string) ?? null,
-    imovel_interesse: record.imovel_titulo ?? null,
+    imovel_interesse: imovelInteresse,
     imovel_id_site: record.imovel_id ?? null,
     imovel_slug: imovelSlug,
     imovel_codigo: imovelCodigo,
@@ -259,14 +265,19 @@ async function handleAgendamento(
   if (record.origem_pagina) agendLines.push(`Página: ${record.origem_pagina}`)
   const obsAgend = agendLines.join('\n')
 
+  const tituloAgend = (record.imovel_titulo as string) ?? null
+  const interesseAgend = tituloAgend && imovelCodigo
+    ? `${tituloAgend} (${imovelCodigo})`
+    : tituloAgend
+
   const { data: leadCRM, error } = await supabaseCRM
     .from('leads')
     .insert({
       nome: record.nome,
       telefone: record.telefone,
       origem: 'site_uhome',
-      origem_detalhe: 'agendamento_visita',
-      imovel_interesse: record.imovel_titulo ?? null,
+      origem_detalhe: 'Agendamento de Visita',
+      imovel_interesse: interesseAgend,
       imovel_id_site: record.imovel_id ?? null,
       imovel_slug: imovelSlug,
       imovel_codigo: imovelCodigo,

@@ -540,7 +540,7 @@ const PropertyDetail = () => {
 
             {/* Price */}
             <div>
-              <p className="font-body text-[clamp(1.75rem,4vw,2.25rem)] font-extrabold text-primary">{priceFormatted}</p>
+              <p className="font-body text-[clamp(1.75rem,4vw,2.25rem)] font-extrabold text-primary" data-price={imovel.preco}>{priceFormatted}</p>
               {(imovel.preco_condominio ?? 0) > 0 && (
                 <p className="mt-1 font-body text-sm text-muted-foreground">
                   + R$ {imovel.preco_condominio!.toLocaleString("pt-BR")}/mês condomínio

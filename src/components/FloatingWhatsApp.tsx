@@ -69,9 +69,34 @@ export function FloatingWhatsApp() {
   const imovelMatch = location.pathname.match(/^\/imovel\/([^/]+)/);
   const currentImovelSlug = imovelMatch ? imovelMatch[1] : undefined;
 
+  // Extract rich property metadata from the DOM/meta tags on property pages
+  const getPropertyMeta = () => {
+    if (!currentImovelSlug) return {};
+    const meta: Record<string, string | number | undefined> = {};
+    // Title from h1 (property pages have the real title)
+    const h1 = document.querySelector("h1")?.textContent?.trim();
+    if (h1 && !h1.includes("Encontre") && !h1.includes("imóvel perfeito")) {
+      meta.imovel_titulo = h1;
+    }
+    // Bairro from og:description or meta description
+    const desc = document.querySelector('meta[property="og:description"]')?.getAttribute("content")
+      || document.querySelector('meta[name="description"]')?.getAttribute("content") || "";
+    const bairroMatch = desc.match(/(?:em|bairro)\s+([A-ZÀ-ÚÇ][a-zà-úç]+(?:\s+[A-ZÀ-ÚÇ][a-zà-úç]+)*)/);
+    if (bairroMatch) meta.imovel_bairro = bairroMatch[1];
+    // Price from the page — look for the formatted price element
+    const priceEl = document.querySelector('[data-price]');
+    if (priceEl) {
+      const raw = priceEl.getAttribute("data-price");
+      if (raw) meta.imovel_preco = Number(raw);
+    }
+    return meta;
+  };
+
   const handleClick = () => {
+    const propertyMeta = getPropertyMeta();
     const imovelData = currentImovelSlug ? { slug: currentImovelSlug } : undefined;
-    const imovelTitulo = document.querySelector("h1")?.textContent || undefined;
+    const imovelTitulo = propertyMeta.imovel_titulo as string | undefined
+      || (currentImovelSlug ? document.querySelector("h1")?.textContent?.trim() : undefined);
     const url = corretor
       ? buildCorretorWhatsAppUrl(corretor.nome, corretor.telefone, imovelData)
       : currentImovelSlug
@@ -83,12 +108,16 @@ export function FloatingWhatsApp() {
       origem_componente: "floating_whatsapp",
       imovel_slug: currentImovelSlug,
       imovel_titulo: imovelTitulo,
+      imovel_bairro: propertyMeta.imovel_bairro as string | undefined,
+      imovel_preco: propertyMeta.imovel_preco as number | undefined,
     });
   };
 
   const handleRetargetingClick = () => {
+    const propertyMeta = getPropertyMeta();
     const imovelData = currentImovelSlug ? { slug: currentImovelSlug } : undefined;
-    const imovelTitulo = document.querySelector("h1")?.textContent || undefined;
+    const imovelTitulo = propertyMeta.imovel_titulo as string | undefined
+      || (currentImovelSlug ? document.querySelector("h1")?.textContent?.trim() : undefined);
     const url = corretor
       ? buildCorretorWhatsAppUrl(corretor.nome, corretor.telefone, imovelData)
       : currentImovelSlug
@@ -100,6 +129,8 @@ export function FloatingWhatsApp() {
       origem_componente: "retargeting_popup",
       imovel_slug: currentImovelSlug,
       imovel_titulo: imovelTitulo,
+      imovel_bairro: propertyMeta.imovel_bairro as string | undefined,
+      imovel_preco: propertyMeta.imovel_preco as number | undefined,
     });
     dismissRetargeting();
   };

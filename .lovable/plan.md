@@ -1,99 +1,101 @@
 
 
-## Comparação Uhome vs QuintoAndar — Melhorias Prioritárias
+# Diagnóstico da Integração Site → CRM UhomeSales
 
-### O que a Uhome já faz bem (paridade ou superior)
-- Prefetch agressivo no hover (React Query + chunk preload)
-- Progressive rendering com IntersectionObserver
-- Lazy loading de Mapbox (só carrega quando necessário)
-- Scroll position restore via Zustand
-- Transição suave com opacity no refetch
-- Filtros avançados em drawer (padrão QuintoAndar)
-- Badges inteligentes (Novidade, Ótimo preço, Em obras)
-- Pins com preço no mapa
+## Situação Atual
 
-### Gaps identificados (o que o QuintoAndar faz melhor)
+### O que ESTÁ funcionando:
+- Leads são enviados e chegam no CRM (todos os recentes têm `uhomesales_lead_id` e `sincronizado_em` preenchidos)
+- WhatsApp clicks são registrados com sucesso
+- Corretores são sincronizados
+- O payload inclui observações completas e origem humanizada
 
----
+### Problemas encontrados:
 
-#### 1. Card do imóvel: informação de custos mensais (ALTO IMPACTO)
+**1. Triggers DUPLICADOS — causa dos erros "duplicate key"**
+Cada tabela tem **2 triggers** que fazem a mesma coisa:
+- `public_leads`: `on_lead_created` + `trg_sync_lead_to_crm` (ambos chamam `trigger_sync_lead_to_crm`)
+- `agendamentos`: `on_agendamento_with_corretor` (com WHEN) + `trg_sync_agendamento_to_crm` (sem WHEN)
+- `captacao_imoveis`: `on_captacao_with_corretor` (com WHEN) + `trg_sync_captacao_to_crm` (sem WHEN)
+- `whatsapp_clicks`: `on_whatsapp_click_with_corretor` (com WHEN) + `trg_sync_whatsapp_to_crm` (sem WHEN)
 
-**QuintoAndar mostra:** Preço + "R$ 709 Cond. + IPTU" como soma única abaixo do preço.
-**Uhome mostra (desktop):** Só preço. Cond/IPTU aparecem apenas no card mobile.
+Resultado: cada lead dispara a Edge Function **2 vezes**. A 1ª insere no CRM ok, a 2ª falha com `duplicate key value violates unique constraint "leads_site_lead_id_key"`.
 
-**Correção:** No card desktop (`SearchPropertyCard.tsx`, linhas 422-433), adicionar a linha de custos mensais (Cond. + IPTU) igual ao mobile. QuintoAndar mostra a soma: `R$ {cond + iptu} Cond. + IPTU`.
+**2. Leads do floating_whatsapp sem dados de imóvel**
+Os 5 leads mais recentes vieram do `floating_whatsapp` e todos têm:
+- `imovel_slug: null`
+- `imovel_bairro: null`
+- `imovel_preco: null`
+- `imovel_titulo: "Encontre o imóvel perfeito para você"` (texto genérico do h1 da home)
 
----
+Isso porque o FloatingWhatsApp tenta extrair dados da página mas na home/busca não há imóvel específico.
 
-#### 2. Card do imóvel: preço acima, título abaixo (layout invertido)
+## Plano de Correção
 
-**QuintoAndar:** Título/descrição → Preço grande → Custos → Stats → Endereço
-**Uhome desktop:** Tipo · Bairro → Stats → Preço (no final)
+### Passo 1: Remover triggers duplicados (migração SQL)
+Dropar os triggers antigos `on_lead_created`, `on_agendamento_with_corretor`, `on_captacao_with_corretor`, `on_whatsapp_click_with_corretor` — manter apenas os `trg_sync_*` (que não têm WHEN e cobrem todos os cenários).
 
-**Correção:** Reorganizar o card desktop: Preço grande primeiro, custos mensais, stats, endereço. Preço é o dado mais importante — deve estar no topo do bloco de texto.
+### Passo 2: Corrigir FloatingWhatsApp para enviar dados reais do imóvel
+Quando o usuário está na página `/imovel/:slug`, o componente já tenta ler o título do h1. Melhorar a extração para pegar também slug, bairro e preço dos metadados da página ou do DOM.
 
----
-
-#### 3. Endereço com rua no card
-
-**QuintoAndar:** "Rua Portugal, Higienópolis · Porto Alegre"
-**Uhome:** "Bairro, Porto Alegre" (sem rua)
-
-**Verificação necessária:** Checar se a tabela `imoveis` tem campo de endereço/rua. Se sim, mostrar. Se não, manter como está — sem dados falsos.
-
----
-
-#### 4. Suspense fallback: spinner genérico
-
-**QuintoAndar:** Transição entre rotas é instantânea (SSR + streaming)
-**Uhome:** `PageFallback` mostra spinner centralizado em tela cheia — abrupto.
-
-**Correção em `App.tsx`:** Substituir o spinner fullscreen por um skeleton que mantém a navbar visível. O fallback deve mostrar `<Navbar />` + skeleton do conteúdo, não uma tela em branco com spinner.
+### Passo 3: Adicionar upsert no sync-to-crm
+Mudar o `insert` do CRM para `upsert` com `onConflict: 'site_lead_id'` — assim mesmo que a trigger dispare 2x, não dá erro (apenas atualiza o mesmo registro).
 
 ---
 
-#### 5. Navbar: prefetch no mousedown (não só hover)
+## Prompt para Conferência no CRM (UhomeSales)
 
-**QuintoAndar:** Navegação é quase instantânea.
-**Uhome:** Prefetch no `mouseEnter` do link "Comprar" já existe, mas poderia também prefetchar no `mousedown` de qualquer link interno para ganhar ~100-200ms.
+Rode estas consultas no banco do CRM para validar:
 
-**Correção:** Adicionar `onMouseDown={handlePrefetchBusca}` além do `onMouseEnter` existente. Também prefetchar o chunk da página de destino em links de bairros, tipos, etc.
+```text
+-- 1. Últimos 10 leads recebidos do site
+SELECT id, nome, telefone, imovel_interesse, origem_detalhe, 
+       atribuido_para, status, created_at 
+FROM leads 
+WHERE origem = 'site_uhome' 
+ORDER BY created_at DESC 
+LIMIT 10;
+
+-- 2. Verificar se há leads duplicados por site_lead_id
+SELECT site_lead_id, COUNT(*) 
+FROM leads 
+WHERE origem = 'site_uhome' AND site_lead_id IS NOT NULL
+GROUP BY site_lead_id 
+HAVING COUNT(*) > 1;
+
+-- 3. Verificar leads sem imovel_interesse preenchido
+SELECT id, nome, telefone, origem_detalhe, observacoes, created_at
+FROM leads 
+WHERE origem = 'site_uhome' AND imovel_interesse IS NULL
+ORDER BY created_at DESC 
+LIMIT 10;
+
+-- 4. Verificar se atribuido_para aponta para corretores válidos
+SELECT l.id, l.nome, l.atribuido_para, p.nome as corretor_nome
+FROM leads l
+LEFT JOIN profiles p ON l.atribuido_para = p.id
+WHERE l.origem = 'site_uhome' AND l.atribuido_para IS NOT NULL
+ORDER BY l.created_at DESC
+LIMIT 10;
+
+-- 5. Verificar notificações criadas para os corretores
+SELECT id, user_id, tipo, titulo, mensagem, created_at
+FROM notificacoes
+WHERE tipo IN ('novo_lead', 'lead_site', 'agendamento')
+ORDER BY created_at DESC
+LIMIT 10;
+```
 
 ---
 
-#### 6. View Transitions API (navegação suave entre rotas)
+## Resumo Técnico
 
-**QuintoAndar:** Transições entre páginas são suaves, sem "flash branco".
-**Uhome:** Cada navegação mostra um flash breve do Suspense fallback.
-
-**Correção:** Usar `document.startViewTransition` (com fallback) no `navigate()` para animar a saída/entrada de páginas. Isso é uma melhoria progressiva — funciona em Chrome/Edge, fallback silencioso em outros.
-
----
-
-#### 7. Mapa: clusters com contagem vs preço
-
-**QuintoAndar:** Clusters mostram contagem numérica (ex: "227", "65").
-**Uhome:** Igual — clusters com contagem. Mas os pins individuais da Uhome já mostram preço (QuintoAndar não mostra preço nos pins). Uhome está à frente aqui.
-
----
-
-### Plano de Implementação (4 arquivos)
-
-**Prioridade 1 — Card desktop com preço no topo + custos mensais**
-- `src/components/SearchPropertyCard.tsx` — Reorganizar bloco de texto desktop (linhas 422-433): preço grande primeiro, custos mensais, stats, endereço
-
-**Prioridade 2 — PageFallback com Navbar visível**
-- `src/App.tsx` — Substituir `PageFallback` por skeleton com Navbar, eliminando a tela em branco
-
-**Prioridade 3 — Prefetch no mousedown**
-- `src/components/Navbar.tsx` — Adicionar `onMouseDown` nos links de navegação
-
-**Prioridade 4 — View Transitions API**
-- `src/App.tsx` ou wrapper de navegação — Envolver `navigate()` com `startViewTransition` quando disponível
-
-### Resultado esperado
-- Cards mostram informação financeira completa como QuintoAndar
-- Zero "tela branca" entre navegações
-- Percepção de velocidade ainda melhor com prefetch antecipado
-- Transições visuais suaves entre rotas
+| Item | Status | Ação |
+|------|--------|------|
+| Leads chegam no CRM | ✅ OK | — |
+| Dados completos (observações) | ✅ OK | — |
+| Rótulos humanizados | ✅ OK | — |
+| Triggers duplicados causando erros | ⚠️ Problema | Remover triggers antigos |
+| Dados de imóvel vazios (floating_whatsapp na home) | ⚠️ Problema | Melhorar extração no FloatingWhatsApp |
+| Proteção contra duplicatas no CRM | ⚠️ Frágil | Usar upsert em vez de insert |
 

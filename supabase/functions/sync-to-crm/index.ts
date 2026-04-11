@@ -218,7 +218,7 @@ async function handleLead(
 
   let { data: leadCRM, error } = await supabaseCRM
     .from('leads')
-    .insert(payload)
+    .upsert(payload, { onConflict: 'site_lead_id' })
     .select()
     .single()
 
@@ -227,7 +227,7 @@ async function handleLead(
     console.warn('[sync-to-crm] FK violation on atribuido_para, retrying without corretor')
     const retryResult = await supabaseCRM
       .from('leads')
-      .insert({ ...payload, atribuido_para: null })
+      .upsert({ ...payload, atribuido_para: null }, { onConflict: 'site_lead_id' })
       .select()
       .single()
     leadCRM = retryResult.data

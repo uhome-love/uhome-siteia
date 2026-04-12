@@ -266,6 +266,8 @@ const Search = () => {
       if (urlDiferenciais) f.diferenciais = urlDiferenciais.split(",").map((s: string) => s.trim()).filter(Boolean);
       if (urlCondominio) f.condominio = urlCondominio;
       if (urlFase) f.fase = urlFase;
+      const urlCollection = searchParams.get("collection");
+      if (urlCollection === "true") f.destaque = true;
       if (urlBairro) {
         f.bairro = urlBairro;
       } else if (urlQ) {
@@ -333,6 +335,7 @@ const Search = () => {
       iptuMax: filters.iptuMax || undefined,
       condominio: filters.condominio || undefined,
       fase: filters.fase || undefined,
+      destaque: filters.destaque || undefined,
     };
   }, [filters]);
 

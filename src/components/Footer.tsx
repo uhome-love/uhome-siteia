@@ -85,6 +85,7 @@ export function Footer() {
             <nav aria-label="Uhome">
               <h3 className="font-body text-sm font-semibold text-foreground">Uhome</h3>
               <ul className="mt-3 space-y-2">
+                <li><Link to={prefixLink("/collection")} className="font-body text-sm text-primary transition-colors hover:text-primary/80">Uhome Collection</Link></li>
                 <li><Link to={prefixLink("/busca?modo=ia")} className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Busca IA</Link></li>
                 <li><Link to={prefixLink("/avaliar-imovel")} className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Avaliar imóvel</Link></li>
                 <li><Link to={prefixLink("/faq")} className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground">Perguntas frequentes</Link></li>

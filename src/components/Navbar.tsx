@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
-import { Menu, X, Sparkles, BarChart3, Building2, MapPin, HelpCircle, Megaphone } from "lucide-react";
+import { Menu, X, Sparkles, BarChart3, Building2, MapPin, HelpCircle, Megaphone, Gem } from "lucide-react";
 
 import { UhomeLogo } from "@/components/UhomeLogo";
 import { UserMenu } from "@/components/UserMenu";
@@ -78,6 +78,13 @@ export function Navbar() {
             <div className="mx-2 h-4 w-px bg-border" />
 
             {/* Value links */}
+            <Link
+              to={prefixLink("/collection")}
+              className="flex items-center gap-1.5 rounded-full px-3 py-1.5 font-body text-[13px] font-medium text-primary transition-colors hover:bg-primary/5"
+            >
+              <Gem className="h-3 w-3" />
+              Collection
+            </Link>
             <Link
               to={prefixLink("/avaliar-imovel")}
               className="rounded-full px-3 py-1.5 font-body text-[13px] font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
@@ -157,6 +164,13 @@ export function Navbar() {
                 to={prefixLink("/avaliar-imovel")}
                 icon={<BarChart3 className="h-4 w-4" />}
                 label="Quanto vale meu imóvel?"
+                accent
+                onClick={() => setMobileOpen(false)}
+              />
+              <MobileNavLink
+                to={prefixLink("/collection")}
+                icon={<Gem className="h-4 w-4" />}
+                label="Uhome Collection"
                 accent
                 onClick={() => setMobileOpen(false)}
               />

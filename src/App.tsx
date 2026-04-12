@@ -63,6 +63,7 @@ const SeoLanding = lazyRetry(() => import("./pages/SeoLanding.tsx"));
 const Vitrine = lazyRetry(() => import("./pages/Vitrine.tsx"));
 const Sobre = lazyRetry(() => import("./pages/Sobre.tsx"));
 const GuiaBairros = lazyRetry(() => import("./pages/GuiaBairros.tsx"));
+const Collection = lazyRetry(() => import("./pages/Collection.tsx"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -250,6 +251,7 @@ const App = () => (
                 <Route path="/mega-cyrela" element={<MegaCyrela />} />
                 <Route path="/sobre" element={<Sobre />} />
                 <Route path="/guia-bairros" element={<GuiaBairros />} />
+                <Route path="/collection" element={<Collection />} />
                 <Route path="/imoveis-porto-alegre" element={<PortoAlegrePilar />} />
                 <Route path="/casas-porto-alegre" element={<TipoImovel />} />
                 <Route path="/coberturas-porto-alegre" element={<TipoImovel />} />
@@ -277,6 +279,7 @@ const App = () => (
                   <Route path="mega-cyrela" element={<MegaCyrela />} />
                   <Route path="sobre" element={<Sobre />} />
                   <Route path="guia-bairros" element={<GuiaBairros />} />
+                  <Route path="collection" element={<Collection />} />
                   <Route path="imoveis-porto-alegre" element={<PortoAlegrePilar />} />
                   <Route path="avaliar-imovel" element={<AvaliacaoPage />} />
                   <Route path="vitrine/:id" element={<Vitrine />} />

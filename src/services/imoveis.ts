@@ -200,6 +200,10 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
     area_desc: { column: "area_total" as const, ascending: false },
   };
   const ordem = orderMap[filters.ordem ?? "recentes"];
+  // Collection items (destaque) always appear first in general search
+  if (!filters.destaque) {
+    query = query.order("destaque", { ascending: false, nullsFirst: false });
+  }
   query = query.order(ordem.column, { ascending: ordem.ascending });
 
   const limit = filters.limit ?? 20;

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect, forwardRef } from "react";
 import { AuthModal } from "@/components/AuthModal";
-import { Heart, TrendingDown, Sparkles, Clock } from "lucide-react";
+import { Heart, TrendingDown, Gem, Sparkles, Clock } from "lucide-react";
 import { motion } from "framer-motion";
 import { type Imovel, fotoPrincipal, formatPreco } from "@/services/imoveis";
 import { FotoImovel } from "@/components/FotoImovel";
@@ -37,9 +37,9 @@ function getBaseBadges(imovel: Imovel): SmartBadge[] {
     badges.push({ label: "Novo", style: "novo-imovel" });
   }
 
-  // Destaque (admin-selected)
+  // Collection (admin-curated)
   if (imovel.destaque) {
-    badges.push({ label: "Destaque", style: "destaque", icon: <Sparkles className="h-3 w-3" /> });
+    badges.push({ label: "Collection", style: "destaque", icon: <Gem className="h-3 w-3" /> });
   }
 
   // Novidade — using real jetimob registration date (now in publicado_em)
@@ -61,7 +61,7 @@ function getBaseBadges(imovel: Imovel): SmartBadge[] {
 
 const badgeClasses: Record<BadgeStyle, string> = {
   novo: "bg-primary/90 text-primary-foreground font-semibold shadow-sm",
-  destaque: "bg-foreground text-background font-semibold shadow-sm",
+  destaque: "bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-semibold shadow-sm",
   exclusivo: "bg-foreground text-background font-semibold shadow-sm",
   visto: "bg-white/90 text-foreground font-semibold shadow-sm backdrop-blur-sm",
   "otimo-preco": "bg-white/95 text-primary font-bold shadow-sm backdrop-blur-sm border border-primary/20",

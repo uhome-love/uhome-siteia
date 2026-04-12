@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { Gem } from "lucide-react";
 import { SearchPropertyCard } from "@/components/SearchPropertyCard";
 import { fetchImoveisDestaque, type Imovel } from "@/services/imoveis";
 import { useFavoritos } from "@/hooks/useFavoritos";
@@ -29,11 +30,14 @@ export function FeaturedProperties() {
           className="flex items-end justify-between"
         >
           <div>
-            <p className="font-body text-sm font-medium uppercase tracking-[0.15em] text-primary">
-              Seleção
-            </p>
+            <div className="flex items-center gap-2">
+              <Gem className="h-4 w-4 text-primary" />
+              <p className="font-body text-sm font-medium uppercase tracking-[0.15em] text-primary">
+                Uhome Collection
+              </p>
+            </div>
             <h2 className="mt-2 text-h2 text-foreground text-balance">
-              Imóveis em destaque
+              Selecionados para você
             </h2>
           </div>
           <Link to={prefixLink("/collection")} className="hidden font-body text-sm font-medium text-primary transition-colors hover:text-primary/80 sm:block">

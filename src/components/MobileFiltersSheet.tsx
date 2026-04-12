@@ -223,8 +223,24 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
             </div>
 
             <div className="px-5 pb-32">
-              {/* Localização */}
+              {/* Uhome Collection */}
               <section className="mt-4">
+                <button
+                  onClick={() => setFilter("destaque", !filters.destaque)}
+                  className={`flex w-full items-center gap-3 rounded-xl px-4 py-3.5 font-body text-sm font-semibold transition-colors ${
+                    filters.destaque
+                      ? "border-[1.5px] border-primary bg-primary/10 text-primary"
+                      : "border border-border bg-background text-foreground"
+                  }`}
+                >
+                  <Gem className="h-5 w-5 shrink-0" />
+                  Uhome Collection
+                  {filters.destaque && <span className="ml-auto text-xs">✓</span>}
+                </button>
+              </section>
+
+              {/* Localização */}
+              <section className="mt-6">
                 <p className="font-body text-base font-bold text-foreground">Localização</p>
                 <button
                   onClick={() => setSubPage("location")}

@@ -63,7 +63,7 @@ const SeoLanding = lazyRetry(() => import("./pages/SeoLanding.tsx"));
 const Vitrine = lazyRetry(() => import("./pages/Vitrine.tsx"));
 const Sobre = lazyRetry(() => import("./pages/Sobre.tsx"));
 const GuiaBairros = lazyRetry(() => import("./pages/GuiaBairros.tsx"));
-const Collection = lazyRetry(() => import("./pages/Collection"));
+const Collection = lazyRetry(() => import("./pages/Collection.tsx"));
 
 const queryClient = new QueryClient({
   defaultOptions: {

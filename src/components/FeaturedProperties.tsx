@@ -39,7 +39,7 @@ export function FeaturedProperties() {
                 <Gem className="h-3.5 w-3.5 text-primary" />
               </div>
               <p className="font-body text-sm font-semibold uppercase tracking-[0.15em] text-primary">
-                Uhome Collection
+                Imóveis Selecionados
               </p>
             </div>
             <h2 className="mt-3 text-h2 text-foreground text-balance">

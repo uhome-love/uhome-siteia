@@ -86,9 +86,14 @@ export function SearchFiltersBar({ onOpenMobileFilters, onOpenAdvancedFilters }:
   const addBairro = (nome: string) => {
     const next = [...bairrosSelecionados, nome];
     setFilter("bairro", next.join(","));
-    // Also clear the text "q" filter since we're using structured bairro
     if (filters.q) setFilter("q", "");
     setBairroInput("");
+  };
+
+  const searchByAddress = (text: string) => {
+    setFilter("q", text.trim());
+    setBairroInput("");
+    setShowDropdown(false);
   };
 
   const removeBairro = (nome: string) => {
@@ -164,9 +169,13 @@ export function SearchFiltersBar({ onOpenMobileFilters, onOpenAdvancedFilters }:
     if (e.key === "Backspace" && !bairroInput && bairrosSelecionados.length > 0) {
       removeBairro(bairrosSelecionados[bairrosSelecionados.length - 1]);
     }
-    if (e.key === "Enter" && bairroInput && suggestions.length > 0) {
+    if (e.key === "Enter" && bairroInput) {
       e.preventDefault();
-      addBairro(suggestions[0]);
+      if (suggestions.length > 0) {
+        addBairro(suggestions[0]);
+      } else {
+        searchByAddress(bairroInput);
+      }
     }
     if (e.key === "Escape") {
       setShowDropdown(false);
@@ -261,6 +270,15 @@ export function SearchFiltersBar({ onOpenMobileFilters, onOpenAdvancedFilters }:
               />
             </span>
           ))}
+          {filters.q && (
+            <span className="flex items-center gap-1 rounded-full bg-accent/60 px-2.5 py-0.5 font-body text-[12px] font-medium text-foreground">
+              🔍 {filters.q}
+              <X
+                className="h-3 w-3 cursor-pointer opacity-60 hover:opacity-100"
+                onClick={(e) => { e.stopPropagation(); setFilter("q", ""); }}
+              />
+            </span>
+          )}
           <input
             ref={inputRef}
             type="text"
@@ -268,7 +286,7 @@ export function SearchFiltersBar({ onOpenMobileFilters, onOpenAdvancedFilters }:
             onChange={(e) => { setBairroInput(e.target.value); setShowDropdown(true); }}
             onFocus={() => setShowDropdown(true)}
             onKeyDown={handleKeyDown}
-            placeholder={hasChips ? "Adicionar bairro..." : "Bairro, cidade ou tipo..."}
+            placeholder={hasChips ? "Adicionar bairro ou rua..." : "Bairro, rua ou endereço..."}
             className="min-w-[100px] flex-1 border-none bg-transparent py-1 font-body text-[13px] text-foreground outline-none placeholder:text-muted-foreground"
           />
         </div>
@@ -277,22 +295,40 @@ export function SearchFiltersBar({ onOpenMobileFilters, onOpenAdvancedFilters }:
         {showDropdown && createPortal(
           <div ref={portalDropdownRef} className="z-50" style={{ position: "fixed" }}>
             {/* Autocomplete suggestions */}
-            {hasInput && suggestions.length > 0 && (
-              <div className="max-h-64 w-80 overflow-y-auto rounded-xl border border-border bg-card p-2 shadow-lg">
-                <p className="px-3 py-1.5 font-body text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  Bairros
-                </p>
-                {suggestions.map(b => (
+            {hasInput && (
+              <div className="max-h-72 w-80 overflow-y-auto rounded-xl border border-border bg-card p-2 shadow-lg">
+                {suggestions.length > 0 && (
+                  <>
+                    <p className="px-3 py-1.5 font-body text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                      Bairros
+                    </p>
+                    {suggestions.map(b => (
+                      <button
+                        key={b}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => addBairro(b)}
+                        className="flex w-full items-center gap-3 rounded-lg px-3 py-2 font-body text-sm text-foreground transition-colors hover:bg-accent/50 active:scale-[0.98]"
+                      >
+                        <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+                        {b}
+                      </button>
+                    ))}
+                  </>
+                )}
+                {/* Search by street/address option */}
+                <div className={suggestions.length > 0 ? "border-t border-border mt-1 pt-1" : ""}>
+                  <p className="px-3 py-1.5 font-body text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    Endereço
+                  </p>
                   <button
-                    key={b}
                     onMouseDown={(e) => e.preventDefault()}
-                    onClick={() => addBairro(b)}
+                    onClick={() => searchByAddress(bairroInput)}
                     className="flex w-full items-center gap-3 rounded-lg px-3 py-2 font-body text-sm text-foreground transition-colors hover:bg-accent/50 active:scale-[0.98]"
                   >
-                    <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-                    {b}
+                    <Search className="h-3.5 w-3.5 text-primary" />
+                    Buscar por "<span className="font-semibold text-primary">{bairroInput.trim()}</span>"
                   </button>
-                ))}
+                </div>
               </div>
             )}
 

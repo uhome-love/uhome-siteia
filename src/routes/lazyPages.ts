@@ -28,7 +28,7 @@ export const Vitrine = lazyRetry(() => import("@/pages/Vitrine"));
 export const Sobre = lazyRetry(() => import("@/pages/Sobre"));
 export const GuiaBairros = lazyRetry(() => import("@/pages/GuiaBairros"));
 export const Collection = lazyRetry(() => import("@/pages/Collection"));
-export const PortoAlegrePilar = lazyRetry(() => import("@/pages/PortoAlegrePilar"));
+export const PortoAlegrePilar = lazyRetry(() => import("@/pages/PortoAlegrePilar.tsx"));
 
 // Catch-all
 export const SeoOrNotFound = lazyRetry(() => import("@/components/SeoOrNotFound"));

@@ -3,17 +3,17 @@ import { Navbar } from "@/components/Navbar";
 import { HeroSection } from "@/components/HeroSection";
 
 
-const Footer = lazy(() => import("@/components/Footer").then(m => ({ default: m.Footer })));
+const Footer = lazy(() => import("../components/Footer.tsx").then(m => ({ default: m.Footer })));
 import { setJsonLd, removeJsonLd, buildOrganizationJsonLd, buildWebSiteJsonLd, buildLocalBusinessJsonLd } from "@/lib/jsonld";
 import { useCanonical } from "@/hooks/useCanonical";
 
 // Lazy load below-fold sections
-const FeaturedNeighborhoods = lazy(() => import("@/components/FeaturedNeighborhoods"));
-const FeaturedProperties = lazy(() => import("@/components/FeaturedProperties").then(m => ({ default: m.FeaturedProperties })));
-const EmpreendimentosDestaque = lazy(() => import("@/components/EmpreendimentosDestaque").then(m => ({ default: m.EmpreendimentosDestaque })));
-const PorQueUhome = lazy(() => import("@/components/PorQueUhome").then(m => ({ default: m.PorQueUhome })));
-const SeoLinksSection = lazy(() => import("@/components/SeoLinksSection").then(m => ({ default: m.SeoLinksSection })));
-const HomeFaqSection = lazy(() => import("@/components/HomeFaqSection").then(m => ({ default: m.HomeFaqSection })));
+const FeaturedNeighborhoods = lazy(() => import("../components/FeaturedNeighborhoods.tsx"));
+const FeaturedProperties = lazy(() => import("../components/FeaturedProperties.tsx").then(m => ({ default: m.FeaturedProperties })));
+const EmpreendimentosDestaque = lazy(() => import("../components/EmpreendimentosDestaque.tsx").then(m => ({ default: m.EmpreendimentosDestaque })));
+const PorQueUhome = lazy(() => import("../components/PorQueUhome.tsx").then(m => ({ default: m.PorQueUhome })));
+const SeoLinksSection = lazy(() => import("../components/SeoLinksSection.tsx").then(m => ({ default: m.SeoLinksSection })));
+const HomeFaqSection = lazy(() => import("../components/HomeFaqSection.tsx").then(m => ({ default: m.HomeFaqSection })));
 
 const HOME_FAQS = [
   { q: "Quanto custa um apartamento em Porto Alegre?", a: "O preço varia de R$ 250 mil em bairros como Cidade Baixa até R$ 5 milhões+ em Moinhos de Vento e Três Figueiras. Use nossa busca com filtro de preço para encontrar opções no seu orçamento." },

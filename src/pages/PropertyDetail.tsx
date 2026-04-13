@@ -8,7 +8,7 @@ import { LeadSidebar } from "@/components/LeadSidebar";
 import { FinancingSimulator } from "@/components/FinancingSimulator";
 import { AgendamentoVisita } from "@/components/AgendamentoVisita";
 import { SimilarProperties } from "@/components/SimilarProperties";
-const PropertyMap = lazy(() => import("@/components/PropertyMap").then(m => ({ default: m.PropertyMap })));
+const PropertyMap = lazy(() => import("../components/PropertyMap.tsx").then(m => ({ default: m.PropertyMap })));
 import { FotoImovel } from "@/components/FotoImovel";
 import { CardUhomePreco } from "@/components/CardUhomePreco";
 import { AuthModal } from "@/components/AuthModal";

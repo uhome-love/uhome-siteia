@@ -1,7 +1,9 @@
 import { lazyRetry } from "@/lib/lazyRetry";
 
-// Eager load homepage
+// Eager load homepage and resolver-sensitive pages
 export { default as Index } from "@/pages/Index";
+export { default as Collection } from "@/pages/Collection";
+export { default as PortoAlegrePilar } from "@/pages/PortoAlegrePilar";
 
 // Public pages
 export const Search = lazyRetry(() => import("@/pages/Search"));
@@ -27,14 +29,12 @@ export const SeoLanding = lazyRetry(() => import("@/pages/SeoLanding"));
 export const Vitrine = lazyRetry(() => import("@/pages/Vitrine"));
 export const Sobre = lazyRetry(() => import("@/pages/Sobre"));
 export const GuiaBairros = lazyRetry(() => import("@/pages/GuiaBairros"));
-export const Collection = lazyRetry(() => import("@/pages/Collection"));
-export const PortoAlegrePilar = lazyRetry(() => import("@/pages/PortoAlegrePilar.tsx"));
 
 // Catch-all
 export const SeoOrNotFound = lazyRetry(() => import("@/components/SeoOrNotFound"));
 
 // Corretor layout
-export const CorretorRefLayout = lazyRetry(() => import("@/components/CorretorRef").then(m => ({ default: m.CorretorRefLayout })));
+export const CorretorRefLayout = lazyRetry(() => import("@/components/CorretorRef").then((m) => ({ default: m.CorretorRefLayout })));
 
 // Admin pages
 export const AdminLayout = lazyRetry(() => import("@/pages/admin/AdminLayout"));

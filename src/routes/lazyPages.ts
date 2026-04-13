@@ -4,8 +4,8 @@ import { lazyRetry } from "@/lib/lazyRetry";
 export { default as Index } from "@/pages/Index";
 
 // Secondary pages – lazy loaded
-export const Collection = lazyRetry(() => import("../pages/Collection.tsx"));
-export const PortoAlegrePilar = lazyRetry(() => import("../pages/PortoAlegrePilar.tsx"));
+export const Collection = lazyRetry(() => import(/* @vite-ignore */ "@/pages/Collection"));
+export const PortoAlegrePilar = lazyRetry(() => import(/* @vite-ignore */ "@/pages/PortoAlegrePilar"));
 
 // Public pages
 export const Search = lazyRetry(() => import("@/pages/Search"));

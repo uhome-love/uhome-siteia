@@ -1,27 +1,41 @@
 
 
-## Plano: Busca por rua no MobileFiltersSheet
+## Plano: Corrigir 3 problemas de filtros e área
 
-### O que muda
+### Problema 1: "Casa em Condomínio" sem resultados
+O banco de dados só tem `tipo = "casa"` (6.891 imóveis). Não existe `"casa em condominio"` como tipo separado. Quando o filtro usa `eq("tipo", "casa em condominio")`, nada aparece.
 
-No sub-page de "Localização" do mobile, quando o texto digitado não bate com nenhum bairro, mostrar uma opção "Buscar por [texto digitado]" (igual ao desktop). Ao clicar, define `filters.q` com o texto e fecha o sub-page.
+**Solução**: Remover "Casa em Condomínio" da lista `propertyTypes` em `src/data/properties.ts`. Manter apenas "Casa" que já cobre todos os imóveis do tipo casa. Caso no futuro o Jetimob envie esse tipo, ele será mapeado automaticamente.
 
-### Alterações em `src/components/MobileFiltersSheet.tsx`
+**Arquivo**: `src/data/properties.ts` — remover a linha `{ value: "casa em condominio", label: "Casa em Condomínio" }`
 
-1. **Placeholder do input** (linha 150): trocar de `"Bairro em Porto Alegre"` para `"Bairro, rua ou endereço..."`.
+---
 
-2. **Função `searchByAddress`**: nova função que faz `setFilter("q", text.trim())`, limpa `locationInput` e fecha o sub-page.
+### Problema 2: Características/Diferenciais não funcionam
+Todos os 25.325 imóveis disponíveis têm `diferenciais = []` (array vazio). O Jetimob não está populando esse campo. O filtro `.contains("diferenciais", [...])` sempre retorna 0 resultados.
 
-3. **Opção "Buscar por endereço" no dropdown** (após linha 205, antes do "Nenhum bairro encontrado"): quando `locationInput.trim()` tem texto e não bate exatamente com um bairro, renderizar um botão com ícone `Search` e texto `Buscar por "${locationInput}"` que chama `searchByAddress`.
+**Solução**: Ocultar temporariamente a seção "Características" dos filtros até que o campo seja populado pelo sync. Isso evita confusão do usuário.
 
-4. **Chip de busca ativa na seção Localização** (após linha 250): se `filters.q` estiver preenchido, mostrar um chip removível com o texto da busca (igual ao desktop), com `X` para limpar via `setFilter("q", "")`.
+**Arquivos**:
+- `src/components/AdvancedFiltersModal.tsx` — envolver a seção de Características em um condicional que só mostra se houver dados (ou comentar/remover temporariamente)
+- `src/components/MobileFiltersSheet.tsx` — mesmo tratamento na seção de diferenciais
 
-5. **Incluir `filters.q` no `activeCount`** (linha 92): adicionar à lista de filtros contados.
+---
 
-6. **Incluir `filters.q` no `locationDisplay`** (linha 110): se `filters.q` estiver ativo, incluir na descrição.
+### Problema 3: Mostrar área privativa (area_util) ao invés de área total
+O banco tem `area_util` para 23k imóveis e `area_total` para 23k. Muitas vezes são diferentes (ex: 616m² total vs 175m² útil). Atualmente mostra `area_total` primeiro.
 
-7. **Enter no input** dispara `searchByAddress` se não houver sugestão exata.
+**Solução**: Priorizar `area_util` (área privativa) nos cards de listagem. Na página de detalhe, mostrar ambas separadamente quando disponíveis.
+
+**Arquivos**:
+- `src/components/SearchPropertyCard.tsx` — trocar a linha `const area = imovel.area_total ?? imovel.area_util ?? 0` para `const area = imovel.area_util ?? imovel.area_total ?? 0` e ajustar o label para "m² priv." quando usar area_util
+- `src/services/imoveis.ts` — adicionar `area_util` ao `LISTING_COLUMNS` para que esteja disponível nos cards
+- `src/pages/PropertyDetail.tsx` — mostrar ambas as áreas separadamente (área privativa e área total) quando ambas existirem
+
+---
 
 ### Validação
-- Build dev + produção para confirmar sem erros.
+- Build dev para confirmar sem erros
+- Testar filtro "Casa" retornando resultados
+- Confirmar que seção Características não aparece nos filtros
 

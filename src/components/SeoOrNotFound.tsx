@@ -2,8 +2,8 @@ import { lazy, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { parseSeoSlug } from "@/data/seoPages";
 
-const SeoLanding = lazy(() => import("@/pages/SeoLanding"));
-const NotFound = lazy(() => import("@/pages/NotFound"));
+const SeoLanding = lazy(() => import("../pages/SeoLanding.tsx"));
+const NotFound = lazy(() => import("../pages/NotFound.tsx"));
 
 /**
  * Catch-all route component: if the current path matches a SEO slug pattern,

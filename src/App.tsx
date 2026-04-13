@@ -12,9 +12,9 @@ import { PageFallback } from "@/components/PageFallback";
 import { AppRoutes } from "@/routes/AppRoutes";
 import { lazyRetry } from "@/lib/lazyRetry";
 
-const ExitIntentModal = lazyRetry(() => import("@/components/ExitIntentModal").then((m) => ({ default: m.ExitIntentModal })));
-const FloatingWhatsApp = lazyRetry(() => import("@/components/FloatingWhatsApp"));
-const WhatsAppLeadModal = lazyRetry(() => import("@/components/WhatsAppLeadModal").then((m) => ({ default: m.WhatsAppLeadModal })));
+const ExitIntentModal = lazyRetry(() => import("./components/ExitIntentModal.tsx").then((m) => ({ default: m.ExitIntentModal })));
+const FloatingWhatsApp = lazyRetry(() => import("./components/FloatingWhatsApp.tsx"));
+const WhatsAppLeadModal = lazyRetry(() => import("./components/WhatsAppLeadModal.tsx").then((m) => ({ default: m.WhatsAppLeadModal })));
 
 const queryClient = new QueryClient({
   defaultOptions: {

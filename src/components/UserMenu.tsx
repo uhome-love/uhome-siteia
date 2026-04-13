@@ -3,7 +3,7 @@ import { User, Heart, Search, LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { useAuth } from "@/hooks/useAuth";
-const AuthModal = lazy(() => import("./AuthModal").then(m => ({ default: m.AuthModal })));
+const AuthModal = lazy(() => import("./AuthModal.tsx").then(m => ({ default: m.AuthModal })));
 
 export function UserMenu() {
   const { user, signOut } = useAuth();

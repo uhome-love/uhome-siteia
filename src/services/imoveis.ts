@@ -125,7 +125,7 @@ export interface BuscaFilters {
 export const CIDADES_PERMITIDAS = ["Porto Alegre", "Canoas", "Cachoeirinha", "Gravataí", "Guaíba"];
 
 // Minimal columns for listing cards — no fotos/descricao/jetimob_raw/diferenciais
-const LISTING_COLUMNS = "id,slug,tipo,finalidade,status,destaque,preco,preco_condominio,area_total,quartos,banheiros,vagas,bairro,cidade,uf,publicado_em,foto_principal,fase";
+const LISTING_COLUMNS = "id,slug,tipo,finalidade,status,destaque,preco,preco_condominio,area_total,area_util,quartos,banheiros,vagas,bairro,cidade,uf,publicado_em,foto_principal,fase";
 
 // Focused detail payload — excludes large sync/debug fields that can slow or stall property pages
 const DETAIL_COLUMNS = "id,slug,tipo,finalidade,status,destaque,preco,preco_condominio,preco_iptu,area_total,area_util,quartos,banheiros,vagas,andar,latitude,longitude,titulo,descricao,diferenciais,fotos,foto_principal,video_url,condominio_nome,publicado_em,bairro,cidade,uf";

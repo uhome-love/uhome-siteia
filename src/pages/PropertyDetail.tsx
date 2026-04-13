@@ -207,10 +207,13 @@ const PropertyDetail = () => {
   const priceFormatted = formatPreco(imovel.preco);
   const finalidadeLabel = "Venda";
   const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
-  const area = imovel.area_total ?? imovel.area_util ?? 0;
+  const areaPriv = imovel.area_util ?? 0;
+  const areaTotal = imovel.area_total ?? 0;
+  const areaPrincipal = areaPriv || areaTotal;
 
   const statItems = [
-    area > 0 ? { icon: Maximize, value: `${area}m²`, label: "Área" } : null,
+    areaPriv > 0 ? { icon: Maximize, value: `${areaPriv}m²`, label: "Área Priv." } : null,
+    areaTotal > 0 && areaTotal !== areaPriv ? { icon: Maximize, value: `${areaTotal}m²`, label: "Área Total" } : null,
     (imovel.quartos ?? 0) > 0 ? { icon: Bed, value: String(imovel.quartos), label: "Quartos" } : null,
     (imovel.banheiros ?? 0) > 0 ? { icon: Bath, value: String(imovel.banheiros), label: "Banheiros" } : null,
     (imovel.vagas ?? 0) > 0 ? { icon: Car, value: String(imovel.vagas), label: "Vagas" } : null,

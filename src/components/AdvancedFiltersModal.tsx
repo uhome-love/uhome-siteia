@@ -201,33 +201,7 @@ export function AdvancedFiltersModal({ open, onClose }: Props) {
                 </div>
               </section>
 
-              {/* Características / Diferenciais */}
-              <section>
-                <p className="font-body text-sm font-bold text-foreground">Características</p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {featureOptions.map((feat) => {
-                    const isSelected = filters.diferenciais.includes(feat);
-                    return (
-                      <button
-                        key={feat}
-                        onClick={() => {
-                          const next = isSelected
-                            ? filters.diferenciais.filter(d => d !== feat)
-                            : [...filters.diferenciais, feat];
-                          setFilter("diferenciais", next);
-                        }}
-                        className={`rounded-full px-3.5 py-2 font-body text-[13px] font-medium transition-colors ${
-                          isSelected
-                            ? "bg-primary/10 text-primary border-[1.5px] border-primary"
-                            : "bg-muted/50 text-foreground hover:bg-muted"
-                        }`}
-                      >
-                        {feat}
-                      </button>
-                    );
-                  })}
-                </div>
-              </section>
+              {/* Características / Diferenciais — oculto enquanto dados não populados */}
             </div>
 
             {/* Footer */}

@@ -99,6 +99,7 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
     filters.areaMin || filters.areaMax,
     filters.codigo,
     filters.condominio,
+    filters.q,
   ].filter(Boolean).length + filters.diferenciais.length;
 
   const handleReset = () => {
@@ -107,9 +108,19 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
     setCondoInput("");
   };
 
-  const locationDisplay = bairrosSelecionados.length > 0
-    ? bairrosSelecionados.join(", ") + ", Porto Alegre"
-    : "Qualquer lugar em Porto Alegre";
+  const searchByAddress = (text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed) return;
+    setFilter("q", trimmed);
+    setLocationInput("");
+    setSubPage(null);
+  };
+
+  const locationDisplay = filters.q
+    ? `"${filters.q}"`
+    : bairrosSelecionados.length > 0
+      ? bairrosSelecionados.join(", ") + ", Porto Alegre"
+      : "Qualquer lugar em Porto Alegre";
 
   return (
     <AnimatePresence>
@@ -147,16 +158,31 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
                     <input
                       value={locationInput}
                       onChange={(e) => setLocationInput(e.target.value)}
-                      placeholder="Bairro em Porto Alegre"
+                      placeholder="Bairro, rua ou endereço..."
                       autoFocus
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && locationInput.trim() && locationSuggestions.length === 0) {
+                          searchByAddress(locationInput);
+                        }
+                      }}
                       className="w-full bg-transparent font-body text-sm text-foreground outline-none placeholder:text-muted-foreground"
                     />
                   </div>
                 </div>
 
                 {/* Selected chips */}
-                {bairrosSelecionados.length > 0 && (
+                {(bairrosSelecionados.length > 0 || filters.q) && (
                   <div className="flex flex-wrap gap-2 px-4 mt-3">
+                    {filters.q && (
+                      <span className="flex items-center gap-1.5 rounded-full bg-accent/20 px-3 py-1.5 font-body text-[13px] font-medium text-foreground">
+                        <Search className="h-3 w-3" />
+                        {filters.q}
+                        <X
+                          className="h-3.5 w-3.5 cursor-pointer opacity-60 hover:opacity-100"
+                          onClick={() => setFilter("q", "")}
+                        />
+                      </span>
+                    )}
                     {bairrosSelecionados.map(b => (
                       <span
                         key={b}
@@ -203,7 +229,16 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
                       {b}
                     </button>
                   ))}
-                  {locationSuggestions.length === 0 && (
+                  {locationInput.trim() && locationSuggestions.length === 0 && (
+                    <button
+                      onClick={() => searchByAddress(locationInput)}
+                      className="flex w-full items-center gap-3 py-3 font-body text-sm text-primary active:bg-secondary/50 rounded-lg px-1 transition-colors"
+                    >
+                      <Search className="h-4 w-4 shrink-0" />
+                      Buscar por "{locationInput.trim()}"
+                    </button>
+                  )}
+                  {locationSuggestions.length === 0 && !locationInput.trim() && (
                     <p className="py-6 text-center font-body text-sm text-muted-foreground">
                       Nenhum bairro encontrado
                     </p>
@@ -251,6 +286,18 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
                     {locationDisplay}
                   </span>
                 </button>
+                {filters.q && (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <span className="flex items-center gap-1.5 rounded-full bg-accent/20 px-3 py-1.5 font-body text-[13px] font-medium text-foreground">
+                      <Search className="h-3 w-3" />
+                      {filters.q}
+                      <X
+                        className="h-3.5 w-3.5 cursor-pointer opacity-60 hover:opacity-100"
+                        onClick={() => setFilter("q", "")}
+                      />
+                    </span>
+                  </div>
+                )}
               </section>
 
               {/* Valor */}

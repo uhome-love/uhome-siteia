@@ -589,33 +589,7 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
                 </div>
               </section>
 
-              {/* Características */}
-              <section className="mt-8">
-                <p className="font-body text-base font-bold text-foreground">Características</p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {featureOptions.map((feat) => {
-                    const isSelected = filters.diferenciais.includes(feat);
-                    return (
-                      <button
-                        key={feat}
-                        onClick={() => {
-                          const next = isSelected
-                            ? filters.diferenciais.filter(d => d !== feat)
-                            : [...filters.diferenciais, feat];
-                          setFilter("diferenciais", next);
-                        }}
-                        className={`rounded-full px-3.5 py-2.5 font-body text-sm font-medium transition-colors ${
-                          isSelected
-                            ? "bg-primary/10 text-primary border-[1.5px] border-primary"
-                            : "bg-muted/50 text-foreground"
-                        }`}
-                      >
-                        {feat}
-                      </button>
-                    );
-                  })}
-                </div>
-              </section>
+              {/* Características — oculto enquanto dados não populados */}
             </div>
           </div>
 

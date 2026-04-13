@@ -145,7 +145,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
     else if (ref) (ref as React.MutableRefObject<HTMLAnchorElement | null>).current = node;
   }, [ref]);
   const price = formatPreco(imovel.preco);
-  const area = imovel.area_total ?? imovel.area_util ?? 0;
+  const area = imovel.area_util ?? imovel.area_total ?? 0;
 
   const statsArr = [
     area > 0 ? `${area} m²` : null,

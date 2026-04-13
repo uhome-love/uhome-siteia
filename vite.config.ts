@@ -32,6 +32,7 @@ export default defineConfig(({ mode }) => ({
     target: "es2020",
     cssCodeSplit: true,
     chunkSizeWarningLimit: 600,
+    sourcemap: false,
     rollupOptions: {
       output: {
         assetFileNames: "assets/[name]-[hash][extname]",

@@ -1,53 +1,31 @@
 
 
-# Uhome Collection — Plano de Implementação
+## Diagnóstico
 
-## Resumo
-Criar a experiência "Uhome Collection": uma curadoria premium de imóveis selecionados manualmente, com página dedicada, filtro especial na busca, e priorização automática nos resultados.
+**Causa raiz**: Os arquivos `src/pages/Collection.tsx` e `src/pages/PortoAlegrePilar.tsx` **não existem no disco**. Todas as tentativas anteriores de criá-los não persistiram no sistema de arquivos. O `lazyPages.ts` faz importação **eager** (linhas 5-6), o que causa falha imediata do Vite.
 
-## O que será feito
+## Plano de correção definitiva
 
-### 1. Página dedicada `/collection`
-- Nova página `src/pages/Collection.tsx` com header premium (ícone de estrela/diamante, título "Uhome Collection", subtítulo "Imóveis selecionados a dedo pela nossa equipe")
-- Grid de cards usando `SearchPropertyCard` existente
-- Busca via `fetchImoveis({ destaque: true })` — já suportado
-- SEO: meta title/description otimizados
+### Passo 1 — Criar `src/pages/Collection.tsx`
+Página da Uhome Collection com:
+- Fetch de imóveis com `destaque: true`
+- Filtros client-side por Tipo e Bairro
+- SEO (meta tags, JSON-LD, canonical)
+- Header com "Imóveis Selecionados" + "Uhome Collection"
+- Grid de `SearchPropertyCard` + `LeadFormInline`
 
-### 2. Destaques sempre primeiro na busca geral
-- Em `src/services/imoveis.ts`, adicionar `.order("destaque", { ascending: false })` como **primeiro** critério de ordenação antes da ordem escolhida pelo usuário
-- Assim, imóveis Collection aparecem no topo automaticamente
+### Passo 2 — Criar `src/pages/PortoAlegrePilar.tsx`
+Página pilar de Porto Alegre com:
+- Fetch geral de imóveis de Porto Alegre com paginação
+- Estatísticas (total, bairros, preço médio)
+- Links rápidos para páginas de tipo
+- Bairros em destaque com links SEO
+- Grid de propriedades + load more
 
-### 3. Filtro "Uhome Collection" na barra de busca
-- Adicionar `destaque: boolean` ao `SearchFilters` no Zustand store (`searchStore.ts`)
-- Novo pill/botão com ícone de estrela na `SearchFiltersBar.tsx` (desktop) e toggle no `MobileFiltersSheet.tsx` (mobile)
-- Ao ativar, filtra apenas imóveis `destaque=true`
-- Sincronizar com URL param `?collection=true`
+### Passo 3 — Validar build
+Rodar `npx vite build --mode development` e `npx vite build` para confirmar que ambos passam sem erro.
 
-### 4. Rotas e navegação
-- Registrar rota `/collection` no `App.tsx` (principal + corretor)
-- Adicionar link "Uhome Collection" na `Navbar.tsx` (com ícone de estrela, estilo diferenciado)
-- Adicionar link no `Footer.tsx`
-- Alterar "Ver todos →" do `FeaturedProperties.tsx` para apontar para `/collection`
-
-### 5. SSR para SEO
-- Adicionar renderização de `/collection` no `ssr-render` Edge Function
-
-## Arquivos
-
-| Ação | Arquivo |
-|------|---------|
-| Criar | `src/pages/Collection.tsx` |
-| Editar | `src/stores/searchStore.ts` — adicionar `destaque` |
-| Editar | `src/services/imoveis.ts` — ordenação `destaque DESC` primeiro |
-| Editar | `src/pages/Search.tsx` — mapear param `collection` |
-| Editar | `src/components/SearchFiltersBar.tsx` — pill Collection |
-| Editar | `src/components/MobileFiltersSheet.tsx` — toggle Collection |
-| Editar | `src/App.tsx` — rota `/collection` |
-| Editar | `src/components/Navbar.tsx` — link Collection |
-| Editar | `src/components/Footer.tsx` — link Collection |
-| Editar | `src/components/FeaturedProperties.tsx` — "Ver todos" → `/collection` |
-| Editar | `supabase/functions/ssr-render/index.ts` — SSR da página |
-
-## Banco de dados
-Nenhuma alteração necessária — o campo `destaque` já existe na tabela `imoveis` e já é gerenciado pelo admin.
+### Detalhes técnicos
+- Ambos os arquivos seguem o padrão existente em `TipoImovel.tsx` (imports de Navbar, Footer, SearchPropertyCard, fetchImoveis, setJsonLd, useCanonical, etc.)
+- As importações eager em `lazyPages.ts` (linhas 5-6) permanecem como estão — o problema é apenas a ausência dos arquivos
 

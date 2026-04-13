@@ -279,6 +279,7 @@ export function SearchFiltersBar({ onOpenMobileFilters, onOpenAdvancedFilters }:
               />
             </span>
           )}
+          <input
             ref={inputRef}
             type="text"
             value={bairroInput}

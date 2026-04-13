@@ -43,7 +43,7 @@ export function FeaturedProperties() {
               </p>
             </div>
             <h2 className="mt-3 text-h2 text-foreground text-balance">
-              Selecionados para você
+              Uhome Collection
             </h2>
             <p className="mt-1.5 font-body text-sm text-muted-foreground max-w-md">
               Curadoria premium dos melhores imóveis à venda em Porto Alegre

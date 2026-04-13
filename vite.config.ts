@@ -38,10 +38,12 @@ export default defineConfig(({ mode }) => ({
         chunkFileNames: "assets/[name]-[hash].js",
         entryFileNames: "assets/[name]-[hash].js",
         manualChunks(id) {
-          // Mapbox — chunk isolado, carregado apenas quando mapa é exibido
           if (id.includes("mapbox-gl")) return "mapbox-gl";
-          // Recharts + D3 — só usado em admin
           if (id.includes("node_modules/recharts") || id.includes("node_modules/d3-") || id.includes("node_modules/victory-")) return "charts";
+          if (id.includes("node_modules/framer-motion")) return "framer";
+          if (id.includes("node_modules/@radix-ui")) return "radix-ui";
+          if (id.includes("node_modules/@tanstack")) return "tanstack";
+          if (id.includes("node_modules/@supabase") || id.includes("node_modules/@lovable.dev")) return "supabase";
         },
       },
     },

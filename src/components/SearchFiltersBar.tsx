@@ -270,7 +270,15 @@ export function SearchFiltersBar({ onOpenMobileFilters, onOpenAdvancedFilters }:
               />
             </span>
           ))}
-          <input
+          {filters.q && (
+            <span className="flex items-center gap-1 rounded-full bg-accent/60 px-2.5 py-0.5 font-body text-[12px] font-medium text-foreground">
+              🔍 {filters.q}
+              <X
+                className="h-3 w-3 cursor-pointer opacity-60 hover:opacity-100"
+                onClick={(e) => { e.stopPropagation(); setFilter("q", ""); }}
+              />
+            </span>
+          )}
             ref={inputRef}
             type="text"
             value={bairroInput}

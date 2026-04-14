@@ -1,41 +1,41 @@
 
 
-## Plano: Corrigir 3 problemas de filtros e área
+## Plano: Auto-zoom do mapa ao filtrar por bairro ou collection
 
-### Problema 1: "Casa em Condomínio" sem resultados
-O banco de dados só tem `tipo = "casa"` (6.891 imóveis). Não existe `"casa em condominio"` como tipo separado. Quando o filtro usa `eq("tipo", "casa em condominio")`, nada aparece.
+### Problema
+Quando o usuário filtra por bairro ou ativa a Collection, os **pins já são filtrados corretamente** no mapa, mas o mapa **não faz zoom para enquadrar** os pins filtrados — ele continua mostrando a visão geral de Porto Alegre.
 
-**Solução**: Remover "Casa em Condomínio" da lista `propertyTypes` em `src/data/properties.ts`. Manter apenas "Casa" que já cobre todos os imóveis do tipo casa. Caso no futuro o Jetimob envie esse tipo, ele será mapeado automaticamente.
+### Solução
 
-**Arquivo**: `src/data/properties.ts` — remover a linha `{ value: "casa em condominio", label: "Casa em Condomínio" }`
+**1. Adicionar prop `fitToPins` no `SearchMap`**
+- Nova prop booleana opcional que, quando `true`, faz o mapa executar `fitBounds` automaticamente sempre que os pins mudarem.
+- No `useEffect` que atualiza o GeoJSON dos pins (linha ~626), após `setData`, calcular o bounding box dos pins e chamar `map.fitBounds(bounds, { padding: 60, maxZoom: 15 })`.
+- Só executar o fitBounds quando há pins (>0) e a prop está ativa.
 
----
+**2. Ativar `fitToPins` no `Search.tsx` quando há filtro de localização ou collection**
+- Computar uma variável `shouldFitMap` baseada em:
+  - `filters.bairro` não vazio
+  - `filters.destaque === true` (collection)
+  - `filters.condominio` não vazio
+- Passar `fitToPins={shouldFitMap}` ao `<SearchMap>`.
 
-### Problema 2: Características/Diferenciais não funcionam
-Todos os 25.325 imóveis disponíveis têm `diferenciais = []` (array vazio). O Jetimob não está populando esse campo. O filtro `.contains("diferenciais", [...])` sempre retorna 0 resultados.
+**3. Lógica de fitBounds no SearchMap**
+- Dentro do effect de atualização de pins (~linha 626-645):
+  ```
+  if (fitToPins && pins.length > 0) {
+    const lngs = pins.map(p => Number(p.longitude));
+    const lats = pins.map(p => Number(p.latitude));
+    const sw = [Math.min(...lngs), Math.min(...lats)];
+    const ne = [Math.max(...lngs), Math.max(...lats)];
+    map.fitBounds([sw, ne], { padding: 60, maxZoom: 15, duration: 800 });
+  }
+  ```
+- Usar um ref para evitar re-fit a cada micro-atualização (só fitar quando a lista de pins muda significativamente, ex: o set de IDs muda).
 
-**Solução**: Ocultar temporariamente a seção "Características" dos filtros até que o campo seja populado pelo sync. Isso evita confusão do usuário.
+### Arquivos modificados
+- `src/components/SearchMap.tsx` — nova prop + lógica fitBounds
+- `src/pages/Search.tsx` — computar `shouldFitMap` e passar como prop
 
-**Arquivos**:
-- `src/components/AdvancedFiltersModal.tsx` — envolver a seção de Características em um condicional que só mostra se houver dados (ou comentar/remover temporariamente)
-- `src/components/MobileFiltersSheet.tsx` — mesmo tratamento na seção de diferenciais
-
----
-
-### Problema 3: Mostrar área privativa (area_util) ao invés de área total
-O banco tem `area_util` para 23k imóveis e `area_total` para 23k. Muitas vezes são diferentes (ex: 616m² total vs 175m² útil). Atualmente mostra `area_total` primeiro.
-
-**Solução**: Priorizar `area_util` (área privativa) nos cards de listagem. Na página de detalhe, mostrar ambas separadamente quando disponíveis.
-
-**Arquivos**:
-- `src/components/SearchPropertyCard.tsx` — trocar a linha `const area = imovel.area_total ?? imovel.area_util ?? 0` para `const area = imovel.area_util ?? imovel.area_total ?? 0` e ajustar o label para "m² priv." quando usar area_util
-- `src/services/imoveis.ts` — adicionar `area_util` ao `LISTING_COLUMNS` para que esteja disponível nos cards
-- `src/pages/PropertyDetail.tsx` — mostrar ambas as áreas separadamente (área privativa e área total) quando ambas existirem
-
----
-
-### Validação
-- Build dev para confirmar sem erros
-- Testar filtro "Casa" retornando resultados
-- Confirmar que seção Características não aparece nos filtros
+### Build fix incluído
+- Corrigir o import de `Collection.tsx` em `lazyPages.ts` removendo a extensão `.tsx` que causa falha no Rollup, ou verificar que o arquivo existe no path correto.
 

@@ -126,9 +126,10 @@ interface SearchMapProps {
   onBoundsChange?: (bounds: { lat_min: number; lat_max: number; lng_min: number; lng_max: number }) => void;
   onDrawFilter?: (filteredPins: MapPinData[]) => void;
   onPertoDeVoce?: () => void;
+  fitToPins?: boolean;
 }
 
-export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, onBoundsChange, onDrawFilter, onPertoDeVoce }: SearchMapProps) {
+export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, onBoundsChange, onDrawFilter, onPertoDeVoce, fitToPins = false }: SearchMapProps) {
   const navigate = useNavigate();
   const { prefixLink } = useCorretor();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -623,6 +624,8 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
 
 
 
+  const lastFitIdsRef = useRef<string>("");
+
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReadyRef.current) return;
@@ -632,17 +635,35 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
 
     const geojson = toGeoJSON(pins);
 
+    const doFit = () => {
+      if (fitToPins && pins.length > 0) {
+        const idsKey = pins.map(p => p.id).sort().join(",");
+        if (idsKey !== lastFitIdsRef.current) {
+          lastFitIdsRef.current = idsKey;
+          const lngs = pins.map(p => Number(p.longitude));
+          const lats = pins.map(p => Number(p.latitude));
+          const sw: [number, number] = [Math.min(...lngs), Math.min(...lats)];
+          const ne: [number, number] = [Math.max(...lngs), Math.max(...lats)];
+          map.fitBounds([sw, ne], { padding: 60, maxZoom: 15, duration: 800 });
+        }
+      } else if (!fitToPins) {
+        lastFitIdsRef.current = "";
+      }
+    };
+
     if ("requestIdleCallback" in window) {
       const id = requestIdleCallback(() => {
         source.setData(geojson);
+        doFit();
       }, { timeout: 500 });
       return () => cancelIdleCallback(id);
     } else {
       requestAnimationFrame(() => {
         source.setData(geojson);
+        doFit();
       });
     }
-  }, [pins]);
+  }, [pins, fitToPins]);
 
   // Hover from card → highlight pin
   useEffect(() => {

@@ -925,7 +925,7 @@ const Search = () => {
         {!isMobile && (
           <div className="relative hidden w-[45%] shrink-0 border-l border-border lg:block overflow-hidden">
             <Suspense fallback={<div className="flex h-full w-full items-center justify-center bg-muted"><div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" /></div>}>
-              <SearchMap pins={mapPins} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} onBoundsChange={handleMapBoundsChange} onPertoDeVoce={handlePertoDeVoce} />
+              <SearchMap pins={mapPins} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} onBoundsChange={handleMapBoundsChange} onPertoDeVoce={handlePertoDeVoce} fitToPins={!!(filters.bairro || filters.destaque || filters.condominio)} />
             </Suspense>
           </div>
         )}
@@ -966,7 +966,7 @@ const Search = () => {
               Voltar à lista
             </button>
             <Suspense fallback={<div className="flex h-full w-full items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" /></div>}>
-              <SearchMap pins={mapPins} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} onBoundsChange={handleMapBoundsChange} onPertoDeVoce={handlePertoDeVoce} />
+              <SearchMap pins={mapPins} hoveredId={hoveredId} onPinHover={setHoveredId} onBoundsSearch={handleBoundsSearch} onBoundsChange={handleMapBoundsChange} onPertoDeVoce={handlePertoDeVoce} fitToPins={!!(filters.bairro || filters.destaque || filters.condominio)} />
             </Suspense>
           </motion.div>
         )}

@@ -27,13 +27,13 @@ export default defineConfig(({ mode }) => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
-    // Prevent duplicate React instances across chunks (fixes __SECRET_INTERNALS error)
+    // Prevent duplicate React instances across chunks
     dedupe: ["react", "react-dom", "react-router-dom"],
   },
   build: {
     target: "es2020",
     cssCodeSplit: true,
-    chunkSizeWarningLimit: 800,
+    chunkSizeWarningLimit: 1200,
     sourcemap: false,
     rollupOptions: {
       output: {
@@ -41,20 +41,21 @@ export default defineConfig(({ mode }) => ({
         chunkFileNames: "assets/[name]-[hash].js",
         entryFileNames: "assets/[name]-[hash].js",
         manualChunks(id) {
-          // React ecosystem - ALL react packages in one chunk to avoid duplicate instances
+          // React ecosystem + charts in ONE chunk to avoid circular dependency
+          // recharts/d3 use React internals, so they MUST be in the same chunk as React
           if (
             id.includes("node_modules/react/") ||
             id.includes("node_modules/react-dom") ||
             id.includes("node_modules/react-router") ||
             id.includes("node_modules/react-router-dom") ||
-            id.includes("node_modules/scheduler/")
+            id.includes("node_modules/scheduler/") ||
+            id.includes("node_modules/recharts") ||
+            id.includes("node_modules/d3-") ||
+            id.includes("node_modules/victory-")
           ) return "react-vendor";
 
           // Mapbox - already lazy loaded but heavy
           if (id.includes("mapbox-gl")) return "mapbox-gl";
-
-          // Charts - heavy library
-          if (id.includes("node_modules/recharts") || id.includes("node_modules/d3-") || id.includes("node_modules/victory-")) return "charts";
 
           // Animation
           if (id.includes("node_modules/framer-motion")) return "framer";

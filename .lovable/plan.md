@@ -1,27 +1,50 @@
 
+Objetivo
 
-## Plan: Fix Persistent Build Failure
+Corrigir o blocker de build sem mexer na lógica das páginas.
 
-**Root cause:** `Collection.tsx` and `PortoAlegrePilar.tsx` are eager-imported in `lazyPages.ts`, creating a hard compile-time dependency. The publish build environment consistently can't resolve these files, even though they exist in the sandbox. This has been failing for over a day.
+Diagnóstico
 
-**Fix:** Convert the two eager imports to lazy imports using `lazyRetry()` — the same pattern used for all 40+ other pages. This makes the dependency runtime-only, so the build succeeds even if there's a file sync delay.
+1. `src/pages/Collection.tsx` e `src/pages/PortoAlegrePilar.tsx` existem no projeto.
+2. `AppRoutes.tsx` consome essas páginas apenas via `src/routes/lazyPages.ts`.
+3. O erro está isolado nas duas linhas atuais de `lazyPages.ts`:
+   ```ts
+   export const Collection = lazyRetry(() => import("../pages/Collection.tsx"));
+   export const PortoAlegrePilar = lazyRetry(() => import("../pages/PortoAlegrePilar.tsx"));
+   ```
+4. A implementação atual entra em conflito com a convenção já usada no projeto para rotas-chave: `/collection` e `/imoveis-porto-alegre` devem ficar em import estático/eager para evitar falhas de resolução no publish.
+5. O aviso do Browserslist não é a causa do build failure; é apenas manutenção pendente.
 
-### Changes
+Plano de implementação
 
-**`src/routes/lazyPages.ts`** (lines 3-6):
-```typescript
-// Before (eager - breaks publish build):
-export { default as Index } from "../pages/Index.tsx";
-export { default as Collection } from "../pages/Collection.tsx";
-export { default as PortoAlegrePilar } from "../pages/PortoAlegrePilar.tsx";
+1. Em `src/routes/lazyPages.ts`, reverter somente `Collection` e `PortoAlegrePilar` para export estático com caminho explícito:
+   ```ts
+   export { default as Collection } from "../pages/Collection.tsx";
+   export { default as PortoAlegrePilar } from "../pages/PortoAlegrePilar.tsx";
+   ```
+2. Manter `Index` eager e todas as demais rotas com `lazyRetry`, sem alterar a arquitetura do restante das páginas.
+3. Corrigir o comentário do topo de `lazyPages.ts` para refletir a regra real:
+   - homepage eager
+   - `/collection` e `/imoveis-porto-alegre` eager
+   - restante lazy
+4. Não alterar `AppRoutes.tsx`, porque a API exportada por `lazyPages.ts` continuará igual.
+5. Validar em sequência:
+   - `npm run build`
+   - `npm run build:dev`
+   - abrir `/collection` e `/imoveis-porto-alegre` no preview para confirmar carregamento, cards, favoritos e navegação
 
-// After (only Index stays eager, others become lazy):
-export { default as Index } from "../pages/Index.tsx";
-export const Collection = lazyRetry(() => import("../pages/Collection.tsx"));
-export const PortoAlegrePilar = lazyRetry(() => import("../pages/PortoAlegrePilar.tsx"));
+Fallback se ainda houver falha no publish
+
+Se a resolução relativa continuar instável, trocar apenas esses 2 imports para alias explícito no topo do arquivo e reexportar:
+```ts
+import Collection from "@/pages/Collection.tsx";
+import PortoAlegrePilar from "@/pages/PortoAlegrePilar.tsx";
+
+export { Collection, PortoAlegrePilar };
 ```
 
-No other files need changes — `AppRoutes.tsx` already wraps everything in `<Suspense>`.
+Resultado esperado
 
-**Impact:** Slightly slower first load for `/collection` and `/imoveis-porto-alegre` (lazy chunk fetch), but eliminates the build blocker entirely. All other pages already use this pattern.
-
+- remover o erro `Could not resolve "../pages/Collection.tsx"`
+- não alterar UI nem lógica de filtros/favoritos
+- separar o warning do Browserslist do blocker real de build

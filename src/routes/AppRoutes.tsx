@@ -13,6 +13,7 @@ import {
   AdminSync,
   Anunciar,
   AvaliacaoPage,
+  Collection,
   Bairro,
   Bairros,
   Blog,

@@ -29,8 +29,8 @@ export const SeoLanding = lazyRetry(() => import("../pages/SeoLanding.tsx"));
 export const Vitrine = lazyRetry(() => import("../pages/Vitrine.tsx"));
 export const Sobre = lazyRetry(() => import("../pages/Sobre.tsx"));
 export const GuiaBairros = lazyRetry(() => import("../pages/GuiaBairros.tsx"));
-export const Collection = lazyRetry(() => import("../pages/Collection.tsx"));
-export const PortoAlegrePilar = lazyRetry(() => import("../pages/PortoAlegrePilar.tsx"));
+export { default as Collection } from "../pages/Collection.tsx";
+export { default as PortoAlegrePilar } from "../pages/PortoAlegrePilar.tsx";
 
 // Catch-all
 export const SeoOrNotFound = lazyRetry(() => import("../components/SeoOrNotFound.tsx"));

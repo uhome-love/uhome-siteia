@@ -9,7 +9,7 @@ import { useCanonical } from "@/hooks/useCanonical";
 
 // Lazy load below-fold sections
 const FeaturedNeighborhoods = lazy(() => import("../components/FeaturedNeighborhoods.tsx"));
-const FeaturedProperties = lazy(() => import("../components/FeaturedProperties.tsx").then(m => ({ default: m.FeaturedProperties })));
+
 const EmpreendimentosDestaque = lazy(() => import("../components/EmpreendimentosDestaque.tsx").then(m => ({ default: m.EmpreendimentosDestaque })));
 const PorQueUhome = lazy(() => import("../components/PorQueUhome.tsx").then(m => ({ default: m.PorQueUhome })));
 const SeoLinksSection = lazy(() => import("../components/SeoLinksSection.tsx").then(m => ({ default: m.SeoLinksSection })));
@@ -54,7 +54,7 @@ const Index = () => {
         <Suspense fallback={null}>
           <EmpreendimentosDestaque />
           <FeaturedNeighborhoods />
-          <FeaturedProperties />
+          
           <PorQueUhome />
           <SeoLinksSection />
           <HomeFaqSection faqs={HOME_FAQS} />

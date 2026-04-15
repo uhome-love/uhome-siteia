@@ -37,10 +37,6 @@ function getBaseBadges(imovel: Imovel): SmartBadge[] {
     badges.push({ label: "Novo", style: "novo-imovel" });
   }
 
-  // Collection (admin-curated)
-  if (imovel.destaque) {
-    badges.push({ label: "Collection", style: "destaque", icon: <Gem className="h-3 w-3" /> });
-  }
 
   // Novidade — using real jetimob registration date (now in publicado_em)
   if (imovel.publicado_em) {

@@ -176,7 +176,7 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
   if (filters.quartos) query = query.gte("quartos", filters.quartos);
   if (filters.banheiros) query = query.gte("banheiros", filters.banheiros);
   if (filters.vagas) query = query.gte("vagas", filters.vagas);
-  if (filters.destaque) query = query.eq("destaque", true);
+  
   if (filters.diferenciais?.length) query = query.contains("diferenciais", filters.diferenciais);
   if (filters.andarMin) query = query.gte("andar", filters.andarMin);
   if (filters.condominioMax) query = query.lte("preco_condominio", filters.condominioMax);
@@ -200,10 +200,6 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
     area_desc: { column: "area_total" as const, ascending: false },
   };
   const ordem = orderMap[filters.ordem ?? "recentes"];
-  // Collection items (destaque) always appear first in general search
-  if (!filters.destaque) {
-    query = query.order("destaque", { ascending: false, nullsFirst: false });
-  }
   query = query.order(ordem.column, { ascending: ordem.ascending });
 
   const limit = filters.limit ?? 20;
@@ -211,7 +207,7 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
   query = query.range(offset, offset + limit - 1);
 
   // Detect if advanced filters are active (not supported by count_imoveis RPC)
-  const hasAdvancedFilters = !!(filters.codigo || filters.andarMin || filters.condominioMax || filters.iptuMax || filters.diferenciais?.length || filters.condominio || filters.destaque);
+  const hasAdvancedFilters = !!(filters.codigo || filters.andarMin || filters.condominioMax || filters.iptuMax || filters.diferenciais?.length || filters.condominio);
 
   // Build count — either via RPC or via a parallel filtered count query
   const bairroStr = filters.bairro || undefined;

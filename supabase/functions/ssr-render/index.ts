@@ -947,14 +947,6 @@ function renderGuiaBairros() {
      <p>Porto Alegre conta com mais de 80 bairros, cada um com perfil, infraestrutura e faixa de preço distintos. Use nosso comparativo para analisar preço médio e quantidade de imóveis por bairro.</p>`);
 }
 
-function renderCollection() {
-  const title = "Uhome Collection — Imóveis Selecionados | Uhome";
-  const desc = "Conheça a Uhome Collection: imóveis selecionados a dedo pela nossa equipe. Curadoria premium dos melhores imóveis à venda em Porto Alegre.";
-  return html(title, desc, OG_DEFAULT, `${SITE}/collection`, [orgJsonLd()],
-    `<h1>Uhome Collection</h1><p>${esc(desc)}</p>
-     <h2>Imóveis selecionados</h2>
-     <p>Nossa equipe seleciona os melhores imóveis à venda em Porto Alegre, com curadoria especializada para garantir qualidade, localização e valor.</p>`);
-}
 
 async function renderEmpreendimentos() {
   const title = "Empreendimentos em Porto Alegre | Uhome";
@@ -1172,8 +1164,6 @@ Deno.serve(async (req) => {
       rendered = renderSobre();
     } else if (path === "/guia-bairros") {
       rendered = renderGuiaBairros();
-    } else if (path === "/collection") {
-      rendered = renderCollection();
     } else if (path.startsWith("/blog/")) {
       const slug = path.replace("/blog/", "").replace(/\/$/, "");
       rendered = await renderBlogPost(slug);

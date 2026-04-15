@@ -1,41 +1,27 @@
 
 
-## Plano: Auto-zoom do mapa ao filtrar por bairro ou collection
+## Plan: Fix Persistent Build Failure
 
-### Problema
-Quando o usuário filtra por bairro ou ativa a Collection, os **pins já são filtrados corretamente** no mapa, mas o mapa **não faz zoom para enquadrar** os pins filtrados — ele continua mostrando a visão geral de Porto Alegre.
+**Root cause:** `Collection.tsx` and `PortoAlegrePilar.tsx` are eager-imported in `lazyPages.ts`, creating a hard compile-time dependency. The publish build environment consistently can't resolve these files, even though they exist in the sandbox. This has been failing for over a day.
 
-### Solução
+**Fix:** Convert the two eager imports to lazy imports using `lazyRetry()` — the same pattern used for all 40+ other pages. This makes the dependency runtime-only, so the build succeeds even if there's a file sync delay.
 
-**1. Adicionar prop `fitToPins` no `SearchMap`**
-- Nova prop booleana opcional que, quando `true`, faz o mapa executar `fitBounds` automaticamente sempre que os pins mudarem.
-- No `useEffect` que atualiza o GeoJSON dos pins (linha ~626), após `setData`, calcular o bounding box dos pins e chamar `map.fitBounds(bounds, { padding: 60, maxZoom: 15 })`.
-- Só executar o fitBounds quando há pins (>0) e a prop está ativa.
+### Changes
 
-**2. Ativar `fitToPins` no `Search.tsx` quando há filtro de localização ou collection**
-- Computar uma variável `shouldFitMap` baseada em:
-  - `filters.bairro` não vazio
-  - `filters.destaque === true` (collection)
-  - `filters.condominio` não vazio
-- Passar `fitToPins={shouldFitMap}` ao `<SearchMap>`.
+**`src/routes/lazyPages.ts`** (lines 3-6):
+```typescript
+// Before (eager - breaks publish build):
+export { default as Index } from "../pages/Index.tsx";
+export { default as Collection } from "../pages/Collection.tsx";
+export { default as PortoAlegrePilar } from "../pages/PortoAlegrePilar.tsx";
 
-**3. Lógica de fitBounds no SearchMap**
-- Dentro do effect de atualização de pins (~linha 626-645):
-  ```
-  if (fitToPins && pins.length > 0) {
-    const lngs = pins.map(p => Number(p.longitude));
-    const lats = pins.map(p => Number(p.latitude));
-    const sw = [Math.min(...lngs), Math.min(...lats)];
-    const ne = [Math.max(...lngs), Math.max(...lats)];
-    map.fitBounds([sw, ne], { padding: 60, maxZoom: 15, duration: 800 });
-  }
-  ```
-- Usar um ref para evitar re-fit a cada micro-atualização (só fitar quando a lista de pins muda significativamente, ex: o set de IDs muda).
+// After (only Index stays eager, others become lazy):
+export { default as Index } from "../pages/Index.tsx";
+export const Collection = lazyRetry(() => import("../pages/Collection.tsx"));
+export const PortoAlegrePilar = lazyRetry(() => import("../pages/PortoAlegrePilar.tsx"));
+```
 
-### Arquivos modificados
-- `src/components/SearchMap.tsx` — nova prop + lógica fitBounds
-- `src/pages/Search.tsx` — computar `shouldFitMap` e passar como prop
+No other files need changes — `AppRoutes.tsx` already wraps everything in `<Suspense>`.
 
-### Build fix incluído
-- Corrigir o import de `Collection.tsx` em `lazyPages.ts` removendo a extensão `.tsx` que causa falha no Rollup, ou verificar que o arquivo existe no path correto.
+**Impact:** Slightly slower first load for `/collection` and `/imoveis-porto-alegre` (lazy chunk fetch), but eliminates the build blocker entirely. All other pages already use this pattern.
 

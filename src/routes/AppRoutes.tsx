@@ -77,6 +77,8 @@ export function AppRoutes() {
       <Route path="/coberturas-porto-alegre" element={<TipoImovel />} />
       <Route path="/studios-porto-alegre" element={<TipoImovel />} />
       <Route path="/comerciais-porto-alegre" element={<TipoImovel />} />
+      <Route path="/collection" element={<Collection />} />
+      <Route path="/imoveis-porto-alegre" element={<PortoAlegrePilar />} />
 
       <Route path="/c/:corretorSlug" element={<CorretorRefLayout />}>
         <Route index element={<Index />} />

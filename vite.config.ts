@@ -31,7 +31,7 @@ export default defineConfig(({ mode }) => ({
   build: {
     target: "es2020",
     cssCodeSplit: true,
-    chunkSizeWarningLimit: 600,
+    chunkSizeWarningLimit: 800,
     sourcemap: false,
     rollupOptions: {
       output: {
@@ -39,11 +39,29 @@ export default defineConfig(({ mode }) => ({
         chunkFileNames: "assets/[name]-[hash].js",
         entryFileNames: "assets/[name]-[hash].js",
         manualChunks(id) {
+          // Mapbox - already lazy loaded but heavy
           if (id.includes("mapbox-gl")) return "mapbox-gl";
+          
+          // Charts - heavy library
           if (id.includes("node_modules/recharts") || id.includes("node_modules/d3-") || id.includes("node_modules/victory-")) return "charts";
+          
+          // React ecosystem - separate from main bundle
+          if (id.includes("node_modules/react-dom") || id.includes("node_modules/react-router") || id.includes("node_modules/react-router-dom")) return "react-vendor";
+          
+          // Animation
           if (id.includes("node_modules/framer-motion")) return "framer";
+          
+          // UI libraries
           if (id.includes("node_modules/@radix-ui")) return "radix-ui";
+          if (id.includes("node_modules/lucide-react")) return "lucide-icons";
+          
+          // Data fetching & state
           if (id.includes("node_modules/@tanstack")) return "tanstack";
+          
+          // Date utilities
+          if (id.includes("node_modules/date-fns")) return "date-fns";
+          
+          // Backend integrations
           if (id.includes("node_modules/@supabase") || id.includes("node_modules/@lovable.dev")) return "supabase";
         },
       },

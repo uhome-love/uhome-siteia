@@ -2,8 +2,10 @@ import { lazyRetry } from "@/lib/lazyRetry";
 
 // Eager load homepage only
 export { default as Index } from "../pages/Index.tsx";
-export { default as Collection } from "../pages/Collection.tsx";
-export { default as PortoAlegrePilar } from "../pages/PortoAlegrePilar.tsx";
+
+// Key pages – lazy to avoid hard compile-time dependency
+export const Collection = lazyRetry(() => import("../pages/Collection.tsx"));
+export const PortoAlegrePilar = lazyRetry(() => import("../pages/PortoAlegrePilar.tsx"));
 
 // Secondary pages – lazy loaded
 

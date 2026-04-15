@@ -27,6 +27,7 @@ export default defineConfig(({ mode }) => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+    dedupe: ["react", "react-dom", "react-router-dom"],
   },
   build: {
     target: "es2020",
@@ -39,14 +40,15 @@ export default defineConfig(({ mode }) => ({
         chunkFileNames: "assets/[name]-[hash].js",
         entryFileNames: "assets/[name]-[hash].js",
         manualChunks(id) {
+          // React core — MUST be a single chunk to avoid duplicate instances
+          if (id.includes("node_modules/react/") || id.includes("node_modules/react-dom/")) return "react-vendor";
+          if (id.includes("node_modules/react-router")) return "react-vendor";
+          
           // Mapbox - already lazy loaded but heavy
           if (id.includes("mapbox-gl")) return "mapbox-gl";
           
           // Charts - heavy library
           if (id.includes("node_modules/recharts") || id.includes("node_modules/d3-") || id.includes("node_modules/victory-")) return "charts";
-          
-          // React ecosystem - separate from main bundle
-          if (id.includes("node_modules/react-dom") || id.includes("node_modules/react-router") || id.includes("node_modules/react-router-dom")) return "react-vendor";
           
           // Animation
           if (id.includes("node_modules/framer-motion")) return "framer";

@@ -30,6 +30,7 @@ import {
   IntegracaoDiagnostico,
   MegaCyrela,
   Onboarding,
+  PortoAlegrePilar,
   Privacidade,
   PropertyDetail,
   ResetPassword,

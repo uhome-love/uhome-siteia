@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
-import { Search, RotateCcw, MapPin, PenTool, Navigation, Sparkles, X, SlidersHorizontal, Gem } from "lucide-react";
+import { Search, RotateCcw, MapPin, PenTool, Navigation, Sparkles, X, SlidersHorizontal } from "lucide-react";
 import { useSearchStore } from "@/stores/searchStore";
 import { useCorretor } from "@/contexts/CorretorContext";
 import { FilterPill, PillOption } from "@/components/FilterPill";

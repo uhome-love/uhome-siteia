@@ -103,7 +103,7 @@ export interface BuscaFilters {
   banheiros?: number;
   vagas?: number;
   diferenciais?: string[];
-  destaque?: boolean;
+  
   ordem?: "recentes" | "preco_asc" | "preco_desc" | "area_desc";
   q?: string;
   codigo?: string;

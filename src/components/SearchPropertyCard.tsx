@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect, forwardRef } from "react";
 import { AuthModal } from "@/components/AuthModal";
-import { Heart, TrendingDown, Gem, Sparkles, Clock } from "lucide-react";
+import { Heart, TrendingDown, Sparkles, Clock } from "lucide-react";
 import { motion } from "framer-motion";
 import { type Imovel, fotoPrincipal, formatPreco } from "@/services/imoveis";
 import { FotoImovel } from "@/components/FotoImovel";

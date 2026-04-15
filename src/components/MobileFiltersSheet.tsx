@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { X, ArrowLeft, Search, MapPin, Navigation, Clock, Hash, Building2, Gem } from "lucide-react";
+import { X, ArrowLeft, Search, MapPin, Navigation, Clock, Hash, Building2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSearchStore } from "@/stores/searchStore";
 import { propertyTypes, featureOptions } from "@/data/properties";

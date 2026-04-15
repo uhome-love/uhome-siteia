@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
-import { Search, RotateCcw, MapPin, PenTool, Navigation, Sparkles, X, SlidersHorizontal, Gem } from "lucide-react";
+import { Search, RotateCcw, MapPin, PenTool, Navigation, Sparkles, X, SlidersHorizontal } from "lucide-react";
 import { useSearchStore } from "@/stores/searchStore";
 import { useCorretor } from "@/contexts/CorretorContext";
 import { FilterPill, PillOption } from "@/components/FilterPill";
@@ -373,18 +373,6 @@ export function SearchFiltersBar({ onOpenMobileFilters, onOpenAdvancedFilters }:
         )}
       </div>
 
-      {/* Uhome Collection */}
-      <button
-        onClick={() => setFilter("destaque", !filters.destaque)}
-        className={`flex items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2 font-body text-[13px] font-semibold transition-all ${
-          filters.destaque
-            ? "bg-primary text-primary-foreground shadow-sm"
-            : "border border-border bg-background text-muted-foreground hover:border-primary hover:text-primary"
-        }`}
-      >
-        <Gem className="h-3.5 w-3.5" />
-        Collection
-      </button>
 
       {/* Cidade */}
       <FilterPill

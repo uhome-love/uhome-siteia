@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { X, ArrowLeft, Search, MapPin, Navigation, Clock, Hash, Building2, Gem } from "lucide-react";
+import { X, ArrowLeft, Search, MapPin, Navigation, Clock, Hash, Building2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSearchStore } from "@/stores/searchStore";
 import { propertyTypes, featureOptions } from "@/data/properties";
@@ -258,21 +258,6 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
             </div>
 
             <div className="px-5 pb-32">
-              {/* Uhome Collection */}
-              <section className="mt-4">
-                <button
-                  onClick={() => setFilter("destaque", !filters.destaque)}
-                  className={`flex w-full items-center gap-3 rounded-xl px-4 py-3.5 font-body text-sm font-semibold transition-colors ${
-                    filters.destaque
-                      ? "border-[1.5px] border-primary bg-primary/10 text-primary"
-                      : "border border-border bg-background text-foreground"
-                  }`}
-                >
-                  <Gem className="h-5 w-5 shrink-0" />
-                  Uhome Collection
-                  {filters.destaque && <span className="ml-auto text-xs">✓</span>}
-                </button>
-              </section>
 
               {/* Localização */}
               <section className="mt-6">

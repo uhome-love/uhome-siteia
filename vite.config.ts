@@ -27,6 +27,7 @@ export default defineConfig(({ mode }) => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+    // Prevent duplicate React instances across chunks (fixes __SECRET_INTERNALS error)
     dedupe: ["react", "react-dom", "react-router-dom"],
   },
   build: {
@@ -40,29 +41,34 @@ export default defineConfig(({ mode }) => ({
         chunkFileNames: "assets/[name]-[hash].js",
         entryFileNames: "assets/[name]-[hash].js",
         manualChunks(id) {
-          // React core — MUST be a single chunk to avoid duplicate instances
-          if (id.includes("node_modules/react/") || id.includes("node_modules/react-dom/")) return "react-vendor";
-          if (id.includes("node_modules/react-router")) return "react-vendor";
-          
+          // React ecosystem - ALL react packages in one chunk to avoid duplicate instances
+          if (
+            id.includes("node_modules/react/") ||
+            id.includes("node_modules/react-dom") ||
+            id.includes("node_modules/react-router") ||
+            id.includes("node_modules/react-router-dom") ||
+            id.includes("node_modules/scheduler/")
+          ) return "react-vendor";
+
           // Mapbox - already lazy loaded but heavy
           if (id.includes("mapbox-gl")) return "mapbox-gl";
-          
+
           // Charts - heavy library
           if (id.includes("node_modules/recharts") || id.includes("node_modules/d3-") || id.includes("node_modules/victory-")) return "charts";
-          
+
           // Animation
           if (id.includes("node_modules/framer-motion")) return "framer";
-          
+
           // UI libraries
           if (id.includes("node_modules/@radix-ui")) return "radix-ui";
           if (id.includes("node_modules/lucide-react")) return "lucide-icons";
-          
+
           // Data fetching & state
           if (id.includes("node_modules/@tanstack")) return "tanstack";
-          
+
           // Date utilities
           if (id.includes("node_modules/date-fns")) return "date-fns";
-          
+
           // Backend integrations
           if (id.includes("node_modules/@supabase") || id.includes("node_modules/@lovable.dev")) return "supabase";
         },

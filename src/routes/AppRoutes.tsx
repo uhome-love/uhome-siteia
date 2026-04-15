@@ -13,6 +13,7 @@ import {
   AdminSync,
   Anunciar,
   AvaliacaoPage,
+  Collection,
   Bairro,
   Bairros,
   Blog,
@@ -29,6 +30,7 @@ import {
   IntegracaoDiagnostico,
   MegaCyrela,
   Onboarding,
+  PortoAlegrePilar,
   Privacidade,
   PropertyDetail,
   ResetPassword,
@@ -75,6 +77,8 @@ export function AppRoutes() {
       <Route path="/coberturas-porto-alegre" element={<TipoImovel />} />
       <Route path="/studios-porto-alegre" element={<TipoImovel />} />
       <Route path="/comerciais-porto-alegre" element={<TipoImovel />} />
+      <Route path="/collection" element={<Collection />} />
+      <Route path="/imoveis-porto-alegre" element={<PortoAlegrePilar />} />
 
       <Route path="/c/:corretorSlug" element={<CorretorRefLayout />}>
         <Route index element={<Index />} />
@@ -96,6 +100,7 @@ export function AppRoutes() {
         <Route path="guia-bairros" element={<GuiaBairros />} />
         <Route path="avaliar-imovel" element={<AvaliacaoPage />} />
         <Route path="vitrine/:id" element={<Vitrine />} />
+        <Route path="collection" element={<Collection />} />
       </Route>
 
       <Route path="/admin" element={<AdminLayout />}>

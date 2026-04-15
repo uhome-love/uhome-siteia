@@ -514,37 +514,6 @@ export async function fetchImovelBySlug(slug: string): Promise<Imovel | null> {
   }
 }
 
-export async function fetchImoveisDestaque(limit = 6): Promise<Imovel[]> {
-  const { data, error } = await supabase
-    .from("imoveis")
-    .select(LISTING_COLUMNS)
-    .eq("destaque", true)
-    .eq("status", "disponivel")
-    .not("fotos", "is", null)
-    .neq("fotos", "[]")
-    .in("cidade", CIDADES_PERMITIDAS)
-    .order("publicado_em", { ascending: false })
-    .limit(limit);
-
-  if (error) throw error;
-  const result = (data || []).map(mapRow);
-
-  // If no featured, return latest
-  if (result.length === 0) {
-    const { data: fallback } = await supabase
-      .from("imoveis")
-      .select(LISTING_COLUMNS)
-      .eq("status", "disponivel")
-      .not("fotos", "is", null)
-      .neq("fotos", "[]")
-      .in("cidade", CIDADES_PERMITIDAS)
-      .order("publicado_em", { ascending: false })
-      .limit(limit);
-    return (fallback || []).map(mapRow);
-  }
-
-  return result;
-}
 
 export async function syncFromJetimob(): Promise<{
   inseridos: number;

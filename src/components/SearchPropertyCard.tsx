@@ -17,7 +17,7 @@ interface Props {
   toggleFavorito?: (id: string) => Promise<"needs_auth" | void>;
 }
 
-type BadgeStyle = "novo" | "exclusivo" | "visto" | "otimo-preco" | "oportunidade" | "destaque" | "em-obras" | "lancamento" | "novo-imovel";
+type BadgeStyle = "novo" | "exclusivo" | "visto" | "otimo-preco" | "oportunidade" | "em-obras" | "lancamento" | "novo-imovel";
 
 interface SmartBadge {
   label: string;
@@ -57,7 +57,7 @@ function getBaseBadges(imovel: Imovel): SmartBadge[] {
 
 const badgeClasses: Record<BadgeStyle, string> = {
   novo: "bg-primary/90 text-primary-foreground font-semibold shadow-sm",
-  destaque: "bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-semibold shadow-sm",
+  
   exclusivo: "bg-foreground text-background font-semibold shadow-sm",
   visto: "bg-white/90 text-foreground font-semibold shadow-sm backdrop-blur-sm",
   "otimo-preco": "bg-white/95 text-primary font-bold shadow-sm backdrop-blur-sm border border-primary/20",

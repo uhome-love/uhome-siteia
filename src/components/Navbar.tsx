@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
-import { Menu, X, Sparkles, BarChart3, Building2, MapPin, HelpCircle, Megaphone, Gem } from "lucide-react";
+import { Menu, X, Sparkles, BarChart3, Building2, MapPin, HelpCircle, Megaphone } from "lucide-react";
 
 import { UhomeLogo } from "@/components/UhomeLogo";
 import { UserMenu } from "@/components/UserMenu";
@@ -18,36 +18,36 @@ export function Navbar() {
 
   const handlePrefetchBusca = useCallback(() => {
     prefetchBusca(queryClient);
-    // Preload the Search page chunk so navigation is instant
     import("../pages/Search");
   }, [queryClient]);
 
   useEffect(() => {
-    const check = () => setBannerVisible(!!document.getElementById('banner-corretor-spacer'));
+    const check = () => setBannerVisible(!!document.getElementById("banner-corretor-spacer"));
     check();
-    window.addEventListener('corretor-ref-ready', check);
+    window.addEventListener("corretor-ref-ready", check);
     const t = setTimeout(check, 2000);
-    return () => { window.removeEventListener('corretor-ref-ready', check); clearTimeout(t); };
+    return () => {
+      window.removeEventListener("corretor-ref-ready", check);
+      clearTimeout(t);
+    };
   }, [location.pathname]);
 
-  // Close mobile menu on route change
-  useEffect(() => { setMobileOpen(false); }, [location.pathname]);
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [location.pathname]);
 
   const isSearchPage = location.pathname === "/busca" || location.pathname.endsWith("/busca");
   const modoIA = searchParams.get("modo") === "ia";
 
   return (
-    <nav className={`fixed left-0 right-0 z-50 border-b border-border/40 bg-background backdrop-blur-lg ${bannerVisible ? 'top-10' : 'top-0'}`}>
+    <nav className={`fixed left-0 right-0 z-50 border-b border-border/40 bg-background backdrop-blur-lg ${bannerVisible ? "top-10" : "top-0"}`}>
       <div className="relative flex h-14 w-full items-center justify-between px-6 sm:px-8 lg:px-10">
-        {/* LEFT — Logo */}
         <Link to={prefixLink("/")} className="flex flex-shrink-0 items-center">
           <UhomeLogo variant="full" height={24} />
         </Link>
 
-        {/* CENTER — Navigation */}
         <div className="absolute inset-x-0 hidden items-center justify-center lg:flex pointer-events-none">
           <div className="flex items-center gap-1 pointer-events-auto">
-            {/* Mode pills */}
             <div className="flex items-center rounded-full border border-border/60 bg-secondary/50 p-[3px]">
               <Link
                 to={prefixLink("/busca?finalidade=venda")}
@@ -74,17 +74,8 @@ export function Navbar() {
               </Link>
             </div>
 
-            {/* Divider */}
             <div className="mx-2 h-4 w-px bg-border" />
 
-            {/* Value links */}
-            <Link
-              to={prefixLink("/collection")}
-              className="flex items-center gap-1.5 rounded-full px-3 py-1.5 font-body text-[13px] font-medium text-primary transition-colors hover:bg-primary/5"
-            >
-              <Gem className="h-3 w-3" />
-              Collection
-            </Link>
             <Link
               to={prefixLink("/avaliar-imovel")}
               className="rounded-full px-3 py-1.5 font-body text-[13px] font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
@@ -100,7 +91,6 @@ export function Navbar() {
           </div>
         </div>
 
-        {/* RIGHT — CTAs + Auth */}
         <div className="hidden items-center gap-2 lg:flex flex-shrink-0">
           <Link
             to={prefixLink("/anunciar")}
@@ -111,7 +101,6 @@ export function Navbar() {
           <UserMenu />
         </div>
 
-        {/* MOBILE — hamburger + user */}
         <div className="ml-auto flex items-center gap-2 lg:hidden">
           <UserMenu />
           <button
@@ -124,88 +113,76 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Mobile menu */}
       {mobileOpen && (
-          <div
-            className="overflow-hidden border-t border-border bg-background lg:hidden animate-in fade-in slide-in-from-top-2 duration-200"
-          >
-            <div className="flex flex-col gap-1 px-6 py-5">
-              {/* Mode pills */}
-              <div className="mb-3 flex items-center gap-1 self-start rounded-full bg-secondary/80 p-[3px]">
-                <Link
-                  to={prefixLink("/busca?finalidade=venda")}
-                  onClick={() => setMobileOpen(false)}
-                  className={`rounded-full px-4 py-2 font-body text-sm font-semibold transition-all ${
-                    isSearchPage && !modoIA
-                      ? "bg-foreground text-background shadow-sm"
-                      : "text-muted-foreground"
-                  }`}
-                >
-                  Comprar
-                </Link>
-                <Link
-                  to={prefixLink("/busca?modo=ia")}
-                  onClick={() => setMobileOpen(false)}
-                  className={`flex items-center gap-1.5 rounded-full px-4 py-2 font-body text-sm font-semibold transition-all ${
-                    isSearchPage && modoIA
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "text-muted-foreground"
-                  }`}
-                >
-                  <Sparkles className="h-3.5 w-3.5" />
-                  Busca IA
-                </Link>
-              </div>
-
-              <div className="my-1 h-px bg-border/60" />
-
-              {/* Links */}
-              <MobileNavLink
-                to={prefixLink("/avaliar-imovel")}
-                icon={<BarChart3 className="h-4 w-4" />}
-                label="Quanto vale meu imóvel?"
-                accent
-                onClick={() => setMobileOpen(false)}
-              />
-              <MobileNavLink
-                to={prefixLink("/collection")}
-                icon={<Gem className="h-4 w-4" />}
-                label="Uhome Collection"
-                accent
-                onClick={() => setMobileOpen(false)}
-              />
-              <MobileNavLink
-                to={prefixLink("/bairros")}
-                icon={<MapPin className="h-4 w-4" />}
-                label="Bairros"
-                onClick={() => setMobileOpen(false)}
-              />
-              <MobileNavLink
-                to={prefixLink("/condominios")}
-                icon={<Building2 className="h-4 w-4" />}
-                label="Condomínios"
-                onClick={() => setMobileOpen(false)}
-              />
-              <MobileNavLink
-                to={prefixLink("/faq")}
-                icon={<HelpCircle className="h-4 w-4" />}
-                label="Ajuda"
-                onClick={() => setMobileOpen(false)}
-              />
-
-              <div className="my-1 h-px bg-border/60" />
-
+        <div className="overflow-hidden border-t border-border bg-background lg:hidden animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="flex flex-col gap-1 px-6 py-5">
+            <div className="mb-3 flex items-center gap-1 self-start rounded-full bg-secondary/80 p-[3px]">
               <Link
-                to={prefixLink("/anunciar")}
+                to={prefixLink("/busca?finalidade=venda")}
                 onClick={() => setMobileOpen(false)}
-                className="mt-1 flex items-center justify-center gap-2 rounded-xl border border-primary/30 bg-primary/5 px-5 py-3 font-body text-sm font-semibold text-primary transition-colors hover:bg-primary hover:text-primary-foreground active:scale-[0.97]"
+                className={`rounded-full px-4 py-2 font-body text-sm font-semibold transition-all ${
+                  isSearchPage && !modoIA
+                    ? "bg-foreground text-background shadow-sm"
+                    : "text-muted-foreground"
+                }`}
               >
-                <Megaphone className="h-4 w-4" />
-                Anuncie seu imóvel
+                Comprar
+              </Link>
+              <Link
+                to={prefixLink("/busca?modo=ia")}
+                onClick={() => setMobileOpen(false)}
+                className={`flex items-center gap-1.5 rounded-full px-4 py-2 font-body text-sm font-semibold transition-all ${
+                  isSearchPage && modoIA
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground"
+                }`}
+              >
+                <Sparkles className="h-3.5 w-3.5" />
+                Busca IA
               </Link>
             </div>
+
+            <div className="my-1 h-px bg-border/60" />
+
+            <MobileNavLink
+              to={prefixLink("/avaliar-imovel")}
+              icon={<BarChart3 className="h-4 w-4" />}
+              label="Quanto vale meu imóvel?"
+              accent
+              onClick={() => setMobileOpen(false)}
+            />
+            <MobileNavLink
+              to={prefixLink("/bairros")}
+              icon={<MapPin className="h-4 w-4" />}
+              label="Bairros"
+              onClick={() => setMobileOpen(false)}
+            />
+            <MobileNavLink
+              to={prefixLink("/condominios")}
+              icon={<Building2 className="h-4 w-4" />}
+              label="Condomínios"
+              onClick={() => setMobileOpen(false)}
+            />
+            <MobileNavLink
+              to={prefixLink("/faq")}
+              icon={<HelpCircle className="h-4 w-4" />}
+              label="Ajuda"
+              onClick={() => setMobileOpen(false)}
+            />
+
+            <div className="my-1 h-px bg-border/60" />
+
+            <Link
+              to={prefixLink("/anunciar")}
+              onClick={() => setMobileOpen(false)}
+              className="mt-1 flex items-center justify-center gap-2 rounded-xl border border-primary/30 bg-primary/5 px-5 py-3 font-body text-sm font-semibold text-primary transition-colors hover:bg-primary hover:text-primary-foreground active:scale-[0.97]"
+            >
+              <Megaphone className="h-4 w-4" />
+              Anuncie seu imóvel
+            </Link>
           </div>
-        )}
+        </div>
+      )}
     </nav>
   );
 }

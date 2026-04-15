@@ -10,7 +10,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { BannerCorretor } from "@/components/BannerCorretor";
 import { PageFallback } from "@/components/PageFallback";
 import { AppRoutes } from "@/routes/AppRoutes";
-import { lazyRetry } from "@/lib/lazyRetry";
+import { lazyRetry } from "@/lib/lazyRetry"; // hmr-trigger
 
 const ExitIntentModal = lazyRetry(() => import("./components/ExitIntentModal.tsx").then((m) => ({ default: m.ExitIntentModal })));
 const FloatingWhatsApp = lazyRetry(() => import("./components/FloatingWhatsApp.tsx"));

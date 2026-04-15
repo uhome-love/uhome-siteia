@@ -1,9 +1,7 @@
 import { lazyRetry } from "@/lib/lazyRetry";
 
-// Eager load: homepage, collection, pillar page
+// Eager load: homepage
 export { default as Index } from "../pages/Index.tsx";
-export { default as Collection } from "../pages/Collection.tsx";
-export { default as PortoAlegrePilar } from "../pages/PortoAlegrePilar.tsx";
 
 // Secondary pages – lazy loaded
 

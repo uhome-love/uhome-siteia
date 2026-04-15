@@ -18,7 +18,6 @@ import {
   Blog,
   BlogPostPage,
   Carreiras,
-  Collection,
   CondominioDetail,
   Condominios,
   CorretorRefLayout,
@@ -30,7 +29,6 @@ import {
   IntegracaoDiagnostico,
   MegaCyrela,
   Onboarding,
-  PortoAlegrePilar,
   Privacidade,
   PropertyDetail,
   ResetPassword,
@@ -73,8 +71,6 @@ export function AppRoutes() {
       <Route path="/mega-cyrela" element={<MegaCyrela />} />
       <Route path="/sobre" element={<Sobre />} />
       <Route path="/guia-bairros" element={<GuiaBairros />} />
-      <Route path="/collection" element={<Collection />} />
-      <Route path="/imoveis-porto-alegre" element={<PortoAlegrePilar />} />
       <Route path="/casas-porto-alegre" element={<TipoImovel />} />
       <Route path="/coberturas-porto-alegre" element={<TipoImovel />} />
       <Route path="/studios-porto-alegre" element={<TipoImovel />} />
@@ -98,8 +94,6 @@ export function AppRoutes() {
         <Route path="mega-cyrela" element={<MegaCyrela />} />
         <Route path="sobre" element={<Sobre />} />
         <Route path="guia-bairros" element={<GuiaBairros />} />
-        <Route path="collection" element={<Collection />} />
-        <Route path="imoveis-porto-alegre" element={<PortoAlegrePilar />} />
         <Route path="avaliar-imovel" element={<AvaliacaoPage />} />
         <Route path="vitrine/:id" element={<Vitrine />} />
       </Route>

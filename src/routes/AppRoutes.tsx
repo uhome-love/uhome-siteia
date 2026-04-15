@@ -100,6 +100,7 @@ export function AppRoutes() {
         <Route path="guia-bairros" element={<GuiaBairros />} />
         <Route path="avaliar-imovel" element={<AvaliacaoPage />} />
         <Route path="vitrine/:id" element={<Vitrine />} />
+        <Route path="collection" element={<Collection />} />
       </Route>
 
       <Route path="/admin" element={<AdminLayout />}>

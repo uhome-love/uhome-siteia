@@ -100,6 +100,7 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
     filters.banheiros,
     filters.bairro,
     filters.areaMin || filters.areaMax,
+    filters.areaUtilMin || filters.areaUtilMax,
     filters.codigo,
     filters.condominio,
     filters.q,
@@ -446,9 +447,40 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
                 </div>
               </section>
 
-              {/* Área */}
+              {/* Área privativa (área útil) */}
               <section className="mt-8">
-                <p className="font-body text-base font-bold text-foreground">Área</p>
+                <p className="font-body text-base font-bold text-foreground">Área privativa</p>
+                <p className="mt-1 font-body text-xs text-muted-foreground">Área interna útil do imóvel</p>
+                <div className="mt-3 flex items-center gap-3">
+                  <div className="relative flex-1">
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="Mínimo"
+                      value={filters.areaUtilMin || ""}
+                      onChange={(e) => setFilter("areaUtilMin", Number(e.target.value.replace(/\D/g, "")) || 0)}
+                      className="w-full rounded-xl border border-border bg-background py-3.5 pl-4 pr-10 font-body text-base text-foreground outline-none transition-colors focus:border-primary"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 font-body text-base text-muted-foreground">m²</span>
+                  </div>
+                  <div className="relative flex-1">
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="Máximo"
+                      value={filters.areaUtilMax || ""}
+                      onChange={(e) => setFilter("areaUtilMax", Number(e.target.value.replace(/\D/g, "")) || 0)}
+                      className="w-full rounded-xl border border-border bg-background py-3.5 pl-4 pr-10 font-body text-base text-foreground outline-none transition-colors focus:border-primary"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 font-body text-base text-muted-foreground">m²</span>
+                  </div>
+                </div>
+              </section>
+
+              {/* Área total */}
+              <section className="mt-8">
+                <p className="font-body text-base font-bold text-foreground">Área total</p>
+                <p className="mt-1 font-body text-xs text-muted-foreground">Área total construída (inclui sacadas, garagem)</p>
                 <div className="mt-3 flex items-center gap-3">
                   <div className="relative flex-1">
                     <input

@@ -244,6 +244,9 @@ const Search = () => {
       const urlPrecoMin = searchParams.get("preco_min");
       const urlPrecoMax = searchParams.get("preco_max");
       const urlAreaMin = searchParams.get("area_min");
+      const urlAreaMax = searchParams.get("area_max");
+      const urlAreaUtilMin = searchParams.get("area_util_min");
+      const urlAreaUtilMax = searchParams.get("area_util_max");
       const urlCodigo = searchParams.get("codigo");
       const urlAndarMin = searchParams.get("andar_min");
       const urlCondominioMax = searchParams.get("condominio_max");
@@ -259,6 +262,9 @@ const Search = () => {
       if (urlPrecoMin) f.precoMin = Number(urlPrecoMin);
       if (urlPrecoMax) f.precoMax = Number(urlPrecoMax);
       if (urlAreaMin) f.areaMin = Number(urlAreaMin);
+      if (urlAreaMax) f.areaMax = Number(urlAreaMax);
+      if (urlAreaUtilMin) f.areaUtilMin = Number(urlAreaUtilMin);
+      if (urlAreaUtilMax) f.areaUtilMax = Number(urlAreaUtilMax);
       if (urlCodigo) f.codigo = urlCodigo;
       if (urlAndarMin) f.andarMin = Number(urlAndarMin);
       if (urlCondominioMax) f.condominioMax = Number(urlCondominioMax);
@@ -324,6 +330,8 @@ const Search = () => {
       precoMax: filters.precoMax || undefined,
       areaMin: filters.areaMin || undefined,
       areaMax: filters.areaMax || undefined,
+      areaUtilMin: filters.areaUtilMin || undefined,
+      areaUtilMax: filters.areaUtilMax || undefined,
       quartos: filters.quartos || undefined,
       banheiros: filters.banheiros || undefined,
       vagas: filters.vagas || undefined,
@@ -431,7 +439,7 @@ const Search = () => {
       .finally(() => setMapLoading(false));
     
     return () => { pinAbortRef.current?.abort(); };
-  }, [filters.tipo, filters.bairro, filters.precoMin, filters.precoMax, filters.quartos, filters.areaMin, filters.areaMax, filters.vagas, filters.banheiros, filters.andarMin, filters.condominioMax, filters.iptuMax, filters.diferenciais, filters.codigo, filters.fase]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [filters.tipo, filters.bairro, filters.precoMin, filters.precoMax, filters.quartos, filters.areaMin, filters.areaMax, filters.areaUtilMin, filters.areaUtilMax, filters.vagas, filters.banheiros, filters.andarMin, filters.condominioMax, filters.iptuMax, filters.diferenciais, filters.codigo, filters.fase]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadMore = useCallback(async () => {
     if (loadingMore || loading) return;
@@ -509,6 +517,9 @@ const Search = () => {
     if (filters.precoMin) params.set("preco_min", String(filters.precoMin));
     if (filters.precoMax) params.set("preco_max", String(filters.precoMax));
     if (filters.areaMin) params.set("area_min", String(filters.areaMin));
+    if (filters.areaMax) params.set("area_max", String(filters.areaMax));
+    if (filters.areaUtilMin) params.set("area_util_min", String(filters.areaUtilMin));
+    if (filters.areaUtilMax) params.set("area_util_max", String(filters.areaUtilMax));
     if (filters.codigo) params.set("codigo", filters.codigo);
     if (filters.andarMin) params.set("andar_min", String(filters.andarMin));
     if (filters.condominioMax) params.set("condominio_max", String(filters.condominioMax));
@@ -518,7 +529,7 @@ const Search = () => {
     const qs = params.toString();
     const basePath = prefixLink("/busca");
     window.history.replaceState(null, "", qs ? `${basePath}?${qs}` : basePath);
-  }, [filters.tipo, filters.bairro, filters.cidade, filters.quartos, filters.banheiros, filters.vagas, filters.precoMin, filters.precoMax, filters.areaMin, filters.q, filters.codigo, filters.andarMin, filters.condominioMax, filters.iptuMax, filters.diferenciais, filters.condominio, modoIA]);
+  }, [filters.tipo, filters.bairro, filters.cidade, filters.quartos, filters.banheiros, filters.vagas, filters.precoMin, filters.precoMax, filters.areaMin, filters.areaMax, filters.areaUtilMin, filters.areaUtilMax, filters.q, filters.codigo, filters.andarMin, filters.condominioMax, filters.iptuMax, filters.diferenciais, filters.condominio, modoIA]);
 
   // AI search handler with throttle
   const buscarComIA = useCallback(async (query?: string) => {
@@ -552,8 +563,10 @@ const Search = () => {
         cidade: "Porto Alegre",
         precoMin: f.preco_min || 0,
         precoMax: f.preco_max || 0,
-        areaMin: f.area_min || 0,
+        areaMin: 0,
         areaMax: 0,
+        areaUtilMin: f.area_util_min || f.area_min || 0,
+        areaUtilMax: 0,
         quartos: f.quartos || 0,
         banheiros: 0,
         vagas: 0,
@@ -571,7 +584,7 @@ const Search = () => {
         cidade: "Porto Alegre",
         precoMin: f.preco_min || undefined,
         precoMax: f.preco_max || undefined,
-        areaMin: f.area_min || undefined,
+        areaUtilMin: f.area_util_min || f.area_min || undefined,
         quartos: f.quartos || undefined,
       };
 

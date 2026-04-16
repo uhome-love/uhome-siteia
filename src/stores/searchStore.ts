@@ -13,8 +13,12 @@ export interface SearchFilters {
   cidade: string;
   precoMin: number;
   precoMax: number;
+  /** Total area (area_total). Kept as `areaMin`/`areaMax` for URL/AI backward compatibility. */
   areaMin: number;
   areaMax: number;
+  /** Private/usable area (area_util). */
+  areaUtilMin: number;
+  areaUtilMax: number;
   quartos: number;
   banheiros: number;
   vagas: number;
@@ -50,6 +54,8 @@ const defaultFilters: SearchFilters = {
   precoMax: 0,
   areaMin: 0,
   areaMax: 0,
+  areaUtilMin: 0,
+  areaUtilMax: 0,
   quartos: 0,
   banheiros: 0,
   vagas: 0,

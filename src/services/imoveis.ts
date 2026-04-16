@@ -101,8 +101,12 @@ export interface BuscaFilters {
   cidade?: string;
   precoMin?: number;
   precoMax?: number;
+  /** Filters area_total */
   areaMin?: number;
   areaMax?: number;
+  /** Filters area_util (private area) */
+  areaUtilMin?: number;
+  areaUtilMax?: number;
   quartos?: number;
   banheiros?: number;
   vagas?: number;
@@ -177,6 +181,8 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
   if (filters.precoMax) query = query.lte("preco", filters.precoMax);
   if (filters.areaMin) query = query.gte("area_total", filters.areaMin);
   if (filters.areaMax) query = query.lte("area_total", filters.areaMax);
+  if (filters.areaUtilMin) query = query.gte("area_util", filters.areaUtilMin);
+  if (filters.areaUtilMax) query = query.lte("area_util", filters.areaUtilMax);
   if (filters.quartos) query = query.gte("quartos", filters.quartos);
   if (filters.banheiros) query = query.gte("banheiros", filters.banheiros);
   if (filters.vagas) query = query.gte("vagas", filters.vagas);
@@ -211,7 +217,7 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
   query = query.range(offset, offset + limit - 1);
 
   // Detect if advanced filters are active (not supported by count_imoveis RPC)
-  const hasAdvancedFilters = !!(filters.codigo || filters.andarMin || filters.condominioMax || filters.iptuMax || filters.diferenciais?.length || filters.condominio);
+  const hasAdvancedFilters = !!(filters.codigo || filters.andarMin || filters.condominioMax || filters.iptuMax || filters.diferenciais?.length || filters.condominio || filters.areaUtilMin || filters.areaUtilMax);
 
   // Build count — either via RPC or via a parallel filtered count query
   const bairroStr = filters.bairro || undefined;
@@ -249,6 +255,8 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
     if (filters.precoMax) countQuery = countQuery.lte("preco", filters.precoMax);
     if (filters.areaMin) countQuery = countQuery.gte("area_total", filters.areaMin);
     if (filters.areaMax) countQuery = countQuery.lte("area_total", filters.areaMax);
+    if (filters.areaUtilMin) countQuery = countQuery.gte("area_util", filters.areaUtilMin);
+    if (filters.areaUtilMax) countQuery = countQuery.lte("area_util", filters.areaUtilMax);
     if (filters.quartos) countQuery = countQuery.gte("quartos", filters.quartos);
     if (filters.banheiros) countQuery = countQuery.gte("banheiros", filters.banheiros);
     if (filters.vagas) countQuery = countQuery.gte("vagas", filters.vagas);
@@ -287,8 +295,11 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
     if (filters.quartos) countParams.p_quartos = filters.quartos;
     if (filters.banheiros) countParams.p_banheiros = filters.banheiros;
     if (filters.vagas) countParams.p_vagas = filters.vagas;
-    if (filters.areaMin) countParams.p_area_min = filters.areaMin;
-    if (filters.areaMax) countParams.p_area_max = filters.areaMax;
+    // RPC accepts one area pair (filters area_total). Prioritize private area when set.
+    const areaMinForRpc = filters.areaUtilMin || filters.areaMin;
+    const areaMaxForRpc = filters.areaUtilMax || filters.areaMax;
+    if (areaMinForRpc) countParams.p_area_min = areaMinForRpc;
+    if (areaMaxForRpc) countParams.p_area_max = areaMaxForRpc;
     if (filters.bounds) {
       countParams.lat_min = filters.bounds.lat_min;
       countParams.lat_max = filters.bounds.lat_max;
@@ -356,6 +367,10 @@ function pinsCacheKey(filters: BuscaFilters): string {
     ba: filters.bairro || filters.bairros?.join(",") || "",
     pMin: filters.precoMin || 0,
     pMax: filters.precoMax || 0,
+    aMin: filters.areaMin || 0,
+    aMax: filters.areaMax || 0,
+    auMin: filters.areaUtilMin || 0,
+    auMax: filters.areaUtilMax || 0,
     q: filters.quartos || 0,
     ci: filters.cidade || "",
   });
@@ -400,8 +415,11 @@ export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSig
   }
   if (filters.precoMin) rpcParams.p_preco_min = filters.precoMin;
   if (filters.precoMax) rpcParams.p_preco_max = filters.precoMax;
-  if (filters.areaMin) rpcParams.p_area_min = filters.areaMin;
-  if (filters.areaMax) rpcParams.p_area_max = filters.areaMax;
+  // RPC accepts only one area pair (area_total). Prioritize private area when set.
+  const areaMinPin = filters.areaUtilMin || filters.areaMin;
+  const areaMaxPin = filters.areaUtilMax || filters.areaMax;
+  if (areaMinPin) rpcParams.p_area_min = areaMinPin;
+  if (areaMaxPin) rpcParams.p_area_max = areaMaxPin;
   if (filters.quartos) rpcParams.p_quartos = filters.quartos;
   if (filters.banheiros) rpcParams.p_banheiros = filters.banheiros;
   if (filters.vagas) rpcParams.p_vagas = filters.vagas;

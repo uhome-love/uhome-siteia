@@ -8,6 +8,7 @@ export interface AISearchFilters {
   preco_min?: number;
   quartos?: number;
   area_min?: number;
+  area_util_min?: number;
   diferenciais?: string[];
 }
 
@@ -40,6 +41,7 @@ export async function interpretarBusca(query: string): Promise<AISearchResult> {
       preco_min: f.preco_min,
       quartos: f.quartos,
       area_min: f.area_min,
+      area_util_min: f.area_util_min,
       diferenciais: f.diferenciais,
     },
     resumo: f.resumo || "Busca interpretada",

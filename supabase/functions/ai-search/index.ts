@@ -16,6 +16,7 @@ const systemPrompt = `Você é um assistente imobiliário especializado em Porto
     "preco_min": number | null,
     "quartos": number | null,
     "area_min": number | null,
+    "area_util_min": number | null,
     "diferenciais": string[] | null
   },
   "resumo": "frase curta do que foi entendido",
@@ -159,6 +160,11 @@ Quartos:
 - "4 quartos" ou mais → 4
 - "suíte" → quartos mínimo 2
 
+Área:
+- "área útil" / "área privativa" / "metros úteis" / "m² privativos" → area_util_min
+- "área total" / "metragem total" → area_min
+- Quando o usuário diz apenas "X m²" / "X metros" sem qualificar, prefira area_util_min (área privativa é o padrão do mercado).
+
 === EXEMPLOS ===
 
 "apartamento próximo ao Iguatemi até 800 mil"
@@ -227,7 +233,8 @@ serve(async (req) => {
                   preco_max: { type: "number", description: "OBRIGATÓRIO quando valor máximo mencionado. Preço máximo em reais (ex: 800000)." },
                   preco_min: { type: "number", description: "Preço mínimo em reais." },
                   quartos: { type: "integer", description: "OBRIGATÓRIO quando dormitórios mencionados. Número mínimo de quartos." },
-                  area_min: { type: "number", description: "Área mínima em m²." },
+                  area_min: { type: "number", description: "Área TOTAL mínima em m². Use somente quando o usuário menciona explicitamente 'área total' ou 'metragem total'." },
+                  area_util_min: { type: "number", description: "Área ÚTIL/PRIVATIVA mínima em m². Padrão quando o usuário menciona 'X m²' sem qualificar — é a métrica padrão do mercado imobiliário." },
                   diferenciais: { type: "array", items: { type: "string" }, description: "Diferenciais: piscina, pet_friendly, mobiliado, academia, sacada, vista." },
                   resumo: { type: "string", description: "Frase curta do que foi entendido." },
                   confianca: { type: "string", enum: ["alta", "media", "baixa"] },

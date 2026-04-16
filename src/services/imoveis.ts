@@ -367,6 +367,10 @@ function pinsCacheKey(filters: BuscaFilters): string {
     ba: filters.bairro || filters.bairros?.join(",") || "",
     pMin: filters.precoMin || 0,
     pMax: filters.precoMax || 0,
+    aMin: filters.areaMin || 0,
+    aMax: filters.areaMax || 0,
+    auMin: filters.areaUtilMin || 0,
+    auMax: filters.areaUtilMax || 0,
     q: filters.quartos || 0,
     ci: filters.cidade || "",
   });

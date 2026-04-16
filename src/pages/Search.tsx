@@ -584,7 +584,7 @@ const Search = () => {
         cidade: "Porto Alegre",
         precoMin: f.preco_min || undefined,
         precoMax: f.preco_max || undefined,
-        areaMin: f.area_min || undefined,
+        areaUtilMin: f.area_util_min || f.area_min || undefined,
         quartos: f.quartos || undefined,
       };
 

@@ -29,6 +29,8 @@ export interface SeoPageConfig {
 const TIPO_MAP: Record<string, { singular: string; plural: string; tipoDb: string }> = {
   apartamentos: { singular: "Apartamento", plural: "Apartamentos", tipoDb: "apartamento" },
   apartamento: { singular: "Apartamento", plural: "Apartamentos", tipoDb: "apartamento" },
+  gardens: { singular: "Apartamento Garden", plural: "Apartamentos Garden", tipoDb: "garden" },
+  garden: { singular: "Apartamento Garden", plural: "Apartamentos Garden", tipoDb: "garden" },
   casas: { singular: "Casa", plural: "Casas", tipoDb: "casa" },
   casa: { singular: "Casa", plural: "Casas", tipoDb: "casa" },
   coberturas: { singular: "Cobertura", plural: "Coberturas", tipoDb: "cobertura" },

@@ -33,9 +33,11 @@ function mapFinalidade(f?: string): string {
 function mapTipo(t?: string): string {
   if (!t) return "apartamento";
   const lower = t.toLowerCase();
-  if (lower.includes("casa")) return "casa";
+  if (lower.includes("garden")) return "garden";
   if (lower.includes("cobert")) return "cobertura";
+  if (lower.includes("casa")) return "casa";
   if (lower.includes("studio") || lower.includes("kitnet") || lower.includes("kit")) return "studio";
+  if (lower.includes("loft")) return "loft";
   if (lower.includes("comerc") || lower.includes("sala") || lower.includes("loja")) return "comercial";
   if (lower.includes("terr")) return "terreno";
   return "apartamento";

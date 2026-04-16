@@ -48,7 +48,7 @@ function capitalize(s: string): string {
 
 /** Generate a clean title regardless of what's stored in the DB */
 export function tituloLimpo(imovel: { tipo: string; finalidade: string; quartos: number | null; bairro: string; titulo?: string }): string {
-  const tipo = capitalize(imovel.tipo);
+  const tipo = imovel.tipo === "garden" ? "Apartamento Garden" : capitalize(imovel.tipo);
   const quartos = imovel.quartos ?? 0;
   if (quartos > 0) {
     return `${tipo} ${quartos} quarto${quartos > 1 ? "s" : ""} — ${imovel.bairro}`;

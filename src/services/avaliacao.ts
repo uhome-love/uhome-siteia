@@ -29,6 +29,7 @@ export interface ResultadoAvaliacao {
 function normalizarTipo(tipo: string): string {
   const map: Record<string, string> = {
     Apartamento: "apartamento",
+    "Apartamento Garden": "garden",
     Casa: "casa",
     Cobertura: "cobertura",
     "Studio / Kitnet": "studio",

@@ -28,12 +28,14 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
   const [condoInput, setCondoInput] = useState(filters.condominio || "");
   const [condoList, setCondoList] = useState<string[]>([]);
   const [condoOpen, setCondoOpen] = useState(false);
+  const [tipoCounts, setTipoCounts] = useState<TipoCounts>({});
 
   useEffect(() => {
     getBairrosDisponiveis().then(data => {
       setDbBairros(data.map(d => d.bairro));
     });
     getCondominiosDisponiveis().then(setCondoList);
+    getTipoCounts().then(setTipoCounts).catch(() => {});
   }, []);
 
   const condoSuggestions = useMemo(() => {

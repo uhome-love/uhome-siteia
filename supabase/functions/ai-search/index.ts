@@ -10,7 +10,7 @@ const systemPrompt = `Você é um assistente imobiliário especializado em Porto
 {
   "filtros": {
     "finalidade": "venda",
-    "tipo": "apartamento" | "casa" | "cobertura" | "studio" | "comercial" | null,
+    "tipo": "apartamento" | "garden" | "casa" | "cobertura" | "studio" | "comercial" | null,
     "bairros": string[] | null,
     "preco_max": number | null,
     "preco_min": number | null,
@@ -134,6 +134,7 @@ Preços:
 Tipos:
 - "kitnet" / "kit" / "quitinete" / "loft" → studio
 - "ap" / "apto" / "apê" → apartamento
+- "garden" / "apartamento garden" / "jardim privativo" / "térreo com jardim" / "pátio" → garden
 - "sobrado" / "townhouse" → casa
 - "sala" / "escritório" / "loja" → comercial
 - "cobertura" / "penthouse" / "pent" → cobertura
@@ -220,7 +221,7 @@ serve(async (req) => {
                 type: "object",
                 properties: {
                   finalidade: { type: "string", enum: ["venda"], description: "Sempre 'venda'. A Uhome não trabalha com locação." },
-                  tipo: { type: "string", enum: ["apartamento", "casa", "cobertura", "studio", "comercial"], description: "Tipo do imóvel" },
+                  tipo: { type: "string", enum: ["apartamento", "garden", "casa", "cobertura", "studio", "comercial"], description: "Tipo do imóvel. Use 'garden' para apartamento garden (térreo com jardim/pátio privativo)." },
                   bairros: { type: "array", items: { type: "string" }, description: "OBRIGATÓRIO quando localização mencionada. Lista de bairros de Porto Alegre." },
                   preco_max: { type: "number", description: "OBRIGATÓRIO quando valor máximo mencionado. Preço máximo em reais (ex: 800000)." },
                   preco_min: { type: "number", description: "Preço mínimo em reais." },

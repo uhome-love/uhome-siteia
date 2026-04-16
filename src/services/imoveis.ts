@@ -101,8 +101,12 @@ export interface BuscaFilters {
   cidade?: string;
   precoMin?: number;
   precoMax?: number;
+  /** Filters area_total */
   areaMin?: number;
   areaMax?: number;
+  /** Filters area_util (private area) */
+  areaUtilMin?: number;
+  areaUtilMax?: number;
   quartos?: number;
   banheiros?: number;
   vagas?: number;
@@ -177,6 +181,8 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
   if (filters.precoMax) query = query.lte("preco", filters.precoMax);
   if (filters.areaMin) query = query.gte("area_total", filters.areaMin);
   if (filters.areaMax) query = query.lte("area_total", filters.areaMax);
+  if (filters.areaUtilMin) query = query.gte("area_util", filters.areaUtilMin);
+  if (filters.areaUtilMax) query = query.lte("area_util", filters.areaUtilMax);
   if (filters.quartos) query = query.gte("quartos", filters.quartos);
   if (filters.banheiros) query = query.gte("banheiros", filters.banheiros);
   if (filters.vagas) query = query.gte("vagas", filters.vagas);
@@ -211,7 +217,7 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
   query = query.range(offset, offset + limit - 1);
 
   // Detect if advanced filters are active (not supported by count_imoveis RPC)
-  const hasAdvancedFilters = !!(filters.codigo || filters.andarMin || filters.condominioMax || filters.iptuMax || filters.diferenciais?.length || filters.condominio);
+  const hasAdvancedFilters = !!(filters.codigo || filters.andarMin || filters.condominioMax || filters.iptuMax || filters.diferenciais?.length || filters.condominio || filters.areaUtilMin || filters.areaUtilMax);
 
   // Build count — either via RPC or via a parallel filtered count query
   const bairroStr = filters.bairro || undefined;
@@ -249,6 +255,8 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
     if (filters.precoMax) countQuery = countQuery.lte("preco", filters.precoMax);
     if (filters.areaMin) countQuery = countQuery.gte("area_total", filters.areaMin);
     if (filters.areaMax) countQuery = countQuery.lte("area_total", filters.areaMax);
+    if (filters.areaUtilMin) countQuery = countQuery.gte("area_util", filters.areaUtilMin);
+    if (filters.areaUtilMax) countQuery = countQuery.lte("area_util", filters.areaUtilMax);
     if (filters.quartos) countQuery = countQuery.gte("quartos", filters.quartos);
     if (filters.banheiros) countQuery = countQuery.gte("banheiros", filters.banheiros);
     if (filters.vagas) countQuery = countQuery.gte("vagas", filters.vagas);

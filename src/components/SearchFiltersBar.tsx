@@ -60,6 +60,7 @@ export function SearchFiltersBar({ onOpenMobileFilters, onOpenAdvancedFilters }:
   // Multi-bairro state
   const [bairroInput, setBairroInput] = useState("");
   const [dbBairros, setDbBairros] = useState<string[]>([]);
+  const [tipoCounts, setTipoCounts] = useState<TipoCounts>({});
 
   // Parse current bairros from filter (comma-separated)
   const bairrosSelecionados = useMemo(() => {
@@ -68,11 +69,12 @@ export function SearchFiltersBar({ onOpenMobileFilters, onOpenAdvancedFilters }:
     return bairroStr.split(",").map(s => s.trim()).filter(Boolean);
   }, [filters.bairro]);
 
-  // Load neighborhoods from DB once
+  // Load neighborhoods + tipo counts from DB once
   useEffect(() => {
     getBairrosDisponiveis().then(data => {
       setDbBairros(data.map(d => d.bairro));
     });
+    getTipoCounts().then(setTipoCounts).catch(() => {});
   }, []);
 
   // Autocomplete suggestions

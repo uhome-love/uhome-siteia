@@ -511,10 +511,60 @@ export function SearchFiltersBar({ onOpenMobileFilters, onOpenAdvancedFilters }:
         ))}
       </FilterPill>
 
-      {/* Área */}
+      {/* Área privativa (área útil) */}
       <FilterPill
-        label="Área"
-        value={areaLabel}
+        label="Área privativa"
+        value={areaUtilLabel}
+        active={!!(filters.areaUtilMin || filters.areaUtilMax)}
+        onClear={() => { setFilter("areaUtilMin", 0); setFilter("areaUtilMax", 0); }}
+      >
+        {areaRanges.map((r) => (
+          <PillOption
+            key={r.label}
+            selected={filters.areaUtilMin === r.min && filters.areaUtilMax === r.max}
+            onClick={() => {
+              const isSelected = filters.areaUtilMin === r.min && filters.areaUtilMax === r.max;
+              setFilter("areaUtilMin", isSelected ? 0 : r.min);
+              setFilter("areaUtilMax", isSelected ? 0 : r.max);
+            }}
+          >
+            {r.label}
+          </PillOption>
+        ))}
+        <div className="mt-2 border-t border-border pt-3 px-1">
+          <p className="mb-2 font-body text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Área privativa personalizada
+          </p>
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <input
+                type="number"
+                placeholder="Mín"
+                value={filters.areaUtilMin || ""}
+                onChange={(e) => setFilter("areaUtilMin", Number(e.target.value) || 0)}
+                className="w-full rounded-lg border border-border bg-background py-2 pl-3 pr-8 font-body text-[13px] text-foreground outline-none transition-colors focus:border-primary"
+              />
+              <span className="absolute right-2.5 top-1/2 -translate-y-1/2 font-body text-[11px] text-muted-foreground">m²</span>
+            </div>
+            <span className="font-body text-xs text-muted-foreground">–</span>
+            <div className="relative flex-1">
+              <input
+                type="number"
+                placeholder="Máx"
+                value={filters.areaUtilMax || ""}
+                onChange={(e) => setFilter("areaUtilMax", Number(e.target.value) || 0)}
+                className="w-full rounded-lg border border-border bg-background py-2 pl-3 pr-8 font-body text-[13px] text-foreground outline-none transition-colors focus:border-primary"
+              />
+              <span className="absolute right-2.5 top-1/2 -translate-y-1/2 font-body text-[11px] text-muted-foreground">m²</span>
+            </div>
+          </div>
+        </div>
+      </FilterPill>
+
+      {/* Área total */}
+      <FilterPill
+        label="Área total"
+        value={areaTotalLabel}
         active={!!(filters.areaMin || filters.areaMax)}
         onClear={() => { setFilter("areaMin", 0); setFilter("areaMax", 0); }}
       >
@@ -533,7 +583,7 @@ export function SearchFiltersBar({ onOpenMobileFilters, onOpenAdvancedFilters }:
         ))}
         <div className="mt-2 border-t border-border pt-3 px-1">
           <p className="mb-2 font-body text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-            Área personalizada
+            Área total personalizada
           </p>
           <div className="flex items-center gap-2">
             <div className="relative flex-1">
@@ -560,6 +610,7 @@ export function SearchFiltersBar({ onOpenMobileFilters, onOpenAdvancedFilters }:
           </div>
         </div>
       </FilterPill>
+
 
       {/* Vagas */}
       <FilterPill

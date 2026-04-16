@@ -244,6 +244,9 @@ const Search = () => {
       const urlPrecoMin = searchParams.get("preco_min");
       const urlPrecoMax = searchParams.get("preco_max");
       const urlAreaMin = searchParams.get("area_min");
+      const urlAreaMax = searchParams.get("area_max");
+      const urlAreaUtilMin = searchParams.get("area_util_min");
+      const urlAreaUtilMax = searchParams.get("area_util_max");
       const urlCodigo = searchParams.get("codigo");
       const urlAndarMin = searchParams.get("andar_min");
       const urlCondominioMax = searchParams.get("condominio_max");
@@ -259,6 +262,9 @@ const Search = () => {
       if (urlPrecoMin) f.precoMin = Number(urlPrecoMin);
       if (urlPrecoMax) f.precoMax = Number(urlPrecoMax);
       if (urlAreaMin) f.areaMin = Number(urlAreaMin);
+      if (urlAreaMax) f.areaMax = Number(urlAreaMax);
+      if (urlAreaUtilMin) f.areaUtilMin = Number(urlAreaUtilMin);
+      if (urlAreaUtilMax) f.areaUtilMax = Number(urlAreaUtilMax);
       if (urlCodigo) f.codigo = urlCodigo;
       if (urlAndarMin) f.andarMin = Number(urlAndarMin);
       if (urlCondominioMax) f.condominioMax = Number(urlCondominioMax);
@@ -324,6 +330,8 @@ const Search = () => {
       precoMax: filters.precoMax || undefined,
       areaMin: filters.areaMin || undefined,
       areaMax: filters.areaMax || undefined,
+      areaUtilMin: filters.areaUtilMin || undefined,
+      areaUtilMax: filters.areaUtilMax || undefined,
       quartos: filters.quartos || undefined,
       banheiros: filters.banheiros || undefined,
       vagas: filters.vagas || undefined,

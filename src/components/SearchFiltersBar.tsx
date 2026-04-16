@@ -413,6 +413,7 @@ export function SearchFiltersBar({ onOpenMobileFilters, onOpenAdvancedFilters }:
             key={t.value}
             selected={filters.tipo === t.value}
             onClick={() => setFilter("tipo", filters.tipo === t.value ? "" : t.value)}
+            count={tipoCounts[t.value]}
           >
             {t.label}
           </PillOption>

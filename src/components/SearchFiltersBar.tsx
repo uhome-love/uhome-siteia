@@ -8,6 +8,7 @@ import { FilterPill, PillOption } from "@/components/FilterPill";
 import { propertyTypes } from "@/data/properties";
 import { CIDADES_PERMITIDAS } from "@/services/imoveis";
 import { getBairrosDisponiveis } from "@/services/bairrosCache";
+import { getTipoCounts, type TipoCounts } from "@/services/tipoCountsCache";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { formatCurrency, rawCurrency } from "@/lib/currencyMask";
 

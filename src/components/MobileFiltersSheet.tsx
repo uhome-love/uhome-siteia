@@ -374,7 +374,12 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
                             </svg>
                           )}
                         </div>
-                        <span className="font-body text-sm text-foreground">{t.label}</span>
+                        <span className="flex-1 font-body text-sm text-foreground">{t.label}</span>
+                        {typeof tipoCounts[t.value] === "number" && (
+                          <span className="font-body text-xs tabular-nums text-muted-foreground">
+                            {tipoCounts[t.value].toLocaleString("pt-BR")}
+                          </span>
+                        )}
                       </label>
                     );
                   })}

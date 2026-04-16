@@ -190,7 +190,10 @@ export function SearchFiltersBar({ onOpenMobileFilters, onOpenAdvancedFilters }:
   const precoLabel = precoRanges.find(
     (r) => r.min === filters.precoMin && r.max === filters.precoMax
   )?.label;
-  const areaLabel = areaRanges.find(
+  const areaUtilLabel = areaRanges.find(
+    (r) => r.min === filters.areaUtilMin && r.max === filters.areaUtilMax
+  )?.label || (filters.areaUtilMin || filters.areaUtilMax ? formatAreaLabel(filters.areaUtilMin, filters.areaUtilMax) : undefined);
+  const areaTotalLabel = areaRanges.find(
     (r) => r.min === filters.areaMin && r.max === filters.areaMax
   )?.label || (filters.areaMin || filters.areaMax ? formatAreaLabel(filters.areaMin, filters.areaMax) : undefined);
   const cidadeLabel = filters.cidade || "Todas";
@@ -209,7 +212,7 @@ export function SearchFiltersBar({ onOpenMobileFilters, onOpenAdvancedFilters }:
   const advancedActive = advancedCount > 0;
 
   const hasAny =
-    filters.tipo || filters.precoMin || filters.precoMax || filters.areaMin || filters.areaMax || filters.quartos || filters.vagas || filters.q || filters.bairro || filters.fase || advancedActive || (filters.cidade && filters.cidade !== "Porto Alegre");
+    filters.tipo || filters.precoMin || filters.precoMax || filters.areaMin || filters.areaMax || filters.areaUtilMin || filters.areaUtilMax || filters.quartos || filters.vagas || filters.q || filters.bairro || filters.fase || advancedActive || (filters.cidade && filters.cidade !== "Porto Alegre");
 
   const hasInput = bairroInput.trim().length > 0;
   const hasChips = bairrosSelecionados.length > 0;

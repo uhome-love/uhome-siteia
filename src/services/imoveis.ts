@@ -295,8 +295,11 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
     if (filters.quartos) countParams.p_quartos = filters.quartos;
     if (filters.banheiros) countParams.p_banheiros = filters.banheiros;
     if (filters.vagas) countParams.p_vagas = filters.vagas;
-    if (filters.areaMin) countParams.p_area_min = filters.areaMin;
-    if (filters.areaMax) countParams.p_area_max = filters.areaMax;
+    // RPC accepts one area pair (filters area_total). Prioritize private area when set.
+    const areaMinForRpc = filters.areaUtilMin || filters.areaMin;
+    const areaMaxForRpc = filters.areaUtilMax || filters.areaMax;
+    if (areaMinForRpc) countParams.p_area_min = areaMinForRpc;
+    if (areaMaxForRpc) countParams.p_area_max = areaMaxForRpc;
     if (filters.bounds) {
       countParams.lat_min = filters.bounds.lat_min;
       countParams.lat_max = filters.bounds.lat_max;
@@ -408,8 +411,11 @@ export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSig
   }
   if (filters.precoMin) rpcParams.p_preco_min = filters.precoMin;
   if (filters.precoMax) rpcParams.p_preco_max = filters.precoMax;
-  if (filters.areaMin) rpcParams.p_area_min = filters.areaMin;
-  if (filters.areaMax) rpcParams.p_area_max = filters.areaMax;
+  // RPC accepts only one area pair (area_total). Prioritize private area when set.
+  const areaMinPin = filters.areaUtilMin || filters.areaMin;
+  const areaMaxPin = filters.areaUtilMax || filters.areaMax;
+  if (areaMinPin) rpcParams.p_area_min = areaMinPin;
+  if (areaMaxPin) rpcParams.p_area_max = areaMaxPin;
   if (filters.quartos) rpcParams.p_quartos = filters.quartos;
   if (filters.banheiros) rpcParams.p_banheiros = filters.banheiros;
   if (filters.vagas) rpcParams.p_vagas = filters.vagas;

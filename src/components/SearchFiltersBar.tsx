@@ -8,6 +8,7 @@ import { FilterPill, PillOption } from "@/components/FilterPill";
 import { propertyTypes } from "@/data/properties";
 import { CIDADES_PERMITIDAS } from "@/services/imoveis";
 import { getBairrosDisponiveis } from "@/services/bairrosCache";
+import { getTipoCounts, type TipoCounts } from "@/services/tipoCountsCache";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { formatCurrency, rawCurrency } from "@/lib/currencyMask";
 
@@ -59,6 +60,7 @@ export function SearchFiltersBar({ onOpenMobileFilters, onOpenAdvancedFilters }:
   // Multi-bairro state
   const [bairroInput, setBairroInput] = useState("");
   const [dbBairros, setDbBairros] = useState<string[]>([]);
+  const [tipoCounts, setTipoCounts] = useState<TipoCounts>({});
 
   // Parse current bairros from filter (comma-separated)
   const bairrosSelecionados = useMemo(() => {
@@ -67,11 +69,12 @@ export function SearchFiltersBar({ onOpenMobileFilters, onOpenAdvancedFilters }:
     return bairroStr.split(",").map(s => s.trim()).filter(Boolean);
   }, [filters.bairro]);
 
-  // Load neighborhoods from DB once
+  // Load neighborhoods + tipo counts from DB once
   useEffect(() => {
     getBairrosDisponiveis().then(data => {
       setDbBairros(data.map(d => d.bairro));
     });
+    getTipoCounts().then(setTipoCounts).catch(() => {});
   }, []);
 
   // Autocomplete suggestions
@@ -410,6 +413,7 @@ export function SearchFiltersBar({ onOpenMobileFilters, onOpenAdvancedFilters }:
             key={t.value}
             selected={filters.tipo === t.value}
             onClick={() => setFilter("tipo", filters.tipo === t.value ? "" : t.value)}
+            count={tipoCounts[t.value]}
           >
             {t.label}
           </PillOption>

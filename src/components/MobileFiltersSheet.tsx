@@ -5,6 +5,7 @@ import { useSearchStore } from "@/stores/searchStore";
 import { propertyTypes, featureOptions } from "@/data/properties";
 import { getBairrosDisponiveis } from "@/services/bairrosCache";
 import { getCondominiosDisponiveis } from "@/services/condominiosCache";
+import { getTipoCounts, type TipoCounts } from "@/services/tipoCountsCache";
 import { formatCurrency, rawCurrency } from "@/lib/currencyMask";
 
 const quartoOptions = [1, 2, 3, 4];
@@ -27,12 +28,14 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
   const [condoInput, setCondoInput] = useState(filters.condominio || "");
   const [condoList, setCondoList] = useState<string[]>([]);
   const [condoOpen, setCondoOpen] = useState(false);
+  const [tipoCounts, setTipoCounts] = useState<TipoCounts>({});
 
   useEffect(() => {
     getBairrosDisponiveis().then(data => {
       setDbBairros(data.map(d => d.bairro));
     });
     getCondominiosDisponiveis().then(setCondoList);
+    getTipoCounts().then(setTipoCounts).catch(() => {});
   }, []);
 
   const condoSuggestions = useMemo(() => {
@@ -371,7 +374,12 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
                             </svg>
                           )}
                         </div>
-                        <span className="font-body text-sm text-foreground">{t.label}</span>
+                        <span className="flex-1 font-body text-sm text-foreground">{t.label}</span>
+                        {typeof tipoCounts[t.value] === "number" && (
+                          <span className="font-body text-xs tabular-nums text-muted-foreground">
+                            {tipoCounts[t.value].toLocaleString("pt-BR")}
+                          </span>
+                        )}
                       </label>
                     );
                   })}

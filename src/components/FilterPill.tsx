@@ -136,21 +136,28 @@ export function PillOption({
   selected,
   onClick,
   children,
+  count,
 }: {
   selected: boolean;
   onClick: () => void;
   children: React.ReactNode;
+  count?: number;
 }) {
   return (
     <button
       onClick={onClick}
-      className={`block w-full rounded-lg px-3 py-2.5 text-left font-body text-sm transition-colors sm:py-2 sm:text-[13px] ${
+      className={`flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left font-body text-sm transition-colors sm:py-2 sm:text-[13px] ${
         selected
           ? "bg-primary/10 font-medium text-primary"
           : "text-foreground hover:bg-secondary"
       }`}
     >
-      {children}
+      <span className="truncate">{children}</span>
+      {typeof count === "number" && (
+        <span className={`shrink-0 font-body text-[11px] tabular-nums ${selected ? "text-primary/70" : "text-muted-foreground"}`}>
+          {count.toLocaleString("pt-BR")}
+        </span>
+      )}
     </button>
   );
 }

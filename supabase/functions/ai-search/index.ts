@@ -10,7 +10,7 @@ const systemPrompt = `Você é um assistente imobiliário especializado em Porto
 {
   "filtros": {
     "finalidade": "venda",
-    "tipo": "apartamento" | "garden" | "casa" | "cobertura" | "studio" | "comercial" | null,
+    "tipo": "apartamento" | "garden" | "casa" | "casa_condominio" | "cobertura" | "studio" | "comercial" | null,
     "bairros": string[] | null,
     "preco_max": number | null,
     "preco_min": number | null,
@@ -135,6 +135,7 @@ Tipos:
 - "kitnet" / "kit" / "quitinete" / "loft" → studio
 - "ap" / "apto" / "apê" → apartamento
 - "garden" / "apartamento garden" / "jardim privativo" / "térreo com jardim" / "pátio" → garden
+- "casa em condomínio" / "casa de condomínio" / "casa em condomínio fechado" → casa_condominio
 - "sobrado" / "townhouse" → casa
 - "sala" / "escritório" / "loja" → comercial
 - "cobertura" / "penthouse" / "pent" → cobertura

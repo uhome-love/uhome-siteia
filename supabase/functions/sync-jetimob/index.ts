@@ -35,6 +35,7 @@ function mapTipo(t?: string): string {
   const lower = t.toLowerCase();
   if (lower.includes("garden")) return "garden";
   if (lower.includes("cobert")) return "cobertura";
+  if (lower.includes("casa") && lower.includes("condom")) return "casa_condominio";
   if (lower.includes("casa")) return "casa";
   if (lower.includes("studio") || lower.includes("kitnet") || lower.includes("kit")) return "studio";
   if (lower.includes("loft")) return "loft";

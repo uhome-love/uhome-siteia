@@ -439,7 +439,7 @@ const Search = () => {
       .finally(() => setMapLoading(false));
     
     return () => { pinAbortRef.current?.abort(); };
-  }, [filters.tipo, filters.bairro, filters.precoMin, filters.precoMax, filters.quartos, filters.areaMin, filters.areaMax, filters.vagas, filters.banheiros, filters.andarMin, filters.condominioMax, filters.iptuMax, filters.diferenciais, filters.codigo, filters.fase]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [filters.tipo, filters.bairro, filters.precoMin, filters.precoMax, filters.quartos, filters.areaMin, filters.areaMax, filters.areaUtilMin, filters.areaUtilMax, filters.vagas, filters.banheiros, filters.andarMin, filters.condominioMax, filters.iptuMax, filters.diferenciais, filters.codigo, filters.fase]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadMore = useCallback(async () => {
     if (loadingMore || loading) return;
@@ -517,6 +517,9 @@ const Search = () => {
     if (filters.precoMin) params.set("preco_min", String(filters.precoMin));
     if (filters.precoMax) params.set("preco_max", String(filters.precoMax));
     if (filters.areaMin) params.set("area_min", String(filters.areaMin));
+    if (filters.areaMax) params.set("area_max", String(filters.areaMax));
+    if (filters.areaUtilMin) params.set("area_util_min", String(filters.areaUtilMin));
+    if (filters.areaUtilMax) params.set("area_util_max", String(filters.areaUtilMax));
     if (filters.codigo) params.set("codigo", filters.codigo);
     if (filters.andarMin) params.set("andar_min", String(filters.andarMin));
     if (filters.condominioMax) params.set("condominio_max", String(filters.condominioMax));
@@ -526,7 +529,7 @@ const Search = () => {
     const qs = params.toString();
     const basePath = prefixLink("/busca");
     window.history.replaceState(null, "", qs ? `${basePath}?${qs}` : basePath);
-  }, [filters.tipo, filters.bairro, filters.cidade, filters.quartos, filters.banheiros, filters.vagas, filters.precoMin, filters.precoMax, filters.areaMin, filters.q, filters.codigo, filters.andarMin, filters.condominioMax, filters.iptuMax, filters.diferenciais, filters.condominio, modoIA]);
+  }, [filters.tipo, filters.bairro, filters.cidade, filters.quartos, filters.banheiros, filters.vagas, filters.precoMin, filters.precoMax, filters.areaMin, filters.areaMax, filters.areaUtilMin, filters.areaUtilMax, filters.q, filters.codigo, filters.andarMin, filters.condominioMax, filters.iptuMax, filters.diferenciais, filters.condominio, modoIA]);
 
   // AI search handler with throttle
   const buscarComIA = useCallback(async (query?: string) => {
@@ -560,8 +563,10 @@ const Search = () => {
         cidade: "Porto Alegre",
         precoMin: f.preco_min || 0,
         precoMax: f.preco_max || 0,
-        areaMin: f.area_min || 0,
+        areaMin: 0,
         areaMax: 0,
+        areaUtilMin: f.area_util_min || f.area_min || 0,
+        areaUtilMax: 0,
         quartos: f.quartos || 0,
         banheiros: 0,
         vagas: 0,

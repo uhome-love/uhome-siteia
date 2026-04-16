@@ -138,8 +138,9 @@ export const neighborhoods = [
 
 export const propertyTypes = [
   { value: "apartamento", label: "Apartamento" },
-  { value: "casa", label: "Casa" },
+  { value: "garden", label: "Apartamento Garden" },
   { value: "cobertura", label: "Cobertura" },
+  { value: "casa", label: "Casa" },
   { value: "sobrado", label: "Sobrado" },
   { value: "studio", label: "Studio" },
   { value: "loft", label: "Loft" },

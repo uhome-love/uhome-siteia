@@ -33,6 +33,8 @@ const TIPO_MAP: Record<string, { singular: string; plural: string; tipoDb: strin
   garden: { singular: "Apartamento Garden", plural: "Apartamentos Garden", tipoDb: "garden" },
   casas: { singular: "Casa", plural: "Casas", tipoDb: "casa" },
   casa: { singular: "Casa", plural: "Casas", tipoDb: "casa" },
+  "casas-em-condominio": { singular: "Casa em Condomínio", plural: "Casas em Condomínio", tipoDb: "casa_condominio" },
+  "casa-em-condominio": { singular: "Casa em Condomínio", plural: "Casas em Condomínio", tipoDb: "casa_condominio" },
   coberturas: { singular: "Cobertura", plural: "Coberturas", tipoDb: "cobertura" },
   cobertura: { singular: "Cobertura", plural: "Coberturas", tipoDb: "cobertura" },
   studios: { singular: "Studio", plural: "Studios", tipoDb: "studio" },

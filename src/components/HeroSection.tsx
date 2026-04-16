@@ -326,6 +326,7 @@ export function HeroSection() {
                       <option value="garden">Apartamento Garden</option>
                       <option value="cobertura">Cobertura</option>
                       <option value="casa">Casa</option>
+                      <option value="casa_condominio">Casa em Condomínio</option>
                       <option value="studio">Studio / Kitnet</option>
                       <option value="comercial">Comercial</option>
                     </select>

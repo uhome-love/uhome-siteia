@@ -152,7 +152,10 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
     .eq("status", "disponivel")
     .eq("finalidade", "venda")
     .not("fotos", "is", null)
-    .neq("fotos", "[]");
+    .neq("fotos", "[]")
+    // Card de listagem usa apenas foto_principal — esconder os que estão sem
+    .not("foto_principal", "is", null)
+    .neq("foto_principal", "");
 
   // City filter: skip when searching by code to find properties in any city
   if (!filters.codigo) {

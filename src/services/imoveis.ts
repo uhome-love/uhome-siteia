@@ -239,7 +239,11 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
       .from("imoveis")
       .select("id", { count: "exact", head: true })
       .eq("status", "disponivel")
-      .eq("finalidade", "venda");
+      .eq("finalidade", "venda")
+      .not("fotos", "is", null)
+      .neq("fotos", "[]")
+      .not("foto_principal", "is", null)
+      .neq("foto_principal", "");
 
     if (filters.cidade) countQuery = countQuery.eq("cidade", filters.cidade);
     else countQuery = countQuery.in("cidade", CIDADES_PERMITIDAS);

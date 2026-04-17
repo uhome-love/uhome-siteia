@@ -30,7 +30,9 @@ async function fetchTipoCountsFresh(): Promise<TipoCounts> {
         .eq("status", "disponivel")
         .eq("finalidade", "venda")
         .not("fotos", "is", null)
-        .neq("fotos", "[]");
+        .neq("fotos", "[]")
+        .not("foto_principal", "is", null)
+        .neq("foto_principal", "");
       return [tipo, count ?? 0] as const;
     })
   );

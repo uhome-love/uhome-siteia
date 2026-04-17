@@ -1,5 +1,5 @@
 import { getCorretorRef } from "./session";
-import { getImovelUrl } from "@/utils/shareUrl";
+import { getShareUrl } from "@/utils/shareUrl";
 
 /** Número do WhatsApp da Uhome — lido de env var ou fallback padrão */
 export const WHATSAPP_NUMBER =
@@ -11,6 +11,13 @@ export const WHATSAPP_DISPLAY = WHATSAPP_NUMBER.replace(
   "($1) $2-$3"
 );
 
+/** Lê o slug do corretor a partir do pathname atual ('/c/:slug/...') */
+function getCurrentCorretorSlug(): string | undefined {
+  if (typeof window === "undefined") return undefined;
+  const m = window.location.pathname.match(/^\/c\/([^/]+)/);
+  return m?.[1];
+}
+
 /** Gera link wa.me com mensagem pré-preenchida (legado) */
 export function whatsappLink(message: string) {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
@@ -19,12 +26,17 @@ export function whatsappLink(message: string) {
 /**
  * Gera URL do WhatsApp incluindo referência do corretor quando disponível.
  * Usar esta função em vez de whatsappLink() para novos componentes.
+ *
+ * O link do imóvel embutido na mensagem usa getShareUrl() (Edge Function SSR)
+ * para garantir preview rico no WhatsApp, preservando o prefixo /c/:slug/
+ * quando o usuário está em uma rota de corretor.
  */
 export function buildWhatsAppUrl(
   mensagem?: string,
   imovel?: { titulo?: string; bairro?: string; slug?: string }
 ): string {
   const corretorNome = localStorage.getItem("corretor_ref_nome");
+  const corretorSlug = getCurrentCorretorSlug();
 
   let msg = "";
 
@@ -33,7 +45,7 @@ export function buildWhatsAppUrl(
     if (imovel.bairro) msg += ` em ${imovel.bairro}`;
     msg += ".";
     if (imovel.slug) {
-      msg += `\nLink: ${getImovelUrl(imovel.slug)}`;
+      msg += `\nLink: ${getShareUrl(imovel.slug, corretorSlug)}`;
     }
   } else {
     msg =
@@ -61,6 +73,7 @@ export function buildCorretorWhatsAppUrl(
 ): string {
   const tel = corretorTelefone?.replace(/\D/g, "") || "";
   const numero = tel ? `55${tel}` : WHATSAPP_NUMBER;
+  const corretorSlug = getCurrentCorretorSlug();
 
   let msg = "";
   if (imovel?.titulo) {
@@ -68,7 +81,7 @@ export function buildCorretorWhatsAppUrl(
     if (imovel.bairro) msg += ` em ${imovel.bairro}`;
     msg += ` no site Uhome e tenho interesse. Pode me ajudar?`;
     if (imovel.slug) {
-      msg += `\nLink: ${getImovelUrl(imovel.slug)}`;
+      msg += `\nLink: ${getShareUrl(imovel.slug, corretorSlug)}`;
     }
   } else {
     msg = `Olá ${corretorNome}, vim pelo site Uhome e gostaria de informações sobre imóveis.`;

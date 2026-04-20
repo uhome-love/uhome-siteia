@@ -198,6 +198,9 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
     if (idx > 0) loadFullFotos();
   }, [loadFullFotos]);
 
+  // Hide card entirely when the primary photo fails to load (broken Jetimob URL or timeout)
+  if (primaryPhotoFailed) return null;
+
   return (
     <>
     <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />

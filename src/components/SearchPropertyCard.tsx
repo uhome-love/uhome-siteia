@@ -74,6 +74,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
   const [lazyFotos, setLazyFotos] = useState<string[] | null>(null);
   const [loadingFotos, setLoadingFotos] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [primaryPhotoFailed, setPrimaryPhotoFailed] = useState(false);
   const fotosLoadedRef = useRef(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLElement>(null);

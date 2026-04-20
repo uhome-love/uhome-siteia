@@ -12,25 +12,30 @@ interface FotoImovelProps {
   width?: number;
   height?: number;
   sizes?: string;
+  onError?: () => void;
 }
 
 export const FotoImovel = forwardRef<HTMLImageElement, FotoImovelProps>(function FotoImovel(
-  { src, alt, className = "", style, loading = "lazy", decoding = "async", fetchPriority, width, height, sizes },
+  { src, alt, className = "", style, loading = "lazy", decoding = "async", fetchPriority, width, height, sizes, onError },
   ref
 ) {
   const [erro, setErro] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
   const handleLoad = useCallback(() => setLoaded(true), []);
+  const handleErr = useCallback(() => {
+    setErro(true);
+    onError?.();
+  }, [onError]);
 
   // Timeout: if image takes > 10s, show fallback
   useEffect(() => {
     if (loaded || erro) return;
     const t = setTimeout(() => {
-      if (!loaded) setErro(true);
+      if (!loaded) handleErr();
     }, 10000);
     return () => clearTimeout(t);
-  }, [loaded, erro, src]);
+  }, [loaded, erro, src, handleErr]);
 
   if (erro) {
     return (
@@ -65,7 +70,7 @@ export const FotoImovel = forwardRef<HTMLImageElement, FotoImovelProps>(function
         height={height || 300}
         sizes={sizes}
         onLoad={handleLoad}
-        onError={() => setErro(true)}
+        onError={handleErr}
         {...(!loaded && { "data-loading": "true" })}
       />
     </div>

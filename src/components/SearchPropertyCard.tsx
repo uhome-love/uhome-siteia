@@ -74,6 +74,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
   const [lazyFotos, setLazyFotos] = useState<string[] | null>(null);
   const [loadingFotos, setLoadingFotos] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [primaryPhotoFailed, setPrimaryPhotoFailed] = useState(false);
   const fotosLoadedRef = useRef(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLElement>(null);
@@ -197,6 +198,9 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
     if (idx > 0) loadFullFotos();
   }, [loadFullFotos]);
 
+  // Hide card entirely when the primary photo fails to load (broken Jetimob URL or timeout)
+  if (primaryPhotoFailed) return null;
+
   return (
     <>
     <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
@@ -234,6 +238,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
                   decoding="async"
                   className="h-full w-full object-cover"
                   style={{ aspectRatio: "4/3" }}
+                  onError={i === 0 ? () => setPrimaryPhotoFailed(true) : undefined}
                 />
               </div>
             ))}
@@ -341,6 +346,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
             decoding="async"
             className="h-full w-full object-cover transition-transform duration-500"
             style={{ transform: hovering ? "scale(1.03)" : "scale(1)" }}
+            onError={fotoAtiva === 0 ? () => setPrimaryPhotoFailed(true) : undefined}
           />
           ) : (
             <div className="flex h-full w-full items-center justify-center bg-muted">

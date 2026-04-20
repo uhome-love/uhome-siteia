@@ -29,6 +29,17 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, info: ErrorInfo) {
     console.error("[ErrorBoundary]", error, info.componentStack);
+    // Evita que o Google indexe a página de erro como sitelink.
+    if (typeof document !== "undefined") {
+      document.title = "Uhome Imóveis | Apartamentos e Casas à Venda em Porto Alegre";
+      let robots = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
+      if (!robots) {
+        robots = document.createElement("meta");
+        robots.name = "robots";
+        document.head.appendChild(robots);
+      }
+      robots.content = "noindex, nofollow";
+    }
   }
 
   handleRetry = () => {
@@ -44,12 +55,12 @@ export class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background px-6 text-center">
           <h1 className="text-2xl font-bold text-foreground">
-            {isChunk ? "Atualização disponível" : "Algo deu errado"}
+            {isChunk ? "Atualização disponível" : "Recarregue a página"}
           </h1>
           <p className="max-w-md text-sm text-muted-foreground">
             {isChunk
               ? "Uma nova versão do site foi publicada. Recarregue a página para continuar."
-              : "Ocorreu um erro inesperado. Tente recarregar a página."}
+              : "Não foi possível carregar este conteúdo. Recarregue a página para tentar novamente."}
           </p>
           <div className="flex gap-3">
             <button

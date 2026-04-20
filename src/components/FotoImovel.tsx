@@ -70,7 +70,7 @@ export const FotoImovel = forwardRef<HTMLImageElement, FotoImovelProps>(function
         height={height || 300}
         sizes={sizes}
         onLoad={handleLoad}
-        onError={() => setErro(true)}
+        onError={handleErr}
         {...(!loaded && { "data-loading": "true" })}
       />
     </div>

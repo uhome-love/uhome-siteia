@@ -921,38 +921,50 @@ export type Database = {
       }
       vitrines: {
         Row: {
+          cliques_whatsapp: number
           corretor_id: string | null
           corretor_slug: string | null
           created_at: string
+          created_by: string | null
           id: string
           imovel_codigos: string[]
+          lead_id: string | null
           lead_nome: string | null
           lead_telefone: string | null
           mensagem: string | null
+          subtitulo: string | null
           titulo: string | null
           visualizacoes: number
         }
         Insert: {
+          cliques_whatsapp?: number
           corretor_id?: string | null
           corretor_slug?: string | null
           created_at?: string
+          created_by?: string | null
           id?: string
           imovel_codigos?: string[]
+          lead_id?: string | null
           lead_nome?: string | null
           lead_telefone?: string | null
           mensagem?: string | null
+          subtitulo?: string | null
           titulo?: string | null
           visualizacoes?: number
         }
         Update: {
+          cliques_whatsapp?: number
           corretor_id?: string | null
           corretor_slug?: string | null
           created_at?: string
+          created_by?: string | null
           id?: string
           imovel_codigos?: string[]
+          lead_id?: string | null
           lead_nome?: string | null
           lead_telefone?: string | null
           mensagem?: string | null
+          subtitulo?: string | null
           titulo?: string | null
           visualizacoes?: number
         }

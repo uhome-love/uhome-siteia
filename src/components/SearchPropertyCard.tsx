@@ -238,6 +238,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
                   decoding="async"
                   className="h-full w-full object-cover"
                   style={{ aspectRatio: "4/3" }}
+                  onError={i === 0 ? () => setPrimaryPhotoFailed(true) : undefined}
                 />
               </div>
             ))}

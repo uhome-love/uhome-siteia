@@ -377,8 +377,37 @@ serve(async (req) => {
       }
     }
 
-    // If sync is complete (no more pages), deactivate properties not touched during this sync
-    if (!morePages && syncStartedAt && autoChain) {
+    // If sync is complete (no more pages), deactivate properties not touched during this sync.
+    // SAFETY GUARDS to prevent mass-deactivation when Jetimob API returns empty/fails:
+    //   1. Must have synced at least 1 item across all chained chunks (totalFetched > 0)
+    //   2. Must have an expectedTotal from Jetimob (proves API responded properly)
+    //   3. totalFetched must be at least 50% of expectedTotal (sanity check)
+    const SAFETY_RATIO = 0.5;
+    const safeToDeactivate =
+      totalFetched > 0 &&
+      expectedTotal !== null &&
+      expectedTotal > 0 &&
+      totalFetched >= expectedTotal * SAFETY_RATIO;
+
+    if (!morePages && syncStartedAt && autoChain && !safeToDeactivate) {
+      console.warn(
+        `⚠️ Skipping auto-deactivate: totalFetched=${totalFetched}, expectedTotal=${expectedTotal}. ` +
+          `Refusing to deactivate to prevent mass-disable from a failed/empty Jetimob response.`
+      );
+      await supabase.from("sync_log").insert({
+        tipo: "jetimob",
+        direcao: "jetimob→uhome",
+        sucesso: true,
+        erro: "auto-deactivate skipped (safety guard)",
+        payload: {
+          action: "deactivate_skipped",
+          reason: "totalFetched too low vs expectedTotal",
+          total_fetched: totalFetched,
+          expected_total: expectedTotal,
+          sync_started_at: syncStartedAt,
+        },
+      });
+    } else if (!morePages && syncStartedAt && autoChain && safeToDeactivate) {
       try {
         console.log(`🧹 Deactivating properties not updated since ${syncStartedAt}...`);
         const { count, error: deactivateError } = await supabase

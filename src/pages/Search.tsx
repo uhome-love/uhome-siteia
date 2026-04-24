@@ -132,6 +132,7 @@ function ProgressiveGrid({
               onHover={setHoveredId}
               isFavorito={isFavorito}
               toggleFavorito={toggleFavorito}
+              onPhotoFail={onPhotoFail}
             />
             {i === 5 && <SearchCTACard />}
           </React.Fragment>

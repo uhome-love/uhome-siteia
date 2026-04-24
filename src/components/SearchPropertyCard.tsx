@@ -15,6 +15,8 @@ interface Props {
   onHover?: (id: string | null) => void;
   isFavorito?: (id: string) => boolean;
   toggleFavorito?: (id: string) => Promise<"needs_auth" | void>;
+  /** Called when the primary photo fails to load. Parent should remove the imovel from the list. */
+  onPhotoFail?: (id: string) => void;
 }
 
 type BadgeStyle = "novo" | "exclusivo" | "visto" | "otimo-preco" | "oportunidade" | "em-obras" | "lancamento" | "novo-imovel";

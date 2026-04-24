@@ -936,6 +936,7 @@ const Search = () => {
                 setHoveredId={setHoveredId}
                 isFavorito={isFavorito}
                 toggleFavorito={toggleFavorito}
+                onPhotoFail={handlePhotoFail}
                 loadMore={loadMore}
                 loadingMore={loadingMore}
                 isMobile={isMobile}

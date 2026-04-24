@@ -15,6 +15,8 @@ interface Props {
   onHover?: (id: string | null) => void;
   isFavorito?: (id: string) => boolean;
   toggleFavorito?: (id: string) => Promise<"needs_auth" | void>;
+  /** Called when the primary photo fails to load. Parent should remove the imovel from the list. */
+  onPhotoFail?: (id: string) => void;
 }
 
 type BadgeStyle = "novo" | "exclusivo" | "visto" | "otimo-preco" | "oportunidade" | "em-obras" | "lancamento" | "novo-imovel";
@@ -67,7 +69,7 @@ const badgeClasses: Record<BadgeStyle, string> = {
   "novo-imovel": "bg-sky-500/90 text-white font-semibold shadow-sm",
 };
 
-export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavorito: isFavoritoProp, toggleFavorito: toggleFavoritoProp }, ref) {
+export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavorito: isFavoritoProp, toggleFavorito: toggleFavoritoProp, onPhotoFail }, ref) {
   const [hovering, setHovering] = useState(false);
   const [fotoAtiva, setFotoAtiva] = useState(0);
   const [showAuth, setShowAuth] = useState(false);
@@ -238,7 +240,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
                   decoding="async"
                   className="h-full w-full object-cover"
                   style={{ aspectRatio: "4/3" }}
-                  onError={i === 0 ? () => setPrimaryPhotoFailed(true) : undefined}
+                  onError={i === 0 ? () => { setPrimaryPhotoFailed(true); onPhotoFail?.(imovel.id); } : undefined}
                 />
               </div>
             ))}
@@ -346,7 +348,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
             decoding="async"
             className="h-full w-full object-cover transition-transform duration-500"
             style={{ transform: hovering ? "scale(1.03)" : "scale(1)" }}
-            onError={fotoAtiva === 0 ? () => setPrimaryPhotoFailed(true) : undefined}
+            onError={fotoAtiva === 0 ? () => { setPrimaryPhotoFailed(true); onPhotoFail?.(imovel.id); } : undefined}
           />
           ) : (
             <div className="flex h-full w-full items-center justify-center bg-muted">

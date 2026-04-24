@@ -66,6 +66,7 @@ function ProgressiveGrid({
   setHoveredId,
   isFavorito,
   toggleFavorito,
+  onPhotoFail,
   loadMore,
   loadingMore,
   isMobile,
@@ -77,6 +78,7 @@ function ProgressiveGrid({
   setHoveredId: (id: string | null) => void;
   isFavorito?: (id: string) => boolean;
   toggleFavorito?: (id: string) => Promise<"needs_auth" | void>;
+  onPhotoFail?: (id: string) => void;
   loadMore: () => void;
   loadingMore: boolean;
   isMobile: boolean;
@@ -130,6 +132,7 @@ function ProgressiveGrid({
               onHover={setHoveredId}
               isFavorito={isFavorito}
               toggleFavorito={toggleFavorito}
+              onPhotoFail={onPhotoFail}
             />
             {i === 5 && <SearchCTACard />}
           </React.Fragment>
@@ -190,6 +193,16 @@ const Search = () => {
   const [mobileFilters, setMobileFilters] = useState(false);
   const [advancedFilters, setAdvancedFilters] = useState(false);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  // IDs of imoveis whose primary photo failed to load — filtered out before rendering to avoid grid gaps
+  const [brokenPhotoIds, setBrokenPhotoIds] = useState<Set<string>>(() => new Set());
+  const handlePhotoFail = useCallback((id: string) => {
+    setBrokenPhotoIds((prev) => {
+      if (prev.has(id)) return prev;
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
+  }, []);
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [alertEmail, setAlertEmail] = useState("");
   const [showLeadCTA, setShowLeadCTA] = useState(false);
@@ -368,7 +381,12 @@ const Search = () => {
     enabled: enableQuery && !aiOverrideData && !buscandoIA,
   });
   
-  const imoveis = aiOverrideData?.imoveis ?? queryImoveis;
+  const rawImoveis = aiOverrideData?.imoveis ?? queryImoveis;
+  // Filter out imoveis whose primary photo failed — prevents empty slots in the grid
+  const imoveis = useMemo(
+    () => brokenPhotoIds.size === 0 ? rawImoveis : rawImoveis.filter((im) => !brokenPhotoIds.has(im.id)),
+    [rawImoveis, brokenPhotoIds]
+  );
   const total = aiOverrideData?.total ?? queryTotal;
   const loading = aiOverrideData ? false : queryLoading;
   const isFetchingOverlay = !loading && queryFetching && !aiOverrideData;
@@ -918,6 +936,7 @@ const Search = () => {
                 setHoveredId={setHoveredId}
                 isFavorito={isFavorito}
                 toggleFavorito={toggleFavorito}
+                onPhotoFail={handlePhotoFail}
                 loadMore={loadMore}
                 loadingMore={loadingMore}
                 isMobile={isMobile}

@@ -240,7 +240,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
                   decoding="async"
                   className="h-full w-full object-cover"
                   style={{ aspectRatio: "4/3" }}
-                  onError={i === 0 ? () => setPrimaryPhotoFailed(true) : undefined}
+                  onError={i === 0 ? () => { setPrimaryPhotoFailed(true); onPhotoFail?.(imovel.id); } : undefined}
                 />
               </div>
             ))}
@@ -348,7 +348,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
             decoding="async"
             className="h-full w-full object-cover transition-transform duration-500"
             style={{ transform: hovering ? "scale(1.03)" : "scale(1)" }}
-            onError={fotoAtiva === 0 ? () => setPrimaryPhotoFailed(true) : undefined}
+            onError={fotoAtiva === 0 ? () => { setPrimaryPhotoFailed(true); onPhotoFail?.(imovel.id); } : undefined}
           />
           ) : (
             <div className="flex h-full w-full items-center justify-center bg-muted">

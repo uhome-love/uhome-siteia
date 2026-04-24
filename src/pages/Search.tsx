@@ -190,6 +190,16 @@ const Search = () => {
   const [mobileFilters, setMobileFilters] = useState(false);
   const [advancedFilters, setAdvancedFilters] = useState(false);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  // IDs of imoveis whose primary photo failed to load — filtered out before rendering to avoid grid gaps
+  const [brokenPhotoIds, setBrokenPhotoIds] = useState<Set<string>>(() => new Set());
+  const handlePhotoFail = useCallback((id: string) => {
+    setBrokenPhotoIds((prev) => {
+      if (prev.has(id)) return prev;
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
+  }, []);
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [alertEmail, setAlertEmail] = useState("");
   const [showLeadCTA, setShowLeadCTA] = useState(false);

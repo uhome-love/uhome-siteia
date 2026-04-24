@@ -378,7 +378,12 @@ const Search = () => {
     enabled: enableQuery && !aiOverrideData && !buscandoIA,
   });
   
-  const imoveis = aiOverrideData?.imoveis ?? queryImoveis;
+  const rawImoveis = aiOverrideData?.imoveis ?? queryImoveis;
+  // Filter out imoveis whose primary photo failed — prevents empty slots in the grid
+  const imoveis = useMemo(
+    () => brokenPhotoIds.size === 0 ? rawImoveis : rawImoveis.filter((im) => !brokenPhotoIds.has(im.id)),
+    [rawImoveis, brokenPhotoIds]
+  );
   const total = aiOverrideData?.total ?? queryTotal;
   const loading = aiOverrideData ? false : queryLoading;
   const isFetchingOverlay = !loading && queryFetching && !aiOverrideData;

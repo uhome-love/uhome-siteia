@@ -66,6 +66,7 @@ function ProgressiveGrid({
   setHoveredId,
   isFavorito,
   toggleFavorito,
+  onPhotoFail,
   loadMore,
   loadingMore,
   isMobile,
@@ -77,6 +78,7 @@ function ProgressiveGrid({
   setHoveredId: (id: string | null) => void;
   isFavorito?: (id: string) => boolean;
   toggleFavorito?: (id: string) => Promise<"needs_auth" | void>;
+  onPhotoFail?: (id: string) => void;
   loadMore: () => void;
   loadingMore: boolean;
   isMobile: boolean;

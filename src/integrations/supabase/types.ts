@@ -919,6 +919,47 @@ export type Database = {
         }
         Relationships: []
       }
+      vitrine_interacoes: {
+        Row: {
+          created_at: string
+          id: string
+          imovel_id: string | null
+          lead_nome: string | null
+          lead_telefone: string | null
+          metadata: Json
+          tipo: string
+          vitrine_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          imovel_id?: string | null
+          lead_nome?: string | null
+          lead_telefone?: string | null
+          metadata?: Json
+          tipo: string
+          vitrine_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          imovel_id?: string | null
+          lead_nome?: string | null
+          lead_telefone?: string | null
+          metadata?: Json
+          tipo?: string
+          vitrine_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vitrine_interacoes_vitrine_id_fkey"
+            columns: ["vitrine_id"]
+            isOneToOne: false
+            referencedRelation: "vitrines"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vitrines: {
         Row: {
           cliques_whatsapp: number
@@ -926,13 +967,18 @@ export type Database = {
           corretor_slug: string | null
           created_at: string
           created_by: string | null
+          dados_custom: Json | null
+          expires_at: string | null
           id: string
           imovel_codigos: string[]
           lead_id: string | null
           lead_nome: string | null
           lead_telefone: string | null
           mensagem: string | null
+          mensagem_corretor: string | null
+          pipeline_lead_id: string | null
           subtitulo: string | null
+          tipo: string
           titulo: string | null
           visualizacoes: number
         }
@@ -942,13 +988,18 @@ export type Database = {
           corretor_slug?: string | null
           created_at?: string
           created_by?: string | null
+          dados_custom?: Json | null
+          expires_at?: string | null
           id?: string
           imovel_codigos?: string[]
           lead_id?: string | null
           lead_nome?: string | null
           lead_telefone?: string | null
           mensagem?: string | null
+          mensagem_corretor?: string | null
+          pipeline_lead_id?: string | null
           subtitulo?: string | null
+          tipo?: string
           titulo?: string | null
           visualizacoes?: number
         }
@@ -958,13 +1009,18 @@ export type Database = {
           corretor_slug?: string | null
           created_at?: string
           created_by?: string | null
+          dados_custom?: Json | null
+          expires_at?: string | null
           id?: string
           imovel_codigos?: string[]
           lead_id?: string | null
           lead_nome?: string | null
           lead_telefone?: string | null
           mensagem?: string | null
+          mensagem_corretor?: string | null
+          pipeline_lead_id?: string | null
           subtitulo?: string | null
+          tipo?: string
           titulo?: string | null
           visualizacoes?: number
         }

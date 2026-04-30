@@ -107,6 +107,7 @@ Deno.serve(async (req) => {
           expires_at: expires_at ?? null,
           // created_by é NOT NULL pela RLS pública; cai no corretor_id se vier
           created_by: created_by ?? corretor_id ?? null,
+          imoveis_resolvidos: snapshot,
         };
 
         const { data, error } = await supabase

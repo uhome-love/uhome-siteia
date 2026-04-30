@@ -67,6 +67,29 @@ Deno.serve(async (req) => {
           return json({ error: "imovel_codigos required" }, 400);
         }
 
+        // Resolve imóveis pelos códigos para criar snapshot
+        const { data: imoveisAtuais } = await supabase
+          .rpc("get_imoveis_by_codigos", { codigos: imovel_codigos });
+
+        const snapshot = (imoveisAtuais ?? []).map((im: any) => ({
+          id: im.id,
+          jetimob_id: im.jetimob_id,
+          slug: im.slug,
+          titulo: im.titulo,
+          tipo: im.tipo,
+          preco: im.preco,
+          preco_condominio: im.preco_condominio,
+          area_total: im.area_total,
+          area_util: im.area_util,
+          quartos: im.quartos,
+          banheiros: im.banheiros,
+          vagas: im.vagas,
+          bairro: im.bairro,
+          cidade: im.cidade,
+          foto_principal: im.foto_principal,
+          status: im.status,
+        }));
+
         const insertRow: Record<string, unknown> = {
           corretor_id: corretor_id ?? null,
           corretor_slug: corretor_slug ?? null,

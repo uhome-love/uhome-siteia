@@ -272,6 +272,34 @@ Deno.serve(async (req) => {
         return json({ ok: true, imoveis: data });
       }
 
+      case "resolve_imoveis_by_codigos": {
+        // Versão simples via RPC - busca apenas por jetimob_id
+        const { codigos } = payload;
+        if (!Array.isArray(codigos) || codigos.length === 0) {
+          return json({ error: "codigos[] required" }, 400);
+        }
+        const { data, error } = await supabase.rpc("get_imoveis_by_codigos", { codigos });
+        if (error) throw error;
+        return json({ ok: true, imoveis: data });
+      }
+
+      // ─── CORRETORES ────────────────────────────────────────────
+      case "upsert_corretor": {
+        const { crm_user_id, email, nome, telefone, foto_url } = payload;
+        if (!crm_user_id || !email) {
+          return json({ error: "crm_user_id and email required" }, 400);
+        }
+        const { data, error } = await supabase.rpc("upsert_corretor_from_crm", {
+          _crm_user_id: crm_user_id,
+          _email: email,
+          _nome: nome ?? null,
+          _telefone: telefone ?? null,
+          _foto_url: foto_url ?? null,
+        });
+        if (error) throw error;
+        return json({ ok: true, profile_id: data });
+      }
+
       default:
         return json({ error: `Unknown action: ${action}` }, 400);
     }

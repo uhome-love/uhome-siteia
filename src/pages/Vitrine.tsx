@@ -6,7 +6,7 @@ import { useCorretor } from "@/contexts/CorretorContext";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { FotoImovel } from "@/components/FotoImovel";
-import { Bed, Bath, Car, Maximize, MapPin, Share2 } from "lucide-react";
+import { MapPin, Share2, MessageCircle, Phone } from "lucide-react";
 import { trackEvent } from "@/lib/trackEvent";
 import { Helmet } from "react-helmet-async";
 
@@ -16,15 +16,54 @@ interface VitrineData {
   corretor_id: string | null;
   lead_nome: string | null;
   titulo: string | null;
+  subtitulo: string | null;
   mensagem: string | null;
+  mensagem_corretor: string | null;
   imovel_codigos: string[];
+  imoveis_resolvidos: SnapshotImovel[] | null;
+  visualizacoes: number | null;
 }
+
+interface SnapshotImovel {
+  id?: string;
+  jetimob_id?: string;
+  slug?: string;
+  titulo?: string;
+  tipo?: string;
+  preco?: number;
+  preco_condominio?: number | null;
+  area_total?: number | null;
+  area_util?: number | null;
+  quartos?: number | null;
+  banheiros?: number | null;
+  vagas?: number | null;
+  bairro?: string;
+  cidade?: string;
+  foto_principal?: string | null;
+  status?: string;
+}
+
+interface CorretorData {
+  id: string;
+  nome: string | null;
+  foto_url: string | null;
+  avatar_url: string | null;
+  telefone: string | null;
+  creci: string | null;
+  slug_ref: string | null;
+}
+
+// Item renderizável — pode ser imóvel completo (ao vivo) ou snapshot (indisponível)
+type ItemVitrine =
+  | { kind: "live"; imovel: Imovel }
+  | { kind: "snapshot"; data: SnapshotImovel };
 
 export default function Vitrine() {
   const { id } = useParams<{ id: string }>();
   const { prefixLink } = useCorretor();
   const [vitrine, setVitrine] = useState<VitrineData | null>(null);
-  const [imoveis, setImoveis] = useState<Imovel[]>([]);
+  const [itens, setItens] = useState<ItemVitrine[]>([]);
+  const [corretor, setCorretor] = useState<CorretorData | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
@@ -34,10 +73,11 @@ export default function Vitrine() {
     async function load() {
       setLoading(true);
 
-      // Fetch vitrine record
       const { data: v } = await (supabase as any)
         .from("vitrines")
-        .select("id, corretor_slug, corretor_id, lead_nome, titulo, mensagem, imovel_codigos")
+        .select(
+          "id, corretor_slug, corretor_id, lead_nome, titulo, subtitulo, mensagem, mensagem_corretor, imovel_codigos, imoveis_resolvidos, visualizacoes"
+        )
         .eq("id", id)
         .maybeSingle();
 
@@ -49,25 +89,55 @@ export default function Vitrine() {
 
       setVitrine(v);
 
-      // Fetch properties by jetimob_id (codigo)
-      if (v.imovel_codigos?.length) {
+      // 1) Buscar imóveis ao vivo
+      const codigos: string[] = v.imovel_codigos ?? [];
+      let liveImoveis: Imovel[] = [];
+      if (codigos.length) {
         const { data: props } = await supabase
           .from("imoveis")
           .select("*")
-          .in("jetimob_id", v.imovel_codigos)
+          .in("jetimob_id", codigos)
           .eq("status", "disponivel");
-
-        setImoveis((props as unknown as Imovel[]) || []);
+        liveImoveis = (props as unknown as Imovel[]) || [];
       }
 
-      // Track vitrine view
+      // 2) Para códigos sem match ao vivo, usar snapshot
+      const liveCodigos = new Set(liveImoveis.map((im: any) => im.jetimob_id));
+      const snapshot = (v.imoveis_resolvidos ?? []) as SnapshotImovel[];
+      const fallback = snapshot.filter(
+        (s) => s.jetimob_id && !liveCodigos.has(s.jetimob_id)
+      );
+
+      // Preserva ordem original dos códigos
+      const itensOrdenados: ItemVitrine[] = [];
+      for (const cod of codigos) {
+        const live = liveImoveis.find((im: any) => im.jetimob_id === cod);
+        if (live) {
+          itensOrdenados.push({ kind: "live", imovel: live });
+          continue;
+        }
+        const snap = fallback.find((s) => s.jetimob_id === cod);
+        if (snap) itensOrdenados.push({ kind: "snapshot", data: snap });
+      }
+      setItens(itensOrdenados);
+
+      // 3) Buscar corretor
+      if (v.corretor_id) {
+        const { data: c } = await supabase
+          .from("profiles")
+          .select("id, nome, foto_url, avatar_url, telefone, creci, slug_ref")
+          .eq("id", v.corretor_id)
+          .maybeSingle();
+        if (c) setCorretor(c as CorretorData);
+      }
+
+      // Track + incrementa view
       trackEvent({
         tipo: "imovel_visualizado",
         imovel_slug: `vitrine-${v.id}`,
         imovel_titulo: v.titulo || `Vitrine ${v.lead_nome || ""}`,
       });
 
-      // Increment view count (fire-and-forget)
       (supabase as any)
         .from("vitrines")
         .update({ visualizacoes: (v.visualizacoes || 0) + 1 })
@@ -89,14 +159,17 @@ export default function Vitrine() {
   }, [vitrine]);
 
   const ogImage = useMemo(() => {
-    if (imoveis.length > 0) return fotoPrincipal(imoveis[0]);
-    return "https://uhome.com.br/og-image.png";
-  }, [imoveis]);
+    const first = itens[0];
+    if (!first) return "https://uhome.com.br/og-image.png";
+    if (first.kind === "live") return fotoPrincipal(first.imovel);
+    return first.data.foto_principal || "https://uhome.com.br/og-image.png";
+  }, [itens]);
 
   const ogDescription = useMemo(() => {
-    if (!vitrine) return "";
-    return `${imoveis.length} imóveis selecionados especialmente para você. Confira preços, fotos e detalhes.`;
-  }, [vitrine, imoveis]);
+    if (vitrine?.mensagem) return vitrine.mensagem.slice(0, 160);
+    if (vitrine?.subtitulo) return vitrine.subtitulo.slice(0, 160);
+    return `${itens.length} imóveis selecionados especialmente para você. Confira preços, fotos e detalhes.`;
+  }, [vitrine, itens]);
 
   const handleShare = async () => {
     const url = window.location.href;
@@ -148,15 +221,18 @@ export default function Vitrine() {
 
       <main className="mx-auto max-w-7xl px-4 pt-20 pb-8 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-foreground sm:text-3xl">
               {vitrine.titulo || (vitrine.lead_nome
                 ? `Seleção especial para ${vitrine.lead_nome}`
                 : "Vitrine personalizada")}
             </h1>
-            <p className="mt-1 text-muted-foreground">
-              {imoveis.length} {imoveis.length === 1 ? "imóvel selecionado" : "imóveis selecionados"} para você
+            {vitrine.subtitulo && (
+              <p className="mt-1 text-muted-foreground">{vitrine.subtitulo}</p>
+            )}
+            <p className="mt-1 text-sm text-muted-foreground">
+              {itens.length} {itens.length === 1 ? "imóvel selecionado" : "imóveis selecionados"} para você
             </p>
             {vitrine.mensagem && (
               <p className="mt-2 max-w-2xl text-sm text-muted-foreground italic">
@@ -166,15 +242,20 @@ export default function Vitrine() {
           </div>
           <button
             onClick={handleShare}
-            className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium text-foreground shadow-sm transition hover:bg-muted"
+            className="inline-flex items-center gap-2 self-start rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium text-foreground shadow-sm transition hover:bg-muted"
           >
             <Share2 className="h-4 w-4" />
             Compartilhar
           </button>
         </div>
 
+        {/* Bloco do corretor */}
+        {corretor && (
+          <CorretorBlock corretor={corretor} mensagem={vitrine.mensagem_corretor} vitrineId={vitrine.id} />
+        )}
+
         {/* Grid */}
-        {imoveis.length === 0 ? (
+        {itens.length === 0 ? (
           <div className="rounded-xl border border-border bg-muted/30 p-12 text-center">
             <p className="text-lg text-muted-foreground">
               Os imóveis desta vitrine não estão mais disponíveis.
@@ -182,9 +263,13 @@ export default function Vitrine() {
           </div>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {imoveis.map((imovel) => (
-              <VitrineCard key={imovel.id} imovel={imovel} prefixLink={prefixLink} />
-            ))}
+            {itens.map((item, idx) =>
+              item.kind === "live" ? (
+                <VitrineCard key={item.imovel.id} imovel={item.imovel} prefixLink={prefixLink} />
+              ) : (
+                <SnapshotCard key={`snap-${idx}`} data={item.data} />
+              )
+            )}
           </div>
         )}
       </main>
@@ -194,6 +279,136 @@ export default function Vitrine() {
   );
 }
 
+// ─── Bloco do corretor ─────────────────────────────────────────────
+function CorretorBlock({
+  corretor,
+  mensagem,
+  vitrineId,
+}: {
+  corretor: CorretorData;
+  mensagem: string | null;
+  vitrineId: string;
+}) {
+  const foto = corretor.foto_url || corretor.avatar_url || "";
+  const telDigits = (corretor.telefone || "").replace(/\D/g, "");
+  const waNumber = telDigits.length > 0
+    ? (telDigits.startsWith("55") ? telDigits : `55${telDigits}`)
+    : "";
+  const waUrl = waNumber
+    ? `https://wa.me/${waNumber}?text=${encodeURIComponent(
+        `Olá ${corretor.nome ?? ""}! Vi a vitrine que você compartilhou e gostaria de mais informações.`
+      )}`
+    : null;
+
+  const handleWaClick = () => {
+    (supabase as any)
+      .from("vitrines")
+      .select("cliques_whatsapp")
+      .eq("id", vitrineId)
+      .maybeSingle()
+      .then(({ data }: any) => {
+        if (data) {
+          (supabase as any)
+            .from("vitrines")
+            .update({ cliques_whatsapp: (data.cliques_whatsapp || 0) + 1 })
+            .eq("id", vitrineId)
+            .then(() => {});
+        }
+      });
+  };
+
+  return (
+    <div className="mb-8 flex flex-col gap-4 rounded-xl border border-border bg-card p-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex items-center gap-4">
+        {foto ? (
+          <img
+            src={foto}
+            alt={corretor.nome ?? "Corretor"}
+            className="h-14 w-14 rounded-full object-cover"
+            loading="lazy"
+          />
+        ) : (
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted text-lg font-semibold text-muted-foreground">
+            {(corretor.nome ?? "?").slice(0, 1).toUpperCase()}
+          </div>
+        )}
+        <div>
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">Seu corretor</p>
+          <p className="text-base font-semibold text-foreground">{corretor.nome ?? "Corretor Uhome"}</p>
+          {corretor.creci && (
+            <p className="text-xs text-muted-foreground">CRECI {corretor.creci}</p>
+          )}
+          {mensagem && (
+            <p className="mt-1 max-w-md text-sm text-muted-foreground italic">"{mensagem}"</p>
+          )}
+        </div>
+      </div>
+      {waUrl && (
+        <a
+          href={waUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={handleWaClick}
+          className="inline-flex items-center gap-2 self-start rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600 sm:self-auto"
+        >
+          <MessageCircle className="h-4 w-4" />
+          WhatsApp
+        </a>
+      )}
+      {!waUrl && corretor.telefone && (
+        <a
+          href={`tel:${corretor.telefone}`}
+          className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
+        >
+          <Phone className="h-4 w-4" />
+          {corretor.telefone}
+        </a>
+      )}
+    </div>
+  );
+}
+
+// ─── Card do snapshot (imóvel indisponível) ────────────────────────
+function SnapshotCard({ data }: { data: SnapshotImovel }) {
+  return (
+    <div className="group block overflow-hidden rounded-xl border border-border bg-card opacity-75">
+      <div className="relative bg-muted" style={{ aspectRatio: "4/3" }}>
+        {data.foto_principal ? (
+          <FotoImovel
+            src={data.foto_principal}
+            alt={data.titulo ?? ""}
+            className="h-full w-full object-cover grayscale"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-muted-foreground">
+            Sem foto
+          </div>
+        )}
+        <div className="absolute left-2 top-2 rounded-md bg-black/70 px-2 py-1 text-[11px] font-semibold uppercase text-white">
+          Indisponível
+        </div>
+      </div>
+      <div className="p-4">
+        {data.preco ? (
+          <p className="text-lg font-bold text-foreground">{formatPreco(data.preco)}</p>
+        ) : null}
+        <h3 className="mt-1 line-clamp-1 text-sm font-medium text-foreground">{data.titulo}</h3>
+        {data.bairro && (
+          <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
+            <MapPin className="h-3 w-3" />
+            {data.bairro}
+            {data.cidade && data.cidade !== "Porto Alegre" ? `, ${data.cidade}` : ""}
+          </p>
+        )}
+        <p className="mt-2 text-xs text-muted-foreground">
+          Este imóvel não está mais disponível no catálogo.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ─── Card de imóvel ao vivo ────────────────────────────────────────
 function VitrineCard({ imovel, prefixLink }: { imovel: Imovel; prefixLink: (p: string) => string }) {
   const [hovering, setHovering] = useState(false);
   const [fotoAtiva, setFotoAtiva] = useState(0);
@@ -241,7 +456,7 @@ function VitrineCard({ imovel, prefixLink }: { imovel: Imovel; prefixLink: (p: s
     if (idx > 0) loadFullFotos();
   }, [loadFullFotos]);
 
-  const area = imovel.area_total ?? imovel.area_util ?? 0;
+  const area = imovel.area_util ?? imovel.area_total ?? 0;
   const statsArr = [
     area > 0 ? `${area} m²` : null,
     (imovel.quartos ?? 0) > 0 ? `${imovel.quartos} quarto${imovel.quartos! > 1 ? "s" : ""}` : null,

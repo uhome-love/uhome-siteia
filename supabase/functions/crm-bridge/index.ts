@@ -67,6 +67,29 @@ Deno.serve(async (req) => {
           return json({ error: "imovel_codigos required" }, 400);
         }
 
+        // Resolve imóveis pelos códigos para criar snapshot
+        const { data: imoveisAtuais } = await supabase
+          .rpc("get_imoveis_by_codigos", { codigos: imovel_codigos });
+
+        const snapshot = (imoveisAtuais ?? []).map((im: any) => ({
+          id: im.id,
+          jetimob_id: im.jetimob_id,
+          slug: im.slug,
+          titulo: im.titulo,
+          tipo: im.tipo,
+          preco: im.preco,
+          preco_condominio: im.preco_condominio,
+          area_total: im.area_total,
+          area_util: im.area_util,
+          quartos: im.quartos,
+          banheiros: im.banheiros,
+          vagas: im.vagas,
+          bairro: im.bairro,
+          cidade: im.cidade,
+          foto_principal: im.foto_principal,
+          status: im.status,
+        }));
+
         const insertRow: Record<string, unknown> = {
           corretor_id: corretor_id ?? null,
           corretor_slug: corretor_slug ?? null,
@@ -84,6 +107,7 @@ Deno.serve(async (req) => {
           expires_at: expires_at ?? null,
           // created_by é NOT NULL pela RLS pública; cai no corretor_id se vier
           created_by: created_by ?? corretor_id ?? null,
+          imoveis_resolvidos: snapshot,
         };
 
         const { data, error } = await supabase
@@ -246,6 +270,34 @@ Deno.serve(async (req) => {
           );
         if (error) throw error;
         return json({ ok: true, imoveis: data });
+      }
+
+      case "resolve_imoveis_by_codigos": {
+        // Versão simples via RPC - busca apenas por jetimob_id
+        const { codigos } = payload;
+        if (!Array.isArray(codigos) || codigos.length === 0) {
+          return json({ error: "codigos[] required" }, 400);
+        }
+        const { data, error } = await supabase.rpc("get_imoveis_by_codigos", { codigos });
+        if (error) throw error;
+        return json({ ok: true, imoveis: data });
+      }
+
+      // ─── CORRETORES ────────────────────────────────────────────
+      case "upsert_corretor": {
+        const { crm_user_id, email, nome, telefone, foto_url } = payload;
+        if (!crm_user_id || !email) {
+          return json({ error: "crm_user_id and email required" }, 400);
+        }
+        const { data, error } = await supabase.rpc("upsert_corretor_from_crm", {
+          _crm_user_id: crm_user_id,
+          _email: email,
+          _nome: nome ?? null,
+          _telefone: telefone ?? null,
+          _foto_url: foto_url ?? null,
+        });
+        if (error) throw error;
+        return json({ ok: true, profile_id: data });
       }
 
       default:

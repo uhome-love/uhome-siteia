@@ -970,6 +970,7 @@ export type Database = {
           dados_custom: Json | null
           expires_at: string | null
           id: string
+          imoveis_resolvidos: Json | null
           imovel_codigos: string[]
           lead_id: string | null
           lead_nome: string | null
@@ -991,6 +992,7 @@ export type Database = {
           dados_custom?: Json | null
           expires_at?: string | null
           id?: string
+          imoveis_resolvidos?: Json | null
           imovel_codigos?: string[]
           lead_id?: string | null
           lead_nome?: string | null
@@ -1012,6 +1014,7 @@ export type Database = {
           dados_custom?: Json | null
           expires_at?: string | null
           id?: string
+          imoveis_resolvidos?: Json | null
           imovel_codigos?: string[]
           lead_id?: string | null
           lead_nome?: string | null
@@ -1117,6 +1120,55 @@ export type Database = {
           count: number
         }[]
       }
+      get_imoveis_by_codigos: {
+        Args: { codigos: string[] }
+        Returns: {
+          andar: number | null
+          area_total: number | null
+          area_util: number | null
+          bairro: string
+          banheiros: number | null
+          cep: string | null
+          cidade: string | null
+          condominio_id: string | null
+          condominio_nome: string | null
+          corretor_id: string | null
+          created_at: string | null
+          descricao: string | null
+          destaque: boolean | null
+          diferenciais: string[] | null
+          endereco_completo: string | null
+          fase: string | null
+          finalidade: string
+          foto_principal: string | null
+          fotos: Json | null
+          id: string
+          jetimob_id: string | null
+          jetimob_raw: Json | null
+          latitude: number | null
+          longitude: number | null
+          origem: string | null
+          preco: number
+          preco_condominio: number | null
+          preco_iptu: number | null
+          publicado_em: string | null
+          quartos: number | null
+          slug: string
+          status: string | null
+          tipo: string
+          titulo: string
+          uf: string | null
+          updated_at: string | null
+          vagas: number | null
+          video_url: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "imoveis"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       get_map_pins: {
         Args: {
           lat_max?: number
@@ -1157,6 +1209,16 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      upsert_corretor_from_crm: {
+        Args: {
+          _crm_user_id: string
+          _email: string
+          _foto_url: string
+          _nome: string
+          _telefone: string
+        }
+        Returns: string
       }
     }
     Enums: {

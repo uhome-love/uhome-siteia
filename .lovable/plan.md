@@ -1,122 +1,128 @@
+# Integração CRM ↔ Site: ajustes na tabela `vitrines`, página `/vitrine` e RPCs
 
+## ⚠️ Conflitos detectados no prompt do CRM (não vou aplicar como veio)
 
-# Migration: `vitrines` — preparar para integração com CRM
+O prompt do CRM assume um schema que **não é** o do Site. Se eu rodar como veio, quebra a `/vitrine/:id` que já existe e que está em produção. Correções aplicadas:
 
-Aplicar todas as mudanças propostas anteriormente em **uma única transação**, com os acréscimos solicitados (`COMMENT ON COLUMN` e validação do `SET search_path = public` na trigger function), seguida de um relatório de verificação.
+| O CRM pediu | Realidade do Site | Decisão |
+|---|---|---|
+| `vitrines.slug` (coluna + índice + rota `/vitrine/:slug`) | **Não existe.** Site usa `/vitrine/:id` (UUID) | Mantenho `:id`. Não crio coluna `slug`. |
+| `vitrines.imoveis_ids` (índice GIN) | **Não existe.** Site usa `imovel_codigos TEXT[]` | Crio índice GIN em `imovel_codigos` |
+| `vitrines.descricao` | **Não existe.** Site usa `mensagem` e `subtitulo` | Uso `mensagem`/`subtitulo` no SEO |
+| `imoveis.imovel_codigo` (RPC `get_imoveis_by_codigos`) | Coluna se chama `jetimob_id` | RPC busca por `jetimob_id` |
+| `profiles.telefone_whatsapp` | Coluna se chama `telefone` | Uso `telefone` |
+| `profiles` tem `email`, `foto_url`, `nome`, `role`, `uhomesales_id` ✅ | OK | RPC `upsert_corretor_from_crm` funciona |
+| Trigger valida `corretor_id NOT NULL` | Vitrines do `WhatsAppLeadModal` e fluxos públicos não têm corretor | Validação só exige `created_by` (que já é NOT NULL pela RLS); `corretor_id` continua opcional |
 
-## SQL a executar (transação única)
+Vou avisar o pessoal do CRM dessas correções pra eles ajustarem a `vitrine-bridge` deles.
+
+---
+
+## 1. Migration no banco do Site
 
 ```sql
-BEGIN;
-
--- 1. Schema: novas colunas (idempotente)
+-- Snapshot dos imóveis (fallback se imóvel for removido)
 ALTER TABLE public.vitrines
-  ADD COLUMN IF NOT EXISTS created_by uuid,
-  ADD COLUMN IF NOT EXISTS subtitulo text,
-  ADD COLUMN IF NOT EXISTS lead_id uuid,
-  ADD COLUMN IF NOT EXISTS cliques_whatsapp integer NOT NULL DEFAULT 0;
+  ADD COLUMN IF NOT EXISTS imoveis_resolvidos JSONB DEFAULT '[]'::jsonb;
 
--- 2. Documentação (COMMENT ON COLUMN)
-COMMENT ON COLUMN public.vitrines.created_by IS
-  'User ID de quem criou a vitrine. No fluxo atual, igual ao corretor_id; mantido separado para auditoria e futuras integrações (admin criando em nome de corretor).';
+-- Índices
+CREATE INDEX IF NOT EXISTS idx_vitrines_corretor_id
+  ON public.vitrines(corretor_id);
+CREATE INDEX IF NOT EXISTS idx_vitrines_imovel_codigos_gin
+  ON public.vitrines USING GIN(imovel_codigos);
+CREATE INDEX IF NOT EXISTS idx_profiles_uhomesales_id
+  ON public.profiles(uhomesales_id);
 
-COMMENT ON COLUMN public.vitrines.lead_id IS
-  'Soft reference para pipeline_leads.id no Supabase do CRM (uhomecrm). Sem foreign key por ser cross-project. Usado apenas pelo CRM para resgate/analytics.';
-
-COMMENT ON COLUMN public.vitrines.subtitulo IS
-  'Subtítulo opcional exibido abaixo do título na página /vitrine/:id.';
-
-COMMENT ON COLUMN public.vitrines.cliques_whatsapp IS
-  'Contador público incrementável por anon via trigger guard. Mede engajamento da vitrine.';
-
--- 3. Indexes
-CREATE INDEX IF NOT EXISTS idx_vitrines_created_by
-  ON public.vitrines (created_by);
-
-CREATE INDEX IF NOT EXISTS idx_vitrines_created_at
-  ON public.vitrines (created_at DESC);
-
--- 4. RLS: substituir INSERT permissivo
-DROP POLICY IF EXISTS "Anyone can insert vitrines" ON public.vitrines;
-
-CREATE POLICY "Public can insert vitrines with created_by"
-ON public.vitrines
-FOR INSERT
-TO anon, authenticated
-WITH CHECK (created_by IS NOT NULL);
-
--- 5. RLS: UPDATE público (validado pela trigger guard)
-DROP POLICY IF EXISTS "Public can increment vitrine counters" ON public.vitrines;
-
-CREATE POLICY "Public can increment vitrine counters"
-ON public.vitrines
-FOR UPDATE
-TO anon, authenticated
-USING (true)
-WITH CHECK (true);
-
--- 6. Trigger guard de imutabilidade (com SET search_path = public confirmado)
-CREATE OR REPLACE FUNCTION public.vitrines_guard_immutable_fields()
-RETURNS trigger
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public
-AS $$
-DECLARE
-  is_admin boolean := has_role(auth.uid(), 'admin'::app_role);
-  is_owner boolean := (NEW.corretor_id IS NOT NULL AND NEW.corretor_id = auth.uid());
+-- Trigger de validação (NÃO exige corretor_id; só valida se vier preenchido)
+CREATE OR REPLACE FUNCTION public.validate_vitrine_corretor()
+RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
 BEGIN
-  IF is_admin OR is_owner THEN
-    RETURN NEW;
+  IF NEW.corretor_id IS NOT NULL
+     AND NOT EXISTS (SELECT 1 FROM public.profiles WHERE id = NEW.corretor_id) THEN
+    RAISE EXCEPTION 'Corretor % não existe em profiles', NEW.corretor_id;
   END IF;
-
-  IF NEW.id              IS DISTINCT FROM OLD.id
-  OR NEW.created_at      IS DISTINCT FROM OLD.created_at
-  OR NEW.created_by      IS DISTINCT FROM OLD.created_by
-  OR NEW.corretor_id     IS DISTINCT FROM OLD.corretor_id
-  OR NEW.corretor_slug   IS DISTINCT FROM OLD.corretor_slug
-  OR NEW.lead_id         IS DISTINCT FROM OLD.lead_id
-  OR NEW.lead_nome       IS DISTINCT FROM OLD.lead_nome
-  OR NEW.lead_telefone   IS DISTINCT FROM OLD.lead_telefone
-  OR NEW.titulo          IS DISTINCT FROM OLD.titulo
-  OR NEW.subtitulo       IS DISTINCT FROM OLD.subtitulo
-  OR NEW.mensagem        IS DISTINCT FROM OLD.mensagem
-  OR NEW.imovel_codigos  IS DISTINCT FROM OLD.imovel_codigos
-  THEN
-    RAISE EXCEPTION 'Apenas visualizacoes e cliques_whatsapp podem ser alterados publicamente';
-  END IF;
-
   RETURN NEW;
 END;
 $$;
 
-DROP TRIGGER IF EXISTS trg_vitrines_guard_immutable ON public.vitrines;
-CREATE TRIGGER trg_vitrines_guard_immutable
-BEFORE UPDATE ON public.vitrines
-FOR EACH ROW EXECUTE FUNCTION public.vitrines_guard_immutable_fields();
+DROP TRIGGER IF EXISTS trg_validate_vitrine ON public.vitrines;
+CREATE TRIGGER trg_validate_vitrine
+  BEFORE INSERT OR UPDATE ON public.vitrines
+  FOR EACH ROW EXECUTE FUNCTION public.validate_vitrine_corretor();
 
-COMMIT;
+-- RPC: resolver imóveis por jetimob_id (códigos)
+CREATE OR REPLACE FUNCTION public.get_imoveis_by_codigos(codigos TEXT[])
+RETURNS SETOF public.imoveis
+LANGUAGE sql SECURITY DEFINER SET search_path = public AS $$
+  SELECT * FROM public.imoveis WHERE jetimob_id = ANY(codigos);
+$$;
+
+-- RPC: upsert corretor vindo do CRM
+CREATE OR REPLACE FUNCTION public.upsert_corretor_from_crm(
+  _crm_user_id UUID, _email TEXT, _nome TEXT,
+  _telefone TEXT, _foto_url TEXT
+) RETURNS UUID
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE _profile_id UUID;
+BEGIN
+  SELECT id INTO _profile_id FROM public.profiles
+    WHERE uhomesales_id = _crm_user_id OR email = _email LIMIT 1;
+
+  IF _profile_id IS NULL THEN
+    INSERT INTO public.profiles
+      (uhomesales_id, email, nome, telefone, foto_url, role, ativo)
+    VALUES (_crm_user_id, _email, _nome, _telefone, _foto_url, 'corretor', true)
+    RETURNING id INTO _profile_id;
+  ELSE
+    UPDATE public.profiles SET
+      uhomesales_id = COALESCE(_crm_user_id, uhomesales_id),
+      nome = COALESCE(_nome, nome),
+      telefone = COALESCE(_telefone, telefone),
+      foto_url = COALESCE(_foto_url, foto_url),
+      sincronizado_em = now()
+    WHERE id = _profile_id;
+  END IF;
+  RETURN _profile_id;
+END;
+$$;
 ```
 
-## Relatório pós-execução
+RLS de leitura pública em `vitrines` **já existe** (`Anyone can read vitrines`), não preciso recriar.
 
-Imediatamente após o `COMMIT`, executar queries de verificação e reportar:
+## 2. Atualizar `crm-bridge` edge function
 
-1. **Contagem de linhas**: `SELECT count(*) FROM public.vitrines;` antes e depois (devem ser iguais — só DDL).
-2. **Colunas adicionadas confirmadas**: query em `information_schema.columns` filtrando `column_name IN ('created_by','subtitulo','lead_id','cliques_whatsapp')`.
-3. **Indexes criados confirmados**: query em `pg_indexes` filtrando `indexname IN ('idx_vitrines_created_by','idx_vitrines_created_at')`.
-4. **Policies ativas após migration**: lista completa via `pg_policy` para `public.vitrines` (esperado: `Admins can manage vitrines`, `Anyone can read vitrines`, `Corretores can update own vitrines`, `Public can insert vitrines with created_by`, `Public can increment vitrine counters`).
-5. **Trigger ativa**: confirmar `trg_vitrines_guard_immutable` em `pg_trigger`.
-6. **search_path da função**: confirmar `proconfig` contém `search_path=public` em `pg_proc` para `vitrines_guard_immutable_fields`.
+Adicionar 2 actions na função que já criei:
 
-## Atualização de memória
+- `upsert_corretor` → chama `upsert_corretor_from_crm`
+- `resolve_imoveis_by_codigos` → chama `get_imoveis_by_codigos`
 
-Após sucesso, atualizar `mem://index.md` adicionando referência a uma nova entrada `mem://features/vitrines/crm-integration-schema` documentando:
-- Campos adicionados e seus papéis (`created_by` ≠ `corretor_id`, `lead_id` como soft reference cross-project).
-- Trigger `vitrines_guard_immutable_fields` como mecanismo de imutabilidade pública.
-- Policies finais e quem pode mutar o quê.
+E na action `create_vitrine` existente: depois de inserir, chamar `get_imoveis_by_codigos` e popular `imoveis_resolvidos` com snapshot mínimo (id, jetimob_id, titulo, preco, foto_principal, bairro, quartos, area_total, slug). Assim o snapshot fica preenchido automaticamente sem o CRM precisar mandar.
 
-## Escopo
+## 3. Refatorar `src/pages/Vitrine.tsx`
 
-Apenas mudanças de schema/segurança no DB. **Nenhuma alteração de código frontend** nesta etapa — `src/pages/Vitrine.tsx` continua compatível (lê `titulo`, `mensagem`, `imovel_codigos`, `corretor_slug`, `corretor_id`, `lead_nome`, `visualizacoes` que já existiam). O incremento de `cliques_whatsapp` e o uso de `subtitulo` ficam para implementações futuras.
+- Buscar vitrine por `id` (continua UUID, mantém `/vitrine/:id`)
+- Selecionar também `subtitulo`, `imoveis_resolvidos`, `mensagem_corretor`
+- **Resolução de imóveis em camadas:**
+  1. Buscar `imoveis` ao vivo por `jetimob_id IN (imovel_codigos)` com `status='disponivel'`
+  2. Para códigos sem match (imóvel removido/indisponível), usar `imoveis_resolvidos` como fallback
+  3. Cards do snapshot recebem badge "Indisponível" e não linkam pra `/imovel/:slug`
+- **Bloco do corretor** (novo): se `corretor_id` preenchido, fazer join com `profiles` (`nome, foto_url, telefone, creci, slug_ref`) e renderizar card no topo com botão WhatsApp em `wa.me/55<telefone-só-dígitos>`
+- **SEO**: `<title>` usa `titulo`, description usa `mensagem ?? subtitulo`, og:image usa primeira foto do primeiro imóvel resolvido
+- **Fallback de vitrine inexistente**: já existe (mantém tela "Vitrine não encontrada"). Não vou fazer redirect+toast porque destrói SEO de links compartilhados antigos.
 
+## 4. Não vou fazer (e por quê)
+
+- **Service role key**: continua impossível extrair pela UI do Lovable. Você não tem acesso ao Supabase. A `crm-bridge` com `x-crm-token` resolve isso — o CRM não precisa de service role do Site.
+- **Rota `/vitrine/:slug`**: criar coluna `slug` em `vitrines` agora quebraria todas as vitrines existentes (que só têm `id`). Se quiserem URLs amigáveis no futuro, faço numa segunda etapa com migração de dados.
+- **Coluna `descricao` em vitrines**: redundante com `mensagem`. Se o CRM precisa de um campo separado, uso `subtitulo` que já existe.
+
+## 5. Mensagem que vou preparar pra você mandar ao CRM
+
+Texto pronto explicando o schema real do Site (nomes de colunas corretos, endpoint da bridge, token compartilhado, lista de actions disponíveis), pra eles ajustarem a `vitrine-bridge` lado deles. Sem service role key, sem URL crua do Supabase — só a URL da edge function.
+
+## Resumo técnico
+
+- 1 migration (colunas + índices + trigger + 2 RPCs)
+- Update em `supabase/functions/crm-bridge/index.ts` (2 actions novas + snapshot automático no create)
+- Refator de `src/pages/Vitrine.tsx` (corretor + snapshot fallback + SEO)
+- Sem mudanças em rotas, sem deletar nada existente

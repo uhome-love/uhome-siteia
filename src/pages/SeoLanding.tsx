@@ -439,7 +439,7 @@ const SeoLanding = () => {
           </h2>
           <div className="mt-4 flex flex-wrap gap-2">
             {relatedBairros.map((b) => {
-              const tipoPrefix = config.tipo ? config.tipo + "s" : "imoveis";
+              const tipoPrefix = config.tipo ? tipoDbToPluralSlug(config.tipo) : "imoveis";
               return (
                 <Link
                   key={b.slug}

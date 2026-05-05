@@ -17,6 +17,7 @@ import {
   generateIntentDescription,
   slugify,
   SEO_TIPOS,
+  tipoDbToPluralSlug,
   type SeoPageConfig,
 } from "@/data/seoPages";
 import { bairrosData } from "@/data/bairros";

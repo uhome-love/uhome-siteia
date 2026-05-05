@@ -176,7 +176,7 @@ const SeoLanding = () => {
     if (!config || !config.bairro) return [];
     const bairroSlug = slugify(config.bairro);
     return SEO_TIPOS
-      .filter((t) => t !== (config.tipo ? config.tipo + "s" : ""))
+      .filter((t) => t !== (config.tipo ? tipoDbToPluralSlug(config.tipo) : ""))
       .map((t) => ({
         label: t.charAt(0).toUpperCase() + t.slice(1),
         href: `/${t}-${bairroSlug}`,

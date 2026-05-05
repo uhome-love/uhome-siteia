@@ -46,6 +46,26 @@ const TIPO_MAP: Record<string, { singular: string; plural: string; tipoDb: strin
   imoveis: { singular: "Imóvel", plural: "Imóveis", tipoDb: "" }, // no filter, all types
 };
 
+/**
+ * Mapeia um tipoDb (singular do banco, ex.: "comercial") para o slug plural
+ * usado nas URLs de SEO (ex.: "comerciais"). Evita pluralizações erradas
+ * tipo "comercials". Sempre prefere o slug plural existente em TIPO_MAP.
+ */
+export function tipoDbToPluralSlug(tipoDb: string | undefined | null): string {
+  if (!tipoDb) return "imoveis";
+  const map: Record<string, string> = {
+    apartamento: "apartamentos",
+    casa: "casas",
+    casa_condominio: "casas-em-condominio",
+    cobertura: "coberturas",
+    studio: "studios",
+    terreno: "terrenos",
+    comercial: "comerciais",
+    garden: "gardens",
+  };
+  return map[tipoDb] ?? `${tipoDb}s`;
+}
+
 // Intent pages config
 const INTENT_PAGES: Record<string, { h1: string; metaTitle: string; metaDesc: string; tipo?: string; precoMin?: number }> = {
   "apartamentos-a-venda-porto-alegre": {
@@ -65,6 +85,11 @@ const INTENT_PAGES: Record<string, { h1: string; metaTitle: string; metaDesc: st
     metaTitle: "Imóveis de Luxo Porto Alegre | Alto Padrão | Uhome",
     metaDesc: "Seleção exclusiva de imóveis de luxo em Porto Alegre. Apartamentos, coberturas e casas de alto padrão nos bairros mais nobres.",
     precoMin: 1500000,
+  },
+  "imoveis-porto-alegre": {
+    h1: "Imóveis à Venda em Porto Alegre",
+    metaTitle: "Imóveis à Venda em Porto Alegre | Uhome",
+    metaDesc: "Todos os imóveis à venda em Porto Alegre em um só lugar. Apartamentos, casas, coberturas e mais nos melhores bairros. Busca inteligente com mapa.",
   },
   "investimento-imobiliario-porto-alegre": {
     h1: "Investimento Imobiliário em Porto Alegre",

@@ -17,6 +17,7 @@ import {
   generateIntentDescription,
   slugify,
   SEO_TIPOS,
+  tipoDbToPluralSlug,
   type SeoPageConfig,
 } from "@/data/seoPages";
 import { bairrosData } from "@/data/bairros";
@@ -175,7 +176,7 @@ const SeoLanding = () => {
     if (!config || !config.bairro) return [];
     const bairroSlug = slugify(config.bairro);
     return SEO_TIPOS
-      .filter((t) => t !== (config.tipo ? config.tipo + "s" : ""))
+      .filter((t) => t !== (config.tipo ? tipoDbToPluralSlug(config.tipo) : ""))
       .map((t) => ({
         label: t.charAt(0).toUpperCase() + t.slice(1),
         href: `/${t}-${bairroSlug}`,
@@ -413,7 +414,7 @@ const SeoLanding = () => {
                 </Link>
               ))}
               {config.quartos == null && [1, 2, 3, 4].map((q) => {
-                const tipoSlug = config.tipo ? config.tipo + "s" : "apartamentos";
+                const tipoSlug = config.tipo ? tipoDbToPluralSlug(config.tipo) : "apartamentos";
                 const bairroSlug = slugify(config.bairro!);
                 return (
                   <Link
@@ -438,7 +439,7 @@ const SeoLanding = () => {
           </h2>
           <div className="mt-4 flex flex-wrap gap-2">
             {relatedBairros.map((b) => {
-              const tipoPrefix = config.tipo ? config.tipo + "s" : "imoveis";
+              const tipoPrefix = config.tipo ? tipoDbToPluralSlug(config.tipo) : "imoveis";
               return (
                 <Link
                   key={b.slug}

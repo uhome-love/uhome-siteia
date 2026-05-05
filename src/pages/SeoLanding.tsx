@@ -414,7 +414,7 @@ const SeoLanding = () => {
                 </Link>
               ))}
               {config.quartos == null && [1, 2, 3, 4].map((q) => {
-                const tipoSlug = config.tipo ? config.tipo + "s" : "apartamentos";
+                const tipoSlug = config.tipo ? tipoDbToPluralSlug(config.tipo) : "apartamentos";
                 const bairroSlug = slugify(config.bairro!);
                 return (
                   <Link

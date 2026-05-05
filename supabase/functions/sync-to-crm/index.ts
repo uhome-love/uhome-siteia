@@ -90,6 +90,11 @@ Deno.serve(async (req) => {
       result = await handleCaptacao(supabaseCRM, record, corretorCRMId)
     } else if (tipo === 'whatsapp_click') {
       result = await handleWhatsAppClick(supabaseCRM, record, corretorCRMId)
+    } else if (tipo === 'favorito') {
+      // Favoritos não são sincronizados ao CRM (apenas tracking interno).
+      // Tratamos como sucesso silencioso para não poluir sync_log com erros.
+      console.info(`[sync-to-crm] favorito ignorado (no-op) record=${record.id}`)
+      result = { ok: true, crm_lead_id: null }
     } else {
       result = { ok: false, error: `Unknown tipo: ${tipo}` }
     }

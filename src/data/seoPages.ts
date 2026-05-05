@@ -86,6 +86,11 @@ const INTENT_PAGES: Record<string, { h1: string; metaTitle: string; metaDesc: st
     metaDesc: "Seleção exclusiva de imóveis de luxo em Porto Alegre. Apartamentos, coberturas e casas de alto padrão nos bairros mais nobres.",
     precoMin: 1500000,
   },
+  "imoveis-porto-alegre": {
+    h1: "Imóveis à Venda em Porto Alegre",
+    metaTitle: "Imóveis à Venda em Porto Alegre | Uhome",
+    metaDesc: "Todos os imóveis à venda em Porto Alegre em um só lugar. Apartamentos, casas, coberturas e mais nos melhores bairros. Busca inteligente com mapa.",
+  },
   "investimento-imobiliario-porto-alegre": {
     h1: "Investimento Imobiliário em Porto Alegre",
     metaTitle: "Investimento Imobiliário Porto Alegre 2026 | Uhome",

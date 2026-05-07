@@ -361,16 +361,15 @@ const Search = () => {
   }, [filters]);
 
   // React Query — cached listing with 3 min staleTime
-  // Stabilize query key: always use max(page+1, 1) so returning to search
-  // with page=0 reuses the same cache key as the initial load
-  const stableLimit = useMemo(() => PAGE_SIZE * Math.max(page + 1, 1), [page]);
+  // Query key NÃO depende de page: paginação é feita via fetchNextPage,
+  // que faz append no cache sem refetchar a lista inteira (evita troca de cards).
   const queryFilters = useMemo<BuscaFilters>(() => ({
     ...buildFilters(),
     ordem: filters.ordem as any,
     bounds: filters.bounds || undefined,
-    limit: stableLimit,
+    limit: PAGE_SIZE,
     offset: 0,
-  }), [buildFilters, filters.ordem, filters.bounds, stableLimit]);
+  }), [buildFilters, filters.ordem, filters.bounds]);
 
   // AI mode can override listing data
   const [aiOverrideData, setAiOverrideData] = useState<{ imoveis: Imovel[]; total: number } | null>(null);

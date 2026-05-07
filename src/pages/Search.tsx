@@ -361,16 +361,15 @@ const Search = () => {
   }, [filters]);
 
   // React Query — cached listing with 3 min staleTime
-  // Stabilize query key: always use max(page+1, 1) so returning to search
-  // with page=0 reuses the same cache key as the initial load
-  const stableLimit = useMemo(() => PAGE_SIZE * Math.max(page + 1, 1), [page]);
+  // Query key NÃO depende de page: paginação é feita via fetchNextPage,
+  // que faz append no cache sem refetchar a lista inteira (evita troca de cards).
   const queryFilters = useMemo<BuscaFilters>(() => ({
     ...buildFilters(),
     ordem: filters.ordem as any,
     bounds: filters.bounds || undefined,
-    limit: stableLimit,
+    limit: PAGE_SIZE,
     offset: 0,
-  }), [buildFilters, filters.ordem, filters.bounds, stableLimit]);
+  }), [buildFilters, filters.ordem, filters.bounds]);
 
   // AI mode can override listing data
   const [aiOverrideData, setAiOverrideData] = useState<{ imoveis: Imovel[]; total: number } | null>(null);
@@ -481,7 +480,8 @@ const Search = () => {
           } : null);
         }
       } else {
-        // Normal mode: just bump page — queryFilters recalculates limit automatically
+        // Normal mode: append next page into the same cache key (no full refetch)
+        await fetchNextPage(page, PAGE_SIZE);
         setPage(page + 1);
       }
     } catch (err) {
@@ -489,7 +489,7 @@ const Search = () => {
     } finally {
       setLoadingMore(false);
     }
-  }, [page, total, loadingMore, loading, imoveis.length, aiOverrideData, buildFilters, filters.ordem]);
+  }, [page, total, loadingMore, loading, imoveis.length, aiOverrideData, buildFilters, filters.ordem, fetchNextPage, setPage]);
 
   // Infinite scroll sentinel for mobile
   const sentinelRef = useRef<HTMLDivElement>(null);

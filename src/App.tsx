@@ -23,6 +23,9 @@ const queryClient = new QueryClient({
       gcTime: 10 * 60 * 1000,
       retry: 1,
       retryDelay: 1000,
+      // Evita que listas mudem "do nada" quando o usuário troca de aba
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
     },
     mutations: {
       retry: 1,

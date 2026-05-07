@@ -489,7 +489,7 @@ const Search = () => {
     } finally {
       setLoadingMore(false);
     }
-  }, [page, total, loadingMore, loading, imoveis.length, aiOverrideData, buildFilters, filters.ordem]);
+  }, [page, total, loadingMore, loading, imoveis.length, aiOverrideData, buildFilters, filters.ordem, fetchNextPage, setPage]);
 
   // Infinite scroll sentinel for mobile
   const sentinelRef = useRef<HTMLDivElement>(null);

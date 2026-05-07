@@ -480,7 +480,8 @@ const Search = () => {
           } : null);
         }
       } else {
-        // Normal mode: just bump page — queryFilters recalculates limit automatically
+        // Normal mode: append next page into the same cache key (no full refetch)
+        await fetchNextPage(page, PAGE_SIZE);
         setPage(page + 1);
       }
     } catch (err) {

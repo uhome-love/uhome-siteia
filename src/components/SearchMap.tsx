@@ -147,6 +147,9 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
   // FIX 3 — Flag to prevent double initial load
   const initialBoundsReportedRef = useRef(false);
 
+  // Flag to suppress onBoundsChange during programmatic fitBounds (avoids zoom-in/zoom-out loop)
+  const programmaticMoveRef = useRef(false);
+
   // FIX 9 — Track last center to avoid closing popup on micro-movements
   const lastCenterRef = useRef<{ lat: number; lng: number }>({ lat: -30.0346, lng: -51.2177 });
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { fetchImoveis, type Imovel, fotoPrincipal, formatPreco } from "@/services/imoveis";
@@ -15,9 +15,29 @@ interface Props {
 
 export function SimilarProperties({ currentId, bairro, tipo, preco }: Props) {
   const [imoveis, setImoveis] = useState<Imovel[]>([]);
+  const [shouldLoad, setShouldLoad] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement>(null);
   const { prefixLink } = useCorretor();
 
+  // Lazy: only fetch when section is near viewport
   useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShouldLoad(true);
+          obs.disconnect();
+        }
+      },
+      { rootMargin: "400px" }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!shouldLoad) return;
     async function load() {
       // Try same neighborhood first
       const { data } = await fetchImoveis({

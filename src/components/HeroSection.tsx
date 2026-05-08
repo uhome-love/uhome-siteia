@@ -151,7 +151,7 @@ export function HeroSection() {
           <img
             src="/hero-bg.webp"
             alt=""
-            fetchPriority="high"
+            {...{ fetchpriority: "high" }}
             decoding="async"
             sizes="100vw"
             width={1920}

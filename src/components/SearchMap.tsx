@@ -654,6 +654,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
           const lats = pins.map(p => Number(p.latitude));
           const sw: [number, number] = [Math.min(...lngs), Math.min(...lats)];
           const ne: [number, number] = [Math.max(...lngs), Math.max(...lats)];
+          programmaticMoveRef.current = true;
           map.fitBounds([sw, ne], { padding: 60, maxZoom: 15, duration: 800 });
         }
       } else if (!fitToPins) {

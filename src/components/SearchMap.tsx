@@ -448,6 +448,13 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       if (!mapReadyRef.current) return;
       boundsRef.current = map.getBounds();
 
+      // Skip side-effects when fitBounds was triggered programmatically by us (prevents zoom loop)
+      if (programmaticMoveRef.current) {
+        programmaticMoveRef.current = false;
+        lastCenterRef.current = { lat: map.getCenter().lat, lng: map.getCenter().lng };
+        return;
+      }
+
       // FIX 9 — Only close popup on significant movement
       const newCenter = map.getCenter();
       const distanceMoved = Math.sqrt(

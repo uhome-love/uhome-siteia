@@ -63,7 +63,7 @@ export const FotoImovel = forwardRef<HTMLImageElement, FotoImovelProps>(function
         alt={alt}
         loading={loading}
         decoding={decoding}
-        fetchPriority={fetchPriority}
+        {...(fetchPriority ? { fetchpriority: fetchPriority } : {})}
         className={`${className} transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"}`}
         style={{ ...style, willChange: loaded ? undefined : "opacity" }}
         width={width || 400}

@@ -72,7 +72,11 @@ export function SimilarProperties({ currentId, bairro, tipo, preco }: Props) {
       setImoveis(results);
     }
     load();
-  }, [currentId, bairro, tipo, preco]);
+  }, [shouldLoad, currentId, bairro, tipo, preco]);
+
+  if (!shouldLoad) {
+    return <div ref={sentinelRef} className="h-px w-full" aria-hidden />;
+  }
 
   if (imoveis.length === 0) return null;
 

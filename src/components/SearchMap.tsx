@@ -799,7 +799,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       {/* Draw mode indicator + confirm button */}
       <AnimatePresence>
         {drawMode && (
-          <div className="absolute left-3 right-3 top-4 z-20 flex flex-wrap items-center gap-2 sm:left-4 sm:right-auto">
+          <div className="absolute left-3 right-3 top-16 z-40 flex flex-wrap items-center gap-2 sm:left-4 sm:right-auto sm:top-4">
             <motion.div
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}

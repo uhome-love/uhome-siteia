@@ -147,6 +147,9 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
   // FIX 3 — Flag to prevent double initial load
   const initialBoundsReportedRef = useRef(false);
 
+  // Flag to suppress onBoundsChange during programmatic fitBounds (avoids zoom-in/zoom-out loop)
+  const programmaticMoveRef = useRef(false);
+
   // FIX 9 — Track last center to avoid closing popup on micro-movements
   const lastCenterRef = useRef<{ lat: number; lng: number }>({ lat: -30.0346, lng: -51.2177 });
 
@@ -445,6 +448,13 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       if (!mapReadyRef.current) return;
       boundsRef.current = map.getBounds();
 
+      // Skip side-effects when fitBounds was triggered programmatically by us (prevents zoom loop)
+      if (programmaticMoveRef.current) {
+        programmaticMoveRef.current = false;
+        lastCenterRef.current = { lat: map.getCenter().lat, lng: map.getCenter().lng };
+        return;
+      }
+
       // FIX 9 — Only close popup on significant movement
       const newCenter = map.getCenter();
       const distanceMoved = Math.sqrt(
@@ -644,6 +654,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
           const lats = pins.map(p => Number(p.latitude));
           const sw: [number, number] = [Math.min(...lngs), Math.min(...lats)];
           const ne: [number, number] = [Math.max(...lngs), Math.max(...lats)];
+          programmaticMoveRef.current = true;
           map.fitBounds([sw, ne], { padding: 60, maxZoom: 15, duration: 800 });
         }
       } else if (!fitToPins) {
@@ -750,7 +761,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
 
       {/* Map toolbar — draw, nearby, auto-search */}
       {onBoundsSearch && !drawMode && !hasDrawn && (
-        <div className="absolute bottom-12 left-1/2 z-20 flex -translate-x-1/2 flex-wrap items-center justify-center gap-2 sm:bottom-4">
+        <div className="absolute left-1/2 z-20 flex -translate-x-1/2 flex-wrap items-center justify-center gap-2 sm:bottom-4" style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 3rem)" }}>
           <button
             onClick={() => window.dispatchEvent(new CustomEvent("uhome:draw-area"))}
             className="flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-2 font-body text-[12px] font-semibold text-muted-foreground shadow-lg transition-all hover:border-foreground/30 active:scale-[0.97]"
@@ -788,7 +799,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       {/* Draw mode indicator + confirm button */}
       <AnimatePresence>
         {drawMode && (
-          <div className="absolute left-3 right-3 top-4 z-20 flex flex-wrap items-center gap-2 sm:left-4 sm:right-auto">
+          <div className="absolute left-3 right-3 top-16 z-40 flex flex-wrap items-center gap-2 sm:left-4 sm:right-auto sm:top-4">
             <motion.div
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}

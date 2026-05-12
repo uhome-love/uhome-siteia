@@ -86,20 +86,20 @@ function ProgressiveGrid({
 }) {
   const INITIAL_VISIBLE = 12;
   const BATCH = 6;
-  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE);
+  // On mount, if cached data already exists (e.g. returning from detail page),
+  // render ALL cached cards immediately so scroll restore lands on the right card.
+  const [visibleCount, setVisibleCount] = useState(() => Math.max(INITIAL_VISIBLE, imoveis.length));
   const growRef = useRef<HTMLDivElement>(null);
   const prevLengthRef = useRef(imoveis.length);
 
-  // Reset visible count only on new search, not on "load more"
+  // Reset visible count only on new search (length shrinks). On load more,
+  // keep visibleCount as-is — the IntersectionObserver below will grow it.
   useEffect(() => {
     const prev = prevLengthRef.current;
     prevLengthRef.current = imoveis.length;
-
-    // New search: length decreased or first results arrived
-    if (imoveis.length < prev || (imoveis.length > 0 && prev === 0)) {
+    if (imoveis.length < prev) {
       setVisibleCount(INITIAL_VISIBLE);
     }
-    // Load more (length grew): keep current visibleCount — IntersectionObserver will reveal new cards
   }, [imoveis.length]);
 
   // Grow visible count as user scrolls near the bottom of rendered cards

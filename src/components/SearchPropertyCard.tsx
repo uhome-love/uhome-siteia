@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect, forwardRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { AuthModal } from "@/components/AuthModal";
 import { Heart, TrendingDown, Sparkles, Clock } from "lucide-react";
 import { motion } from "framer-motion";
@@ -81,6 +82,14 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
   const scrollRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLElement>(null);
   const { prefixLink } = useCorretor();
+  const navigate = useNavigate();
+  const detailHref = prefixLink(`/imovel/${imovel.slug}`);
+  const handleCardClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
+    // Allow opening in new tab via cmd/ctrl/middle click — let the browser handle it
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    navigate(detailHref);
+  }, [navigate, detailHref]);
   const isFavorito = isFavoritoProp ?? (() => false);
   const toggleFavorito = toggleFavoritoProp ?? (async () => undefined as "needs_auth" | void);
   const liked = isFavorito(imovel.id);
@@ -208,7 +217,8 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
     <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
     <motion.a
       ref={mergedRef}
-      href={prefixLink(`/imovel/${imovel.slug}`)}
+      href={detailHref}
+      onClick={handleCardClick}
       initial={index < 6 ? { opacity: 0, y: 8 } : false}
       animate={index < 6 ? { opacity: 1, y: 0 } : undefined}
       transition={index < 6 ? { duration: 0.3, delay: Math.min(index * 0.03, 0.15) } : undefined}

@@ -82,6 +82,14 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
   const scrollRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLElement>(null);
   const { prefixLink } = useCorretor();
+  const navigate = useNavigate();
+  const detailHref = prefixLink(`/imovel/${imovel.slug}`);
+  const handleCardClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
+    // Allow opening in new tab via cmd/ctrl/middle click — let the browser handle it
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    navigate(detailHref);
+  }, [navigate, detailHref]);
   const isFavorito = isFavoritoProp ?? (() => false);
   const toggleFavorito = toggleFavoritoProp ?? (async () => undefined as "needs_auth" | void);
   const liked = isFavorito(imovel.id);

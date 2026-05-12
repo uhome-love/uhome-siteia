@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect, forwardRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { AuthModal } from "@/components/AuthModal";
 import { Heart, TrendingDown, Sparkles, Clock } from "lucide-react";
 import { motion } from "framer-motion";

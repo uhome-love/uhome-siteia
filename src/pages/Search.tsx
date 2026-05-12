@@ -92,18 +92,13 @@ function ProgressiveGrid({
   const growRef = useRef<HTMLDivElement>(null);
   const prevLengthRef = useRef(imoveis.length);
 
-  // Reset visible count only on new search (length shrinks), not on "load more"
+  // Reset visible count only on new search (length shrinks). On load more,
+  // keep visibleCount as-is — the IntersectionObserver below will grow it.
   useEffect(() => {
     const prev = prevLengthRef.current;
     prevLengthRef.current = imoveis.length;
-
-    // New search: length decreased — start fresh
     if (imoveis.length < prev) {
       setVisibleCount(INITIAL_VISIBLE);
-    }
-    // Load more (length grew) or initial mount with cache: keep visible count growing
-    else if (imoveis.length > prev) {
-      setVisibleCount((current) => Math.max(current, Math.min(prev + BATCH, imoveis.length)));
     }
   }, [imoveis.length]);
 

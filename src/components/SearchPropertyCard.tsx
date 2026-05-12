@@ -217,7 +217,8 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
     <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
     <motion.a
       ref={mergedRef}
-      href={prefixLink(`/imovel/${imovel.slug}`)}
+      href={detailHref}
+      onClick={handleCardClick}
       initial={index < 6 ? { opacity: 0, y: 8 } : false}
       animate={index < 6 ? { opacity: 1, y: 0 } : undefined}
       transition={index < 6 ? { duration: 0.3, delay: Math.min(index * 0.03, 0.15) } : undefined}

@@ -499,16 +499,33 @@ const Search = () => {
           } : null);
         }
       } else {
-        // Normal mode: append next page into the same cache key (no full refetch)
-        await fetchNextPage(page, PAGE_SIZE);
-        setPage(page + 1);
+        // Normal mode: fetch next page and append to local state.
+        // We use queryImoveis.length (the unfiltered server result count) as offset
+        // so server pagination stays correct even when broken-photo cards are hidden.
+        const nextOffset = queryImoveis.length + appendedImoveis.length;
+        const nextFilters: BuscaFilters = {
+          ...buildFilters(),
+          ordem: filters.ordem as any,
+          bounds: filters.bounds || undefined,
+          limit: PAGE_SIZE,
+          offset: nextOffset,
+        };
+        const { data } = await fetchImoveis(nextFilters);
+        if (data.length > 0) {
+          setAppendedImoveis((prev) => {
+            const seen = new Set([...queryImoveis, ...prev].map((im) => im.id));
+            const extras = data.filter((im) => !seen.has(im.id));
+            return [...prev, ...extras];
+          });
+          setPage(page + 1);
+        }
       }
     } catch (err) {
       console.error("Erro ao carregar mais:", err);
     } finally {
       setLoadingMore(false);
     }
-  }, [page, total, loadingMore, loading, imoveis.length, aiOverrideData, buildFilters, filters.ordem, fetchNextPage, setPage]);
+  }, [page, total, loadingMore, loading, imoveis.length, aiOverrideData, buildFilters, filters.ordem, filters.bounds, queryImoveis, appendedImoveis, setPage]);
 
   // Infinite scroll sentinel for mobile
   const sentinelRef = useRef<HTMLDivElement>(null);

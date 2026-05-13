@@ -57,8 +57,8 @@ function describeFilters(filters: Record<string, any>): string {
   return parts.length > 0 ? parts.join(", ") : "Todos os imóveis";
 }
 
-/** Progressive rendering — only mounts cards that are near the viewport.
- *  Initial batch = 12, grows by 6 as user scrolls. Keeps DOM light. */
+/** Renders all loaded property cards. Pagination is handled by the parent
+ *  via loadMore (button on desktop, infinite scroll on mobile). */
 function ProgressiveGrid({
   imoveis,
   total,
@@ -84,46 +84,10 @@ function ProgressiveGrid({
   isMobile: boolean;
   sentinelRef: React.RefObject<HTMLDivElement>;
 }) {
-  const INITIAL_VISIBLE = 12;
-  const BATCH = 6;
-  // On mount, if cached data already exists (e.g. returning from detail page),
-  // render ALL cached cards immediately so scroll restore lands on the right card.
-  const [visibleCount, setVisibleCount] = useState(() => Math.max(INITIAL_VISIBLE, imoveis.length));
-  const growRef = useRef<HTMLDivElement>(null);
-  const prevLengthRef = useRef(imoveis.length);
-
-  // Reset visible count only on new search (length shrinks). On load more,
-  // keep visibleCount as-is — the IntersectionObserver below will grow it.
-  useEffect(() => {
-    const prev = prevLengthRef.current;
-    prevLengthRef.current = imoveis.length;
-    if (imoveis.length < prev) {
-      setVisibleCount(INITIAL_VISIBLE);
-    }
-  }, [imoveis.length]);
-
-  // Grow visible count as user scrolls near the bottom of rendered cards
-  useEffect(() => {
-    const el = growRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          setVisibleCount((prev) => Math.min(prev + BATCH, imoveis.length));
-        }
-      },
-      { rootMargin: "600px" }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [imoveis.length, visibleCount]);
-
-  const visible = imoveis.slice(0, visibleCount);
-
   return (
     <>
       <div className="grid content-start items-start grid-cols-1 gap-y-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
-        {visible.map((imovel, i) => (
+        {imoveis.map((imovel, i) => (
           <React.Fragment key={imovel.id}>
             <SearchPropertyCard
               imovel={imovel}
@@ -139,13 +103,8 @@ function ProgressiveGrid({
         ))}
       </div>
 
-      {/* Sentinel to grow visible cards */}
-      {visibleCount < imoveis.length && (
-        <div ref={growRef} className="h-1" />
-      )}
-
       {/* Load more from server — button on desktop, infinite scroll on mobile */}
-      {imoveis.length < total && visibleCount >= imoveis.length && (
+      {imoveis.length < total && (
         <>
           <div className="hidden sm:flex justify-center pb-4 pt-6">
             <button
@@ -375,12 +334,31 @@ const Search = () => {
   const [aiOverrideData, setAiOverrideData] = useState<{ imoveis: Imovel[]; total: number } | null>(null);
 
   const enableQuery = !(modoIA && !aiResult && queryIA.trim() !== "");
-  const { imoveis: queryImoveis, total: queryTotal, isLoading: queryLoading, isFetching: queryFetching, fetchNextPage } = useImoveisQuery({
+  const { imoveis: queryImoveis, total: queryTotal, isLoading: queryLoading, isFetching: queryFetching } = useImoveisQuery({
     filters: queryFilters,
     enabled: enableQuery && !aiOverrideData && !buscandoIA,
   });
-  
-  const rawImoveis = aiOverrideData?.imoveis ?? queryImoveis;
+
+  // Locally appended pages (offset > 0). Reset on filter change.
+  const [appendedImoveis, setAppendedImoveis] = useState<Imovel[]>([]);
+  const queryFiltersKey = useMemo(() => JSON.stringify(queryFilters), [queryFilters]);
+  const lastFiltersKeyRef = useRef(queryFiltersKey);
+  useEffect(() => {
+    if (lastFiltersKeyRef.current !== queryFiltersKey) {
+      lastFiltersKeyRef.current = queryFiltersKey;
+      setAppendedImoveis([]);
+      setPage(0);
+    }
+  }, [queryFiltersKey, setPage]);
+
+  const mergedQueryImoveis = useMemo(() => {
+    if (appendedImoveis.length === 0) return queryImoveis;
+    const seen = new Set(queryImoveis.map((im) => im.id));
+    const extras = appendedImoveis.filter((im) => !seen.has(im.id));
+    return [...queryImoveis, ...extras];
+  }, [queryImoveis, appendedImoveis]);
+
+  const rawImoveis = aiOverrideData?.imoveis ?? mergedQueryImoveis;
   // Filter out imoveis whose primary photo failed — prevents empty slots in the grid
   const imoveis = useMemo(
     () => brokenPhotoIds.size === 0 ? rawImoveis : rawImoveis.filter((im) => !brokenPhotoIds.has(im.id)),
@@ -480,16 +458,33 @@ const Search = () => {
           } : null);
         }
       } else {
-        // Normal mode: append next page into the same cache key (no full refetch)
-        await fetchNextPage(page, PAGE_SIZE);
-        setPage(page + 1);
+        // Normal mode: fetch next page and append to local state.
+        // We use queryImoveis.length (the unfiltered server result count) as offset
+        // so server pagination stays correct even when broken-photo cards are hidden.
+        const nextOffset = queryImoveis.length + appendedImoveis.length;
+        const nextFilters: BuscaFilters = {
+          ...buildFilters(),
+          ordem: filters.ordem as any,
+          bounds: filters.bounds || undefined,
+          limit: PAGE_SIZE,
+          offset: nextOffset,
+        };
+        const { data } = await fetchImoveis(nextFilters);
+        if (data.length > 0) {
+          setAppendedImoveis((prev) => {
+            const seen = new Set([...queryImoveis, ...prev].map((im) => im.id));
+            const extras = data.filter((im) => !seen.has(im.id));
+            return [...prev, ...extras];
+          });
+          setPage(page + 1);
+        }
       }
     } catch (err) {
       console.error("Erro ao carregar mais:", err);
     } finally {
       setLoadingMore(false);
     }
-  }, [page, total, loadingMore, loading, imoveis.length, aiOverrideData, buildFilters, filters.ordem, fetchNextPage, setPage]);
+  }, [page, total, loadingMore, loading, imoveis.length, aiOverrideData, buildFilters, filters.ordem, filters.bounds, queryImoveis, appendedImoveis, setPage]);
 
   // Infinite scroll sentinel for mobile
   const sentinelRef = useRef<HTMLDivElement>(null);

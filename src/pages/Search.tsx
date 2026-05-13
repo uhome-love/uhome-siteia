@@ -59,7 +59,7 @@ function describeFilters(filters: Record<string, any>): string {
 
 /** Renders all loaded property cards. Pagination is handled by the parent
  *  via loadMore (button on desktop, infinite scroll on mobile). */
-function ProgressiveGrid({
+export function ProgressiveGrid({
   imoveis,
   total,
   hoveredId,

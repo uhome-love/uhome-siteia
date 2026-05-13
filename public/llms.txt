@@ -1,0 +1,34 @@
+# Uhome Imóveis
+
+> Imobiliária digital especializada em venda de imóveis em Porto Alegre, Litoral Gaúcho e Serra Gaúcha. Mais de 14.600 imóveis com busca inteligente por IA.
+
+A Uhome é uma imobiliária 100% digital focada exclusivamente na venda de apartamentos, casas, coberturas, studios e imóveis comerciais no Rio Grande do Sul. Oferece busca com IA em linguagem natural, simulador de financiamento, avaliação automática de imóveis e atendimento via WhatsApp.
+
+## Pages
+
+- [Home](/): Busca principal e bairros em destaque.
+- [Buscar imóveis](/busca): Listagem com filtros, mapa e busca por IA.
+- [Bairros de Porto Alegre](/bairros): Guia completo de bairros com estatísticas.
+- [Condomínios e empreendimentos](/condominios): Lançamentos e empreendimentos.
+- [Avaliar imóvel](/avaliar-imovel): Avaliação gratuita com IA.
+- [Anunciar imóvel](/anunciar): Captação de imóveis para venda.
+- [Sobre a Uhome](/sobre): Quem somos, missão e diferenciais.
+- [Guia de bairros](/guia-bairros): Conteúdo editorial sobre bairros.
+- [Blog](/blog): Artigos sobre mercado imobiliário gaúcho.
+- [FAQ](/faq): Perguntas frequentes sobre compra e financiamento.
+
+## Categorias populares
+
+- [Apartamentos em Porto Alegre](/apartamentos-porto-alegre)
+- [Casas em Porto Alegre](/casas-porto-alegre)
+- [Coberturas em Porto Alegre](/coberturas-porto-alegre)
+- [Studios em Porto Alegre](/studios-porto-alegre)
+- [Imóveis de luxo](/imoveis-de-luxo-porto-alegre)
+- [Apartamentos até R$ 500 mil](/apartamentos-ate-500-mil-porto-alegre)
+- [Apartamentos em Moinhos de Vento](/apartamentos-moinhos-de-vento)
+- [Apartamentos em Petrópolis](/apartamentos-petropolis)
+
+## Optional
+
+- [Política de privacidade](/politica-de-privacidade)
+- [Carreiras](/carreiras)

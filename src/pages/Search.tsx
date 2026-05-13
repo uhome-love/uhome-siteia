@@ -375,12 +375,31 @@ const Search = () => {
   const [aiOverrideData, setAiOverrideData] = useState<{ imoveis: Imovel[]; total: number } | null>(null);
 
   const enableQuery = !(modoIA && !aiResult && queryIA.trim() !== "");
-  const { imoveis: queryImoveis, total: queryTotal, isLoading: queryLoading, isFetching: queryFetching, fetchNextPage } = useImoveisQuery({
+  const { imoveis: queryImoveis, total: queryTotal, isLoading: queryLoading, isFetching: queryFetching } = useImoveisQuery({
     filters: queryFilters,
     enabled: enableQuery && !aiOverrideData && !buscandoIA,
   });
-  
-  const rawImoveis = aiOverrideData?.imoveis ?? queryImoveis;
+
+  // Locally appended pages (offset > 0). Reset on filter change.
+  const [appendedImoveis, setAppendedImoveis] = useState<Imovel[]>([]);
+  const queryFiltersKey = useMemo(() => JSON.stringify(queryFilters), [queryFilters]);
+  const lastFiltersKeyRef = useRef(queryFiltersKey);
+  useEffect(() => {
+    if (lastFiltersKeyRef.current !== queryFiltersKey) {
+      lastFiltersKeyRef.current = queryFiltersKey;
+      setAppendedImoveis([]);
+      setPage(0);
+    }
+  }, [queryFiltersKey, setPage]);
+
+  const mergedQueryImoveis = useMemo(() => {
+    if (appendedImoveis.length === 0) return queryImoveis;
+    const seen = new Set(queryImoveis.map((im) => im.id));
+    const extras = appendedImoveis.filter((im) => !seen.has(im.id));
+    return [...queryImoveis, ...extras];
+  }, [queryImoveis, appendedImoveis]);
+
+  const rawImoveis = aiOverrideData?.imoveis ?? mergedQueryImoveis;
   // Filter out imoveis whose primary photo failed — prevents empty slots in the grid
   const imoveis = useMemo(
     () => brokenPhotoIds.size === 0 ? rawImoveis : rawImoveis.filter((im) => !brokenPhotoIds.has(im.id)),

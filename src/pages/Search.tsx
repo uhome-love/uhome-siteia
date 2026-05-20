@@ -443,30 +443,32 @@ const Search = () => {
 
   const loadMore = useCallback(async () => {
     if (loadingMore || loading) return;
-    const currentCount = imoveis.length;
-    if (currentCount >= total) return;
+    const loadedCount = aiOverrideData
+      ? aiOverrideData.imoveis.length
+      : queryImoveis.length + appendedImoveis.length;
+    if (loadedCount >= total) return;
     setLoadingMore(true);
     try {
       if (aiOverrideData) {
-        // AI mode: fetch next batch and append to override data
+        // AI mode: fetch next batch using loaded (raw) count as offset.
         const aiFilters: BuscaFilters = {
           ...buildFilters(),
           ordem: filters.ordem as any,
           limit: PAGE_SIZE,
-          offset: currentCount,
+          offset: loadedCount,
         };
         const { data } = await fetchImoveis(aiFilters);
         if (data.length > 0) {
-          setAiOverrideData(prev => prev ? {
-            ...prev,
-            imoveis: [...prev.imoveis, ...data],
-          } : null);
+          setAiOverrideData(prev => {
+            if (!prev) return null;
+            const seen = new Set(prev.imoveis.map((im) => im.id));
+            const extras = data.filter((im) => !seen.has(im.id));
+            return { ...prev, imoveis: [...prev.imoveis, ...extras] };
+          });
         }
       } else {
         // Normal mode: fetch next page and append to local state.
-        // We use queryImoveis.length (the unfiltered server result count) as offset
-        // so server pagination stays correct even when broken-photo cards are hidden.
-        const nextOffset = queryImoveis.length + appendedImoveis.length;
+        const nextOffset = loadedCount;
         const nextFilters: BuscaFilters = {
           ...buildFilters(),
           ordem: filters.ordem as any,
@@ -489,7 +491,7 @@ const Search = () => {
     } finally {
       setLoadingMore(false);
     }
-  }, [page, total, loadingMore, loading, imoveis.length, aiOverrideData, buildFilters, filters.ordem, filters.bounds, queryImoveis, appendedImoveis, setPage]);
+  }, [page, total, loadingMore, loading, aiOverrideData, buildFilters, filters.ordem, filters.bounds, queryImoveis, appendedImoveis, setPage]);
 
   // Infinite scroll sentinel for mobile
   const sentinelRef = useRef<HTMLDivElement>(null);

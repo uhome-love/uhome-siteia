@@ -109,7 +109,7 @@ export function ProgressiveGrid({
       </div>
 
       {/* Load more from server — button on desktop, infinite scroll on mobile */}
-      {imoveis.length < total && (
+      {effectiveLoaded < total && (
         <>
           <div className="hidden sm:flex justify-center pb-4 pt-6">
             <button

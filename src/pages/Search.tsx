@@ -62,6 +62,7 @@ function describeFilters(filters: Record<string, any>): string {
 export function ProgressiveGrid({
   imoveis,
   total,
+  loadedCount,
   hoveredId,
   setHoveredId,
   isFavorito,
@@ -74,6 +75,9 @@ export function ProgressiveGrid({
 }: {
   imoveis: Imovel[];
   total: number;
+  /** Count of items already fetched from the server (before hiding broken-photo cards).
+   *  Used to gate "Ver mais" so we don't keep refetching pages whose items are all hidden. */
+  loadedCount?: number;
   hoveredId: string | null;
   setHoveredId: (id: string | null) => void;
   isFavorito?: (id: string) => boolean;
@@ -84,6 +88,7 @@ export function ProgressiveGrid({
   isMobile: boolean;
   sentinelRef: React.RefObject<HTMLDivElement>;
 }) {
+  const effectiveLoaded = loadedCount ?? imoveis.length;
   return (
     <>
       <div className="grid content-start items-start grid-cols-1 gap-y-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
@@ -104,7 +109,7 @@ export function ProgressiveGrid({
       </div>
 
       {/* Load more from server — button on desktop, infinite scroll on mobile */}
-      {imoveis.length < total && (
+      {effectiveLoaded < total && (
         <>
           <div className="hidden sm:flex justify-center pb-4 pt-6">
             <button
@@ -438,30 +443,32 @@ const Search = () => {
 
   const loadMore = useCallback(async () => {
     if (loadingMore || loading) return;
-    const currentCount = imoveis.length;
-    if (currentCount >= total) return;
+    const loadedCount = aiOverrideData
+      ? aiOverrideData.imoveis.length
+      : queryImoveis.length + appendedImoveis.length;
+    if (loadedCount >= total) return;
     setLoadingMore(true);
     try {
       if (aiOverrideData) {
-        // AI mode: fetch next batch and append to override data
+        // AI mode: fetch next batch using loaded (raw) count as offset.
         const aiFilters: BuscaFilters = {
           ...buildFilters(),
           ordem: filters.ordem as any,
           limit: PAGE_SIZE,
-          offset: currentCount,
+          offset: loadedCount,
         };
         const { data } = await fetchImoveis(aiFilters);
         if (data.length > 0) {
-          setAiOverrideData(prev => prev ? {
-            ...prev,
-            imoveis: [...prev.imoveis, ...data],
-          } : null);
+          setAiOverrideData(prev => {
+            if (!prev) return null;
+            const seen = new Set(prev.imoveis.map((im) => im.id));
+            const extras = data.filter((im) => !seen.has(im.id));
+            return { ...prev, imoveis: [...prev.imoveis, ...extras] };
+          });
         }
       } else {
         // Normal mode: fetch next page and append to local state.
-        // We use queryImoveis.length (the unfiltered server result count) as offset
-        // so server pagination stays correct even when broken-photo cards are hidden.
-        const nextOffset = queryImoveis.length + appendedImoveis.length;
+        const nextOffset = loadedCount;
         const nextFilters: BuscaFilters = {
           ...buildFilters(),
           ordem: filters.ordem as any,
@@ -484,7 +491,7 @@ const Search = () => {
     } finally {
       setLoadingMore(false);
     }
-  }, [page, total, loadingMore, loading, imoveis.length, aiOverrideData, buildFilters, filters.ordem, filters.bounds, queryImoveis, appendedImoveis, setPage]);
+  }, [page, total, loadingMore, loading, aiOverrideData, buildFilters, filters.ordem, filters.bounds, queryImoveis, appendedImoveis, setPage]);
 
   // Infinite scroll sentinel for mobile
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -927,6 +934,7 @@ const Search = () => {
               <ProgressiveGrid
                 imoveis={imoveis}
                 total={total}
+                loadedCount={aiOverrideData ? aiOverrideData.imoveis.length : queryImoveis.length + appendedImoveis.length}
                 hoveredId={hoveredId}
                 setHoveredId={setHoveredId}
                 isFavorito={isFavorito}

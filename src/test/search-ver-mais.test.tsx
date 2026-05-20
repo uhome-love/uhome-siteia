@@ -159,6 +159,26 @@ describe("ProgressiveGrid — Ver mais regression", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("hides Ver mais when loadedCount reached total even if some cards are hidden (broken photos)", () => {
+    const sentinelRef = React.createRef<HTMLDivElement>();
+    render(
+      <ProgressiveGrid
+        imoveis={makeImoveis(9)}
+        total={19}
+        loadedCount={19}
+        hoveredId={null}
+        setHoveredId={() => {}}
+        loadMore={() => {}}
+        loadingMore={false}
+        isMobile={false}
+        sentinelRef={sentinelRef}
+      />
+    );
+    expect(
+      screen.queryByRole("button", { name: /Ver mais imóveis/i })
+    ).not.toBeInTheDocument();
+  });
+
   it("disables button and shows Carregando state while fetching", async () => {
     let resolveFetch: (v: Imovel[]) => void = () => {};
     const pending = new Promise<Imovel[]>((r) => {

@@ -62,6 +62,7 @@ function describeFilters(filters: Record<string, any>): string {
 export function ProgressiveGrid({
   imoveis,
   total,
+  loadedCount,
   hoveredId,
   setHoveredId,
   isFavorito,
@@ -74,6 +75,9 @@ export function ProgressiveGrid({
 }: {
   imoveis: Imovel[];
   total: number;
+  /** Count of items already fetched from the server (before hiding broken-photo cards).
+   *  Used to gate "Ver mais" so we don't keep refetching pages whose items are all hidden. */
+  loadedCount?: number;
   hoveredId: string | null;
   setHoveredId: (id: string | null) => void;
   isFavorito?: (id: string) => boolean;
@@ -84,6 +88,7 @@ export function ProgressiveGrid({
   isMobile: boolean;
   sentinelRef: React.RefObject<HTMLDivElement>;
 }) {
+  const effectiveLoaded = loadedCount ?? imoveis.length;
   return (
     <>
       <div className="grid content-start items-start grid-cols-1 gap-y-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">

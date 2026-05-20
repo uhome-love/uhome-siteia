@@ -934,6 +934,7 @@ const Search = () => {
               <ProgressiveGrid
                 imoveis={imoveis}
                 total={total}
+                loadedCount={aiOverrideData ? aiOverrideData.imoveis.length : queryImoveis.length + appendedImoveis.length}
                 hoveredId={hoveredId}
                 setHoveredId={setHoveredId}
                 isFavorito={isFavorito}

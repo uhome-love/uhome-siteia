@@ -348,11 +348,17 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         paint: { "text-color": "#FFFFFF" },
       });
 
-      // Pill images
-      map.addImage("pin-bg", createPillImage("#FFFFFF", "rgba(0,0,0,0.2)"));
-      map.addImage("pin-bg-dark", createPillImage("#222222", "#222222"));
+      // Pill images — high-DPI with 9-slice stretch so corners never distort
+      const pillOptions = {
+        pixelRatio: PILL_SCALE,
+        stretchX: [[63, 171]] as [number, number][],
+        stretchY: [[60, 66]] as [number, number][],
+        content: [18, 18, 234, 108] as [number, number, number, number],
+      };
+      map.addImage("pin-bg", createPillImage("#FFFFFF", "rgba(0,0,0,0.10)"), pillOptions);
+      map.addImage("pin-bg-dark", createPillImage("#1A1A1A", "rgba(0,0,0,0.25)"), pillOptions);
 
-      // FIX 7 — Individual pins with collision management
+      // Individual pins with collision management
       map.addLayer({
         id: "imoveis-pins",
         type: "symbol",
@@ -361,22 +367,26 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         layout: {
           "icon-image": "pin-bg",
           "icon-text-fit": "both",
-          "icon-text-fit-padding": [5, 10, 5, 10],
+          "icon-text-fit-padding": [6, 11, 6, 11],
           "icon-allow-overlap": false,
           "icon-ignore-placement": false,
-          "icon-padding": 2,
+          "icon-padding": 3,
           "text-field": ["get", "preco_label"],
           "text-font": ["DIN Pro Bold", "Arial Unicode MS Bold"],
-          "text-size": 11,
+          "text-size": 11.5,
           "text-allow-overlap": false,
-          "text-optional": true,
+          "text-optional": false,
           "text-anchor": "center",
-          "symbol-sort-key": ["get", "preco"],
+          "symbol-sort-key": ["-", 0, ["get", "preco"]],
         },
-        paint: { "text-color": "#222222", "icon-opacity": 1 },
+        paint: {
+          "text-color": "#1A1A1A",
+          "icon-opacity": 1,
+          "icon-opacity-transition": { duration: 180, delay: 0 },
+        },
       });
 
-      // Hovered pin — always on top
+      // Hovered / selected pin — always on top
       map.addLayer({
         id: "imoveis-pins-hover",
         type: "symbol",
@@ -385,12 +395,14 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         layout: {
           "icon-image": "pin-bg-dark",
           "icon-text-fit": "both",
-          "icon-text-fit-padding": [5, 10, 5, 10],
+          "icon-text-fit-padding": [7, 12, 7, 12],
           "icon-allow-overlap": true,
+          "icon-ignore-placement": true,
           "text-field": ["get", "preco_label"],
           "text-font": ["DIN Pro Bold", "Arial Unicode MS Bold"],
-          "text-size": 12,
+          "text-size": 12.5,
           "text-allow-overlap": true,
+          "text-ignore-placement": true,
           "text-anchor": "center",
         },
         paint: { "text-color": "#FFFFFF" },

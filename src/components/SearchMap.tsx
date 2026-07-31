@@ -297,6 +297,23 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         data: { type: "FeatureCollection", features: [] },
       });
 
+      // Cluster halo (soft outer ring — Airbnb-like depth)
+      map.addLayer({
+        id: "clusters-halo",
+        type: "circle",
+        source: "imoveis",
+        filter: ["has", "point_count"],
+        paint: {
+          "circle-color": "#5B6CF9",
+          "circle-opacity": 0.16,
+          "circle-radius": [
+            "interpolate", ["linear"], ["get", "point_count"],
+            1, 26, 25, 32, 100, 39, 500, 47,
+          ],
+          "circle-radius-transition": { duration: 260, delay: 0 },
+        },
+      });
+
       // Cluster circles
       map.addLayer({
         id: "clusters",
@@ -305,10 +322,14 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         filter: ["has", "point_count"],
         paint: {
           "circle-color": "#5B6CF9",
-          "circle-radius": ["step", ["get", "point_count"], 20, 10, 26, 50, 32, 200, 38],
-          "circle-stroke-width": 2,
+          "circle-radius": [
+            "interpolate", ["linear"], ["get", "point_count"],
+            1, 18, 25, 23, 100, 29, 500, 36,
+          ],
+          "circle-stroke-width": 2.5,
           "circle-stroke-color": "#FFFFFF",
-          "circle-opacity": 0.92,
+          "circle-opacity": 1,
+          "circle-radius-transition": { duration: 260, delay: 0 },
         },
       });
 
@@ -320,8 +341,9 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         layout: {
           "text-field": "{point_count_abbreviated}",
           "text-font": ["DIN Pro Bold", "Arial Unicode MS Bold"],
-          "text-size": 13,
+          "text-size": ["interpolate", ["linear"], ["get", "point_count"], 1, 12, 100, 14, 500, 15],
           "text-allow-overlap": true,
+          "text-ignore-placement": true,
         },
         paint: { "text-color": "#FFFFFF" },
       });

@@ -528,8 +528,11 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       const ne = boundsRef.current!.getNorthEast();
       const currentBounds = { lat_min: sw.lat, lat_max: ne.lat, lng_min: sw.lng, lng_max: ne.lng };
 
-      // Always report bounds change for lazy pin loading
-      onBoundsChangeRef.current?.(currentBounds);
+      // Report bounds change (debounced 350ms) for lazy pin loading
+      if (boundsChangeTimerRef.current) clearTimeout(boundsChangeTimerRef.current);
+      boundsChangeTimerRef.current = window.setTimeout(() => {
+        onBoundsChangeRef.current?.(currentBounds);
+      }, 350);
 
       // FIX 5 — Auto-search with 800ms debounce
       if (autoSearchRef.current && onBoundsSearchRef.current) {

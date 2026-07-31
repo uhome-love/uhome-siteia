@@ -80,15 +80,25 @@ function toGeoJSON(pins: MapPinData[]): GeoJSON.FeatureCollection {
   };
 }
 
-function createPillImage(fillColor: string, strokeColor: string): ImageData {
+// High-DPI pill sprite (Airbnb-style): crisp edges + soft drop shadow.
+// Rendered at PILL_SCALE and registered with pixelRatio so text-fit stays sharp.
+const PILL_SCALE = 3;
+
+function createPillImage(fillColor: string, strokeColor: string, shadow = true): ImageData {
+  const w = 72, h = 30, r = 15, pad = 6; // pad reserves room for the shadow
   const canvas = document.createElement("canvas");
-  canvas.width = 72;
-  canvas.height = 26;
+  canvas.width = (w + pad * 2) * PILL_SCALE;
+  canvas.height = (h + pad * 2) * PILL_SCALE;
   const ctx = canvas.getContext("2d")!;
+  ctx.scale(PILL_SCALE, PILL_SCALE);
+  ctx.translate(pad, pad);
+
+  if (shadow) {
+    ctx.shadowColor = "rgba(0,0,0,0.22)";
+    ctx.shadowBlur = 5;
+    ctx.shadowOffsetY = 1.5;
+  }
   ctx.fillStyle = fillColor;
-  ctx.strokeStyle = strokeColor;
-  ctx.lineWidth = 1.5;
-  const w = 72, h = 26, r = 13;
   ctx.beginPath();
   ctx.moveTo(r, 0);
   ctx.lineTo(w - r, 0);
@@ -101,8 +111,13 @@ function createPillImage(fillColor: string, strokeColor: string): ImageData {
   ctx.quadraticCurveTo(0, 0, r, 0);
   ctx.closePath();
   ctx.fill();
+
+  ctx.shadowColor = "transparent";
+  ctx.strokeStyle = strokeColor;
+  ctx.lineWidth = 1;
   ctx.stroke();
-  return ctx.getImageData(0, 0, w, h);
+
+  return ctx.getImageData(0, 0, canvas.width, canvas.height);
 }
 
 function pointInPolygon(point: [number, number], polygon: [number, number][]): boolean {
@@ -142,6 +157,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
   const [autoSearch, setAutoSearch] = useState(false);
   const autoSearchRef = useRef(false);
   const autoSearchTimerRef = useRef<number | null>(null);
+  const boundsChangeTimerRef = useRef<number | null>(null);
   const userMarkerRef = useRef<mapboxgl.Marker | null>(null);
 
   // FIX 3 — Flag to prevent double initial load
@@ -246,8 +262,16 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         style: "mapbox://styles/mapbox/streets-v12",
         center: [-51.2177, -30.0346],
         zoom: 11,
+        minZoom: 7,
+        maxZoom: 18,
         dragRotate: false,
+        pitchWithRotate: false,
+        touchPitch: false,
         attributionControl: false,
+        renderWorldCopies: false,
+        fadeDuration: 120,
+        antialias: false,
+        refreshExpiredTiles: false,
       });
 
       map.addControl(new mb.default.NavigationControl({ showCompass: false }), "top-right");
@@ -274,6 +298,23 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         data: { type: "FeatureCollection", features: [] },
       });
 
+      // Cluster halo (soft outer ring — Airbnb-like depth)
+      map.addLayer({
+        id: "clusters-halo",
+        type: "circle",
+        source: "imoveis",
+        filter: ["has", "point_count"],
+        paint: {
+          "circle-color": "#5B6CF9",
+          "circle-opacity": 0.16,
+          "circle-radius": [
+            "interpolate", ["linear"], ["get", "point_count"],
+            1, 26, 25, 32, 100, 39, 500, 47,
+          ],
+          "circle-radius-transition": { duration: 260, delay: 0 },
+        },
+      });
+
       // Cluster circles
       map.addLayer({
         id: "clusters",
@@ -282,10 +323,14 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         filter: ["has", "point_count"],
         paint: {
           "circle-color": "#5B6CF9",
-          "circle-radius": ["step", ["get", "point_count"], 20, 10, 26, 50, 32, 200, 38],
-          "circle-stroke-width": 2,
+          "circle-radius": [
+            "interpolate", ["linear"], ["get", "point_count"],
+            1, 18, 25, 23, 100, 29, 500, 36,
+          ],
+          "circle-stroke-width": 2.5,
           "circle-stroke-color": "#FFFFFF",
-          "circle-opacity": 0.92,
+          "circle-opacity": 1,
+          "circle-radius-transition": { duration: 260, delay: 0 },
         },
       });
 
@@ -297,17 +342,24 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         layout: {
           "text-field": "{point_count_abbreviated}",
           "text-font": ["DIN Pro Bold", "Arial Unicode MS Bold"],
-          "text-size": 13,
+          "text-size": ["interpolate", ["linear"], ["get", "point_count"], 1, 12, 100, 14, 500, 15],
           "text-allow-overlap": true,
+          "text-ignore-placement": true,
         },
         paint: { "text-color": "#FFFFFF" },
       });
 
-      // Pill images
-      map.addImage("pin-bg", createPillImage("#FFFFFF", "rgba(0,0,0,0.2)"));
-      map.addImage("pin-bg-dark", createPillImage("#222222", "#222222"));
+      // Pill images — high-DPI with 9-slice stretch so corners never distort
+      const pillOptions = {
+        pixelRatio: PILL_SCALE,
+        stretchX: [[63, 171]] as [number, number][],
+        stretchY: [[60, 66]] as [number, number][],
+        content: [18, 18, 234, 108] as [number, number, number, number],
+      };
+      map.addImage("pin-bg", createPillImage("#FFFFFF", "rgba(0,0,0,0.10)"), pillOptions);
+      map.addImage("pin-bg-dark", createPillImage("#1A1A1A", "rgba(0,0,0,0.25)"), pillOptions);
 
-      // FIX 7 — Individual pins with collision management
+      // Individual pins with collision management
       map.addLayer({
         id: "imoveis-pins",
         type: "symbol",
@@ -316,22 +368,26 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         layout: {
           "icon-image": "pin-bg",
           "icon-text-fit": "both",
-          "icon-text-fit-padding": [5, 10, 5, 10],
+          "icon-text-fit-padding": [6, 11, 6, 11],
           "icon-allow-overlap": false,
           "icon-ignore-placement": false,
-          "icon-padding": 2,
+          "icon-padding": 3,
           "text-field": ["get", "preco_label"],
           "text-font": ["DIN Pro Bold", "Arial Unicode MS Bold"],
-          "text-size": 11,
+          "text-size": 11.5,
           "text-allow-overlap": false,
-          "text-optional": true,
+          "text-optional": false,
           "text-anchor": "center",
-          "symbol-sort-key": ["get", "preco"],
+          "symbol-sort-key": ["-", 0, ["get", "preco"]],
         },
-        paint: { "text-color": "#222222", "icon-opacity": 1 },
+        paint: {
+          "text-color": "#1A1A1A",
+          "icon-opacity": 1,
+          "icon-opacity-transition": { duration: 180, delay: 0 },
+        },
       });
 
-      // Hovered pin — always on top
+      // Hovered / selected pin — always on top
       map.addLayer({
         id: "imoveis-pins-hover",
         type: "symbol",
@@ -340,12 +396,14 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         layout: {
           "icon-image": "pin-bg-dark",
           "icon-text-fit": "both",
-          "icon-text-fit-padding": [5, 10, 5, 10],
+          "icon-text-fit-padding": [7, 12, 7, 12],
           "icon-allow-overlap": true,
+          "icon-ignore-placement": true,
           "text-field": ["get", "preco_label"],
           "text-font": ["DIN Pro Bold", "Arial Unicode MS Bold"],
-          "text-size": 12,
+          "text-size": 12.5,
           "text-allow-overlap": true,
+          "text-ignore-placement": true,
           "text-anchor": "center",
         },
         paint: { "text-color": "#FFFFFF" },
@@ -471,8 +529,11 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       const ne = boundsRef.current!.getNorthEast();
       const currentBounds = { lat_min: sw.lat, lat_max: ne.lat, lng_min: sw.lng, lng_max: ne.lng };
 
-      // Always report bounds change for lazy pin loading
-      onBoundsChangeRef.current?.(currentBounds);
+      // Report bounds change (debounced 350ms) for lazy pin loading
+      if (boundsChangeTimerRef.current) clearTimeout(boundsChangeTimerRef.current);
+      boundsChangeTimerRef.current = window.setTimeout(() => {
+        onBoundsChangeRef.current?.(currentBounds);
+      }, 350);
 
       // FIX 5 — Auto-search with 800ms debounce
       if (autoSearchRef.current && onBoundsSearchRef.current) {
@@ -676,17 +737,20 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
     }
   }, [pins, fitToPins]);
 
-  // Hover from card → highlight pin
+  // Hover from card OR selected pin (popup aberto) → destaque escuro no topo
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReadyRef.current) return;
     if (!map.getLayer("imoveis-pins-hover")) return;
 
+    const activeIds = [hoveredId, previewPin?.id].filter(Boolean) as string[];
     map.setFilter(
       "imoveis-pins-hover",
-      hoveredId ? ["==", ["get", "id"], hoveredId] : ["==", ["get", "id"], ""],
+      activeIds.length
+        ? (["in", ["get", "id"], ["literal", activeIds]] as unknown as mapboxgl.FilterSpecification)
+        : (["==", ["get", "id"], ""] as unknown as mapboxgl.FilterSpecification),
     );
-  }, [hoveredId]);
+  }, [hoveredId, previewPin]);
 
   const handleBoundsSearch = useCallback(() => {
     if (!boundsRef.current || !onBoundsSearch) return;

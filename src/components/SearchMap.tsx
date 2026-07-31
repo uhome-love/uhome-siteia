@@ -261,8 +261,16 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         style: "mapbox://styles/mapbox/streets-v12",
         center: [-51.2177, -30.0346],
         zoom: 11,
+        minZoom: 7,
+        maxZoom: 18,
         dragRotate: false,
+        pitchWithRotate: false,
+        touchPitch: false,
         attributionControl: false,
+        renderWorldCopies: false,
+        fadeDuration: 120,
+        antialias: false,
+        refreshExpiredTiles: false,
       });
 
       map.addControl(new mb.default.NavigationControl({ showCompass: false }), "top-right");

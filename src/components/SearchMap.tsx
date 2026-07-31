@@ -80,15 +80,25 @@ function toGeoJSON(pins: MapPinData[]): GeoJSON.FeatureCollection {
   };
 }
 
-function createPillImage(fillColor: string, strokeColor: string): ImageData {
+// High-DPI pill sprite (Airbnb-style): crisp edges + soft drop shadow.
+// Rendered at PILL_SCALE and registered with pixelRatio so text-fit stays sharp.
+const PILL_SCALE = 3;
+
+function createPillImage(fillColor: string, strokeColor: string, shadow = true): ImageData {
+  const w = 72, h = 30, r = 15, pad = 6; // pad reserves room for the shadow
   const canvas = document.createElement("canvas");
-  canvas.width = 72;
-  canvas.height = 26;
+  canvas.width = (w + pad * 2) * PILL_SCALE;
+  canvas.height = (h + pad * 2) * PILL_SCALE;
   const ctx = canvas.getContext("2d")!;
+  ctx.scale(PILL_SCALE, PILL_SCALE);
+  ctx.translate(pad, pad);
+
+  if (shadow) {
+    ctx.shadowColor = "rgba(0,0,0,0.22)";
+    ctx.shadowBlur = 5;
+    ctx.shadowOffsetY = 1.5;
+  }
   ctx.fillStyle = fillColor;
-  ctx.strokeStyle = strokeColor;
-  ctx.lineWidth = 1.5;
-  const w = 72, h = 26, r = 13;
   ctx.beginPath();
   ctx.moveTo(r, 0);
   ctx.lineTo(w - r, 0);
@@ -101,8 +111,13 @@ function createPillImage(fillColor: string, strokeColor: string): ImageData {
   ctx.quadraticCurveTo(0, 0, r, 0);
   ctx.closePath();
   ctx.fill();
+
+  ctx.shadowColor = "transparent";
+  ctx.strokeStyle = strokeColor;
+  ctx.lineWidth = 1;
   ctx.stroke();
-  return ctx.getImageData(0, 0, w, h);
+
+  return ctx.getImageData(0, 0, canvas.width, canvas.height);
 }
 
 function pointInPolygon(point: [number, number], polygon: [number, number][]): boolean {

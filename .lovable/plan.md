@@ -1,66 +1,77 @@
-# Diagnóstico + Plano: Mapa ultrafluido e design de alto padrão
+# Direção de criação: Home, Busca e Página do Imóvel
 
-## Diagnóstico do estado atual
-
-**Mapa (`src/components/SearchMap.tsx`, 876 linhas)**
-- Clustering nativo do Mapbox já existe (`cluster: true`, `clusterMaxZoom: 12`, `clusterRadius: 40`), com camadas de cluster, contagem e pins.
-- `moveend` dispara busca de pins com debounce de 800 ms; há um `programmaticMoveRef` para evitar o loop de zoom.
-- Gargalos: arquivo monolítico com estado de mapa, desenho de polígono, popup e busca misturados; `setData` roda em `requestAnimationFrame` sem diffing (recria a FeatureCollection inteira a cada atualização); `fitBounds` de 800 ms compete com o debounce; sem `maxZoom`/`minZoom` coerentes nem `renderWorldCopies:false`; popup criado por evento em vez de reutilizado.
-- Sem hover-link mapa↔lista (destacar o card ao passar o mouse no pin e vice-versa), que é o que dá sensação de fluidez no QuintoAndar.
-
-**Design system (`src/index.css`, `tailwind.config.ts`)**
-- Tokens semânticos existem, mas a paleta é dominada por um azul saturado (`235 93% 67%`) usado em botões, chips, sombras e bordas — leitura "SaaS", não "alto padrão".
-- Sombras hardcoded em rgba azul (`shadow-card`, `hover-lift`) fora do sistema de tokens.
-- Escala tipográfica em px fixo, sem variação responsiva; densidade de espaçamento apertada nos cards e na barra de filtros.
-- Microinterações limitadas a `scale(0.97)`; sem transições de elevação/skeleton coerentes.
-
-**Arquitetura de informação (`src/pages/Search.tsx`, 1137 linhas)**
-- Split view já existe (lista scrollável + mapa à direita, `lg:h-screen`), mobile alterna lista/mapa em fullscreen.
-- Gargalos: página gigante acumulando filtros, paginação, modal de alerta e mapa; sem largura ajustável do split; no mobile falta o padrão "peek" (bottom sheet de cards sobre o mapa).
+Visão: hoje o site funciona bem, mas comunica "portal de listagem". O alvo é **corretora digital de alto padrão** — menos ruído, mais curadoria, mais confiança, e velocidade percebida quase instantânea. Abaixo, o que eu faria em cada superfície, em ordem de impacto.
 
 ---
 
-## Fase 1 (prioridade) — Mapa nível Airbnb: fluidez, pins e carregamento
+## 1. Página do Imóvel — a mais estratégica (é onde a decisão acontece)
 
-**Pins com identidade (o que mais diferencia o Airbnb)**
-1. Trocar os pins de círculo por "price pills": preço abreviado (R$ 1,2M) em pílula branca com sombra suave, renderizada como `symbol layer` do Mapbox (texto + ícone de fundo SDF) — continua GPU-accelerated, sem marcador DOM, sem perda de FPS com milhares de pins.
-2. Estados por `feature-state`: hover eleva a pílula e escurece o fundo, "visualizado" fica cinza, selecionado fica preto/primário. Zero re-render React.
-3. `symbol-sort-key` por preço e `text-allow-overlap: false` para descolagem automática das pílulas em zoom baixo, evitando poluição visual.
-4. Clusters redesenhados: círculo branco com contagem, raio interpolado por zoom, `clusterMaxZoom` 13 e `clusterRadius` responsivo (50 no mobile).
+**Design / UX**
+- Galeria como protagonista: hoje é um grid 4x2 fixo de 480px. Trocar por uma galeria cinematográfica full-bleed com foto principal grande, contador "1/32", e lightbox por categoria (Sala, Cozinha, Vista, Planta) em vez de rolagem cega.
+- Painel de decisão fixo à direita (já é sticky) reorganizado por hierarquia real: preço → custo mensal total (condomínio + IPTU somados, o que ninguém faz bem) → CTA único de agendamento → WhatsApp secundário. Hoje há CTAs competindo.
+- "Por que este imóvel": bloco curto e editorial acima da descrição — 3 pontos gerados a partir dos dados (posição solar, m² privativo vs média do bairro, andar, vagas). Substitui o texto cru importado do Jetimob.
+- Contexto de bairro dentro da página: distância a pé de mercado, escola, parque, e um mini-comparativo de preço/m² do imóvel vs média do bairro. É o que gera confiança de alto padrão.
+- Descrição tratada tipograficamente (medida de linha ~70 caracteres, "ler mais" suave) em vez de bloco denso.
+- Mobile: barra inferior única e persistente com preço + Agendar; sem competir com o FAB do WhatsApp.
 
-**Fluidez de movimento**
-5. Timings unificados: debounce de bounds 350 ms (hoje 800 ms), `easeTo`/`fitBounds` com uma única curva e duração menor; requisição em voo cancelada via `AbortController` ao iniciar novo movimento.
-6. `setData` direto com diffing por id (hoje há rAF duplo recriando a FeatureCollection inteira a cada atualização) — atualiza só quando o conjunto muda.
-7. Popup/card único reutilizado em vez de criado por evento; `queryRenderedFeatures` com throttle.
-8. Hover-link bidirecional lista↔mapa via `feature-state` (passar o mouse no card destaca o pin e vice-versa).
+**Qualidade / velocidade**
+- LCP: foto principal em AVIF/WebP responsivo com `fetchpriority=high` e preload; galeria restante lazy.
+- Prefetch do detalhe no hover/touchstart do card da busca (já existe parcialmente) → abertura percebida como instantânea.
+- Skeleton com a forma real da página (galeria + painel), não spinner.
 
-**Carregamento**
-9. Estilo do mapa mais leve e limpo (Mapbox Light/custom com POIs reduzidos), `renderWorldCopies: false`, `fadeDuration` menor, `maxZoom`/`minZoom` coerentes com a cobertura RS.
-10. Preload do estilo + primeira leva de pins em paralelo com a lista; skeleton do mapa com placeholder estático em vez de spinner.
-11. Cache de pins por bounds/filtros em memória (já existe parcialmente) com invalidação por chave de filtro, evitando refetch ao voltar do detalhe.
+## 2. Página de Busca — onde o site ganha ou perde a sessão
 
-**Organização**
-12. Extrair `SearchMap.tsx` (876 linhas) em `useMapInstance`, `useMapPins`, `useDrawPolygon`, `MapPricePin`, `MapPopupCard`. Comportamento de desenho de área, filtros e URL sync inalterados.
+**Mapa (prioridade absoluta, detalhada no plano anterior)**
+- Price pills estilo Airbnb, clusters limpos, hover-link lista↔mapa, debounce 350 ms, pins sem re-render.
 
-## Fase 2 — Design system de alto padrão
-1. Nova paleta neutra: base off-white/grafite, azul rebaixado para acento pontual, tokens de superfície (`--surface`, `--surface-elevated`) e bordas mais suaves.
-2. Sombras tokenizadas (`--shadow-sm/md/lg`) em cinza neutro, substituindo as rgba azuis.
-3. Escala tipográfica fluida com `clamp()`, tracking negativo em títulos, altura de linha mais generosa no corpo. Mantém Plus Jakarta Sans.
-4. Cards de imóvel: mais respiro interno, hierarquia preço > endereço > atributos, foto com transição suave, badges discretos, elevação no hover.
-5. Microinterações padronizadas em 150–250 ms, skeletons coerentes, estados de foco acessíveis.
+**Qualificação da busca (o maior salto de qualidade)**
+- Ordenação com inteligência real: além de "recentes/preço", oferecer **"Melhor custo-benefício"** (preço/m² vs média do bairro) e **"Recomendados para você"** (baseado nos favoritos e imóveis vistos).
+- Filtros que respondem: contagem em tempo real em todos os filtros (hoje só nos tipos), e "0 resultados" nunca vazio — sempre com 3 sugestões de relaxamento ("sem a vaga extra: 42 imóveis").
+- Salvar busca + alerta como parte natural do fluxo (o modal já existe) — oferecido após o 2º scroll, não como botão frio.
+- Chips de contexto no topo mostrando a busca em linguagem natural ("Apartamentos de 3 quartos no Menino Deus até R$ 900 mil") — reforça a busca por IA que já existe.
+- Comparador: selecionar até 3 imóveis e ver lado a lado (preço/m², condomínio, vagas, andar).
 
-## Fase 3 — Arquitetura de informação
-1. Desktop: split ajustável (lista 58% / mapa 42%), barra de filtros fixa com hierarquia reduzida, contador de resultados fixo no topo da lista.
-2. Mobile: bottom sheet arrastável de cards sobre o mapa (peek → meio → full) no lugar do toggle fullscreen, mantendo o comportamento atual como fallback.
-3. Fatiar `Search.tsx` (1137 linhas) em `SearchHeader`, `SearchResultsPanel`, `SearchMapPanel`, `AlertModal`.
+**Card do imóvel (SearchPropertyCard)**
+- Menos badges, mais respiro. Hierarquia: foto → preço → endereço → 3 atributos → custo mensal. Hoje a densidade é de portal.
+- Um sinal de escassez honesto e discreto ("visto 14 vezes esta semana") em vez de badges genéricos.
+- Carrossel de fotos com pré-carregamento da próxima foto (mobile já tem IntersectionObserver; estender a lógica).
+
+## 3. Home — hoje ela apresenta; deveria qualificar
+
+- Hero: manter o card de busca sobre o skyline, mas reduzir a competição visual. Um H1 e um único caminho primário — busca. As 3 abas atuais dispersam.
+- Prova social acima da dobra secundária: número real de imóveis, bairros cobertos, tempo médio de resposta. Dados que já existem no banco.
+- Curadoria em vez de listagem: uma faixa "Selecionados da semana" com 6 imóveis escolhidos por critério (preço/m² abaixo da média, novos no site) — dá voz editorial de imobiliária de alto padrão.
+- "Continue de onde parou": últimos imóveis vistos e buscas salvas. É a maior alavanca de retorno e não custa nada de infra.
+- Bairros: manter, mas com foto tratada e dado de contexto (preço médio/m², nº de imóveis) em vez de só nome.
+- Ferramentas de captação (avaliação de imóvel) com peso editorial próprio, não como banner.
+
+## 4. Design system transversal
+
+- Paleta rebaixada: base off-white/grafite, azul como acento pontual e não como cor de tudo. Hoje o azul saturado em botões, chips, bordas e sombras dá leitura "SaaS".
+- Sombras neutras tokenizadas; hoje são rgba azuis hardcoded.
+- Tipografia fluida com `clamp()`, tracking negativo em títulos, corpo mais respirado. Mantém Plus Jakarta Sans.
+- Movimento com propósito: 150–250 ms padrão, elevação no hover, transições de página já existentes refinadas.
+
+## 5. Velocidade percebida (transversal)
+
+- Skeletons com a forma real de cada tela, nunca spinner.
+- Prefetch em hover/touch nas rotas quentes (card → detalhe, nav → busca; parte já existe).
+- Imagens: AVIF + tamanhos responsivos servidos pelo proxy que já usamos.
+- Redução do JS inicial da busca fatiando `Search.tsx` (1137 linhas) e `SearchMap.tsx` (876 linhas).
+
+---
 
 ## Detalhes técnicos
-- Nada de mudança em RPC, filtros, URL sync ou regras de negócio; `get_map_pins` e `fetchImoveis` permanecem intactos.
-- As price pills precisam do preço no payload de pins — `get_map_pins` já retorna preço, então não há mudança de banco.
-- Paginação "Ver mais" e o teste `search-ver-mais.test.tsx` continuam válidos; rodar a suíte a cada fase.
-- Validação com Playwright em mobile (390×844) e desktop (1536×864): pan/zoom contínuo, desenho de área, clique em pin, volta do detalhe.
-- Cada fase é entregável independente e pode ir ao ar isolada; o site permanece no ar durante todas.
+- Ordenações novas ("custo-benefício", "recomendados") usam dados já existentes (`preco`, `area_util`, stats de bairro) — no máximo uma RPC nova de média por bairro, sem alterar o schema.
+- "Continue de onde parou" e comparador vivem em localStorage + Zustand; sem backend novo.
+- Nada muda em Jetimob sync, CRM triggers, URL sync de filtros ou SEO/SSR.
+- Cada item é entregável isolado; o site permanece no ar.
 
-## Ordem sugerida
-Fase 1 (mapa) → validar → Fase 2 → validar → Fase 3.
+## Ordem que eu executaria
+1. Mapa Airbnb-style (plano já aprovado em espírito) — maior impacto percebido.
+2. Página do imóvel: galeria + painel de decisão + custo mensal total.
+3. Busca: ordenações inteligentes, contagens em todos os filtros, zero-resultado com sugestões.
+4. Design system rebaixado + card do imóvel.
+5. Home: curadoria, prova social, "continue de onde parou".
 
+Me diga por qual bloco começamos — ou aprove esta ordem e eu sigo do 1 ao 5.

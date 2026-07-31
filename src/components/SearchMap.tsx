@@ -737,17 +737,20 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
     }
   }, [pins, fitToPins]);
 
-  // Hover from card → highlight pin
+  // Hover from card OR selected pin (popup aberto) → destaque escuro no topo
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReadyRef.current) return;
     if (!map.getLayer("imoveis-pins-hover")) return;
 
+    const activeIds = [hoveredId, previewPin?.id].filter(Boolean) as string[];
     map.setFilter(
       "imoveis-pins-hover",
-      hoveredId ? ["==", ["get", "id"], hoveredId] : ["==", ["get", "id"], ""],
+      activeIds.length
+        ? (["in", ["get", "id"], ["literal", activeIds]] as unknown as mapboxgl.FilterSpecification)
+        : (["==", ["get", "id"], ""] as unknown as mapboxgl.FilterSpecification),
     );
-  }, [hoveredId]);
+  }, [hoveredId, previewPin]);
 
   const handleBoundsSearch = useCallback(() => {
     if (!boundsRef.current || !onBoundsSearch) return;

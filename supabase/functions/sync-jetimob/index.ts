@@ -204,6 +204,8 @@ const RATE_LIMIT_MS = 50;
 const SAFETY_RATIO = 0.9;
 // Uma execução parada há mais de 10 minutos é considerada travada e é retomada
 const STALE_RUN_MINUTES = 10;
+// Uma execução que passa disso sem terminar é abandonada e uma nova é iniciada
+const ABANDON_RUN_HOURS = 6;
 // Intervalo mínimo entre execuções completas
 const MIN_HOURS_BETWEEN_RUNS = 20;
 
@@ -256,17 +258,36 @@ serve(async (req) => {
     } else if (run && run.status === "rodando") {
       const lastTouch = new Date(run.updated_at ?? run.iniciado_em).getTime();
       const minutesIdle = (nowMs - lastTouch) / 60000;
-      if (mode === "tick" && minutesIdle < 1) {
-        // Outro bloco provavelmente ainda está rodando — evita execução concorrente
-        return json({ skipped: "already_running", run_id: run.id, pagina_atual: run.pagina_atual });
-      }
-      if (minutesIdle >= STALE_RUN_MINUTES) {
-        console.log(`♻️ Retomando execução travada ${run.id} na página ${run.pagina_atual + 1}`);
+      const hoursOpen = (nowMs - new Date(run.iniciado_em).getTime()) / 3600000;
+      if (hoursOpen >= ABANDON_RUN_HOURS) {
+        // Execução presa há horas: abandona e começa outra do zero
+        console.warn(`🛑 Execução ${run.id} aberta há ${hoursOpen.toFixed(1)}h — abandonando.`);
+        await supabase
+          .from("sync_state")
+          .update({
+            status: "abandonada",
+            finalizado_em: new Date().toISOString(),
+            erro: `Abandonada após ${hoursOpen.toFixed(1)}h sem concluir`,
+          })
+          .eq("id", run.id);
+        run = null;
+      } else {
+        if (mode === "tick" && minutesIdle < 1) {
+          // Outro bloco provavelmente ainda está rodando — evita execução concorrente
+          return json({ skipped: "already_running", run_id: run.id, pagina_atual: run.pagina_atual });
+        }
+        if (minutesIdle >= STALE_RUN_MINUTES) {
+          console.log(`♻️ Retomando execução travada ${run.id} na página ${run.pagina_atual + 1}`);
+        }
       }
     } else if (run) {
       const finished = new Date(run.finalizado_em ?? run.iniciado_em).getTime();
       const hoursSince = (nowMs - finished) / 3600000;
-      if (hoursSince < MIN_HOURS_BETWEEN_RUNS) {
+      const concluidaComLimpeza = run.status === "concluida";
+      // Execuções que não terminaram bem (abandonada/cancelada/sem limpeza) podem
+      // recomeçar já no próximo tick; só a execução 100% concluída respeita o intervalo.
+      const esperaMinima = concluidaComLimpeza ? MIN_HOURS_BETWEEN_RUNS : 3;
+      if (hoursSince < esperaMinima) {
         return json({ skipped: "recent_run", horas_desde_ultima: Number(hoursSince.toFixed(1)) });
       }
       run = null;

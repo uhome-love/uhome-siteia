@@ -204,6 +204,8 @@ const RATE_LIMIT_MS = 50;
 const SAFETY_RATIO = 0.9;
 // Uma execução parada há mais de 10 minutos é considerada travada e é retomada
 const STALE_RUN_MINUTES = 10;
+// Uma execução que passa disso sem terminar é abandonada e uma nova é iniciada
+const ABANDON_RUN_HOURS = 6;
 // Intervalo mínimo entre execuções completas
 const MIN_HOURS_BETWEEN_RUNS = 20;
 

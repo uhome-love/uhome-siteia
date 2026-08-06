@@ -286,7 +286,7 @@ serve(async (req) => {
       const concluidaComLimpeza = run.status === "concluida";
       // Execuções que não terminaram bem (abandonada/cancelada/sem limpeza) podem
       // recomeçar já no próximo tick; só a execução 100% concluída respeita o intervalo.
-      const esperaMinima = concluidaComLimpeza ? MIN_HOURS_BETWEEN_RUNS : 0.5;
+      const esperaMinima = concluidaComLimpeza ? MIN_HOURS_BETWEEN_RUNS : 3;
       if (hoursSince < esperaMinima) {
         return json({ skipped: "recent_run", horas_desde_ultima: Number(hoursSince.toFixed(1)) });
       }

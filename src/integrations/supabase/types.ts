@@ -901,6 +901,51 @@ export type Database = {
         }
         Relationships: []
       }
+      sync_state: {
+        Row: {
+          created_at: string
+          desativados: number | null
+          erro: string | null
+          finalizado_em: string | null
+          id: string
+          iniciado_em: string
+          pagina_atual: number
+          paginas_totais: number | null
+          status: string
+          total_esperado: number | null
+          total_processado: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          desativados?: number | null
+          erro?: string | null
+          finalizado_em?: string | null
+          id?: string
+          iniciado_em?: string
+          pagina_atual?: number
+          paginas_totais?: number | null
+          status?: string
+          total_esperado?: number | null
+          total_processado?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          desativados?: number | null
+          erro?: string | null
+          finalizado_em?: string | null
+          id?: string
+          iniciado_em?: string
+          pagina_atual?: number
+          paginas_totais?: number | null
+          status?: string
+          total_esperado?: number | null
+          total_processado?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string

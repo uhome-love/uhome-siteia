@@ -197,6 +197,16 @@ function hasNextPage(data: any, itemsCount: number, pageSize: number, currentPag
   return itemsCount >= pageSize;
 }
 
+const PAGE_SIZE = 100;
+const MAX_RETRIES = 3;
+const RATE_LIMIT_MS = 50;
+// Só desativa imóveis quando a execução trouxe pelo menos 90% do total informado pelo Jetimob
+const SAFETY_RATIO = 0.9;
+// Uma execução parada há mais de 10 minutos é considerada travada e é retomada
+const STALE_RUN_MINUTES = 10;
+// Intervalo mínimo entre execuções completas
+const MIN_HOURS_BETWEEN_RUNS = 20;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -212,86 +222,147 @@ serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Parse request body
-    let startPage = 1;
-    let maxPagesToProcess = 10;
-    let autoChain = false;
-    let syncStartedAt: string | null = null;
+    // ---- Parse body -------------------------------------------------------
+    // mode: "tick"  → continua execução em andamento, ou inicia se estiver na hora (usado pelo cron)
+    //       "start" → força o início de uma nova execução completa (usado pelo admin)
+    let mode: "tick" | "start" | "continue" = "tick";
+    let maxPagesToProcess = 8;
     try {
       const body = await req.json();
-      if (body?.start_page) startPage = Number(body.start_page);
-      if (body?.max_pages) maxPagesToProcess = Number(body.max_pages);
-      if (body?.auto_chain) autoChain = true;
-      if (body?.sync_started_at) syncStartedAt = body.sync_started_at;
-    } catch { /* no body is fine */ }
+      if (body?.mode === "start" || body?.force === true) mode = "start";
+      else if (body?.mode === "continue") mode = "continue";
+      if (body?.max_pages) maxPagesToProcess = Math.max(1, Number(body.max_pages));
+    } catch { /* sem body é válido (cron) */ }
 
-    // If this is the first chunk of an auto-chain, record the start time
-    if (!syncStartedAt) {
-      syncStartedAt = new Date().toISOString();
+    // ---- Determina a execução (run) a usar --------------------------------
+    const { data: lastRuns } = await supabase
+      .from("sync_state")
+      .select("*")
+      .order("iniciado_em", { ascending: false })
+      .limit(1);
+
+    let run = lastRuns?.[0] ?? null;
+    const nowMs = Date.now();
+
+    if (mode === "start") {
+      // Fecha execução anterior ainda aberta
+      if (run && run.status === "rodando") {
+        await supabase
+          .from("sync_state")
+          .update({ status: "cancelada", finalizado_em: new Date().toISOString() })
+          .eq("id", run.id);
+      }
+      run = null;
+    } else if (run && run.status === "rodando") {
+      const lastTouch = new Date(run.updated_at ?? run.iniciado_em).getTime();
+      const minutesIdle = (nowMs - lastTouch) / 60000;
+      if (mode === "tick" && minutesIdle < 1) {
+        // Outro bloco provavelmente ainda está rodando — evita execução concorrente
+        return json({ skipped: "already_running", run_id: run.id, pagina_atual: run.pagina_atual });
+      }
+      if (minutesIdle >= STALE_RUN_MINUTES) {
+        console.log(`♻️ Retomando execução travada ${run.id} na página ${run.pagina_atual + 1}`);
+      }
+    } else if (run) {
+      const finished = new Date(run.finalizado_em ?? run.iniciado_em).getTime();
+      const hoursSince = (nowMs - finished) / 3600000;
+      if (hoursSince < MIN_HOURS_BETWEEN_RUNS) {
+        return json({ skipped: "recent_run", horas_desde_ultima: Number(hoursSince.toFixed(1)) });
+      }
+      run = null;
     }
 
-    const PAGE_SIZE = 100;
-    const MAX_RETRIES = 3;
-    const RATE_LIMIT_MS = 50;
+    if (!run) {
+      const { data: created, error: createErr } = await supabase
+        .from("sync_state")
+        .insert({ status: "rodando", pagina_atual: 0, total_processado: 0 })
+        .select()
+        .single();
+      if (createErr) throw createErr;
+      run = created;
+      console.log(`🚀 Nova execução iniciada: ${run.id}`);
+    }
 
-    let totalInserted = 0;
-    let totalErrors = 0;
-    let totalFetched = 0;
-    let expectedTotal: number | null = null;
-    let lastPage = startPage;
+    // ---- Lock otimista: só um worker por execução -------------------------
+    // Reivindica a execução comparando updated_at (CAS). Se outro worker
+    // atualizou a linha nesse meio tempo, este bloco encerra sem duplicar trabalho.
+    let lockToken: string = run.updated_at;
+    async function claim(): Promise<boolean> {
+      const next = new Date().toISOString();
+      const { data, error } = await supabase
+        .from("sync_state")
+        .update({ updated_at: next })
+        .eq("id", run.id)
+        .eq("updated_at", lockToken)
+        .select("updated_at")
+        .maybeSingle();
+      if (error || !data) return false;
+      lockToken = data.updated_at;
+      return true;
+    }
 
-    console.log(`🔄 Sync started | startPage=${startPage} maxPages=${maxPagesToProcess} autoChain=${autoChain} syncStartedAt=${syncStartedAt}`);
+    if (!(await claim())) {
+      return json({ skipped: "lock_taken", run_id: run.id });
+    }
 
+    const syncStartedAt: string = run.iniciado_em;
+    const startPage = (run.pagina_atual ?? 0) + 1;
     const endPage = startPage + maxPagesToProcess - 1;
+
+    let inserted = 0;
+    let errors = 0;
+    let fetched = 0;
+    let expectedTotal: number | null = run.total_esperado ?? null;
+    let totalPages: number | null = run.paginas_totais ?? null;
+    let lastPage = run.pagina_atual ?? 0;
+    let reachedEnd = false;
+    let chunkError: string | null = null;
+    let lockLost = false;
+
+    console.log(`🔄 run=${run.id} páginas ${startPage}-${endPage} (início ${syncStartedAt})`);
+
+
 
     for (let page = startPage; page <= endPage; page++) {
       const url = `${JETIMOB_BASE}/${JETIMOB_KEY}/imoveis/todos?v=6&page=${page}&pageSize=${PAGE_SIZE}`;
 
       let response: Response | null = null;
-      let retries = 0;
-
-      while (retries < MAX_RETRIES) {
+      for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
         try {
-          console.log(`📄 Page ${page} (attempt ${retries + 1})...`);
           response = await fetch(url, { headers: { Accept: "application/json" } });
           if (response.ok) break;
-          const text = await response.text();
-          console.error(`❌ Page ${page} HTTP ${response.status}: ${text.slice(0, 200)}`);
-          if (page === startPage && retries === 0) throw new Error(`Jetimob API returned ${response.status}`);
-          retries++;
-          if (retries < MAX_RETRIES) await sleep(2000 * retries);
+          console.error(`❌ Página ${page} HTTP ${response.status}`);
+          response = null;
         } catch (fetchErr) {
-          retries++;
-          console.error(`❌ Page ${page} fetch error (attempt ${retries}):`, fetchErr);
-          if (page === startPage && retries >= MAX_RETRIES) throw fetchErr;
-          if (retries < MAX_RETRIES) await sleep(2000 * retries);
+          console.error(`❌ Página ${page} erro (tentativa ${attempt}):`, fetchErr);
+          response = null;
         }
+        if (attempt < MAX_RETRIES) await sleep(1500 * attempt);
       }
 
-      if (!response || !response.ok) {
-        console.warn(`⚠️ Skipping page ${page} after ${MAX_RETRIES} retries`);
+      if (!response) {
+        // Não avança a página: o próximo tick retoma exatamente daqui
+        chunkError = `Falha ao buscar a página ${page} após ${MAX_RETRIES} tentativas`;
+        console.warn(`⚠️ ${chunkError}`);
         break;
       }
 
       const data = await response.json();
 
-      if (page === startPage) {
-        const topKeys = Object.keys(data);
-        console.log(`📊 Response structure: ${JSON.stringify(topKeys)}`);
-        const total = extractTotal(data);
-        if (total) {
-          expectedTotal = total;
-          console.log(`📊 Expected total: ${expectedTotal}, totalPages: ${data?.totalPages ?? '?'}`);
-        }
+      const total = extractTotal(data);
+      if (total) {
+        expectedTotal = total;
+        totalPages = data?.totalPages != null ? Number(data.totalPages) : Math.ceil(total / PAGE_SIZE);
       }
 
       const items = extractItems(data);
       if (items.length === 0) {
-        console.log(`🏁 Page ${page}: empty — stopping.`);
+        console.log(`🏁 Página ${page} vazia — fim da listagem.`);
+        reachedEnd = true;
         break;
       }
 
-      totalFetched += items.length;
+      fetched += items.length;
 
       for (let i = 0; i < items.length; i += 50) {
         const batch = items.slice(i, i + 50);
@@ -301,116 +372,91 @@ serve(async (req) => {
           .upsert(mapped, { onConflict: "jetimob_id", ignoreDuplicates: false });
         if (error) {
           console.error(`❌ Upsert p${page}b${i}: ${error.message}`);
-          totalErrors += batch.length;
+          errors += batch.length;
+          chunkError = error.message;
         } else {
-          totalInserted += batch.length;
+          inserted += batch.length;
         }
       }
 
       lastPage = page;
-      console.log(`✅ Page ${page}: ${items.length} items | Running: ${totalInserted} ok, ${totalErrors} err`);
+
+      // Heartbeat + verificação do lock
+      if (!(await claim())) {
+        lockLost = true;
+        console.warn("⚠️ Lock perdido para outro worker — encerrando este bloco.");
+        break;
+      }
 
       if (!hasNextPage(data, items.length, PAGE_SIZE, page)) {
-        console.log(`🏁 No next page — stopping.`);
+        console.log(`🏁 Sem próxima página após ${page}.`);
+        reachedEnd = true;
         break;
       }
 
       await sleep(RATE_LIMIT_MS);
     }
 
-    // Check if there are more pages to sync
-    const morePages = hasNextPage({ totalPages: expectedTotal ? Math.ceil(expectedTotal / PAGE_SIZE) : null }, 0, PAGE_SIZE, lastPage);
-    const nextStartPage = lastPage + 1;
+    const totalProcessado = (run.total_processado ?? 0) + inserted;
 
-    // Log this chunk to sync_log
+    if (lockLost) {
+      return json({ skipped: "lock_lost", run_id: run.id, inseridos: inserted, last_page: lastPage });
+    }
+
+    // ---- Persiste progresso ----------------------------------------------
+    const progressoAt = new Date().toISOString();
+    const { data: progressoRow } = await supabase
+      .from("sync_state")
+      .update({
+        pagina_atual: lastPage,
+        paginas_totais: totalPages,
+        total_esperado: expectedTotal,
+        total_processado: totalProcessado,
+        erro: chunkError,
+        updated_at: progressoAt,
+      })
+      .eq("id", run.id)
+      .eq("updated_at", lockToken)
+      .select("updated_at")
+      .maybeSingle();
+
+    if (!progressoRow) {
+      return json({ skipped: "lock_lost", run_id: run.id, inseridos: inserted, last_page: lastPage });
+    }
+    lockToken = progressoRow.updated_at;
+
+
     await supabase.from("sync_log").insert({
       tipo: "jetimob",
       direcao: "jetimob→uhome",
-      sucesso: totalErrors === 0,
-      erro: totalErrors > 0 ? `${totalErrors} erros de upsert` : null,
+      sucesso: errors === 0 && !chunkError,
+      erro: chunkError,
       payload: {
+        run_id: run.id,
         start_page: startPage,
         last_page: lastPage,
-        inseridos: totalInserted,
-        erros: totalErrors,
-        total_fetched: totalFetched,
+        inseridos: inserted,
+        erros: errors,
+        total_fetched: fetched,
+        total_processado: totalProcessado,
         expected_total: expectedTotal,
-        more_pages: morePages,
         sync_started_at: syncStartedAt,
       },
     });
 
-    const result = {
-      inseridos: totalInserted,
-      erros: totalErrors,
-      total: totalFetched,
-      total_esperado: expectedTotal,
-      last_page: lastPage,
-      next_start_page: nextStartPage,
-      more_pages: morePages,
-      chained: false,
-      sync_started_at: syncStartedAt,
-    };
+    let desativados: number | null = null;
+    let finalizado = false;
 
-    // Auto-chain: trigger the next chunk if there are more pages
-    if (autoChain && morePages && totalFetched > 0) {
-      try {
-        const selfUrl = `${SUPABASE_URL}/functions/v1/sync-jetimob`;
-        const anonKey = Deno.env.get("SUPABASE_ANON_KEY") || Deno.env.get("SUPABASE_PUBLISHABLE_KEY") || "";
-        console.log(`🔗 Chaining next chunk: start_page=${nextStartPage}`);
-        fetch(selfUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${anonKey}`,
-          },
-          body: JSON.stringify({
-            start_page: nextStartPage,
-            max_pages: maxPagesToProcess,
-            auto_chain: true,
-            sync_started_at: syncStartedAt,
-          }),
-        }).catch((err) => console.error("Chain fetch error:", err));
-        result.chained = true;
-      } catch (chainErr) {
-        console.error("Chain error:", chainErr);
-      }
-    }
+    // ---- Finalização + limpeza -------------------------------------------
+    if (reachedEnd) {
+      const safeToDeactivate =
+        totalProcessado > 0 &&
+        expectedTotal !== null &&
+        expectedTotal > 0 &&
+        totalProcessado >= expectedTotal * SAFETY_RATIO;
 
-    // If sync is complete (no more pages), deactivate properties not touched during this sync.
-    // SAFETY GUARDS to prevent mass-deactivation when Jetimob API returns empty/fails:
-    //   1. Must have synced at least 1 item across all chained chunks (totalFetched > 0)
-    //   2. Must have an expectedTotal from Jetimob (proves API responded properly)
-    //   3. totalFetched must be at least 50% of expectedTotal (sanity check)
-    const SAFETY_RATIO = 0.5;
-    const safeToDeactivate =
-      totalFetched > 0 &&
-      expectedTotal !== null &&
-      expectedTotal > 0 &&
-      totalFetched >= expectedTotal * SAFETY_RATIO;
-
-    if (!morePages && syncStartedAt && autoChain && !safeToDeactivate) {
-      console.warn(
-        `⚠️ Skipping auto-deactivate: totalFetched=${totalFetched}, expectedTotal=${expectedTotal}. ` +
-          `Refusing to deactivate to prevent mass-disable from a failed/empty Jetimob response.`
-      );
-      await supabase.from("sync_log").insert({
-        tipo: "jetimob",
-        direcao: "jetimob→uhome",
-        sucesso: true,
-        erro: "auto-deactivate skipped (safety guard)",
-        payload: {
-          action: "deactivate_skipped",
-          reason: "totalFetched too low vs expectedTotal",
-          total_fetched: totalFetched,
-          expected_total: expectedTotal,
-          sync_started_at: syncStartedAt,
-        },
-      });
-    } else if (!morePages && syncStartedAt && autoChain && safeToDeactivate) {
-      try {
-        console.log(`🧹 Deactivating properties not updated since ${syncStartedAt}...`);
-        const { count, error: deactivateError } = await supabase
+      if (safeToDeactivate) {
+        const { count, error: deactErr } = await supabase
           .from("imoveis")
           .update({ status: "inativo" })
           .eq("origem", "jetimob")
@@ -418,33 +464,70 @@ serve(async (req) => {
           .lt("updated_at", syncStartedAt)
           .select("id", { count: "exact", head: true });
 
-        if (deactivateError) {
-          console.error("❌ Deactivation error:", deactivateError.message);
+        if (deactErr) {
+          console.error("❌ Erro ao desativar:", deactErr.message);
         } else {
-          console.log(`🧹 Deactivated ${count ?? 0} stale properties`);
+          desativados = count ?? 0;
+          console.log(`🧹 ${desativados} imóveis desativados (fora do Jetimob).`);
         }
+      } else {
+        console.warn(
+          `⚠️ Desativação pulada por segurança: processado=${totalProcessado} esperado=${expectedTotal}`
+        );
+      }
 
-        // Log the final summary
-        await supabase.from("sync_log").insert({
-          tipo: "jetimob",
-          direcao: "jetimob→uhome",
-          sucesso: true,
-          payload: {
-            action: "sync_complete",
-            sync_started_at: syncStartedAt,
-            deactivated: count ?? 0,
+      finalizado = true;
+      await supabase
+        .from("sync_state")
+        .update({
+          status: safeToDeactivate ? "concluida" : "concluida_sem_limpeza",
+          finalizado_em: new Date().toISOString(),
+          desativados,
+        })
+        .eq("id", run.id);
+
+      await supabase.from("sync_log").insert({
+        tipo: "jetimob",
+        direcao: "jetimob→uhome",
+        sucesso: true,
+        payload: {
+          action: "sync_complete",
+          run_id: run.id,
+          sync_started_at: syncStartedAt,
+          total_processado: totalProcessado,
+          expected_total: expectedTotal,
+          desativados,
+          limpeza_aplicada: safeToDeactivate,
+        },
+      });
+    } else {
+      // Encadeia o próximo bloco; se a chamada se perder, o cron retoma pelo sync_state
+      try {
+        fetch(`${SUPABASE_URL}/functions/v1/sync-jetimob`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Deno.env.get("SUPABASE_ANON_KEY") ?? ""}`,
           },
-        });
-      } catch (deactivateErr) {
-        console.error("Deactivation error:", deactivateErr);
+          body: JSON.stringify({ mode: "continue", max_pages: maxPagesToProcess }),
+        }).catch((err) => console.error("Chain error:", err));
+      } catch (chainErr) {
+        console.error("Chain error:", chainErr);
       }
     }
 
-    console.log(`✅ Sync chunk complete:`, JSON.stringify(result));
-
-    return new Response(JSON.stringify(result), {
-      status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    return json({
+      run_id: run.id,
+      inseridos: inserted,
+      erros: errors,
+      total: fetched,
+      total_processado: totalProcessado,
+      total_esperado: expectedTotal,
+      last_page: lastPage,
+      paginas_totais: totalPages,
+      finalizado,
+      desativados,
+      erro: chunkError,
     });
   } catch (e) {
     console.error("sync-jetimob error:", e);
@@ -455,3 +538,10 @@ serve(async (req) => {
     });
   }
 });
+
+function json(payload: Record<string, unknown>) {
+  return new Response(JSON.stringify(payload), {
+    status: 200,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}

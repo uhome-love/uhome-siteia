@@ -76,15 +76,16 @@ export default function AdminImoveis() {
   async function handleSync() {
     setSyncing(true);
     try {
-      const { data, error } = await supabase.functions.invoke("sync-jetimob", {
-        body: { start_page: 1, max_pages: 5 },
+      const { error } = await supabase.functions.invoke("sync-jetimob", {
+        body: { mode: "start", max_pages: 10 },
       });
       if (error) throw error;
-      toast.success(`Sync concluída: ${data.inseridos} inseridos, ${data.erros} erros`);
-      load();
+      toast.success("Sincronização iniciada — acompanhe em Sync");
     } catch (err: any) {
-      toast.error("Erro na sincronização: " + (err.message || ""));
+      toast.message("Sincronização disparada", { description: "Acompanhe o progresso na aba Sync." });
+      console.warn("[sync-jetimob]", err);
     } finally {
+      setTimeout(load, 3000);
       setSyncing(false);
     }
   }

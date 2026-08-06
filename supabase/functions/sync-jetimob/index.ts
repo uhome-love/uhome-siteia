@@ -283,7 +283,11 @@ serve(async (req) => {
     } else if (run) {
       const finished = new Date(run.finalizado_em ?? run.iniciado_em).getTime();
       const hoursSince = (nowMs - finished) / 3600000;
-      if (hoursSince < MIN_HOURS_BETWEEN_RUNS) {
+      const concluidaComLimpeza = run.status === "concluida";
+      // Execuções que não terminaram bem (abandonada/cancelada/sem limpeza) podem
+      // recomeçar já no próximo tick; só a execução 100% concluída respeita o intervalo.
+      const esperaMinima = concluidaComLimpeza ? MIN_HOURS_BETWEEN_RUNS : 0.5;
+      if (hoursSince < esperaMinima) {
         return json({ skipped: "recent_run", horas_desde_ultima: Number(hoursSince.toFixed(1)) });
       }
       run = null;

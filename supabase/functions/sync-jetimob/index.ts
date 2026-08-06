@@ -258,12 +258,27 @@ serve(async (req) => {
     } else if (run && run.status === "rodando") {
       const lastTouch = new Date(run.updated_at ?? run.iniciado_em).getTime();
       const minutesIdle = (nowMs - lastTouch) / 60000;
-      if (mode === "tick" && minutesIdle < 1) {
-        // Outro bloco provavelmente ainda está rodando — evita execução concorrente
-        return json({ skipped: "already_running", run_id: run.id, pagina_atual: run.pagina_atual });
-      }
-      if (minutesIdle >= STALE_RUN_MINUTES) {
-        console.log(`♻️ Retomando execução travada ${run.id} na página ${run.pagina_atual + 1}`);
+      const hoursOpen = (nowMs - new Date(run.iniciado_em).getTime()) / 3600000;
+      if (hoursOpen >= ABANDON_RUN_HOURS) {
+        // Execução presa há horas: abandona e começa outra do zero
+        console.warn(`🛑 Execução ${run.id} aberta há ${hoursOpen.toFixed(1)}h — abandonando.`);
+        await supabase
+          .from("sync_state")
+          .update({
+            status: "abandonada",
+            finalizado_em: new Date().toISOString(),
+            erro: `Abandonada após ${hoursOpen.toFixed(1)}h sem concluir`,
+          })
+          .eq("id", run.id);
+        run = null;
+      } else {
+        if (mode === "tick" && minutesIdle < 1) {
+          // Outro bloco provavelmente ainda está rodando — evita execução concorrente
+          return json({ skipped: "already_running", run_id: run.id, pagina_atual: run.pagina_atual });
+        }
+        if (minutesIdle >= STALE_RUN_MINUTES) {
+          console.log(`♻️ Retomando execução travada ${run.id} na página ${run.pagina_atual + 1}`);
+        }
       }
     } else if (run) {
       const finished = new Date(run.finalizado_em ?? run.iniciado_em).getTime();

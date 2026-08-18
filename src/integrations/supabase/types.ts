@@ -471,6 +471,7 @@ export type Database = {
           foto_principal: string | null
           fotos: Json | null
           id: string
+          iptu_periodicidade: string | null
           jetimob_id: string | null
           jetimob_raw: Json | null
           latitude: number | null
@@ -511,6 +512,7 @@ export type Database = {
           foto_principal?: string | null
           fotos?: Json | null
           id?: string
+          iptu_periodicidade?: string | null
           jetimob_id?: string | null
           jetimob_raw?: Json | null
           latitude?: number | null
@@ -551,6 +553,7 @@ export type Database = {
           foto_principal?: string | null
           fotos?: Json | null
           id?: string
+          iptu_periodicidade?: string | null
           jetimob_id?: string | null
           jetimob_raw?: Json | null
           latitude?: number | null
@@ -1188,6 +1191,7 @@ export type Database = {
           foto_principal: string | null
           fotos: Json | null
           id: string
+          iptu_periodicidade: string | null
           jetimob_id: string | null
           jetimob_raw: Json | null
           latitude: number | null

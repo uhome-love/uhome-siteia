@@ -29,6 +29,7 @@ function makeImoveis(count: number, offset = 0): Imovel[] {
     preco: 100000 + i,
     preco_condominio: null,
     preco_iptu: null,
+  iptu_periodicidade: null,
     area_total: 50,
     area_util: null,
     quartos: 2,

@@ -10,6 +10,7 @@ export interface Imovel {
   preco: number;
   preco_condominio: number | null;
   preco_iptu: number | null;
+  iptu_periodicidade: string | null;
   area_total: number | null;
   area_util: number | null;
   quartos: number | null;
@@ -136,7 +137,7 @@ export const CIDADES_PERMITIDAS = ["Porto Alegre", "Canoas", "Cachoeirinha", "Gr
 const LISTING_COLUMNS = "id,slug,tipo,finalidade,status,destaque,preco,preco_condominio,area_total,area_util,quartos,banheiros,vagas,bairro,cidade,uf,publicado_em,foto_principal,fase";
 
 // Focused detail payload — excludes large sync/debug fields that can slow or stall property pages
-const DETAIL_COLUMNS = "id,slug,tipo,finalidade,status,destaque,preco,preco_condominio,preco_iptu,area_total,area_util,quartos,banheiros,vagas,andar,latitude,longitude,titulo,descricao,diferenciais,fotos,foto_principal,video_url,condominio_nome,publicado_em,bairro,cidade,uf";
+const DETAIL_COLUMNS = "id,slug,tipo,finalidade,status,destaque,preco,preco_condominio,preco_iptu,iptu_periodicidade,area_total,area_util,quartos,banheiros,vagas,andar,latitude,longitude,titulo,descricao,diferenciais,fotos,foto_principal,video_url,condominio_nome,publicado_em,bairro,cidade,uf";
 
 const PUBLIC_REST_URL = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/imoveis`;
 const PUBLIC_REST_HEADERS: HeadersInit = {
@@ -193,7 +194,7 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
   if (filters.diferenciais?.length) query = query.contains("diferenciais", filters.diferenciais);
   if (filters.andarMin) query = query.gte("andar", filters.andarMin);
   if (filters.condominioMax) query = query.lte("preco_condominio", filters.condominioMax);
-  if (filters.iptuMax) query = query.lte("preco_iptu", filters.iptuMax);
+  if (filters.iptuMax) query = query.or(`and(iptu_periodicidade.eq.anual,preco_iptu.lte.${filters.iptuMax * 12}),and(iptu_periodicidade.neq.anual,preco_iptu.lte.${filters.iptuMax}),and(iptu_periodicidade.is.null,preco_iptu.lte.${filters.iptuMax})`);
   if (filters.condominio) query = query.ilike("condominio_nome", `%${filters.condominio}%`);
   if (filters.fase) query = query.eq("fase", filters.fase);
   if (filters.q) query = query.or(`titulo.ilike.%${filters.q}%,bairro.ilike.%${filters.q}%,tipo.ilike.%${filters.q}%,endereco_completo.ilike.%${filters.q}%`);
@@ -270,7 +271,7 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
     if (filters.diferenciais?.length) countQuery = countQuery.contains("diferenciais", filters.diferenciais);
     if (filters.andarMin) countQuery = countQuery.gte("andar", filters.andarMin);
     if (filters.condominioMax) countQuery = countQuery.lte("preco_condominio", filters.condominioMax);
-    if (filters.iptuMax) countQuery = countQuery.lte("preco_iptu", filters.iptuMax);
+    if (filters.iptuMax) countQuery = countQuery.or(`and(iptu_periodicidade.eq.anual,preco_iptu.lte.${filters.iptuMax * 12}),and(iptu_periodicidade.neq.anual,preco_iptu.lte.${filters.iptuMax}),and(iptu_periodicidade.is.null,preco_iptu.lte.${filters.iptuMax})`);
     if (filters.condominio) countQuery = countQuery.ilike("condominio_nome", `%${filters.condominio}%`);
     if (filters.fase) countQuery = countQuery.eq("fase", filters.fase);
     

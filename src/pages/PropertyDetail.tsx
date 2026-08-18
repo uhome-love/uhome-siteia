@@ -27,6 +27,7 @@ import { useCanonical } from "@/hooks/useCanonical";
 import { useFavoritos } from "@/hooks/useFavoritos";
 import { trackWhatsAppClick } from "@/services/whatsappTracker";
 import { StickyPropertyCTA } from "@/components/StickyPropertyCTA";
+import { formatIptu, iptuMensal } from "@/lib/iptu";
 
 function extractPropertyCode(slug: string, id: string): string {
   const parts = slug.split("-");

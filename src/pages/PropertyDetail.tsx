@@ -551,7 +551,7 @@ const PropertyDetail = () => {
               )}
               {(imovel.preco_iptu ?? 0) > 0 && (
                 <p className="font-body text-sm text-muted-foreground">
-                  IPTU: R$ {imovel.preco_iptu!.toLocaleString("pt-BR")}/mês
+                  {formatIptu(imovel)}
                 </p>
               )}
             </div>

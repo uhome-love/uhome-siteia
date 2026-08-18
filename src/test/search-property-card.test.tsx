@@ -24,6 +24,7 @@ const mockImovel: Imovel = {
   preco: 350000,
   preco_condominio: 500,
   preco_iptu: null,
+  iptu_periodicidade: null,
   area_total: 65,
   area_util: null,
   quartos: 2,

@@ -8,6 +8,7 @@ import { FotoImovel } from "@/components/FotoImovel";
 import { useCorretor } from "@/contexts/CorretorContext";
 import { supabase } from "@/integrations/supabase/client";
 import { getBairroStats } from "@/services/bairroStatsCache";
+import { iptuMensal, formatIptuCurto } from "@/lib/iptu";
 
 interface Props {
   imovel: Imovel;
@@ -325,8 +326,8 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
           {((imovel.preco_condominio ?? 0) > 0 || (imovel.preco_iptu ?? 0) > 0) && (
             <p className="mt-0.5 font-body text-[12px] text-muted-foreground">
               {(imovel.preco_condominio ?? 0) > 0 && `Cond. R$ ${imovel.preco_condominio!.toLocaleString("pt-BR")}`}
-              {(imovel.preco_condominio ?? 0) > 0 && (imovel.preco_iptu ?? 0) > 0 && " · "}
-              {(imovel.preco_iptu ?? 0) > 0 && `IPTU R$ ${imovel.preco_iptu!.toLocaleString("pt-BR")}`}
+              {(imovel.preco_condominio ?? 0) > 0 && iptuMensal(imovel) > 0 && " · "}
+              {iptuMensal(imovel) > 0 && formatIptuCurto(imovel)}
             </p>
           )}
 
@@ -443,7 +444,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
           <p className="mt-0.5 min-h-[1rem] font-body text-[11px] text-muted-foreground">
             {(() => {
               const cond = imovel.preco_condominio ?? 0;
-              const iptu = imovel.preco_iptu ?? 0;
+              const iptu = iptuMensal(imovel);
               const total = cond + iptu;
               if (total > 0) return `R$ ${total.toLocaleString("pt-BR")} Cond. + IPTU`;
               return <span className="invisible">R$ 0 Cond. + IPTU</span>;

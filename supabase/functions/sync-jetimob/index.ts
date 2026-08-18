@@ -113,6 +113,14 @@ function mapFase(s?: string): string {
   return "usado";
 }
 
+function mapPeriodicidadeIptu(p?: string): string | null {
+  if (!p) return null;
+  const lower = String(p).toLowerCase();
+  if (lower.startsWith("anual")) return "anual";
+  if (lower.startsWith("mensal")) return "mensal";
+  return null;
+}
+
 function extractPreco(j: any): number {
   const candidates = [j.valor_venda, j.valor_locacao, j.valor_temporada, j.valor, j.preco, j.price, j.valor_total];
   for (const v of candidates) {
@@ -138,6 +146,7 @@ function mapImovel(j: any) {
     preco: extractPreco(j),
     preco_condominio: j.valor_condominio ? Number(j.valor_condominio) : null,
     preco_iptu: j.valor_iptu || j.iptu ? Number(j.valor_iptu || j.iptu) : null,
+    iptu_periodicidade: mapPeriodicidadeIptu(j.periodicidade_iptu || j.iptu_periodicidade),
     area_total: j.area_total ? Number(j.area_total) : (j.area_privativa ? Number(j.area_privativa) : (j.area_util ? Number(j.area_util) : null)),
     area_util: j.area_privativa || j.area_util ? Number(j.area_privativa || j.area_util) : null,
     quartos: j.dormitorios || j.quartos ? Number(j.dormitorios || j.quartos) : null,

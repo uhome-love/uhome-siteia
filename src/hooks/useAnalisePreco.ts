@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Imovel } from "@/services/imoveis";
+import { iptuMensal } from "@/lib/iptu";
 import {
   computeAdvancedScore,
   filterOutliersIQR,
@@ -162,7 +163,7 @@ export function useAnalisePreco(imovel: Imovel | null): AnalisePreco | null {
       const margin = confianca === "alta" ? 0.07 : confianca === "media" ? 0.11 : 0.16;
 
       const cond = imovel!.preco_condominio ?? 0;
-      const iptu = imovel!.preco_iptu ?? 0;
+      const iptu = iptuMensal(imovel!);
       const custoTotalMensal = cond + iptu > 0 ? cond + iptu : null;
 
       if (cancelled) return;

@@ -113,6 +113,14 @@ function mapFase(s?: string): string {
   return "usado";
 }
 
+function mapPeriodicidadeIptu(p?: string): string | null {
+  if (!p) return null;
+  const lower = String(p).toLowerCase();
+  if (lower.startsWith("anual")) return "anual";
+  if (lower.startsWith("mensal")) return "mensal";
+  return null;
+}
+
 function extractPreco(j: any): number {
   const candidates = [j.valor_venda, j.valor_locacao, j.valor_temporada, j.valor, j.preco, j.price, j.valor_total];
   for (const v of candidates) {

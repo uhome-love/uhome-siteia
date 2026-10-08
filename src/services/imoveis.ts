@@ -534,9 +534,6 @@ async function fetchImovelBySlugOnce(slug: string, signal?: AbortSignal): Promis
   const codeRows = res.ok ? ((await res.json()) as any[]) : [];
   if (codeRows[0]) return mapRow(codeRows[0]);
   return null;
-  // eslint-disable-next-line no-unreachable
-  if (!fallbackRows[0]) return null;
-  return mapRow(fallbackRows[0]);
 }
 
 /**

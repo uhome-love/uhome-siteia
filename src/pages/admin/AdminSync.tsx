@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Database, Clock, Loader2, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import VerificarImovel from "./VerificarImovel";
 
 interface SyncState {
   id: string;
@@ -133,6 +134,8 @@ export default function AdminSync() {
           </CardContent>
         </Card>
       </div>
+
+      <VerificarImovel />
 
       <Card>
         <CardContent className="space-y-4 p-5">

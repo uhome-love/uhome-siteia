@@ -243,6 +243,9 @@ serve(async (req) => {
       if (body?.mode === "start" || body?.force === true) mode = "start";
       else if (body?.mode === "continue") mode = "continue";
       if (body?.max_pages) maxPagesToProcess = Math.max(1, Number(body.max_pages));
+      if (body?.mode === "geocode") {
+        return json(await geocodeMissing(supabase, Number(body?.limit) || 100));
+      }
       if (body?.mode === "incremental") {
         return json(await runIncremental(supabase, JETIMOB_KEY, Number(body?.pages) || 3));
       }
@@ -625,8 +628,33 @@ async function runIncremental(supabase: any, key: string, pages: number) {
     }
     await sleep(RATE_LIMIT_MS);
   }
+  const geo = await geocodeMissing(supabase, 40).catch(() => null);
   const now = new Date().toISOString();
   await supabase.from("site_config").upsert({ key: "jetimob_last_incremental", value: now, updated_at: now }, { onConflict: "key" });
   await supabase.from("sync_log").insert({ tipo: "jetimob_incremental", direcao: "jetimob→uhome", sucesso: erros === 0, erro: erros ? `${erros} lotes com erro` : null, payload: { paginas: [...alvo], upserts, total, totalPages, amostra } });
   return { ok: erros === 0, upserts, total, totalPages, paginas: [...alvo], amostra };
+}
+
+// ---- Geocodificação de imóveis sem latitude/longitude -----------------------
+async function geocodeMissing(supabase: any, limit: number) {
+  const token = Deno.env.get("VITE_MAPBOX_TOKEN");
+  if (!token) return { geocodificados: 0, erro: "sem token" };
+  const { data: rows } = await supabase.from("imoveis")
+    .select("id, endereco_completo, bairro, cidade, uf, cep")
+    .eq("status", "disponivel").is("latitude", null)
+    .order("updated_at", { ascending: false }).limit(limit);
+  let ok = 0;
+  for (const r of rows ?? []) {
+    const q = [r.endereco_completo, r.bairro, r.cidade, r.uf || "RS", "Brasil"].filter(Boolean).join(", ");
+    try {
+      const res = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(q)}.json?country=br&limit=1&language=pt&access_token=${token}`);
+      const j = await res.json();
+      const c = j?.features?.[0]?.center;
+      if (Array.isArray(c)) {
+        await supabase.from("imoveis").update({ longitude: c[0], latitude: c[1] }).eq("id", r.id);
+        ok++;
+      }
+    } catch { /* ignora */ }
+  }
+  return { geocodificados: ok, analisados: rows?.length ?? 0 };
 }

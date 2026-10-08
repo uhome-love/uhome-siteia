@@ -248,6 +248,19 @@ serve(async (req) => {
       }
     } catch { /* sem body é válido (cron) */ }
 
+    // Watchdog (tick): se não há varredura completa rodando, roda a incremental a cada ~10 min
+    if (mode === "tick") {
+      const [{ data: cfg }, { data: rodandoRows }] = await Promise.all([
+        supabase.from("site_config").select("value").eq("key", "jetimob_last_incremental").maybeSingle(),
+        supabase.from("sync_state").select("id").eq("status", "rodando").limit(1),
+      ]);
+      const lastInc = cfg?.value ? new Date(cfg.value).getTime() : 0;
+      if (!rodandoRows?.length && Date.now() - lastInc > 9 * 60 * 1000) {
+        const h = new Date().getUTCHours();
+        if (h !== 6) return json(await runIncremental(supabase, JETIMOB_KEY, 3));
+      }
+    }
+
     // ---- Determina a execução (run) a usar --------------------------------
     const { data: lastRuns } = await supabase
       .from("sync_state")

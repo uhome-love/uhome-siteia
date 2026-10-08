@@ -243,7 +243,26 @@ serve(async (req) => {
       if (body?.mode === "start" || body?.force === true) mode = "start";
       else if (body?.mode === "continue") mode = "continue";
       if (body?.max_pages) maxPagesToProcess = Math.max(1, Number(body.max_pages));
+      if (body?.mode === "geocode") {
+        return json(await geocodeMissing(supabase, Number(body?.limit) || 100));
+      }
+      if (body?.mode === "incremental") {
+        return json(await runIncremental(supabase, JETIMOB_KEY, Number(body?.pages) || 3));
+      }
     } catch { /* sem body é válido (cron) */ }
+
+    // Watchdog (tick): se não há varredura completa rodando, roda a incremental a cada ~10 min
+    if (mode === "tick") {
+      const [{ data: cfg }, { data: rodandoRows }] = await Promise.all([
+        supabase.from("site_config").select("value").eq("key", "jetimob_last_incremental").maybeSingle(),
+        supabase.from("sync_state").select("id").eq("status", "rodando").limit(1),
+      ]);
+      const lastInc = cfg?.value ? new Date(cfg.value).getTime() : 0;
+      if (!rodandoRows?.length && Date.now() - lastInc > 9 * 60 * 1000) {
+        const h = new Date().getUTCHours();
+        if (h !== 6) return json(await runIncremental(supabase, JETIMOB_KEY, 3));
+      }
+    }
 
     // ---- Determina a execução (run) a usar --------------------------------
     const { data: lastRuns } = await supabase
@@ -574,4 +593,68 @@ function json(payload: Record<string, unknown>) {
     status: 200,
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
+}
+
+// ---- Sync incremental: pega imóveis recém-cadastrados/alterados -------------
+// O Jetimob acrescenta novos imóveis no fim da listagem; as primeiras páginas
+// trazem os mais recentemente alterados. Processamos as duas pontas a cada 15 min.
+async function runIncremental(supabase: any, key: string, pages: number) {
+  const fetchPage = async (page: number) => {
+    for (let a = 1; a <= 3; a++) {
+      try {
+        const r = await fetch(`${JETIMOB_BASE}/${key}/imoveis/todos?v=6&page=${page}&pageSize=${PAGE_SIZE}`, { headers: { Accept: "application/json" } });
+        if (r.ok) return await r.json();
+      } catch { /* retry */ }
+      await sleep(1000 * a);
+    }
+    return null;
+  };
+  const first = await fetchPage(1);
+  if (!first) return { ok: false, erro: "Jetimob indisponível" };
+  const total = extractTotal(first) ?? 0;
+  const totalPages = first?.totalPages != null ? Number(first.totalPages) : Math.ceil(total / PAGE_SIZE);
+  const alvo = new Set<number>([1, 2]);
+  for (let p = Math.max(1, totalPages - pages + 1); p <= totalPages + 1; p++) alvo.add(p);
+
+  let upserts = 0, erros = 0;
+  const amostra: Record<string, unknown> = {};
+  for (const p of [...alvo].sort((a, b) => a - b)) {
+    const data = p === 1 ? first : await fetchPage(p);
+    const items = data ? extractItems(data) : [];
+    if (items.length) amostra[`p${p}`] = items.slice(0, 2).map((j: any) => [j.codigo, j.data_atualizacao, j.data_cadastro]);
+    for (let i = 0; i < items.length; i += 50) {
+      const { error } = await supabase.from("imoveis").upsert(items.slice(i, i + 50).map(mapImovel), { onConflict: "jetimob_id", ignoreDuplicates: false });
+      if (error) { erros++; console.error("incremental upsert", error.message); } else upserts += Math.min(50, items.length - i);
+    }
+    await sleep(RATE_LIMIT_MS);
+  }
+  const geo = await geocodeMissing(supabase, 40).catch(() => null);
+  const now = new Date().toISOString();
+  await supabase.from("site_config").upsert({ key: "jetimob_last_incremental", value: now, updated_at: now }, { onConflict: "key" });
+  await supabase.from("sync_log").insert({ tipo: "jetimob_incremental", direcao: "jetimob→uhome", sucesso: erros === 0, erro: erros ? `${erros} lotes com erro` : null, payload: { paginas: [...alvo], upserts, total, totalPages, amostra } });
+  return { ok: erros === 0, upserts, total, totalPages, paginas: [...alvo], amostra };
+}
+
+// ---- Geocodificação de imóveis sem latitude/longitude -----------------------
+async function geocodeMissing(supabase: any, limit: number) {
+  const token = Deno.env.get("VITE_MAPBOX_TOKEN");
+  if (!token) return { geocodificados: 0, erro: "sem token" };
+  const { data: rows } = await supabase.from("imoveis")
+    .select("id, endereco_completo, bairro, cidade, uf, cep")
+    .eq("status", "disponivel").is("latitude", null)
+    .order("updated_at", { ascending: false }).limit(limit);
+  let ok = 0;
+  for (const r of rows ?? []) {
+    const q = [r.endereco_completo, r.bairro, r.cidade, r.uf || "RS", "Brasil"].filter(Boolean).join(", ");
+    try {
+      const res = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(q)}.json?country=br&limit=1&language=pt&access_token=${token}`);
+      const j = await res.json();
+      const c = j?.features?.[0]?.center;
+      if (Array.isArray(c)) {
+        await supabase.from("imoveis").update({ longitude: c[0], latitude: c[1] }).eq("id", r.id);
+        ok++;
+      }
+    } catch { /* ignora */ }
+  }
+  return { geocodificados: ok, analisados: rows?.length ?? 0 };
 }

@@ -1,0 +1,2 @@
+- Jetimob sync: full daily scan (deactivates removed listings) + incremental run of first/last listing pages triggered by the 3-min watchdog tick; Jetimob lists by registration date, so new listings land on the last pages.
+- A DB trigger keeps existing imoveis coordinates when the sync sends null, so geocoded locations survive re-syncs.

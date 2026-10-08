@@ -145,7 +145,13 @@ const PUBLIC_REST_HEADERS: HeadersInit = {
   "accept-profile": "public",
 };
 
+const CODIGO_RE = /^\s*\d{2,7}\s*-\s*[a-z]{1,4}\s*$/i;
+
 export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: Imovel[]; count: number }> {
+  // Texto digitado que é um código Jetimob (ex: 85149-UH) vira busca por código
+  if (filters.q && !filters.codigo && CODIGO_RE.test(filters.q)) {
+    filters = { ...filters, codigo: filters.q.replace(/\s+/g, "").toUpperCase(), q: undefined, cidade: undefined, bairro: undefined, bairros: undefined };
+  }
   // Build data query — NO count (much faster)
   let query = supabase
     .from("imoveis")
@@ -162,8 +168,6 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
   if (!filters.codigo) {
     if (filters.cidade) {
       query = query.eq("cidade", filters.cidade);
-    } else {
-      query = query.in("cidade", CIDADES_PERMITIDAS);
     }
   }
 
@@ -247,7 +251,6 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
       .neq("foto_principal", "");
 
     if (filters.cidade) countQuery = countQuery.eq("cidade", filters.cidade);
-    else countQuery = countQuery.in("cidade", CIDADES_PERMITIDAS);
 
     if (filters.tipo) {
       const tipos = filters.tipo.split(",").map(s => s.trim()).filter(Boolean);
@@ -290,7 +293,7 @@ export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: 
     // Use fast RPC for standard filters
     const countParams: Record<string, any> = {};
     if (filters.cidade) countParams.p_cidade = filters.cidade;
-    else countParams.p_cidades = CIDADES_PERMITIDAS;
+    else countParams.p_cidades = null;
     if (filters.tipo) {
       const tipos = filters.tipo.split(",").map(s => s.trim()).filter(Boolean);
       if (tipos.length === 1) countParams.p_tipo = tipos[0];
@@ -408,7 +411,7 @@ export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSig
   if (filters.cidade) {
     rpcParams.p_cidade = filters.cidade;
   } else {
-    rpcParams.p_cidades = CIDADES_PERMITIDAS;
+    rpcParams.p_cidades = null;
   }
 
   if (filters.tipo) {
@@ -517,9 +520,20 @@ async function fetchImovelBySlugOnce(slug: string, signal?: AbortSignal): Promis
   const exactRows = await fetchRows("eq");
   if (exactRows[0]) return mapRow(exactRows[0]);
 
-  const fallbackRows = await fetchRows("ilike");
-  if (!fallbackRows[0]) return null;
-  return mapRow(fallbackRows[0]);
+  // Link só com o código (ex: /imovel/85149-UH) → procura o slug que termina com ele
+  const pattern = CODIGO_RE.test(slug) ? `*-${slug.replace(/\s+/g, "")}` : slug;
+  const fallbackRows = await fetchRows("ilike" as any).catch(() => [] as any[]);
+  if (fallbackRows[0]) return mapRow(fallbackRows[0]);
+  if (pattern === slug) return null;
+  const url = new URL(PUBLIC_REST_URL);
+  url.searchParams.set("select", DETAIL_COLUMNS);
+  url.searchParams.set("slug", `ilike.${pattern}`);
+  url.searchParams.set("status", "eq.disponivel");
+  url.searchParams.set("limit", "1");
+  const res = await fetch(url.toString(), { headers: PUBLIC_REST_HEADERS, signal, cache: "no-store" });
+  const codeRows = res.ok ? ((await res.json()) as any[]) : [];
+  if (codeRows[0]) return mapRow(codeRows[0]);
+  return null;
 }
 
 /**

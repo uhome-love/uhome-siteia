@@ -12,6 +12,11 @@ Então o problema não é a sync quebrada — são 3 pontos que fazem o corretor
 3. **1.106 imóveis sem localização** (sem latitude/longitude) não aparecem no mapa da busca.
 4. 33 imóveis sem foto ficam ocultos (regra correta, mantida).
 
+### Caso da Larissa (85149-UH, Sarandi, Vivaz Ecoville)
+- O imóvel **está no banco, disponível, com 10 fotos e localização**, atualizado hoje às 06:58. Endereço no site: `/imovel/apartamento-1-quarto-sarandi-85149-UH`.
+- Ou seja, os dados chegaram. Suspeitas a confirmar no primeiro passo: (a) o botão **"Ver no site" do Jetimob** abre um endereço em formato diferente do nosso e cai em erro/página vazia; (b) a busca por código não encontra; (c) a foto principal falha ao carregar e o card some da lista.
+- Vou abrir o site publicado com esse código pelos 3 caminhos e corrigir o que falhar — inclusive aceitar qualquer formato de link do Jetimob (ex.: só o código) e redirecionar para a página certa.
+
 ## O que vou fazer
 
 ### 1. Sync rápida de novidades (a cada 15 min)

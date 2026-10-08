@@ -243,6 +243,9 @@ serve(async (req) => {
       if (body?.mode === "start" || body?.force === true) mode = "start";
       else if (body?.mode === "continue") mode = "continue";
       if (body?.max_pages) maxPagesToProcess = Math.max(1, Number(body.max_pages));
+      if (body?.mode === "incremental") {
+        return json(await runIncremental(supabase, JETIMOB_KEY, Number(body?.pages) || 3));
+      }
     } catch { /* sem body é válido (cron) */ }
 
     // ---- Determina a execução (run) a usar --------------------------------

@@ -4,7 +4,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Database, Clock, Loader2, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
-import VerificarImovel from "./VerificarImovel";
+import { Input } from "@/components/ui/input";
+import { Search as SearchIcon } from "lucide-react";
+
 
 interface SyncState {
   id: string;
@@ -202,5 +204,116 @@ export default function AdminSync() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+
+interface Row {
+  jetimob_id: string | null;
+  slug: string;
+  status: string | null;
+  finalidade: string;
+  cidade: string | null;
+  latitude: number | null;
+  foto_principal: string | null;
+  updated_at: string | null;
+}
+
+function motivos(r: Row): string[] {
+  const m: string[] = [];
+  if (r.status !== "disponivel") m.push(`Status "${r.status}" no Jetimob (não está à venda/ativo)`);
+  if (r.finalidade !== "venda") m.push("Finalidade não é venda");
+  if (!r.foto_principal) m.push("Sem foto — imóveis sem foto ficam ocultos");
+  if (r.latitude == null) m.push("Sem localização — não aparece no mapa (aparece na lista)");
+  return m;
+}
+
+function VerificarImovel() {
+  const [codigo, setCodigo] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [rows, setRows] = useState<Row[] | null>(null);
+  const [puxando, setPuxando] = useState(false);
+
+  async function buscar() {
+    const c = codigo.trim();
+    if (!c) return;
+    setLoading(true);
+    const { data } = await supabase
+      .from("imoveis")
+      .select("jetimob_id,slug,status,finalidade,cidade,latitude,foto_principal,updated_at")
+      .ilike("jetimob_id", `%${c}%`)
+      .limit(5);
+    setRows((data as Row[]) ?? []);
+    setLoading(false);
+  }
+
+  async function puxarNovidades() {
+    setPuxando(true);
+    try {
+      await supabase.functions.invoke("sync-jetimob", { body: { mode: "incremental", pages: 3 } });
+      toast.success("Novidades do Jetimob puxadas.");
+      await buscar();
+    } catch {
+      toast.message("Sincronização disparada", { description: "Busque o código de novo em 1 minuto." });
+    } finally {
+      setPuxando(false);
+    }
+  }
+
+  return (
+    <Card>
+      <CardContent className="space-y-3 p-5">
+        <p className="font-medium">Verificar imóvel pelo código</p>
+        <div className="flex gap-2">
+          <Input
+            placeholder="Ex.: 85149-UH"
+            value={codigo}
+            onChange={(e) => setCodigo(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && buscar()}
+          />
+          <Button onClick={buscar} disabled={loading} aria-label="Buscar código">
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <SearchIcon className="h-4 w-4" />}
+          </Button>
+        </div>
+
+        {rows && rows.length === 0 && (
+          <div className="space-y-2 text-sm">
+            <p className="text-destructive">Esse código ainda não chegou no site.</p>
+            <Button variant="outline" size="sm" onClick={puxarNovidades} disabled={puxando}>
+              <RefreshCw className={`mr-2 h-4 w-4 ${puxando ? "animate-spin" : ""}`} />
+              Puxar novidades do Jetimob agora
+            </Button>
+          </div>
+        )}
+
+        {rows?.map((r) => {
+          const m = motivos(r);
+          return (
+            <div key={r.slug} className="space-y-1 rounded-lg bg-muted/50 p-3 text-sm">
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-medium">{r.jetimob_id} · {r.cidade}</span>
+                <a className="text-primary underline" href={`/imovel/${r.slug}`} target="_blank" rel="noreferrer">
+                  Abrir no site
+                </a>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Atualizado {r.updated_at ? new Date(r.updated_at).toLocaleString("pt-BR") : "—"}
+              </p>
+              {m.length === 0 ? (
+                <p className="text-xs text-primary">Visível no site normalmente.</p>
+              ) : (
+                <ul className="list-disc pl-4 text-xs text-destructive">
+                  {m.map((x) => <li key={x}>{x}</li>)}
+                </ul>
+              )}
+            </div>
+          );
+        })}
+        <p className="text-xs text-muted-foreground">
+          Imóveis novos do Jetimob entram sozinhos a cada ~10 minutos. Alterações em imóveis antigos são
+          atualizadas na varredura completa diária das 03:00.
+        </p>
+      </CardContent>
+    </Card>
   );
 }

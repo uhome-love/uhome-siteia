@@ -21,7 +21,8 @@ import { useWhatsAppLeadStore } from "@/stores/whatsappLeadStore";
 import { motion } from "framer-motion";
 import { trackEvent } from "@/lib/trackEvent";
 import { trackView, getViewCount } from "@/services/leads";
-import { fetchImovelBySlug, type Imovel, formatPreco, fotoPrincipal } from "@/services/imoveis";
+import { fetchImovelBySlug, isCodigoSlug, type Imovel, formatPreco, fotoPrincipal } from "@/services/imoveis";
+import { supabase } from "@/integrations/supabase/client";
 import { setJsonLd, removeJsonLd, buildImovelJsonLd, buildImovelBreadcrumbJsonLd } from "@/lib/jsonld";
 import { useCanonical } from "@/hooks/useCanonical";
 import { useFavoritos } from "@/hooks/useFavoritos";
@@ -52,6 +53,7 @@ const PropertyDetail = () => {
   const [imovel, setImovel] = useState<Imovel | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [sincronizando, setSincronizando] = useState(false);
   const [showFullDesc, setShowFullDesc] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, dragFree: false });
@@ -188,8 +190,11 @@ const PropertyDetail = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <div className="flex items-center justify-center pt-32">
+        <div className="flex flex-col items-center justify-center gap-3 pt-32">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          {sincronizando && (
+            <p className="font-body text-sm text-muted-foreground">Este imóvel está sendo atualizado…</p>
+          )}
         </div>
       </div>
     );

@@ -517,23 +517,37 @@ async function fetchImovelBySlugOnce(slug: string, signal?: AbortSignal): Promis
     return (await response.json()) as any[];
   };
 
+  // Link só com o código (ex: /imovel/85149-UH, vindo do "Ver no site" do Jetimob):
+  // busca EXATA pelo código — nunca aceita imóveis parecidos.
+  if (CODIGO_RE.test(slug)) {
+    const codigo = normalizarCodigo(slug);
+    const url = new URL(PUBLIC_REST_URL);
+    url.searchParams.set("select", DETAIL_COLUMNS);
+    url.searchParams.set("jetimob_id", `eq.${codigo}`);
+    url.searchParams.set("order", "status.asc");
+    url.searchParams.set("limit", "1");
+    const res = await fetch(url.toString(), { headers: PUBLIC_REST_HEADERS, signal, cache: "no-store" });
+    if (!res.ok) throw new Error(`Erro ao buscar imóvel (${res.status})`);
+    const rows = (await res.json()) as any[];
+    return rows[0] ? mapRow(rows[0]) : null;
+  }
+
   const exactRows = await fetchRows("eq");
   if (exactRows[0]) return mapRow(exactRows[0]);
 
-  // Link só com o código (ex: /imovel/85149-UH) → procura o slug que termina com ele
-  const pattern = CODIGO_RE.test(slug) ? `*-${slug.replace(/\s+/g, "")}` : slug;
-  const fallbackRows = await fetchRows("ilike" as any).catch(() => [] as any[]);
+  const fallbackRows = await fetchRows("ilike").catch(() => [] as any[]);
   if (fallbackRows[0]) return mapRow(fallbackRows[0]);
-  if (pattern === slug) return null;
-  const url = new URL(PUBLIC_REST_URL);
-  url.searchParams.set("select", DETAIL_COLUMNS);
-  url.searchParams.set("slug", `ilike.${pattern}`);
-  url.searchParams.set("status", "eq.disponivel");
-  url.searchParams.set("limit", "1");
-  const res = await fetch(url.toString(), { headers: PUBLIC_REST_HEADERS, signal, cache: "no-store" });
-  const codeRows = res.ok ? ((await res.json()) as any[]) : [];
-  if (codeRows[0]) return mapRow(codeRows[0]);
   return null;
+}
+
+/** True when the URL slug is only a Jetimob code (ex: 85149-UH) */
+export function isCodigoSlug(slug: string): boolean {
+  return CODIGO_RE.test(slug);
+}
+
+/** Normalize a Jetimob code: no spaces, upper case (ex: " 85149 - uh" → "85149-UH") */
+export function normalizarCodigo(codigo: string): string {
+  return codigo.replace(/\s+/g, "").toUpperCase();
 }
 
 /**

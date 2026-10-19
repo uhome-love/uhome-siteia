@@ -379,14 +379,30 @@ async function renderBairro(slug: string) {
   return html(title, desc, OG_DEFAULT, canonical, schemas, bodyHtml);
 }
 
-async function renderImovel(slug: string) {
-  const { data: row, error } = await supabase
-    .from("imoveis")
-    .select("*")
-    .eq("slug", slug)
-    .maybeSingle();
+async function renderImovel(slugParam: string) {
+  let slug = slugParam;
+  let row: any = null;
+  if (/^\s*\d{2,7}\s*-\s*[a-z]{1,4}\s*$/i.test(slug)) {
+    // Link curto só com o código Jetimob — busca exata pelo código
+    const { data } = await supabase
+      .from("imoveis")
+      .select("*")
+      .eq("jetimob_id", slug.replace(/\s+/g, "").toUpperCase())
+      .order("status", { ascending: true })
+      .limit(1);
+    row = data?.[0] ?? null;
+    if (row) slug = row.slug;
+  } else {
+    const { data, error } = await supabase
+      .from("imoveis")
+      .select("*")
+      .eq("slug", slug)
+      .maybeSingle();
+    if (error) return null;
+    row = data;
+  }
 
-  if (error || !row) return null;
+  if (!row) return null;
 
   const fotos = parseFotos(row.fotos);
   const titulo = tituloLimpo(row);

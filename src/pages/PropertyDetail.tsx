@@ -99,11 +99,34 @@ const PropertyDetail = () => {
       setLoading(false);
     }
 
-    fetchImovelBySlug(slug)
-      .then(handleSuccess)
+    const porCodigo = isCodigoSlug(slug);
+    const carregar = async () => {
+      let data = await fetchImovelBySlug(slug);
+      // Código ainda não sincronizado: puxa novidades do Jetimob e tenta de novo uma vez
+      if (!data && porCodigo && !cancelled) {
+        setSincronizando(true);
+        await supabase.functions.invoke("sync-jetimob", { body: { mode: "incremental" } }).catch(() => null);
+        if (cancelled) return null;
+        data = await fetchImovelBySlug(slug);
+        setSincronizando(false);
+      }
+      return data;
+    };
+
+    carregar()
+      .then((data) => {
+        if (cancelled) return;
+        // Link curto (/imovel/CODIGO) → troca para o link completo do imóvel
+        if (data && porCodigo && data.slug !== slug) {
+          navigate(prefixLink(`/imovel/${data.slug}`), { replace: true });
+          return;
+        }
+        handleSuccess(data);
+      })
       .catch((error) => {
         console.error("Erro ao carregar imóvel:", error);
         if (cancelled) return;
+        setSincronizando(false);
         setLoadError("Não foi possível carregar este imóvel agora.");
         setLoading(false);
       });

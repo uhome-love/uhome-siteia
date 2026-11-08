@@ -10,8 +10,9 @@ uhome.com.br/campanha/<qualquer>    -> próximas campanhas (Black, Verão, Feir�
 uhome.com.br/empreendimentos/<slug> -> página do produto (já existe, destino dos anúncios Meta)
 ```
 
-## 1. Página /lancamentos (fixa)
-- Topo forte: "Lançamentos e oportunidades em foco" + filtros rápidos (cidade, estágio: lançamento / em obras / pronto, faixa de preço, construtora).
+## 1. Vitrine fixa "Uhome em Foco" (/em-foco, com /lancamentos e /destaques levando para ela)
+- Uma vitrine grande e bonita de todos os produtos com campanha no ar; o Natal é uma campanha à parte.
+- Topo forte: "Uhome em Foco" + filtros rápidos (cidade, estágio: lançamento / em obras / pronto, faixa de preço, construtora).
 - Faixa das campanhas ativas (ex.: banner do Natal) levando para a página da campanha.
 - Grade de cards dos empreendimentos em foco: foto, nome, bairro, construtora, "a partir de R$", entrega, selo da campanha (ex.: "Condição de Natal").
 - Bloco "Por que comprar na planta com a Uhome" + formulário de interesse + WhatsApp.
@@ -23,8 +24,14 @@ Cada campanha tem: nome, período (início/fim), tema visual, banner, título, t
 - Quando a campanha vence, ela sai sozinha do ar (e da /lancamentos), com redirecionamento para /lancamentos — link nunca quebra.
 - A Mega Cyrela atual pode virar uma campanha nesse mesmo modelo.
 
-## 3. Página do produto preparada para Meta Ads
-- Na página do empreendimento: selo e condição da campanha ativa, botão fixo de WhatsApp/formulário.
+## 3. Landing page completa de cada produto (destino dos anúncios Meta e Google)
+Foco em produto (empreendimento), não em imóvel avulso. Cada produto ganha uma página completa:
+- Abertura em tela cheia com foto/vídeo, nome, construtora, "a partir de" e condição da campanha.
+- Galeria grande em alta qualidade, tour/vídeo, plantas por tipologia (metragem, quartos, vagas, preço).
+- Diferenciais e lazer com ícones, localização no mapa com o que tem perto, estágio da obra e entrega.
+- Condições de pagamento e simulador de financiamento; unidades disponíveis puxadas do Jetimob.
+- Perguntas frequentes, formulário curto e WhatsApp fixo, sempre visíveis.
+- Selo e condição da campanha ativa, botão fixo de WhatsApp/formulário.
 - Links com UTM do anúncio continuam sendo gravados e o lead chega ao CRM com o nome da campanha.
 - Prévia bonita ao compartilhar no WhatsApp (imagem e título da campanha).
 
@@ -84,7 +91,7 @@ Comparação com os grandes (QuintoAndar, Zillow, Zap/VivaReal, Airbnb, Lopes). 
 
 ## Detalhes técnicos
 - Nova tabela `campanhas` (slug, nome, tema, datas, banner, textos, condições, ativo) + tabela de ligação `campanha_empreendimentos` (ordem, condição específica). RLS: leitura pública só das ativas e dentro do período; edição só admin.
-- Campo `em_foco` em `empreendimentos` para a /lancamentos.
+- Campo `em_foco` em `empreendimentos` para a vitrine; novos campos para a landing (vídeo, plantas, lazer, condições de pagamento, FAQ, estágio da obra).
 - Rotas `/lancamentos` e `/campanha/:slug` (também sob `/c/:slug` do corretor), SSR/SEO com JSON-LD, sitemap e canônico.
 - Leads com `origem = campanha:<slug>` sincronizados pelos gatilhos do banco já existentes.
 - Temas como conjuntos de cores no design system (sem cores fixas nos componentes).

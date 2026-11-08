@@ -43,6 +43,45 @@ Cada campanha tem: nome, período (início/fim), tema visual, banner, título, t
 5. Preço "a partir de", tipologias, metragens e previsão de entrega.
 6. WhatsApp/corretor responsável por produto, se for diferente do padrão.
 
+## Parte B — Auditoria e evolução do site inteiro
+Comparação com os grandes (QuintoAndar, Zillow, Zap/VivaReal, Airbnb, Lopes). Execução em ondas, sempre sem tirar o site do ar.
+
+### Onda 0 — Medir antes de mexer (1º passo)
+- Medir a velocidade real dos visitantes por página (busca, imóvel, home) e montar o "antes".
+- Teste completo de busca, filtros, mapa, busca por IA, botões e mobile, com lista de falhas.
+- Conectar o Google Search Console (hoje não está ligado, então não temos como saber o que o Google indexou) e enviar o mapa do site.
+- Já sabemos: o mapa do site está desatualizado (tem páginas que não existem mais e falta bairros e condomínios) e várias páginas mostram a prévia da Home ao serem compartilhadas.
+
+### Onda 1 — Velocidade e fluidez ("clicou, abriu")
+- Pré-carregar a página do imóvel ao passar o dedo/mouse no card e abrir com transição suave.
+- Fotos em alta qualidade, mas no tamanho certo para cada tela (formato moderno, carregamento progressivo).
+- Esqueletos de carregamento em tudo, sem "piscadas" nem saltos de layout.
+
+### Onda 2 — Busca, filtros e mapa nível "portal grande"
+- Busca única que entende tudo: bairro, condomínio, código, rua ou frase ("3 quartos com piscina no Bela Vista até 1,5 mi").
+- Filtros mais rápidos: chips de filtros ativos, contagem ao vivo, "salvar busca" e alerta de novos imóveis por WhatsApp/e-mail.
+- Mapa: desenhar área, "buscar nesta região", tempo até um endereço (trabalho/escola), pins de preço já implementados refinados.
+- Ordenações úteis: mais novos, menor preço/m², baixou de preço.
+- Comparar imóveis lado a lado.
+
+### Onda 3 — Página do imóvel que converte
+- Galeria em tela cheia com plantas e vídeo; custo mensal total (parcela + condomínio + IPTU).
+- Preço do m² comparado ao bairro, histórico de preço, "o que tem perto".
+- Botões fixos: WhatsApp, agendar visita, simular financiamento.
+
+### Onda 4 — Google (ser muito mais encontrado)
+- Mapa do site automático e sempre certo (imóveis, bairros, condomínios, empreendimentos, campanhas).
+- Prévias corretas no WhatsApp/Google para todas as páginas; dados estruturados de imóvel, empreendimento e navegação.
+- Páginas de bairro e de "tipo + bairro" mais ricas; páginas de lançamentos e campanhas otimizadas para Google Ads.
+
+### Onda 5 — Leads e campanhas Google/Meta
+- Páginas de destino por produto com formulário curto e WhatsApp, medição de conversões no Google e Meta.
+- Origem do anúncio (campanha, palavra-chave) chega no CRM junto com o lead.
+- Painel no admin: leads por campanha e por empreendimento.
+
+### Onda 6 — Visual e acabamento
+- Refinamento do design system (tipografia, espaçamentos, cores, ícones) e microinterações, mantendo a identidade Uhome.
+
 ## Detalhes técnicos
 - Nova tabela `campanhas` (slug, nome, tema, datas, banner, textos, condições, ativo) + tabela de ligação `campanha_empreendimentos` (ordem, condição específica). RLS: leitura pública só das ativas e dentro do período; edição só admin.
 - Campo `em_foco` em `empreendimentos` para a /lancamentos.

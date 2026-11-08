@@ -39,8 +39,11 @@ Foco em produto (empreendimento), não em imóvel avulso. Cada produto ganha uma
 - Criar/editar campanha, escolher tema, subir banner, definir datas, marcar quais empreendimentos entram e a ordem.
 - Ligar/desligar campanha com um clique; marcar empreendimento como "Em foco" na /lancamentos.
 
-## 5. Destaques no site
-- Item "Lançamentos" no menu e um bloco na Home levando para a campanha ativa.
+## 5. Acesso fácil na página principal (uhome.com.br)
+- Na abertura, junto da busca de todos os imóveis, um botão de destaque "Uhome em Foco".
+- Logo abaixo, um banner grande da campanha ativa (ex.: "Natal Uhome"), trocado pelo painel; com mais de uma campanha, vira um carrossel.
+- Faixa com os produtos em foco logo em seguida, antes das outras seções.
+- Item "Uhome em Foco" no menu do topo e no rodapé, no celular e no computador.
 
 ## Materiais que preciso de vocês (para o Natal)
 1. Lista dos empreendimentos da campanha (nome e construtora).

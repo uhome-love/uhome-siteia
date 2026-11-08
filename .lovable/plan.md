@@ -45,13 +45,27 @@ Foco em produto (empreendimento), não em imóvel avulso. Cada produto ganha uma
 - Faixa com os produtos em foco logo em seguida, antes das outras seções.
 - Item "Uhome em Foco" no menu do topo e no rodapé, no celular e no computador.
 
-## Materiais que preciso de vocês (para o Natal)
-1. Lista dos empreendimentos da campanha (nome e construtora).
-2. Condições especiais de cada um e regulamento/período (início e fim).
-3. Fotos e plantas em boa qualidade, vídeo se tiver, e logo das construtoras.
-4. Peças da campanha (artes do Meta, slogan, nome da campanha).
-5. Preço "a partir de", tipologias, metragens e previsão de entrega.
-6. WhatsApp/corretor responsável por produto, se for diferente do padrão.
+## 6. Página personalizada do corretor (link para mandar no WhatsApp)
+- Toda landing de produto, vitrine "Uhome em Foco" e página do Natal ganha uma versão do corretor: `uhome.com.br/c/<corretor>/em-foco/<produto>` (aproveita o link de corretor que já existe no site).
+- Nessa versão não há formulário: aparece a foto, o nome, o CRECI e os botões de WhatsApp e ligar do corretor; o cliente fala direto com ele.
+- Prévia no WhatsApp com a foto do produto e "Enviado por <corretor>".
+- Cada abertura e clique no WhatsApp fica registrado e aparece no CRM para aquele corretor (o caminho de ligação com o CRM já existe).
+- No Uhome Sales CRM (outro projeto), na Central de Natal, um botão "Copiar meu link" em cada empreendimento. Daqui eu deixo pronto o endereço e a lista de produtos para o CRM consumir e escrevo o pedido exato para colar no projeto do CRM.
+- Teste completo: abrir o link de um corretor real (ex.: Lucas Sarmento), conferir dados, WhatsApp e o registro da visita.
+
+## Material de Natal recebido: o que dá para usar
+Já temos: nome e período da campanha (02/11 a 18/12), os 8 empreendimentos (Open Bosque, Essence Canoas, Open Arvoredo, Skyglass, Casa Tua Porto Alegre, Casa Tua Canoas, Boa Vista Country Club, Golden Lake), construtoras, preços por tipologia, selos, textos aprovados, urna premiada, posts, cards, vídeos e elementos visuais (chave de ouro, estrela, luzes, selo).
+
+Falta para landings completas de produto:
+1. Fotos originais em alta de cada empreendimento (fachada, lazer, decorado). O pacote cita "FOTO-01..." mas elas não vieram; os cards têm texto por cima e não servem como foto principal.
+2. Endereço/bairro de cada um (o campo "local" está vazio em todos).
+3. Plantas, metragens, vagas e previsão de entrega.
+4. Descrição e lista de lazer/diferenciais de cada produto (só existe nos posts em imagem).
+5. Logos das incorporadoras (pasta 07 não veio no arquivo).
+6. Regulamento da urna para o cliente (veio só o dos corretores) e a condição da Black Natal (23 a 29/11), quando definida.
+7. Material completo do Open Arvoredo (o próprio pacote diz que está faltando).
+
+Se algum desses já estiver no Jetimob ou no cadastro de empreendimentos do site, eu puxo de lá.
 
 ## Parte B — Auditoria e evolução do site inteiro
 Comparação com os grandes (QuintoAndar, Zillow, Zap/VivaReal, Airbnb, Lopes). Execução em ondas, sempre sem tirar o site do ar.

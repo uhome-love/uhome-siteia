@@ -41,24 +41,12 @@ function HeroFocoButtons() {
   );
 }
 import { useCorretor } from "@/contexts/CorretorContext";
+import { useTotalImoveis, formatTotal } from "@/hooks/useTotalImoveis";
 
 
 
 function HeroPropertyCount() {
-  const { data: total } = useQuery({
-    queryKey: ["imoveis", "total-count"],
-    queryFn: async () => {
-      const { count } = await supabase
-        .from("imoveis")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "disponivel");
-      return count && count > 0 ? count : 14600;
-    },
-    staleTime: 10 * 60 * 1000, // 10 min cache
-    gcTime: 30 * 60 * 1000,
-    placeholderData: 14600,
-  });
-  return <>{(total ?? 14600).toLocaleString("pt-BR")}+</>;
+  return <>{formatTotal(useTotalImoveis())}</>;
 }
 
 export function HeroSection() {
@@ -483,7 +471,7 @@ export function HeroSection() {
               <>
                 <h3 className="font-body text-lg font-extrabold text-foreground">Venda mais rápido</h3>
                 <p className="mb-5 mt-1 font-body text-xs text-muted-foreground">
-                  14.600+ imóveis na vitrine em Porto Alegre
+                  <HeroPropertyCount /> imóveis na vitrine em Porto Alegre
                 </p>
 
                 {[

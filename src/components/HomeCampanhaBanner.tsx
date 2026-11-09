@@ -1,9 +1,16 @@
-import { useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import { useCorretor } from "@/contexts/CorretorContext";
 import { useCampanhaDestaque, useProdutosFoco, formatPreco } from "@/lib/produtosFoco";
 import { NATAL_ART, NatalLuzes, Ouro, natalBg } from "@/components/foco/NatalArt";
+
+const FAIXAS = [
+  { id: "todas", label: "Todos os valores", min: 0, max: Infinity },
+  { id: "ate400", label: "Até R$ 400 mil", min: 0, max: 400_000 },
+  { id: "400a1m", label: "R$ 400 mil a 1 mi", min: 400_000, max: 1_000_000 },
+  { id: "1m", label: "Acima de R$ 1 mi", min: 1_000_000, max: Infinity },
+];
 
 /** Banner da campanha ativa + faixa de produtos, logo abaixo da busca da página principal. */
 export function HomeCampanhaBanner() {
@@ -11,6 +18,17 @@ export function HomeCampanhaBanner() {
   const { campanha: c, black } = useCampanhaDestaque();
   const { data: produtos = [] } = useProdutosFoco();
   const trilho = useRef<HTMLDivElement>(null);
+  const [faixa, setFaixa] = useState("todas");
+  const [cidade, setCidade] = useState("todas");
+  const fim = black ? c?.config.black?.fim : c?.fim;
+  const alvo = useMemo(() => (fim ? new Date(`${fim}T23:59:59-03:00`).getTime() : 0), [fim]);
+  const [agora, setAgora] = useState(Date.now());
+  useEffect(() => { const t = setInterval(() => setAgora(Date.now()), 60_000); return () => clearInterval(t); }, []);
+  const dias = Math.max(0, Math.floor((alvo - agora) / 86_400_000));
+  const cidades = Array.from(new Set(produtos.map((p) => p.cidade).filter(Boolean))) as string[];
+  const F = FAIXAS.find((f) => f.id === faixa)!;
+  const lista = produtos.filter((p) => (cidade === "todas" || p.cidade === cidade) && (p.preco_a_partir ?? 0) >= F.min && (p.preco_a_partir ?? 0) < F.max);
+  const chip = (on: boolean) => `h-9 whitespace-nowrap rounded-full border px-4 font-body text-[13px] font-medium transition-colors ${on ? "border-foreground bg-foreground text-background" : "border-border bg-card text-foreground hover:border-foreground/40"}`;
   const rolar = (dir: number) => trilho.current?.scrollBy({ left: dir * (trilho.current.clientWidth * 0.8), behavior: "smooth" });
   if (!c && !produtos.length) return null;
   const linkTodos = c ? `/campanha/${c.slug}` : "/em-foco";
@@ -33,7 +51,10 @@ export function HomeCampanhaBanner() {
               <span className="mt-6 inline-flex h-12 items-center gap-2 rounded-full px-6 font-body text-sm font-bold text-natal-deep transition-transform group-hover:scale-[1.02]" style={{ backgroundImage: "var(--natal-gold-grad)" }}>
                 Ver os {produtos.length || ""} empreendimentos <ArrowRight className="h-4 w-4" />
               </span>
-              <p className="mt-3 font-body text-xs text-natal-foreground/70">{black ? "Condições Black só até 29/11" : "Contratos até 18 de dezembro"}</p>
+              <p className="mt-3 font-body text-xs text-natal-foreground/70">
+                {alvo > agora && <><strong className="text-natal-gold">Faltam {dias} dias</strong> · </>}
+                {black ? "condições Black só até 29/11" : "contratos até 18/12 · comprou, ganhou presente da urna premiada"}
+              </p>
             </div>
             <img src={NATAL_ART.homi} alt="" loading="lazy" className="pointer-events-none absolute -bottom-4 right-2 hidden h-56 w-auto lg:static lg:block lg:h-64" />
             <img src={NATAL_ART.presentes} alt="" loading="lazy" className="pointer-events-none absolute -bottom-2 -right-4 h-28 w-auto opacity-90 lg:hidden" />
@@ -54,8 +75,15 @@ export function HomeCampanhaBanner() {
               <button onClick={() => rolar(1)} aria-label="Próximos" className="hidden h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-secondary md:flex"><ChevronRight className="h-4 w-4" /></button>
             </div>
           </div>
+          {c && (
+            <div className="mt-4 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
+              {FAIXAS.map((f) => <button key={f.id} onClick={() => setFaixa(f.id)} className={chip(faixa === f.id)}>{f.label}</button>)}
+              {cidades.length > 1 && <span className="mx-1 w-px flex-shrink-0 bg-border" />}
+              {cidades.length > 1 && ["todas", ...cidades].map((x) => <button key={x} onClick={() => setCidade(x)} className={chip(cidade === x)}>{x === "todas" ? "Todas as cidades" : x}</button>)}
+            </div>
+          )}
           <div ref={trilho} className="scrollbar-none mt-4 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 [scrollbar-width:none]">
-            {produtos.map((p) => (
+            {lista.map((p) => (
               <Link key={p.id} to={prefixLink(`/em-foco/${p.slug}`)} className="group w-[72vw] max-w-[260px] flex-shrink-0 snap-start overflow-hidden rounded-2xl border border-border/60 bg-card sm:w-64">
                 <div className="relative aspect-[4/3] overflow-hidden bg-muted">
                   {p.capa_url && <img src={p.capa_url} alt={p.nome} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />}

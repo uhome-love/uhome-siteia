@@ -548,6 +548,36 @@ export type Database = {
         }
         Relationships: []
       }
+      google_reviews_cache: {
+        Row: {
+          avaliacoes: Json
+          id: string
+          maps_url: string | null
+          nota: number | null
+          review_url: string | null
+          total: number | null
+          updated_at: string
+        }
+        Insert: {
+          avaliacoes?: Json
+          id?: string
+          maps_url?: string | null
+          nota?: number | null
+          review_url?: string | null
+          total?: number | null
+          updated_at?: string
+        }
+        Update: {
+          avaliacoes?: Json
+          id?: string
+          maps_url?: string | null
+          nota?: number | null
+          review_url?: string | null
+          total?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       imoveis: {
         Row: {
           andar: number | null

@@ -11,6 +11,9 @@ import { useCanonical } from "@/hooks/useCanonical";
 // Lazy load below-fold sections
 const FeaturedNeighborhoods = lazy(() => import("../components/FeaturedNeighborhoods.tsx"));
 
+const HomeVistosRecentemente = lazy(() => import("../components/home/HomeVistosRecentemente.tsx").then(m => ({ default: m.HomeVistosRecentemente })));
+const HomeCorretorBusca = lazy(() => import("../components/home/HomeCorretorBusca.tsx").then(m => ({ default: m.HomeCorretorBusca })));
+const HomeConfianca = lazy(() => import("../components/home/HomeConfianca.tsx").then(m => ({ default: m.HomeConfianca })));
 const EmpreendimentosDestaque = lazy(() => import("../components/EmpreendimentosDestaque.tsx").then(m => ({ default: m.EmpreendimentosDestaque })));
 const PorQueUhome = lazy(() => import("../components/PorQueUhome.tsx").then(m => ({ default: m.PorQueUhome })));
 const SeoLinksSection = lazy(() => import("../components/SeoLinksSection.tsx").then(m => ({ default: m.SeoLinksSection })));
@@ -54,10 +57,12 @@ const Index = () => {
         <HeroSection />
         <HomeCampanhaBanner />
         <Suspense fallback={null}>
+          <HomeVistosRecentemente />
           <EmpreendimentosDestaque />
           <FeaturedNeighborhoods />
-          
           <PorQueUhome />
+          <HomeCorretorBusca />
+          <HomeConfianca />
           <SeoLinksSection />
           <HomeFaqSection faqs={HOME_FAQS} />
         </Suspense>

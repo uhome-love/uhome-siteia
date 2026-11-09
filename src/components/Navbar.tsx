@@ -46,6 +46,14 @@ export function Navbar() {
 
   useEffect(() => setMobileOpen(false), [location.pathname]);
 
+  const [rolou, setRolou] = useState(false);
+  useEffect(() => {
+    const on = () => setRolou(window.scrollY > 8);
+    on();
+    window.addEventListener("scroll", on, { passive: true });
+    return () => window.removeEventListener("scroll", on);
+  }, []);
+
   const path = location.pathname;
   const isSearchPage = path === "/busca" || path.endsWith("/busca");
   const modoIA = searchParams.get("modo") === "ia";
@@ -61,7 +69,7 @@ export function Navbar() {
     `${linkBase} ${active ? "bg-foreground text-background" : "text-muted-foreground hover:bg-secondary hover:text-foreground"}`;
 
   return (
-    <nav className={`fixed left-0 right-0 z-50 border-b border-border/40 bg-background/95 backdrop-blur-lg ${bannerVisible ? "top-10" : "top-0"}`}>
+    <nav className={`fixed left-0 right-0 z-50 border-b backdrop-blur-lg transition-[background-color,box-shadow,border-color] duration-300 ${rolou ? "border-border/60 bg-background/80 shadow-sm" : "border-border/40 bg-background/95"} ${bannerVisible ? "top-10" : "top-0"}`}>
       <div className="mx-auto flex h-14 w-full max-w-[1440px] items-center gap-4 px-4 sm:px-6 lg:px-8">
         <Link to={prefixLink("/")} className="flex flex-shrink-0 items-center" aria-label="Uhome, página inicial">
           <UhomeLogo variant="full" height={24} />

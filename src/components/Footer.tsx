@@ -2,28 +2,32 @@ import { Link } from "react-router-dom";
 import { UhomeLogo } from "@/components/UhomeLogo";
 import { WHATSAPP_NUMBER, WHATSAPP_DISPLAY } from "@/lib/whatsapp";
 import { useCorretor } from "@/contexts/CorretorContext";
+import { useTotalImoveis, formatTotal } from "@/hooks/useTotalImoveis";
 
 // Footer uses content-auto for below-fold performance
 
 export function Footer() {
   const { prefixLink } = useCorretor();
+  const total = useTotalImoveis();
 
   return (
     <footer className="border-t border-border bg-background">
       {/* SEO Content Block — rich text for search engines */}
       <div className="border-b border-border bg-secondary/20 py-10">
         <div className="mx-auto max-w-7xl px-6">
-          <h2 className="font-body text-sm font-bold text-foreground mb-4">
-            Imóveis à Venda em Porto Alegre | Uhome Imóveis
-          </h2>
-          <div className="columns-1 sm:columns-2 lg:columns-3 gap-8 font-body text-xs leading-relaxed text-muted-foreground space-y-3">
+          <details className="group">
+          <summary className="flex cursor-pointer list-none items-center justify-between font-body text-sm font-bold text-foreground [&::-webkit-details-marker]:hidden">
+            <h2 className="font-body text-sm font-bold">Imóveis à venda em Porto Alegre | Uhome Imóveis</h2>
+            <span className="font-body text-xs font-semibold text-primary group-open:hidden">Saiba mais</span>
+          </summary>
+          <div className="mt-4 columns-1 sm:columns-2 lg:columns-3 gap-8 font-body text-xs leading-relaxed text-muted-foreground space-y-3">
             <p>
               A <strong>Uhome</strong> é uma <strong>imobiliária digital em Porto Alegre</strong> especializada na venda de{" "}
               <Link to={prefixLink("/apartamentos-porto-alegre")} className="text-primary hover:underline">apartamentos</Link>,{" "}
               <Link to={prefixLink("/casas-porto-alegre")} className="text-primary hover:underline">casas</Link>,{" "}
               <Link to={prefixLink("/coberturas-porto-alegre")} className="text-primary hover:underline">coberturas</Link> e{" "}
               <Link to={prefixLink("/studios-porto-alegre")} className="text-primary hover:underline">studios</Link>.
-              Com mais de 14.600 imóveis disponíveis e tecnologia de busca inteligente por IA, ajudamos você a encontrar o imóvel perfeito nos melhores bairros da capital gaúcha.
+              Com {formatTotal(total)} imóveis disponíveis e tecnologia de busca inteligente por IA, ajudamos você a encontrar o imóvel perfeito nos melhores bairros da capital gaúcha.
             </p>
             <p>
               Encontre <strong>apartamentos à venda</strong> nos bairros mais valorizados:{" "}
@@ -52,6 +56,7 @@ export function Footer() {
               <Link to={prefixLink("/lancamentos-porto-alegre")} className="text-primary hover:underline">lançamentos imobiliários</Link>.
             </p>
           </div>
+          </details>
         </div>
       </div>
 

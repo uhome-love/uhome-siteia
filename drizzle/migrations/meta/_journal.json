@@ -22,6 +22,13 @@
       "when": 1794186791530,
       "tag": "0002_campanhas_e_produtos_foco",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794190154444,
+      "tag": "0003_google_reviews_cache",
+      "breakpoints": true
     }
   ]
 }

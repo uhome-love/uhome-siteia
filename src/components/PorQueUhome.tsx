@@ -1,167 +1,78 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Bot, BarChart3, MapPinned, UserCheck } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { Search, CalendarCheck, ShieldCheck, ArrowRight } from "lucide-react";
 import { useCorretor } from "@/contexts/CorretorContext";
+import { useTotalImoveis, formatTotal } from "@/hooks/useTotalImoveis";
+import { useGoogleReviews } from "@/hooks/useGoogleReviews";
+import { useCorretoresVitrine } from "@/hooks/useCorretoresVitrine";
 
-const diferenciais = [
-  {
-    icon: Bot,
-    titulo: "Busca Inteligente por IA",
-    desc: "Descreva o imóvel em linguagem natural e a IA encontra as melhores opções para você.",
-  },
-  {
-    icon: BarChart3,
-    titulo: "UhomePreço",
-    desc: "Análise de preço justo com dados reais do mercado de Porto Alegre em tempo real.",
-  },
-  {
-    icon: MapPinned,
-    titulo: "Mapa Interativo",
-    desc: "Explore imóveis no mapa, desenhe sua área ideal e encontre o imóvel perfeito.",
-  },
-  {
-    icon: UserCheck,
-    titulo: "Corretor Dedicado",
-    desc: "Cada cliente tem um corretor especializado no bairro de interesse. Sem enrolação.",
-  },
+const passos = [
+  { icon: Search, n: "1", titulo: "Encontre", desc: "Busque por bairro, no mapa ou descreva o que procura para a nossa IA. Só imóveis com foto e informação real." },
+  { icon: CalendarCheck, n: "2", titulo: "Visite", desc: "Agende a visita online em poucos cliques. Um corretor especialista no bairro te acompanha." },
+  { icon: ShieldCheck, n: "3", titulo: "Compre com segurança", desc: "Simulação de financiamento, negociação e toda a documentação cuidadas pela Uhome até a chave." },
 ];
 
 const ease = [0.16, 1, 0.3, 1] as [number, number, number, number];
 
-function AnimatedNumber({ target, suffix = "" }: { target: number; suffix?: string }) {
-  const [value, setValue] = useState(0);
-  const [started, setStarted] = useState(false);
-
-  useEffect(() => {
-    if (!started) return;
-    const duration = 1600;
-    const start = performance.now();
-    function tick(now: number) {
-      const elapsed = now - start;
-      const progress = Math.min(elapsed / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setValue(Math.round(eased * target));
-      if (progress < 1) requestAnimationFrame(tick);
-    }
-    requestAnimationFrame(tick);
-  }, [started, target]);
-
-  return (
-    <motion.span
-      onViewportEnter={() => setStarted(true)}
-      viewport={{ once: true, amount: 0.5 }}
-    >
-      {value.toLocaleString("pt-BR")}{suffix}
-    </motion.span>
-  );
-}
-
+/** "Como funciona" em 3 passos + números de confiança (todos vindos do banco). */
 export function PorQueUhome() {
   const { prefixLink } = useCorretor();
-  const [totalImoveis, setTotalImoveis] = useState(14600);
-
-  useEffect(() => {
-    supabase
-      .from("imoveis")
-      .select("*", { count: "exact", head: true })
-      .eq("status", "disponivel")
-      .then(({ count }) => {
-        if (count && count > 0) setTotalImoveis(count);
-      });
-  }, []);
+  const total = useTotalImoveis();
+  const { data: reviews } = useGoogleReviews();
+  const { data: corretores = [] } = useCorretoresVitrine();
 
   const stats = [
-    { numero: totalImoveis, suffix: "+", label: "Imóveis disponíveis" },
-    { numero: 34, suffix: "", label: "Corretores especializados" },
-    { numero: 100, suffix: "%", label: "Foco em Porto Alegre" },
-  ];
+    { v: formatTotal(total), l: "imóveis à venda" },
+    reviews?.nota ? { v: `${reviews.nota.toLocaleString("pt-BR")} ★`, l: `${reviews.total} avaliações no Google` } : null,
+    corretores.length ? { v: `${corretores.length}`, l: "corretores especialistas" } : null,
+  ].filter(Boolean) as { v: string; l: string }[];
 
   return (
-    <section className="bg-secondary/50 pt-10 pb-20 sm:pt-14 sm:pb-28">
-      <div className="mx-auto max-w-7xl px-6">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 16, filter: "blur(4px)" }}
-          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.6, ease }}
-          className="text-center"
-        >
-          <p className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-primary">
-            Por que escolher a Uhome
-          </p>
-          <h2
-            className="mx-auto mt-3 max-w-xl font-body text-[clamp(1.5rem,3.5vw,2.25rem)] font-extrabold leading-[1.15] tracking-tight text-foreground"
-            style={{ textWrap: "balance" }}
-          >
-            A forma mais inteligente de comprar imóvel em Porto Alegre
+    <section className="bg-secondary/50 py-16 sm:py-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-8">
+        <div className="max-w-2xl">
+          <p className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-primary">Como funciona</p>
+          <h2 className="mt-3 font-body text-[clamp(1.6rem,3.5vw,2.4rem)] font-extrabold leading-[1.12] tracking-tight text-foreground" style={{ textWrap: "balance" }}>
+            Do primeiro clique à chave na mão, em 3 passos
           </h2>
-          <p className="mx-auto mt-4 max-w-lg font-body text-sm leading-relaxed text-muted-foreground sm:text-base">
-            Tecnologia de ponta, corretores especializados e dados reais do mercado para você tomar a melhor decisão.
-          </p>
-        </motion.div>
+        </div>
 
-        {/* Diferenciais grid */}
-        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {diferenciais.map((item, i) => (
+        <div className="-mx-4 mt-10 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 [scrollbar-width:none] md:mx-0 md:grid md:grid-cols-3 md:gap-6 md:overflow-visible md:px-0">
+          {passos.map((p, i) => (
             <motion.div
-              key={item.titulo}
-              initial={{ opacity: 0, y: 20, filter: "blur(4px)" }}
-              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              viewport={{ once: true, amount: 0.2 }}
+              key={p.titulo}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.5, delay: i * 0.08, ease }}
-              className="group rounded-2xl border border-border bg-card p-6 shadow-sm transition-shadow hover:shadow-md"
+              className="relative w-[78vw] max-w-[320px] flex-shrink-0 snap-start rounded-2xl border border-border bg-card p-6 md:w-auto md:max-w-none"
             >
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                <item.icon className="h-5 w-5" />
+              <span className="absolute right-5 top-4 font-body text-5xl font-extrabold text-primary/10">{p.n}</span>
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <p.icon className="h-5 w-5" />
               </div>
-              <h3 className="mt-4 font-body text-sm font-bold text-foreground">
-                {item.titulo}
-              </h3>
-              <p className="mt-2 font-body text-[13px] leading-relaxed text-muted-foreground">
-                {item.desc}
-              </p>
+              <h3 className="mt-5 font-body text-lg font-bold text-foreground">{p.titulo}</h3>
+              <p className="mt-2 font-body text-sm leading-relaxed text-muted-foreground">{p.desc}</p>
             </motion.div>
           ))}
         </div>
 
-        {/* Stats */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.6, delay: 0.2, ease }}
-          className="mt-14 grid grid-cols-3 gap-6"
-        >
-          {stats.map((stat) => (
-            <div key={stat.label} className="text-center">
-              <p className="font-body text-2xl font-extrabold text-primary sm:text-3xl">
-                <AnimatedNumber target={stat.numero} suffix={stat.suffix} />
-              </p>
-              <p className="mt-1 font-body text-xs text-muted-foreground sm:text-sm">
-                {stat.label}
-              </p>
-            </div>
-          ))}
-        </motion.div>
-
-        {/* CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.5, delay: 0.3, ease }}
-          className="mt-12 text-center"
-        >
+        <div className="mt-10 flex flex-col gap-6 rounded-2xl border border-border bg-card p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+          <div className="grid flex-1 grid-cols-3 gap-4">
+            {stats.map((s) => (
+              <div key={s.l}>
+                <p className="font-body text-xl font-extrabold text-foreground sm:text-3xl">{s.v}</p>
+                <p className="mt-1 font-body text-xs text-muted-foreground sm:text-sm">{s.l}</p>
+              </div>
+            ))}
+          </div>
           <Link
             to={prefixLink("/busca?finalidade=venda")}
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3 font-body text-sm font-semibold text-primary-foreground shadow-lg transition-all hover:shadow-xl active:scale-[0.97]"
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-primary px-6 font-body text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Explorar imóveis →
+            Começar a busca <ArrowRight className="h-4 w-4" />
           </Link>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

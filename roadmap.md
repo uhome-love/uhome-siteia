@@ -18,4 +18,4 @@
 - [ ] Conversão página por página (home, busca, imóvel, formulários, WhatsApp)
 - [ ] IA que qualifica o lead e envia resumo ao CRM
 - [ ] Campanhas Google/Meta apontando para as landings
-- [ ] Home alto nível: destaque Natal com filtros, número único, avaliações Google, corretores com foto, Como funciona, "corretor busca para você", bairros com preço
+- [x] Home alto nível: destaque Natal com filtros, número único, avaliações Google, corretores com foto, Como funciona, "corretor busca para você", bairros com preço

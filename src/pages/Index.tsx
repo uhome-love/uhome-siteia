@@ -1,6 +1,7 @@
 import { useEffect, lazy, Suspense } from "react";
 import { Navbar } from "@/components/Navbar";
 import { HeroSection } from "@/components/HeroSection";
+import { HomeCampanhaBanner } from "@/components/HomeCampanhaBanner";
 
 
 const Footer = lazy(() => import("../components/Footer.tsx").then(m => ({ default: m.Footer })));
@@ -51,6 +52,7 @@ const Index = () => {
       <Navbar />
       <main>
         <HeroSection />
+        <HomeCampanhaBanner />
         <Suspense fallback={null}>
           <EmpreendimentosDestaque />
           <FeaturedNeighborhoods />

@@ -11,6 +11,35 @@ import { CIDADES_PERMITIDAS } from "@/services/imoveis";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { prefetchBusca } from "@/lib/prefetch";
 import { useCorretor } from "@/contexts/CorretorContext";
+import { blackAtiva, useCampanhasAtivas } from "@/lib/produtosFoco";
+
+function HeroFocoButtons() {
+  const { prefixLink } = useCorretor();
+  const { data: campanhas = [] } = useCampanhasAtivas();
+  const c = campanhas.find((x) => x.destaque_home);
+  const black = blackAtiva(c);
+  return (
+    <div className="mt-6 flex flex-wrap gap-3">
+      <Link
+        to={prefixLink("/em-foco")}
+        className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 font-body text-sm font-bold text-primary-foreground shadow-lg transition-transform hover:scale-[1.03] active:scale-[0.98]"
+      >
+        <Sparkles className="h-4 w-4" /> Uhome em Foco
+      </Link>
+      {c && (
+        <Link
+          to={prefixLink(`/campanha/${c.slug}`)}
+          className={`inline-flex items-center gap-2 rounded-full border border-natal-gold/60 px-5 py-3 font-body text-sm font-bold shadow-lg transition-transform hover:scale-[1.03] active:scale-[0.98] ${
+            black ? "bg-noir text-noir-foreground" : "bg-natal text-natal-gold"
+          }`}
+        >
+          🎁 {black ? "Black Natal Uhome" : c.nome}
+        </Link>
+      )}
+    </div>
+  );
+}
+import { useCorretor } from "@/contexts/CorretorContext";
 
 
 
@@ -193,6 +222,7 @@ export function HeroSection() {
             <p className="mt-4 max-w-md font-body text-base leading-relaxed text-white/70">
               Apartamentos, casas e coberturas nos melhores bairros. Busca inteligente por IA e curadoria especializada.
             </p>
+            <HeroFocoButtons />
           </div>
 
           {/* Right — card (CSS animation for instant LCP) */}

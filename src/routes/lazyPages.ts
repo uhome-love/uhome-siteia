@@ -24,6 +24,9 @@ export const AvaliacaoPage = lazyRetry(() => import("../pages/AvaliacaoPage.tsx"
 export const Privacidade = lazyRetry(() => import("../pages/Privacidade.tsx"));
 export const ResetPassword = lazyRetry(() => import("../pages/ResetPassword.tsx"));
 export const EmpreendimentoDetail = lazyRetry(() => import("../pages/EmpreendimentoDetail.tsx"));
+export const EmFoco = lazyRetry(() => import("../pages/EmFoco.tsx"));
+export const ProdutoFocoPage = lazyRetry(() => import("../pages/ProdutoFocoPage.tsx"));
+export const CampanhaPage = lazyRetry(() => import("../pages/CampanhaPage.tsx"));
 export const MegaCyrela = lazyRetry(() => import("../pages/MegaCyrela.tsx"));
 export const SeoLanding = lazyRetry(() => import("../pages/SeoLanding.tsx"));
 export const Vitrine = lazyRetry(() => import("../pages/Vitrine.tsx"));

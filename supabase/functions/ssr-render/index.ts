@@ -229,7 +229,7 @@ function html(title: string, description: string, rawOgImage: string, canonical:
 
 async function renderHome() {
   const title = "Imóveis à Venda em Porto Alegre | Uhome Imóveis";
-  const desc = "Encontre apartamentos, casas e coberturas à venda em Porto Alegre. Busca inteligente com IA, mais de 14.600 imóveis nos melhores bairros. Uhome — imobiliária digital.";
+  const desc = "Encontre apartamentos, casas e coberturas à venda em Porto Alegre. Busca inteligente com IA, mais de 21.000 imóveis nos melhores bairros. Uhome — imobiliária digital.";
 
   const homeFaqs = [
     { q: "Quanto custa um apartamento em Porto Alegre?", a: "O preço varia de R$ 250 mil em bairros como Cidade Baixa até R$ 5 milhões+ em Moinhos de Vento e Três Figueiras." },
@@ -248,7 +248,7 @@ async function renderHome() {
     })),
   });
 
-  const seoText = `<p>A Uhome é uma imobiliária digital em Porto Alegre especializada na venda de apartamentos, casas, coberturas e studios. Com mais de 14.600 imóveis disponíveis e tecnologia de busca inteligente por IA, ajudamos você a encontrar o imóvel perfeito nos melhores bairros: Moinhos de Vento, Petrópolis, Bela Vista, Três Figueiras, Auxiliadora e Mont'Serrat.</p>`;
+  const seoText = `<p>A Uhome é uma imobiliária digital em Porto Alegre especializada na venda de apartamentos, casas, coberturas e studios. Com mais de 21.000 imóveis disponíveis e tecnologia de busca inteligente por IA, ajudamos você a encontrar o imóvel perfeito nos melhores bairros: Moinhos de Vento, Petrópolis, Bela Vista, Três Figueiras, Auxiliadora e Mont'Serrat.</p>`;
 
   const faqHtml = homeFaqs.map((f) => `<h2>${esc(f.q)}</h2><p>${esc(f.a)}</p>`).join("");
 
@@ -649,7 +649,7 @@ async function renderFaq() {
     { q: "Quais são os melhores bairros para morar em Porto Alegre?", a: "Moinhos de Vento (alto padrão), Petrópolis (famílias), Bela Vista (condomínios modernos), Três Figueiras (exclusividade), Menino Deus (vista Guaíba), Tristeza (zona sul)." },
     { q: "Como funciona o financiamento imobiliário?", a: "Cobre até 80% do valor do imóvel, prazos até 35 anos, taxas entre 8% e 12% ao ano. Entrada mínima de 20%. Use nosso simulador para calcular." },
     { q: "Posso usar o FGTS para comprar imóvel?", a: "Sim, desde que o imóvel seja residencial, avaliado em até R$ 1,5 milhão pelo SFH, e você tenha 3+ anos de contribuição." },
-    { q: "O que é a Uhome e como funciona?", a: "A Uhome é uma imobiliária digital em Porto Alegre com busca por IA, curadoria especializada e mais de 14.600 imóveis. Catálogo atualizado diariamente." },
+    { q: "O que é a Uhome e como funciona?", a: "A Uhome é uma imobiliária digital em Porto Alegre com busca por IA, curadoria especializada e mais de 21.000 imóveis. Catálogo atualizado diariamente." },
     { q: "Como funciona a busca por IA da Uhome?", a: "Nossa busca inteligente entende linguagem natural. Descreva o que procura e a IA aplica os filtros automaticamente." },
     { q: "Qual a documentação necessária para comprar um imóvel?", a: "RG, CPF, comprovante de renda, comprovante de residência, certidão de estado civil e IR. O vendedor apresenta matrícula atualizada e certidões negativas." },
   ];

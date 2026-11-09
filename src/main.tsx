@@ -46,3 +46,11 @@ createRoot(rootEl).render(
     <App />
   </HelmetProvider>
 );
+
+// Fade out the branded splash once React has painted
+requestAnimationFrame(() => requestAnimationFrame(() => {
+  const splash = document.getElementById("uh-splash");
+  if (!splash) return;
+  splash.classList.add("uh-out");
+  setTimeout(() => splash.remove(), 350);
+}));

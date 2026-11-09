@@ -6,7 +6,7 @@ export function PageFallback() {
       <Navbar />
       <div className="pt-14">
         <div className="mx-auto max-w-7xl px-6 pt-8">
-          <div className="h-1 w-24 animate-pulse rounded bg-primary/30" />
+          <div className="uh-progress" role="progressbar" aria-label="Carregando página" />
           <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="animate-pulse">

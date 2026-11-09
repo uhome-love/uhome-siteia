@@ -53,19 +53,18 @@ Foco em produto (empreendimento), não em imóvel avulso. Cada produto ganha uma
 - No Uhome Sales CRM (outro projeto), na Central de Natal, um botão "Copiar meu link" em cada empreendimento. Daqui eu deixo pronto o endereço e a lista de produtos para o CRM consumir e escrevo o pedido exato para colar no projeto do CRM.
 - Teste completo: abrir o link de um corretor real (ex.: Lucas Sarmento), conferir dados, WhatsApp e o registro da visita.
 
-## Material de Natal recebido: o que dá para usar
-Já temos: nome e período da campanha (02/11 a 18/12), os 8 empreendimentos (Open Bosque, Essence Canoas, Open Arvoredo, Skyglass, Casa Tua Porto Alegre, Casa Tua Canoas, Boa Vista Country Club, Golden Lake), construtoras, preços por tipologia, selos, textos aprovados, urna premiada, posts, cards, vídeos e elementos visuais (chave de ouro, estrela, luzes, selo).
+## Material de Natal: validação
+Os dois arquivos juntos estão muito completos:
+- 10 produtos com ficha completa: Open Bosque, Open Arvoredo, Casa Tua Porto Alegre, Casa Tua Canoas, Golden Lake, Essence Canoas, Orygem, Boa Vista Country Club, Connect João Wallig e Skyglass.
+- 205 imagens já otimizadas (116 fotos, 59 plantas, 20 de localização, 10 logos), endereços, tabelas, condições de Natal, textos aprovados, elementos visuais e ligação com o CRM.
 
-Falta para landings completas de produto:
-1. Fotos originais em alta de cada empreendimento (fachada, lazer, decorado). O pacote cita "FOTO-01..." mas elas não vieram; os cards têm texto por cima e não servem como foto principal.
-2. Endereço/bairro de cada um (o campo "local" está vazio em todos).
-3. Plantas, metragens, vagas e previsão de entrega.
-4. Descrição e lista de lazer/diferenciais de cada produto (só existe nos posts em imagem).
-5. Logos das incorporadoras (pasta 07 não veio no arquivo).
-6. Regulamento da urna para o cliente (veio só o dos corretores) e a condição da Black Natal (23 a 29/11), quando definida.
-7. Material completo do Open Arvoredo (o próprio pacote diz que está faltando).
-
-Se algum desses já estiver no Jetimob ou no cadastro de empreendimentos do site, eu puxo de lá.
+Pendências que precisam de decisão:
+1. Orygem e Connect João Wallig não estão no encarte nem na urna: proposta é entrarem só na vitrine "Uhome em Foco", não na página de Natal.
+2. Preço: na campanha vale o valor do encarte até 18/12 (decisão do Lucas). Falta a confirmação por escrito das incorporadoras.
+3. Entrega "a confirmar" em Open Bosque, Open Arvoredo, Orygem e habite-se do Skyglass: mostro só o estágio (em obras / pronto) até confirmar.
+4. Textos que não vou usar: "fechadura digital" e "ITBI grátis" no Skyglass, "Santa Maria Goretti" no Open Bosque (correto: Passo d'Areia), "bairro com praia", "31 andares" e "valorização garantida".
+5. Golden Lake: falta a tabela do Lake Baikal (mostro só Victoria e Eyre).
+6. Condição da Black Natal (23 a 29/11), quando estiver definida.
 
 ## Parte B — Auditoria e evolução do site inteiro
 Comparação com os grandes (QuintoAndar, Zillow, Zap/VivaReal, Airbnb, Lopes). Execução em ondas, sempre sem tirar o site do ar.

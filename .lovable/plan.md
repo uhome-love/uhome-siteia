@@ -103,6 +103,23 @@ Comparação com os grandes (QuintoAndar, Zillow, Zap/VivaReal, Airbnb, Lopes). 
 - Origem do anúncio (campanha, palavra-chave) chega no CRM junto com o lead.
 - Painel no admin: leads por campanha e por empreendimento.
 
+### Onda 5b — Conversão página por página (padrão dos melhores portais)
+Auditoria real, abrindo cada página no celular e no computador, com relatório de falhas antes de mexer.
+- **Home:** busca em destaque, banner da campanha, "Uhome em Foco", prova social (vendas, anos, avaliações Google), WhatsApp sempre visível.
+- **Busca:** "receber alertas deste filtro", "falar com especialista nesta região" após alguns imóveis vistos, sem resultados vira pedido de imóvel.
+- **Página do imóvel/produto:** botões fixos (WhatsApp, agendar visita, simular), "quero saber a parcela", "imóveis parecidos", urgência real (unidades restantes, fim da condição).
+- **Formulários:** no máximo 2 campos (nome e WhatsApp), máscara e validação do telefone, envio em 1 toque, confirmação imediata.
+- **Captura:** saída da página, scroll profundo e retorno do visitante, sem exagero (limites já existentes).
+- **WhatsApp:** mensagem já preenchida com o imóvel e a origem, rodízio de corretor e registro do clique.
+- **Medição:** funil completo (visita, clique, formulário, WhatsApp) por página e por campanha no admin.
+
+### Onda 5c — IA que qualifica o lead antes de chegar no corretor
+- **Assistente Uhome no site:** conversa curta (no chat do site e após enviar o formulário) que pergunta objetivo (morar/investir), faixa de valor, entrada, uso de FGTS/financiamento, prazo para comprar e região.
+- **Nota do lead (quente, morno, frio)** calculada pela IA com base nas respostas e no comportamento (imóveis vistos, tempo, filtros, voltas ao site).
+- **Resumo pronto para o corretor** no CRM: "Busca 2 dorm. no Passo d'Areia, até R$ 350 mil, tem FGTS, quer comprar em 3 meses, viu Open Bosque 4x".
+- **Sugestão automática** de 3 produtos compatíveis e agendamento de visita no próprio chat.
+- Tudo enviado ao CRM pelos gatilhos do banco que já existem; a IA nunca sugere aluguel.
+
 ### Onda 6 — Visual e acabamento
 - Refinamento do design system (tipografia, espaçamentos, cores, ícones) e microinterações, mantendo a identidade Uhome.
 

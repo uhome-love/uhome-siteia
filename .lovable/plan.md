@@ -58,13 +58,16 @@ Os dois arquivos juntos estão muito completos:
 - 10 produtos com ficha completa: Open Bosque, Open Arvoredo, Casa Tua Porto Alegre, Casa Tua Canoas, Golden Lake, Essence Canoas, Orygem, Boa Vista Country Club, Connect João Wallig e Skyglass.
 - 205 imagens já otimizadas (116 fotos, 59 plantas, 20 de localização, 10 logos), endereços, tabelas, condições de Natal, textos aprovados, elementos visuais e ligação com o CRM.
 
-Pendências que precisam de decisão:
-1. Orygem e Connect João Wallig não estão no encarte nem na urna: proposta é entrarem só na vitrine "Uhome em Foco", não na página de Natal.
-2. Preço: na campanha vale o valor do encarte até 18/12 (decisão do Lucas). Falta a confirmação por escrito das incorporadoras.
-3. Entrega "a confirmar" em Open Bosque, Open Arvoredo, Orygem e habite-se do Skyglass: mostro só o estágio (em obras / pronto) até confirmar.
-4. Textos que não vou usar: "fechadura digital" e "ITBI grátis" no Skyglass, "Santa Maria Goretti" no Open Bosque (correto: Passo d'Areia), "bairro com praia", "31 andares" e "valorização garantida".
-5. Golden Lake: falta a tabela do Lake Baikal (mostro só Victoria e Eyre).
-6. Condição da Black Natal (23 a 29/11), quando estiver definida.
+Decisões confirmadas:
+- Os 10 produtos entram na página de Natal e na vitrine, incluindo Orygem e Connect João Wallig.
+- Preço da campanha: vale o valor do encarte até 18/12.
+- Entregas: Open Bosque dezembro/2028, Open Arvoredo dezembro/2029, Orygem julho/2027. Habite-se do Skyglass: mostro só "Pronto".
+- Black Natal (23 a 29/11): faixa e selo "Black Natal Uhome" nas páginas durante a semana, com as artes de feed e stories e os textos de cada produto (ex.: Open Arvoredo 2 dorm. com suíte a partir de R$ 329 mil; Skyglass com ITBI, registro e 1 ano de condomínio grátis). Depois de 29/11 volta sozinho para o visual de Natal.
+
+Ainda em aberto (não trava o início):
+1. Textos que não vou usar: "fechadura digital" (Skyglass), "Santa Maria Goretti" (correto: Passo d'Areia), "bairro com praia", "31 andares" e "valorização garantida".
+2. Golden Lake: falta a tabela do Lake Baikal (mostro só Victoria e Eyre).
+3. Black Natal sem arte para Orygem e Connect: uso a foto do produto com o selo Black.
 
 ## Parte B — Auditoria e evolução do site inteiro
 Comparação com os grandes (QuintoAndar, Zillow, Zap/VivaReal, Airbnb, Lopes). Execução em ondas, sempre sem tirar o site do ar.

@@ -184,6 +184,105 @@ export type Database = {
         }
         Relationships: []
       }
+      campanha_produtos: {
+        Row: {
+          campanha_id: string
+          condicao: Json
+          created_at: string
+          id: string
+          ordem: number
+          produto_id: string
+        }
+        Insert: {
+          campanha_id: string
+          condicao?: Json
+          created_at?: string
+          id?: string
+          ordem?: number
+          produto_id: string
+        }
+        Update: {
+          campanha_id?: string
+          condicao?: Json
+          created_at?: string
+          id?: string
+          ordem?: number
+          produto_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campanha_produtos_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
+            referencedRelation: "campanhas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campanha_produtos_produto_id_fkey"
+            columns: ["produto_id"]
+            isOneToOne: false
+            referencedRelation: "produtos_foco"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      campanhas: {
+        Row: {
+          ativo: boolean
+          banner_url: string | null
+          config: Json
+          created_at: string
+          descricao: string | null
+          destaque_home: boolean
+          fim: string | null
+          id: string
+          inicio: string | null
+          nome: string
+          ordem: number
+          slug: string
+          subtitulo: string | null
+          tema: string
+          titulo: string | null
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          banner_url?: string | null
+          config?: Json
+          created_at?: string
+          descricao?: string | null
+          destaque_home?: boolean
+          fim?: string | null
+          id?: string
+          inicio?: string | null
+          nome: string
+          ordem?: number
+          slug: string
+          subtitulo?: string | null
+          tema?: string
+          titulo?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          banner_url?: string | null
+          config?: Json
+          created_at?: string
+          descricao?: string | null
+          destaque_home?: boolean
+          fim?: string | null
+          id?: string
+          inicio?: string | null
+          nome?: string
+          ordem?: number
+          slug?: string
+          subtitulo?: string | null
+          tema?: string
+          titulo?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       captacao_imoveis: {
         Row: {
           area: number | null
@@ -701,6 +800,90 @@ export type Database = {
           path?: string
           referrer?: string | null
           user_agent?: string | null
+        }
+        Relationships: []
+      }
+      produtos_foco: {
+        Row: {
+          ativo: boolean
+          bairro: string | null
+          capa_url: string | null
+          cidade: string | null
+          created_at: string
+          em_foco: boolean
+          endereco: string | null
+          entrega: string | null
+          ficha: Json
+          galeria: Json
+          id: string
+          incorporadora: string | null
+          logo_url: string | null
+          mapas: Json
+          nome: string
+          ordem: number
+          plantas: Json
+          preco_a_partir: number | null
+          preco_texto: string | null
+          resumo: string | null
+          segmento: string | null
+          slug: string
+          status_obra: string | null
+          tipo: string | null
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          bairro?: string | null
+          capa_url?: string | null
+          cidade?: string | null
+          created_at?: string
+          em_foco?: boolean
+          endereco?: string | null
+          entrega?: string | null
+          ficha?: Json
+          galeria?: Json
+          id?: string
+          incorporadora?: string | null
+          logo_url?: string | null
+          mapas?: Json
+          nome: string
+          ordem?: number
+          plantas?: Json
+          preco_a_partir?: number | null
+          preco_texto?: string | null
+          resumo?: string | null
+          segmento?: string | null
+          slug: string
+          status_obra?: string | null
+          tipo?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          bairro?: string | null
+          capa_url?: string | null
+          cidade?: string | null
+          created_at?: string
+          em_foco?: boolean
+          endereco?: string | null
+          entrega?: string | null
+          ficha?: Json
+          galeria?: Json
+          id?: string
+          incorporadora?: string | null
+          logo_url?: string | null
+          mapas?: Json
+          nome?: string
+          ordem?: number
+          plantas?: Json
+          preco_a_partir?: number | null
+          preco_texto?: string | null
+          resumo?: string | null
+          segmento?: string | null
+          slug?: string
+          status_obra?: string | null
+          tipo?: string | null
+          updated_at?: string
         }
         Relationships: []
       }

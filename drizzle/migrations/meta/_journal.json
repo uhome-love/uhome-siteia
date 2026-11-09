@@ -15,6 +15,13 @@
       "when": 1791482673229,
       "tag": "0001_keep_geocoded_coords",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794186791530,
+      "tag": "0002_campanhas_e_produtos_foco",
+      "breakpoints": true
     }
   ]
 }

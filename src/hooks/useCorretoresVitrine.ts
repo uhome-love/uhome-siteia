@@ -14,7 +14,7 @@ export function useCorretoresVitrine() {
         .select("id, nome, foto_url, telefone, creci, slug_ref")
         .eq("ativo", true)
         .not("slug_ref", "is", null)
-        .not("foto_url", "is", null)
+        .like("foto_url", "/__l5e/%") // só quem recebeu foto oficial = corretor em atividade
         .order("nome");
       if (error) throw error;
       return (data ?? []).filter((c) => c.nome && c.foto_url) as CorretorVitrine[];

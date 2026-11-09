@@ -36,7 +36,7 @@ export function HomeConfianca() {
   if (!g && !corretores.length) return null;
 
   return (
-    <section className="py-16 sm:py-24">
+    <section className="py-8 sm:py-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-8">
         {g && g.avaliacoes.length > 0 && (
           <>

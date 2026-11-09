@@ -19,6 +19,17 @@ export default {
         mono: ['"DM Mono"', "monospace"],
       },
       colors: {
+        natal: {
+          DEFAULT: "hsl(var(--natal))",
+          deep: "hsl(var(--natal-deep))",
+          gold: "hsl(var(--natal-gold))",
+          red: "hsl(var(--natal-red))",
+          foreground: "hsl(var(--natal-foreground))",
+        },
+        noir: {
+          DEFAULT: "hsl(var(--noir))",
+          foreground: "hsl(var(--noir-foreground))",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

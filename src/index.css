@@ -5,6 +5,14 @@
 @layer base {
   :root {
     /* ── MARCA ── */
+    /* Campanhas */
+    --natal: 158 45% 14%;
+    --natal-deep: 160 50% 9%;
+    --natal-gold: 42 72% 58%;
+    --natal-red: 355 62% 46%;
+    --natal-foreground: 40 40% 96%;
+    --noir: 0 0% 6%;
+    --noir-foreground: 0 0% 98%;
     --uhome-blue: 235 93% 67%;
     --uhome-blue-dark: 233 80% 59%;
     --uhome-blue-light: 233 94% 73%;

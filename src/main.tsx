@@ -18,6 +18,8 @@ const loadDeferredFonts = () => {
   import("@fontsource/plus-jakarta-sans/600.css");
   import("@fontsource/plus-jakarta-sans/800.css");
   import("@fontsource/dm-mono/400.css");
+  import("@fontsource/montserrat/700.css");
+  import("@fontsource/montserrat/800.css");
 };
 
 const scheduleIdleCallback = (

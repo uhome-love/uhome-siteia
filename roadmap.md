@@ -9,6 +9,7 @@
 - [x] Versão do corretor (/c/<corretor>/...) sem formulário, com foto e WhatsApp dele
 - [x] Prévia dos links no WhatsApp/Google
 - [x] Pedido pronto para o Uhome Sales CRM (botão "Copiar meu link") — aplicar no projeto do CRM
+- [x] Auditoria visual: menu profissional, Natal na identidade oficial, vitrine única no Natal
 - [ ] Painel admin de campanhas (trocar produtos, datas e banner sem pedir)
 
 ## Fase 2 — Auditoria e evolução do site

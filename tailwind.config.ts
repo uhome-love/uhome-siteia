@@ -17,11 +17,13 @@ export default {
         display: ['"Plus Jakarta Sans"', "system-ui", "sans-serif"],
         body: ['"Plus Jakarta Sans"', "system-ui", "sans-serif"],
         mono: ['"DM Mono"', "monospace"],
+        natal: ['"Montserrat"', '"Plus Jakarta Sans"', "system-ui", "sans-serif"],
       },
       colors: {
         natal: {
           DEFAULT: "hsl(var(--natal))",
           deep: "hsl(var(--natal-deep))",
+          glow: "hsl(var(--natal-glow))",
           gold: "hsl(var(--natal-gold))",
           red: "hsl(var(--natal-red))",
           foreground: "hsl(var(--natal-foreground))",

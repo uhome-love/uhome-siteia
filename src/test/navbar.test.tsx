@@ -30,9 +30,8 @@ describe("Navbar", () => {
     renderNavbar();
     expect(screen.getByText("Comprar")).toBeInTheDocument();
     expect(screen.getByText("Busca IA")).toBeInTheDocument();
-    expect(screen.getByText("Quanto vale meu imóvel?")).toBeInTheDocument();
-    expect(screen.getByText("Ajuda")).toBeInTheDocument();
-    expect(screen.getByText("Anuncie seu imóvel")).toBeInTheDocument();
+    expect(screen.getByText("Mais")).toBeInTheDocument();
+    expect(screen.getByText("Anunciar imóvel")).toBeInTheDocument();
   });
 
   it("renders login button when not authenticated", () => {
@@ -49,10 +48,8 @@ describe("Navbar", () => {
 
   it("links to correct routes", () => {
     renderNavbar();
-    const ajuda = screen.getByText("Ajuda");
-    expect(ajuda.closest("a")).toHaveAttribute("href", "/faq");
-
-    const avaliar = screen.getByText("Quanto vale meu imóvel?");
-    expect(avaliar.closest("a")).toHaveAttribute("href", "/avaliar-imovel");
+    expect(screen.getByText("Anunciar imóvel").closest("a")).toHaveAttribute("href", "/anunciar");
+    // Sem campanha em destaque, o menu mostra "Uhome em Foco".
+    expect(screen.getByText("Uhome em Foco").closest("a")).toHaveAttribute("href", "/em-foco");
   });
 });

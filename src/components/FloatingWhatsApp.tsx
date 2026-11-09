@@ -22,7 +22,8 @@ export function FloatingWhatsApp() {
   const location = useLocation();
 
   // Hide on property detail pages in mobile — the sticky bottom CTA handles it
-  const isPropertyPage = location.pathname.startsWith("/imovel/");
+  // Páginas com barra de contato própria no celular: o botão flutuante sai no mobile.
+  const isPropertyPage = location.pathname.startsWith("/imovel/") || /\/em-foco\/[^/]+/.test(location.pathname);
   // Pages with sticky bottom bars need extra offset
   const hasBottomBar = location.pathname === "/busca" || isPropertyPage;
 

@@ -10,29 +10,31 @@ import { bairrosData } from "@/data/bairros";
 import { CIDADES_PERMITIDAS } from "@/services/imoveis";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { prefetchBusca } from "@/lib/prefetch";
-import { blackAtiva, useCampanhasAtivas } from "@/lib/produtosFoco";
+import { useCampanhaDestaque } from "@/lib/produtosFoco";
+import { NATAL_ART } from "@/components/foco/NatalArt";
 
 function HeroFocoButtons() {
   const { prefixLink } = useCorretor();
-  const { data: campanhas = [] } = useCampanhasAtivas();
-  const c = campanhas.find((x) => x.destaque_home);
-  const black = blackAtiva(c);
+  const { campanha: c, black } = useCampanhaDestaque();
   return (
-    <div className="mt-6 flex flex-wrap gap-3">
-      <Link
-        to={prefixLink("/em-foco")}
-        className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 font-body text-sm font-bold text-primary-foreground shadow-lg transition-transform hover:scale-[1.03] active:scale-[0.98]"
-      >
-        <Sparkles className="h-4 w-4" /> Uhome em Foco
-      </Link>
-      {c && (
+    <div className="mt-7 flex flex-wrap gap-3">
+      {c ? (
         <Link
           to={prefixLink(`/campanha/${c.slug}`)}
-          className={`inline-flex items-center gap-2 rounded-full border border-natal-gold/60 px-5 py-3 font-body text-sm font-bold shadow-lg transition-transform hover:scale-[1.03] active:scale-[0.98] ${
+          className={`inline-flex h-12 items-center gap-2.5 rounded-full border border-natal-gold/60 px-6 font-body text-sm font-bold shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98] ${
             black ? "bg-noir text-noir-foreground" : "bg-natal text-natal-gold"
           }`}
         >
-          🎁 {black ? "Black Natal Uhome" : c.nome}
+          <img src={NATAL_ART.chave} alt="" className="h-3.5 w-auto" />
+          {black ? "Black Natal Uhome" : c.nome}
+          <span className="hidden font-normal text-natal-foreground/80 sm:inline">· até {black ? "29/11" : "18/12"}</span>
+        </Link>
+      ) : (
+        <Link
+          to={prefixLink("/em-foco")}
+          className="inline-flex h-12 items-center gap-2 rounded-full bg-primary px-6 font-body text-sm font-bold text-primary-foreground shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98]"
+        >
+          <Sparkles className="h-4 w-4" /> Uhome em Foco
         </Link>
       )}
     </div>
@@ -230,7 +232,7 @@ export function HeroSection() {
           >
             {/* Toggle */}
             <div className="mb-4 flex gap-2 sm:mb-6">
-              {(["comprar", "ia", "anunciar"] as const).map((m) => {
+              {(["comprar", "ia"] as const).map((m) => {
                 const label = m === "comprar" ? "Buscar imóveis" : m === "ia" ? "Busca IA" : "Anunciar imóvel";
                 const mobileLabel = m === "comprar" ? "Buscar" : m === "ia" ? "IA" : "Anunciar";
                 return (

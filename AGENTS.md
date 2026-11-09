@@ -2,3 +2,5 @@
 - A DB trigger keeps existing imoveis coordinates when the sync sends null, so geocoded locations survive re-syncs.
 - Campaign/"Uhome em Foco" products live in `produtos_foco` (public content in `ficha` jsonb, images as Lovable Assets URLs) and `campanhas` + `campanha_produtos`; kept separate from legacy `empreendimentos` so old pages keep working. Campaign visibility and Black week are date-driven (America/Sao_Paulo) in `src/lib/produtosFoco.ts`, so campaigns switch on/off without deploys.
 - Broker-personalized product pages reuse the `/c/:corretorSlug` prefix; in that mode pages show the broker card and WhatsApp instead of the lead form. `ssr-render` serves link previews for `/em-foco`, `/em-foco/:slug` and `/campanha/:slug`.
+- The campaign flagged `destaque_home` (via `useCampanhaDestaque`) replaces "Uhome em Foco" in navbar, hero and `/em-foco` while vigente; after it ends `/em-foco` returns automatically. Why: one showcase per period, no deploy needed.
+- Official Natal art (lights, key, seal, Homi) lives in `src/components/foco/NatalArt.tsx` as Lovable Assets; `--natal-*` tokens follow the campaign brand kit.

@@ -147,6 +147,16 @@ export function useCampanhasAtivas() {
   });
 }
 
+/**
+ * Campanha em destaque agora (ex.: Natal). Enquanto vigente, ela substitui
+ * "Uhome em Foco" em menu, abertura e /em-foco; quando acaba, volta o Em Foco.
+ */
+export function useCampanhaDestaque() {
+  const q = useCampanhasAtivas();
+  const c = (q.data ?? []).find((x) => x.destaque_home) ?? null;
+  return { campanha: c, black: blackAtiva(c), isLoading: q.isLoading };
+}
+
 export function useCampanha(slug?: string) {
   return useQuery({
     queryKey: ["campanha", slug],

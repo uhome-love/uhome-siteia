@@ -29,10 +29,10 @@ export function UserMenu() {
         <button
           onClick={() => setShowModal(true)}
           aria-label="Entrar na conta"
-          className="flex items-center gap-1.5 rounded-full border border-border px-3 py-2 font-body text-sm font-medium text-foreground transition-colors hover:bg-secondary active:scale-[0.97]"
+          className="flex h-9 items-center gap-1.5 rounded-full bg-primary px-4 font-body text-[13px] font-semibold text-primary-foreground transition-colors hover:bg-primary/90 active:scale-[0.97]"
         >
           <User className="h-4 w-4" />
-          <span className="hidden sm:inline">Entrar</span>
+          <span>Entrar</span>
         </button>
         {showModal && <Suspense fallback={null}><AuthModal open={showModal} onClose={() => setShowModal(false)} /></Suspense>}
       </>

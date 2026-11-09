@@ -6,11 +6,14 @@
   :root {
     /* ── MARCA ── */
     /* Campanhas */
-    --natal: 158 45% 14%;
-    --natal-deep: 160 50% 9%;
-    --natal-gold: 42 72% 58%;
-    --natal-red: 355 62% 46%;
-    --natal-foreground: 40 40% 96%;
+    /* Identidade oficial Natal Chave de Ouro: azul-noite, dourado, vermelho, creme */
+    --natal: 233 66% 15%;
+    --natal-deep: 234 69% 9%;
+    --natal-glow: 232 61% 30%;
+    --natal-gold: 46 65% 52%;
+    --natal-red: 356 68% 39%;
+    --natal-foreground: 41 67% 95%;
+    --natal-gold-grad: linear-gradient(90deg, #A97A22, #D9B04A 55%, #FBEFC0);
     --noir: 0 0% 6%;
     --noir-foreground: 0 0% 98%;
     --uhome-blue: 235 93% 67%;

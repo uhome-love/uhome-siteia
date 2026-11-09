@@ -14,11 +14,11 @@ function useCountdown(fim?: string | null) {
   const alvo = useMemo(() => (fim ? new Date(`${fim}T23:59:59-03:00`).getTime() : 0), [fim]);
   const [now, setNow] = useState(Date.now());
   useEffect(() => {
-    const t = setInterval(() => setNow(Date.now()), 60_000);
+    const t = setInterval(() => setNow(Date.now()), 1_000);
     return () => clearInterval(t);
   }, []);
   const ms = Math.max(0, alvo - now);
-  return { dias: Math.floor(ms / 86_400_000), horas: Math.floor((ms / 3_600_000) % 24) };
+  return { dias: Math.floor(ms / 86_400_000), horas: Math.floor((ms / 3_600_000) % 24), min: Math.floor((ms / 60_000) % 60), seg: Math.floor((ms / 1000) % 60) };
 }
 
 export default function CampanhaPage() {
@@ -29,7 +29,7 @@ export default function CampanhaPage() {
   const c = data?.campanha;
   const black = blackAtiva(c);
   const fimExibido = black ? c?.config.black?.fim : c?.fim;
-  const { dias, horas } = useCountdown(fimExibido);
+  const { dias, horas, min, seg } = useCountdown(fimExibido);
 
   useEffect(() => {
     if (!c) return;
@@ -53,9 +53,9 @@ export default function CampanhaPage() {
       <main className="pt-14">
         <section className={`relative overflow-hidden ${tema}`}>
           <NatalLuzes />
-          <img src={NATAL_ART.homi} alt="" className="pointer-events-none absolute bottom-0 right-4 hidden h-[420px] w-auto lg:block xl:right-16" />
+          <img src={NATAL_ART.homi} alt="" className="uh-float pointer-events-none absolute bottom-0 right-4 hidden h-[420px] w-auto lg:block xl:right-16" />
           <img src={NATAL_ART.estrela} alt="" aria-hidden className="pointer-events-none absolute right-6 top-12 h-10 w-auto opacity-80 lg:hidden" />
-          <div className="relative mx-auto max-w-7xl px-5 pb-14 pt-8 sm:px-8 lg:pb-24 lg:pt-14">
+          <div className="uh-rise relative mx-auto max-w-7xl px-5 pb-14 pt-8 sm:px-8 lg:pb-24 lg:pt-14">
             <img src={NATAL_ART.selo} alt="Natal Chave de Ouro" className="h-16 w-auto sm:h-20" />
             <p className="mt-6 inline-flex items-center gap-2 rounded-full border border-natal-gold/40 px-4 py-1.5 font-body text-[11px] font-bold uppercase tracking-[0.2em] text-natal-gold sm:text-xs">
               <KeyRound className="h-3.5 w-3.5" /> {black ? "Semana Black · 23 a 29/11" : "Campanha de Natal Uhome"}
@@ -68,14 +68,14 @@ export default function CampanhaPage() {
 
             <div className="mt-10 flex flex-wrap items-center gap-6">
               <div className="flex gap-3">
-                {[{ v: dias, l: "dias" }, { v: horas, l: "horas" }].map((x) => (
-                  <div key={x.l} className="min-w-[84px] rounded-2xl border border-natal-gold/30 bg-current/5 px-4 py-3 text-center">
-                    <p className="font-heading text-3xl font-bold text-natal-gold">{x.v}</p>
+                {[{ v: dias, l: "dias" }, { v: horas, l: "horas" }, { v: min, l: "min" }, { v: seg, l: "seg" }].map((x) => (
+                  <div key={x.l} className="min-w-[64px] sm:min-w-[80px] rounded-2xl border border-natal-gold/30 bg-current/5 px-4 py-3 text-center">
+                    <p className="font-heading text-2xl sm:text-3xl font-bold tabular-nums text-natal-gold">{String(x.v).padStart(2, "0")}</p>
                     <p className="font-body text-xs uppercase tracking-wider opacity-75">{x.l}</p>
                   </div>
                 ))}
               </div>
-              <a href={`https://wa.me/${numero}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full bg-natal-gold px-6 py-3.5 font-body text-sm font-bold text-natal-deep shadow-lg transition-transform hover:scale-[1.02]">
+              <a href={`https://wa.me/${numero}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full bg-natal-gold px-6 py-3.5 font-body text-sm font-bold text-natal-deep shadow-lg uh-shine transition-transform hover:scale-[1.02] active:scale-[0.98]">
                 <MessageCircle className="h-4 w-4" /> {isDirectAccess && corretor ? `Falar com ${corretor.nome.split(" ")[0]}` : "Quero as condições de Natal"}
               </a>
             </div>

@@ -279,3 +279,15 @@
 .uh-progress::after { content: ""; position: absolute; inset: 0; width: 35%; border-radius: 3px; background: hsl(var(--primary)); animation: uh-progress 1.1s cubic-bezier(.4,0,.2,1) infinite; }
 @keyframes uh-progress { from { transform: translateX(-100%); } to { transform: translateX(300%); } }
 @media (prefers-reduced-motion: reduce) { .uh-progress::after { animation-duration: 3s; } }
+
+/* Movimento premium (respeita reduced-motion) */
+@keyframes uh-kenburns { from { transform: scale(1); } to { transform: scale(1.08); } }
+@keyframes uh-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes uh-rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes uh-shine { 0%,100% { box-shadow: 0 0 0 0 hsl(var(--natal-gold) / 0); } 50% { box-shadow: 0 0 24px 2px hsl(var(--natal-gold) / 0.35); } }
+.uh-kenburns { animation: uh-kenburns 22s ease-out both; will-change: transform; }
+.uh-float { animation: uh-float 5s ease-in-out infinite; }
+.uh-rise { animation: uh-rise .6s cubic-bezier(.2,.7,.2,1) both; }
+.uh-shine { animation: uh-shine 3s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .uh-kenburns,.uh-float,.uh-rise,.uh-shine { animation: none !important; } }
+html { scroll-behavior: smooth; }

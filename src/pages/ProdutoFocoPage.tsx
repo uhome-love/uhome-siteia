@@ -126,9 +126,9 @@ export default function ProdutoFocoPage() {
       <main className="pt-14">
         {/* Abertura */}
         <section className="relative h-[72vh] min-h-[460px] max-h-[760px] w-full overflow-hidden bg-noir">
-          {p.capa_url && <img src={p.capa_url} alt={p.nome} fetchPriority="high" className="absolute inset-0 h-full w-full object-cover opacity-80" />}
+          {p.capa_url && <img src={p.capa_url} alt={p.nome} fetchPriority="high" className="uh-kenburns absolute inset-0 h-full w-full object-cover opacity-90" />}
           <div className="absolute inset-0 bg-gradient-to-t from-noir via-noir/40 to-transparent" />
-          <div className="relative mx-auto flex h-full max-w-7xl flex-col justify-end px-5 pb-10 text-noir-foreground sm:px-8">
+          <div className="uh-rise relative mx-auto flex h-full max-w-7xl flex-col justify-end px-5 pb-10 text-noir-foreground sm:px-8">
             <div className="flex flex-wrap items-center gap-2">
               {natal && (
                 <Link to={prefixLink(`/campanha/${natal.slug}`)} className={`rounded-full px-3 py-1 font-body text-xs font-bold uppercase tracking-wide ${black ? "bg-noir-foreground text-noir" : "bg-natal-red text-natal-foreground"}`}>
@@ -147,7 +147,7 @@ export default function ProdutoFocoPage() {
                   <p className="font-heading text-4xl font-bold">{formatPreco(p.preco_a_partir)}</p>
                 </div>
               )}
-              <a href={waUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3.5 font-body text-sm font-bold text-primary-foreground shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98]">
+              <a href={waUrl} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center gap-2 rounded-full ${natal && !black ? "bg-natal-gold text-natal-deep" : "bg-primary text-primary-foreground"} px-6 py-3.5 font-body text-sm font-bold shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98]`}>
                 <MessageCircle className="h-4 w-4" /> {modoCorretor ? `Falar com ${corretor!.nome.split(" ")[0]}` : "Quero as condições"}
               </a>
               {fotos.length > 0 && (
@@ -163,7 +163,7 @@ export default function ProdutoFocoPage() {
           <div className="min-w-0 space-y-14">
             {/* Resumo */}
             <section>
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
                 {[
                   { i: Building2, l: "Tipo", v: fi.segmento?.split(" (")[0] ?? p.tipo },
                   { i: Calendar, l: "Entrega", v: p.entrega },
@@ -173,7 +173,7 @@ export default function ProdutoFocoPage() {
                   <div key={x.l} className="rounded-xl border border-border/60 p-4">
                     <x.i className="h-4 w-4 text-primary" />
                     <p className="mt-2 font-body text-xs text-muted-foreground">{x.l}</p>
-                    <p className="font-body text-sm font-semibold text-foreground">{x.v}</p>
+                    <p className="break-words font-body text-sm font-semibold leading-snug text-foreground">{x.v}</p>
                   </div>
                 ))}
               </div>

@@ -174,7 +174,7 @@ export function HeroSection() {
             sizes="100vw"
             width={1920}
             height={1280}
-            className="absolute inset-0 h-full w-full object-cover"
+            className="uh-kenburns absolute inset-0 h-full w-full object-cover"
             style={{ objectPosition: "center center" }}
           />
         </picture>

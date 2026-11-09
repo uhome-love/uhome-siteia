@@ -1,133 +1,45 @@
-# Página de Lançamentos + Campanhas temáticas (Natal)
+# Auditoria visual + Natal com a identidade oficial + menu profissional
 
-## Ideia geral
-Criar um "hub" fixo de produtos em foco, que vocês controlam pelo painel admin, sem precisar mexer no site a cada troca de campanha.
+## 1. Menu do topo (desktop e celular)
+Hoje: "Ajuda" fica embaixo de "Anuncie seu imóvel", são 7 itens com estilos diferentes e há botões repetidos.
 
+Novo menu, limpo e alinhado:
 ```text
-uhome.com.br/lancamentos            -> todos os empreendimentos com campanha ativa
-uhome.com.br/campanha/natal-uhome   -> página temática de Natal (só os produtos dela)
-uhome.com.br/campanha/<qualquer>    -> próximas campanhas (Black, Verão, Feirão, Mega Cyrela...)
-uhome.com.br/empreendimentos/<slug> -> página do produto (já existe, destino dos anúncios Meta)
+[Logo]   Comprar   Busca IA   Natal Chave de Ouro*   Mais v        [Anunciar imóvel]  [Entrar]
 ```
+- *Durante o Natal (até 18/12) aparece "Natal Chave de Ouro". Depois some sozinho e aparece "Uhome em Foco".
+- "Mais" abre um menu com: Quanto vale meu imóvel, Bairros, Blog, Ajuda.
+- À direita só 2 botões: "Anunciar imóvel" (contorno) e "Entrar" (cheio, azul da marca).
+- Telas médias (notebook pequeno): os itens recolhem no "Mais" antes de encostar um no outro.
+- Celular: logo + "Entrar" + botão de menu. O menu lateral fica organizado em grupos (Buscar, Natal, Para proprietários, Conta).
 
-## 1. Vitrine fixa "Uhome em Foco" (/em-foco, com /lancamentos e /destaques levando para ela)
-- Uma vitrine grande e bonita de todos os produtos com campanha no ar; o Natal é uma campanha à parte.
-- Topo forte: "Uhome em Foco" + filtros rápidos (cidade, estágio: lançamento / em obras / pronto, faixa de preço, construtora).
-- Faixa das campanhas ativas (ex.: banner do Natal) levando para a página da campanha.
-- Grade de cards dos empreendimentos em foco: foto, nome, bairro, construtora, "a partir de R$", entrega, selo da campanha (ex.: "Condição de Natal").
-- Bloco "Por que comprar na planta com a Uhome" + formulário de interesse + WhatsApp.
-- Pronto para mostrar aos incorporadores e mandar para clientes.
+## 2. Abertura da Home
+- Tirar o botão duplicado "Uhome em Foco". Durante o Natal fica um único botão, "Natal Chave de Ouro", no visual da campanha. Depois de 18/12 ele vira "Uhome em Foco".
+- Tirar a aba "Anunciar imóvel" do quadro de busca (já fica no menu). O quadro fica só com Buscar imóveis e Busca IA.
+- Conferir o espaçamento entre título, texto e botões.
 
-## 2. Páginas de campanha /campanha/:slug (modelo reutilizável)
-Cada campanha tem: nome, período (início/fim), tema visual, banner, título, texto, condições especiais (ex.: entrada facilitada, bônus, desconto) e a lista de empreendimentos.
-- Natal: visual temático elegante (tons verde-escuro, dourado e vermelho suave, detalhes de brilho discretos), contagem regressiva até o fim da campanha, condições em destaque, produtos, formulário "Quero a condição de Natal".
-- Quando a campanha vence, ela sai sozinha do ar (e da /lancamentos), com redirecionamento para /lancamentos — link nunca quebra.
-- A Mega Cyrela atual pode virar uma campanha nesse mesmo modelo.
+## 3. Natal Chave de Ouro na identidade oficial do ZIP
+Hoje as páginas estão em verde-escuro, que não é a identidade. Vamos trocar para o que vocês criaram:
+- Azul-noite #0D1340 (fundo), dourado #D4AF37 com degradê dourado, vermelho #A8202A, creme #FAF5EA. Botões principais continuam no azul da marca #5271FF.
+- Títulos e números grandes em Montserrat.
+- Elementos oficiais: faixa de luzes no topo da campanha, chave de ouro, selo "Natal Chave de Ouro", estrela, urna premiada, Homi de Natal, presentes, árvore, sino e bolas em 3D, neve leve.
+- Onde aplicar: banner da Home, página da campanha, páginas dos produtos durante o Natal e o Black Natal (23 a 29/11).
 
-## 3. Landing page completa de cada produto (destino dos anúncios Meta e Google)
-Foco em produto (empreendimento), não em imóvel avulso. Cada produto ganha uma página completa:
-- Abertura em tela cheia com foto/vídeo, nome, construtora, "a partir de" e condição da campanha.
-- Galeria grande em alta qualidade, tour/vídeo, plantas por tipologia (metragem, quartos, vagas, preço).
-- Diferenciais e lazer com ícones, localização no mapa com o que tem perto, estágio da obra e entrega.
-- Condições de pagamento e simulador de financiamento; unidades disponíveis puxadas do Jetimob.
-- Perguntas frequentes, formulário curto e WhatsApp fixo, sempre visíveis.
-- Selo e condição da campanha ativa, botão fixo de WhatsApp/formulário.
-- Links com UTM do anúncio continuam sendo gravados e o lead chega ao CRM com o nome da campanha.
-- Prévia bonita ao compartilhar no WhatsApp (imagem e título da campanha).
+## 4. Uma página só para o Natal
+- Durante o Natal, /em-foco, /lancamentos e /destaques levam direto para a página do Natal, e os produtos mostram o selo do Natal.
+- Depois de 18/12, a página do Natal sai do ar e /em-foco volta como "Uhome em Foco" no visual normal da Uhome, nos outros meses.
+- Tudo muda sozinho pela data, sem precisar mexer.
 
-## 4. Painel admin "Campanhas"
-- Criar/editar campanha, escolher tema, subir banner, definir datas, marcar quais empreendimentos entram e a ordem.
-- Ligar/desligar campanha com um clique; marcar empreendimento como "Em foco" na /lancamentos.
-
-## 5. Acesso fácil na página principal (uhome.com.br)
-- Na abertura, junto da busca de todos os imóveis, um botão de destaque "Uhome em Foco".
-- Logo abaixo, um banner grande da campanha ativa (ex.: "Natal Uhome"), trocado pelo painel; com mais de uma campanha, vira um carrossel.
-- Faixa com os produtos em foco logo em seguida, antes das outras seções.
-- Item "Uhome em Foco" no menu do topo e no rodapé, no celular e no computador.
-
-## 6. Página personalizada do corretor (link para mandar no WhatsApp)
-- Toda landing de produto, vitrine "Uhome em Foco" e página do Natal ganha uma versão do corretor: `uhome.com.br/c/<corretor>/em-foco/<produto>` (aproveita o link de corretor que já existe no site).
-- Nessa versão não há formulário: aparece a foto, o nome, o CRECI e os botões de WhatsApp e ligar do corretor; o cliente fala direto com ele.
-- Prévia no WhatsApp com a foto do produto e "Enviado por <corretor>".
-- Cada abertura e clique no WhatsApp fica registrado e aparece no CRM para aquele corretor (o caminho de ligação com o CRM já existe).
-- No Uhome Sales CRM (outro projeto), na Central de Natal, um botão "Copiar meu link" em cada empreendimento. Daqui eu deixo pronto o endereço e a lista de produtos para o CRM consumir e escrevo o pedido exato para colar no projeto do CRM.
-- Teste completo: abrir o link de um corretor real (ex.: Lucas Sarmento), conferir dados, WhatsApp e o registro da visita.
-
-## Material de Natal: validação
-Os dois arquivos juntos estão muito completos:
-- 10 produtos com ficha completa: Open Bosque, Open Arvoredo, Casa Tua Porto Alegre, Casa Tua Canoas, Golden Lake, Essence Canoas, Orygem, Boa Vista Country Club, Connect João Wallig e Skyglass.
-- 205 imagens já otimizadas (116 fotos, 59 plantas, 20 de localização, 10 logos), endereços, tabelas, condições de Natal, textos aprovados, elementos visuais e ligação com o CRM.
-
-Decisões confirmadas:
-- Os 10 produtos entram na página de Natal e na vitrine, incluindo Orygem e Connect João Wallig.
-- Preço da campanha: vale o valor do encarte até 18/12.
-- Entregas: Open Bosque dezembro/2028, Open Arvoredo dezembro/2029, Orygem julho/2027. Habite-se do Skyglass: mostro só "Pronto".
-- Black Natal (23 a 29/11): faixa e selo "Black Natal Uhome" nas páginas durante a semana, com as artes de feed e stories e os textos de cada produto (ex.: Open Arvoredo 2 dorm. com suíte a partir de R$ 329 mil; Skyglass com ITBI, registro e 1 ano de condomínio grátis). Depois de 29/11 volta sozinho para o visual de Natal.
-
-Ainda em aberto (não trava o início):
-1. Textos que não vou usar: "fechadura digital" (Skyglass), "Santa Maria Goretti" (correto: Passo d'Areia), "bairro com praia", "31 andares" e "valorização garantida".
-2. Golden Lake: falta a tabela do Lake Baikal (mostro só Victoria e Eyre).
-3. Black Natal sem arte para Orygem e Connect: uso a foto do produto com o selo Black.
-
-## Parte B — Auditoria e evolução do site inteiro
-Comparação com os grandes (QuintoAndar, Zillow, Zap/VivaReal, Airbnb, Lopes). Execução em ondas, sempre sem tirar o site do ar.
-
-### Onda 0 — Medir antes de mexer (1º passo)
-- Medir a velocidade real dos visitantes por página (busca, imóvel, home) e montar o "antes".
-- Teste completo de busca, filtros, mapa, busca por IA, botões e mobile, com lista de falhas.
-- Conectar o Google Search Console (hoje não está ligado, então não temos como saber o que o Google indexou) e enviar o mapa do site.
-- Já sabemos: o mapa do site está desatualizado (tem páginas que não existem mais e falta bairros e condomínios) e várias páginas mostram a prévia da Home ao serem compartilhadas.
-
-### Onda 1 — Velocidade e fluidez ("clicou, abriu")
-- Pré-carregar a página do imóvel ao passar o dedo/mouse no card e abrir com transição suave.
-- Fotos em alta qualidade, mas no tamanho certo para cada tela (formato moderno, carregamento progressivo).
-- Esqueletos de carregamento em tudo, sem "piscadas" nem saltos de layout.
-
-### Onda 2 — Busca, filtros e mapa nível "portal grande"
-- Busca única que entende tudo: bairro, condomínio, código, rua ou frase ("3 quartos com piscina no Bela Vista até 1,5 mi").
-- Filtros mais rápidos: chips de filtros ativos, contagem ao vivo, "salvar busca" e alerta de novos imóveis por WhatsApp/e-mail.
-- Mapa: desenhar área, "buscar nesta região", tempo até um endereço (trabalho/escola), pins de preço já implementados refinados.
-- Ordenações úteis: mais novos, menor preço/m², baixou de preço.
-- Comparar imóveis lado a lado.
-
-### Onda 3 — Página do imóvel que converte
-- Galeria em tela cheia com plantas e vídeo; custo mensal total (parcela + condomínio + IPTU).
-- Preço do m² comparado ao bairro, histórico de preço, "o que tem perto".
-- Botões fixos: WhatsApp, agendar visita, simular financiamento.
-
-### Onda 4 — Google (ser muito mais encontrado)
-- Mapa do site automático e sempre certo (imóveis, bairros, condomínios, empreendimentos, campanhas).
-- Prévias corretas no WhatsApp/Google para todas as páginas; dados estruturados de imóvel, empreendimento e navegação.
-- Páginas de bairro e de "tipo + bairro" mais ricas; páginas de lançamentos e campanhas otimizadas para Google Ads.
-
-### Onda 5 — Leads e campanhas Google/Meta
-- Páginas de destino por produto com formulário curto e WhatsApp, medição de conversões no Google e Meta.
-- Origem do anúncio (campanha, palavra-chave) chega no CRM junto com o lead.
-- Painel no admin: leads por campanha e por empreendimento.
-
-### Onda 5b — Conversão página por página (padrão dos melhores portais)
-Auditoria real, abrindo cada página no celular e no computador, com relatório de falhas antes de mexer.
-- **Home:** busca em destaque, banner da campanha, "Uhome em Foco", prova social (vendas, anos, avaliações Google), WhatsApp sempre visível.
-- **Busca:** "receber alertas deste filtro", "falar com especialista nesta região" após alguns imóveis vistos, sem resultados vira pedido de imóvel.
-- **Página do imóvel/produto:** botões fixos (WhatsApp, agendar visita, simular), "quero saber a parcela", "imóveis parecidos", urgência real (unidades restantes, fim da condição).
-- **Formulários:** no máximo 2 campos (nome e WhatsApp), máscara e validação do telefone, envio em 1 toque, confirmação imediata.
-- **Captura:** saída da página, scroll profundo e retorno do visitante, sem exagero (limites já existentes).
-- **WhatsApp:** mensagem já preenchida com o imóvel e a origem, rodízio de corretor e registro do clique.
-- **Medição:** funil completo (visita, clique, formulário, WhatsApp) por página e por campanha no admin.
-
-### Onda 5c — IA que qualifica o lead antes de chegar no corretor
-- **Assistente Uhome no site:** conversa curta (no chat do site e após enviar o formulário) que pergunta objetivo (morar/investir), faixa de valor, entrada, uso de FGTS/financiamento, prazo para comprar e região.
-- **Nota do lead (quente, morno, frio)** calculada pela IA com base nas respostas e no comportamento (imóveis vistos, tempo, filtros, voltas ao site).
-- **Resumo pronto para o corretor** no CRM: "Busca 2 dorm. no Passo d'Areia, até R$ 350 mil, tem FGTS, quer comprar em 3 meses, viu Open Bosque 4x".
-- **Sugestão automática** de 3 produtos compatíveis e agendamento de visita no próprio chat.
-- Tudo enviado ao CRM pelos gatilhos do banco que já existem; a IA nunca sugere aluguel.
-
-### Onda 6 — Visual e acabamento
-- Refinamento do design system (tipografia, espaçamentos, cores, ícones) e microinterações, mantendo a identidade Uhome.
+## 5. Auditoria visual página por página
+Abrir no computador (1440, 1280, 1024) e no celular (390, 360) e corrigir textos sobrepostos, botões desalinhados, cortes e espaços:
+Home, busca com mapa, página do imóvel, Natal, produto em campanha, link do corretor, Quanto vale meu imóvel, Anunciar, Entrar, favoritos, rodapé.
+- Celular: botões de ação fixos sem cobrir o WhatsApp, área de toque confortável, nada saindo da tela.
+- Entregar fotos de antes e depois de cada página.
 
 ## Detalhes técnicos
-- Nova tabela `campanhas` (slug, nome, tema, datas, banner, textos, condições, ativo) + tabela de ligação `campanha_empreendimentos` (ordem, condição específica). RLS: leitura pública só das ativas e dentro do período; edição só admin.
-- Campo `em_foco` em `empreendimentos` para a vitrine; novos campos para a landing (vídeo, plantas, lazer, condições de pagamento, FAQ, estágio da obra).
-- Rotas `/lancamentos` e `/campanha/:slug` (também sob `/c/:slug` do corretor), SSR/SEO com JSON-LD, sitemap e canônico.
-- Leads com `origem = campanha:<slug>` sincronizados pelos gatilhos do banco já existentes.
-- Temas como conjuntos de cores no design system (sem cores fixas nos componentes).
+- Navbar.tsx reescrito com o dropdown "Mais" (shadcn DropdownMenu), recolhimento por breakpoint e Sheet no mobile; links da campanha via `isCampanhaAtiva` de produtosFoco.ts.
+- Tokens `--natal-*` em index.css redefinidos para os valores do ZIP (HSL); fonte Montserrat como `font-natal` no tailwind.
+- SVG/PNG do ZIP subidos como Lovable Assets.
+- Redirecionamento de /em-foco para /campanha/natal-chave-de-ouro condicionado à data, mantendo também as versões /c/:corretor.
+- HeroSection: remover aba Anunciar e botão duplicado.
+- Validação com Playwright nos tamanhos citados, sem erros de console; testes existentes rodados.

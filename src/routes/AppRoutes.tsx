@@ -21,6 +21,9 @@ import {
   CondominioDetail,
   Condominios,
   CorretorRefLayout,
+  EmFoco,
+  ProdutoFocoPage,
+  CampanhaPage,
   EmpreendimentoDetail,
   FAQ,
   Favoritos,
@@ -63,7 +66,12 @@ export function AppRoutes() {
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/empreendimentos" element={<Condominios />} />
       <Route path="/empreendimentos/:slug" element={<EmpreendimentoDetail />} />
-      <Route path="/lancamentos" element={<Navigate to="/condominios" replace />} />
+      <Route path="/em-foco" element={<EmFoco />} />
+      <Route path="/em-foco/:slug" element={<ProdutoFocoPage />} />
+      <Route path="/campanha/:slug" element={<CampanhaPage />} />
+      <Route path="/lancamentos" element={<Navigate to="/em-foco" replace />} />
+      <Route path="/destaques" element={<Navigate to="/em-foco" replace />} />
+      <Route path="/natal" element={<Navigate to="/campanha/natal-chave-de-ouro" replace />} />
       <Route path="/imoveis" element={<Navigate to="/busca" replace />} />
       <Route path="/comprar" element={<Navigate to="/busca" replace />} />
       <Route path="/venda" element={<Navigate to="/busca?finalidade=venda" replace />} />
@@ -92,6 +100,9 @@ export function AppRoutes() {
         <Route path="condominios/:slug" element={<CondominioDetail />} />
         <Route path="empreendimentos/:slug" element={<EmpreendimentoDetail />} />
         <Route path="mega-cyrela" element={<MegaCyrela />} />
+        <Route path="em-foco" element={<EmFoco />} />
+        <Route path="em-foco/:slug" element={<ProdutoFocoPage />} />
+        <Route path="campanha/:slug" element={<CampanhaPage />} />
         <Route path="sobre" element={<Sobre />} />
         <Route path="guia-bairros" element={<GuiaBairros />} />
         <Route path="avaliar-imovel" element={<AvaliacaoPage />} />

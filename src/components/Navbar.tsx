@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
-import { Menu, X, Sparkles, BarChart3, Building2, MapPin, HelpCircle, Megaphone } from "lucide-react";
+import { Menu, X, Sparkles, BarChart3, Building2, MapPin, HelpCircle, Megaphone, Star } from "lucide-react";
 
 import { UhomeLogo } from "@/components/UhomeLogo";
 import { UserMenu } from "@/components/UserMenu";
@@ -77,6 +77,12 @@ export function Navbar() {
             <div className="mx-2 h-4 w-px bg-border" />
 
             <Link
+              to={prefixLink("/em-foco")}
+              className="flex items-center gap-1 rounded-full px-3 py-1.5 font-body text-[13px] font-semibold text-primary transition-colors hover:bg-primary/10"
+            >
+              <Star className="h-3 w-3" /> Uhome em Foco
+            </Link>
+            <Link
               to={prefixLink("/avaliar-imovel")}
               className="rounded-full px-3 py-1.5 font-body text-[13px] font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
             >
@@ -144,6 +150,13 @@ export function Navbar() {
 
             <div className="my-1 h-px bg-border/60" />
 
+            <MobileNavLink
+              to={prefixLink("/em-foco")}
+              icon={<Star className="h-4 w-4" />}
+              label="Uhome em Foco"
+              accent
+              onClick={() => setMobileOpen(false)}
+            />
             <MobileNavLink
               to={prefixLink("/avaliar-imovel")}
               icon={<BarChart3 className="h-4 w-4" />}

@@ -7,8 +7,9 @@ import { EmpreendimentoLeadForm } from "@/components/EmpreendimentoLeadForm";
 import { useCanonical } from "@/hooks/useCanonical";
 import { useCorretor } from "@/contexts/CorretorContext";
 import { setJsonLd, removeJsonLd } from "@/lib/jsonld";
-import { absUrl, blackAtiva, formatPreco, useCampanhasAtivas, useProdutoFoco, SITE_URL, type MidiaFoco } from "@/lib/produtosFoco";
-import { CorretorContatoCard, useWhatsAppProduto } from "@/components/foco/FocoShared";
+import { absUrl, blackAtiva, formatPreco, useCampanha, useCampanhasAtivas, useProdutoFoco, SITE_URL, type MidiaFoco } from "@/lib/produtosFoco";
+import { CorretorContatoCard, ProdutoFocoCard, useWhatsAppProduto } from "@/components/foco/FocoShared";
+import { Reveal } from "@/components/ui/reveal";
 
 function setMeta(attr: "name" | "property", key: string, content: string) {
   let el = document.querySelector(`meta[${attr}="${key}"]`);
@@ -62,6 +63,8 @@ export default function ProdutoFocoPage() {
   const natal = campanhas.find((c) => c.tema === "natal");
   const black = blackAtiva(natal);
   const modoCorretor = isDirectAccess && !!corretor;
+  const { data: camp } = useCampanha(natal?.slug);
+  const outros = (camp?.produtos ?? []).filter((x) => x.slug !== slug).slice(0, 3);
 
   useEffect(() => {
     if (!p) return;
@@ -159,10 +162,18 @@ export default function ProdutoFocoPage() {
           </div>
         </section>
 
+        <nav aria-label="Seções" className="sticky top-14 z-30 border-b border-border/60 bg-background/90 backdrop-blur">
+          <div className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-5 py-2 sm:px-8 [scrollbar-width:none]">
+            {[["visao-geral","Visão geral"],["condicoes","Condições"],["galeria","Galeria"],["plantas","Plantas"],["lazer","Lazer"],["localizacao","Localização"]].map(([id,l]) => (
+              <a key={id} href={`#${id}`} className="whitespace-nowrap rounded-full px-3 py-1.5 font-body text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">{l}</a>
+            ))}
+          </div>
+        </nav>
+
         <div className="mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:px-8 lg:grid-cols-[1fr_380px]">
           <div className="min-w-0 space-y-14">
             {/* Resumo */}
-            <section>
+            <section id="visao-geral" className="scroll-mt-32">
               <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
                 {[
                   { i: Building2, l: "Tipo", v: fi.segmento?.split(" (")[0] ?? p.tipo },
@@ -182,7 +193,7 @@ export default function ProdutoFocoPage() {
 
             {/* Condição */}
             {(precos.length > 0 || bk) && (
-              <section className={`overflow-hidden rounded-2xl ${black ? "bg-noir text-noir-foreground" : natal ? "bg-natal text-natal-foreground" : "bg-secondary"}`}>
+              <section id="condicoes" className={`scroll-mt-32 overflow-hidden rounded-2xl ${black ? "bg-noir text-noir-foreground" : natal ? "bg-natal text-natal-foreground" : "bg-secondary"}`}>
                 <div className="grid gap-0 sm:grid-cols-[1fr_auto]">
                   <div className="p-6 sm:p-8">
                     <p className="flex items-center gap-2 font-body text-xs font-bold uppercase tracking-widest text-natal-gold">
@@ -213,7 +224,7 @@ export default function ProdutoFocoPage() {
 
             {/* Galeria */}
             {fotos.length > 0 && (
-              <section>
+              <section id="galeria" className="scroll-mt-32">
                 <h2 className="font-heading text-2xl font-bold text-foreground">Galeria</h2>
                 <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
                   {fotos.map((f, i) => (
@@ -228,7 +239,7 @@ export default function ProdutoFocoPage() {
 
             {/* Tipologias e plantas */}
             {(fi.tipologias?.length || p.plantas.length) ? (
-              <section>
+              <section id="plantas" className="scroll-mt-32">
                 <h2 className="font-heading text-2xl font-bold text-foreground">Plantas e tipologias</h2>
                 {fi.tipologias?.length ? (
                   <div className="mt-5 overflow-x-auto rounded-xl border border-border/60">
@@ -263,7 +274,7 @@ export default function ProdutoFocoPage() {
 
             {/* Lazer e diferenciais */}
             {(fi.lazer?.length || fi.unidade?.length) ? (
-              <section className="grid gap-8 sm:grid-cols-2">
+              <section id="lazer" className="scroll-mt-32 grid gap-8 sm:grid-cols-2">
                 {fi.lazer?.length ? (
                   <div>
                     <h2 className="font-heading text-2xl font-bold text-foreground">Lazer</h2>
@@ -284,7 +295,7 @@ export default function ProdutoFocoPage() {
             ) : null}
 
             {/* Localização */}
-            <section>
+            <section id="localizacao" className="scroll-mt-32">
               <h2 className="font-heading text-2xl font-bold text-foreground">Localização</h2>
               <p className="mt-2 font-body text-muted-foreground">{[p.endereco, p.bairro, p.cidade].filter(Boolean).join(", ")}{fi.referencia ? ` · ${fi.referencia}` : ""}</p>
               {fi.maps_url && (
@@ -323,7 +334,7 @@ export default function ProdutoFocoPage() {
           </div>
 
           {/* Contato */}
-          <aside className="lg:sticky lg:top-20 lg:self-start" id="contato">
+          <aside className="scroll-mt-32 lg:sticky lg:top-32 lg:self-start" id="contato">
             {modoCorretor ? (
               <CorretorContatoCard produto={p} />
             ) : (
@@ -339,11 +350,19 @@ export default function ProdutoFocoPage() {
             <Link to={prefixLink("/em-foco")} className="mt-4 block text-center font-body text-sm font-semibold text-primary">Ver outros produtos em foco</Link>
           </aside>
         </div>
+        {outros.length > 0 && (
+          <Reveal className="mx-auto max-w-7xl px-5 pb-16 sm:px-8">
+            <h2 className="font-heading text-2xl font-bold text-foreground">Outros produtos do Natal</h2>
+            <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {outros.map((o) => <ProdutoFocoCard key={o.id} p={o} selo={black ? "Black Natal" : "Condição de Natal"} campanha={black ? "black" : "natal"} />)}
+            </div>
+          </Reveal>
+        )}
       </main>
 
       {/* Barra fixa no celular */}
       <div className="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-border bg-background/95 p-3 backdrop-blur lg:hidden" style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}>
-        <a href={waUrl} target="_blank" rel="noopener noreferrer" className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary py-3.5 font-body text-sm font-bold text-primary-foreground">
+        <a href={waUrl} target="_blank" rel="noopener noreferrer" className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3.5 font-body text-sm font-bold ${natal && !black ? "bg-natal-gold text-natal-deep" : "bg-primary text-primary-foreground"}`}>
           <MessageCircle className="h-4 w-4" /> {modoCorretor ? `WhatsApp de ${corretor!.nome.split(" ")[0]}` : "Chamar no WhatsApp"}
         </a>
         {!modoCorretor && <a href="#contato" className="rounded-xl border border-border px-4 py-3.5 font-body text-sm font-semibold text-foreground">Condições</a>}

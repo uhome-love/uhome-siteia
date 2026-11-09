@@ -8,6 +8,7 @@ import { useCorretor } from "@/contexts/CorretorContext";
 import { blackAtiva, useCampanha } from "@/lib/produtosFoco";
 import { ProdutoFocoCard } from "@/components/foco/FocoShared";
 import { WHATSAPP_NUMBER } from "@/lib/whatsapp";
+import { Reveal } from "@/components/ui/reveal";
 import { NATAL_ART, NatalLuzes, Ouro, natalBg } from "@/components/foco/NatalArt";
 
 function useCountdown(fim?: string | null) {
@@ -48,7 +49,7 @@ export default function CampanhaPage() {
   const tema = black ? "bg-noir text-noir-foreground" : `${natalBg} text-natal-foreground`;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20 lg:pb-0">
       <Navbar />
       <main className="pt-14">
         <section className={`relative overflow-hidden ${tema}`}>
@@ -100,7 +101,7 @@ export default function CampanhaPage() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-7xl px-5 py-14 sm:px-8">
+        <Reveal><section className="mx-auto max-w-7xl px-5 py-14 sm:px-8">
           <h2 className="font-heading text-3xl font-bold text-foreground">Empreendimentos participantes</h2>
           <p className="mt-2 font-body text-muted-foreground">{data.produtos.length} produtos selecionados, do primeiro apê ao alto padrão.</p>
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -108,8 +109,13 @@ export default function CampanhaPage() {
               <ProdutoFocoCard key={p.id} p={p} selo={black ? "Black Natal" : "Condição de Natal"} campanha={black ? "black" : "natal"} />
             ))}
           </div>
-        </section>
+        </section></Reveal>
       </main>
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-natal-gold/30 bg-natal-deep/95 p-3 backdrop-blur lg:hidden" style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}>
+        <a href={`https://wa.me/${numero}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 rounded-xl bg-natal-gold py-3.5 font-body text-sm font-bold text-natal-deep">
+          <MessageCircle className="h-4 w-4" /> Quero as condições de Natal
+        </a>
+      </div>
       <Footer />
     </div>
   );

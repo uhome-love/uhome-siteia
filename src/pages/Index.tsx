@@ -2,6 +2,8 @@ import { useEffect, lazy, Suspense } from "react";
 import { Navbar } from "@/components/Navbar";
 import { HeroSection } from "@/components/HeroSection";
 import { HomeCampanhaBanner } from "@/components/HomeCampanhaBanner";
+import { HomeFaixaConfianca } from "@/components/home/HomeFaixaConfianca";
+import { Reveal } from "@/components/ui/reveal";
 
 
 const Footer = lazy(() => import("../components/Footer.tsx").then(m => ({ default: m.Footer })));
@@ -53,12 +55,13 @@ const Index = () => {
       <Navbar />
       <main>
         <HeroSection />
+        <HomeFaixaConfianca />
         <HomeCampanhaBanner />
         <Suspense fallback={null}>
-          <EmpreendimentosDestaque />
-          <FeaturedNeighborhoods />
-          <HomeCorretorBusca />
-          <HomeConfianca />
+          <Reveal><EmpreendimentosDestaque /></Reveal>
+          <Reveal><FeaturedNeighborhoods /></Reveal>
+          <Reveal><HomeCorretorBusca /></Reveal>
+          <Reveal><HomeConfianca /></Reveal>
           <SeoLinksSection />
           <HomeFaqSection faqs={HOME_FAQS} />
         </Suspense>

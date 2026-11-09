@@ -41,23 +41,27 @@ export function HomeCampanhaBanner() {
           className={`group relative block overflow-hidden rounded-3xl ${black ? "bg-noir text-noir-foreground" : `${natalBg} text-natal-foreground`}`}
         >
           <NatalLuzes />
-          <div className="relative grid items-center gap-6 px-6 pb-8 pt-4 sm:px-10 sm:pb-10 lg:grid-cols-[1fr_auto]">
+          <div className="relative grid items-center gap-4 px-6 pb-6 pt-5 sm:px-10 sm:pb-7 lg:grid-cols-[1fr_auto]">
             <div className="relative z-10">
-              <img src={NATAL_ART.selo} alt="Natal Chave de Ouro" className="h-14 w-auto sm:h-16" />
-              <h2 className="mt-4 font-natal text-3xl font-extrabold leading-tight sm:text-5xl">
-                {black ? <>Black Natal <Ouro>Uhome</Ouro></> : <>Natal <Ouro>Chave de Ouro</Ouro></>}
-              </h2>
-              <p className="mt-3 max-w-xl font-body text-sm text-natal-foreground/85 sm:text-base">{c.subtitulo}</p>
-              <span className="mt-6 inline-flex h-12 items-center gap-2 rounded-full px-6 font-body text-sm font-bold text-natal-deep transition-transform group-hover:scale-[1.02]" style={{ backgroundImage: "var(--natal-gold-grad)" }}>
-                Ver os {produtos.length || ""} empreendimentos <ArrowRight className="h-4 w-4" />
-              </span>
-              <p className="mt-3 font-body text-xs text-natal-foreground/70">
-                {alvo > agora && <><strong className="text-natal-gold">Faltam {dias} dias</strong> · </>}
-                {black ? "condições Black só até 29/11" : "contratos até 18/12 · comprou, ganhou presente da urna premiada"}
-              </p>
+              <div className="flex items-center gap-4">
+                <img src={NATAL_ART.selo} alt="Natal Chave de Ouro" className="h-12 w-auto flex-shrink-0 sm:h-14" />
+                <h2 className="font-natal text-2xl font-extrabold leading-tight sm:text-4xl">
+                  {black ? <>Black Natal <Ouro>Uhome</Ouro></> : <>Natal <Ouro>Chave de Ouro</Ouro></>}
+                </h2>
+              </div>
+              <p className="mt-2 max-w-xl font-body text-sm text-natal-foreground/85">{c.subtitulo}</p>
+              <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
+                <span className="inline-flex h-11 items-center gap-2 rounded-full px-5 font-body text-sm font-bold text-natal-deep transition-transform group-hover:scale-[1.02]" style={{ backgroundImage: "var(--natal-gold-grad)" }}>
+                  Ver os {produtos.length || ""} empreendimentos <ArrowRight className="h-4 w-4" />
+                </span>
+                <p className="font-body text-xs text-natal-foreground/70">
+                  {alvo > agora && <><strong className="text-natal-gold">Faltam {dias} dias</strong> · </>}
+                  {black ? "condições Black só até 29/11" : "contratos até 18/12 · comprou, ganhou presente da urna"}
+                </p>
+              </div>
             </div>
-            <img src={NATAL_ART.homi} alt="" loading="lazy" className="pointer-events-none absolute -bottom-4 right-2 hidden h-56 w-auto lg:static lg:block lg:h-64" />
-            <img src={NATAL_ART.presentes} alt="" loading="lazy" className="pointer-events-none absolute -bottom-2 -right-4 h-28 w-auto opacity-90 lg:hidden" />
+            <img src={NATAL_ART.homi} alt="" loading="lazy" className="uh-float pointer-events-none hidden h-40 w-auto self-end lg:block xl:mr-6" />
+            <img src={NATAL_ART.presentes} alt="" loading="lazy" className="pointer-events-none absolute -bottom-2 -right-4 h-20 w-auto opacity-80 lg:hidden" />
           </div>
         </Link>
       )}

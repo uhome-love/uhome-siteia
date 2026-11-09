@@ -13,16 +13,18 @@ Analisei a página inteira no computador e no celular. Ela está limpa, mas hoje
 
 ## O que vou fazer
 
-### 1. Imóveis logo no começo (maior impacto)
-- Nova faixa **"Imóveis à venda em destaque"** logo depois do Natal, com abas: Mais procurados, Novos esta semana, Até R$ 500 mil e Alto padrão.
-- Os cards são os mesmos da busca (fotos que deslizam, preço, quartos, área privativa, favoritar), em carrossel com setas no computador e deslize no celular.
-- **"Vistos recentemente"**: para quem já navegou, aparece no topo dessa faixa com os últimos imóveis abertos.
+### 1. O destaque é o Natal
+- Não entra faixa de imóveis avulsos. O destaque da página inicial é o **Natal Chave de Ouro**, mais completo:
+  - Cards dos empreendimentos com preço, entrega e selo do Natal, mais filtros rápidos por cidade e faixa (Até R$ 400 mil, R$ 400 mil a 1 mi, Acima de R$ 1 mi).
+  - Contagem regressiva até 18/12 e o "Comprou, ganhou" da urna premiada no banner.
+  - Botão "Quero as condições de Natal" direto no WhatsApp.
+- **"Vistos recentemente"** aparece discreto logo abaixo, só para quem já abriu imóveis.
 
 ### 2. Número único e verdadeiro
 - O total de imóveis vem de uma única contagem do banco e aparece igual em todo lugar: abertura, "Por que a Uhome" e rodapé.
 
 ### 3. Prova social e confiança
-- Faixa **"Quem comprou com a Uhome"** com 3 depoimentos e nota/estrelas.
+- Faixa **"Avaliações no Google"** com a nota real, o total de avaliações e as mais recentes, puxadas do Perfil da Uhome no Google. Para isso vou pedir a conexão da conta Google que administra o perfil. Se não der para conectar, a seção fica escondida, nunca com depoimentos inventados.
 - **"Conheça nossos corretores"**: carrossel com foto, nome e bairros de especialidade, com botão de WhatsApp de cada um. Usa os corretores já cadastrados.
 - Selos: CRECI, anos de mercado e imóveis vendidos.
 
@@ -45,8 +47,8 @@ Analisei a página inteira no computador e no celular. Ela está limpa, mas hoje
 ## Ordem final da página
 ```text
 Abertura com busca
-Natal Chave de Ouro (banner + empreendimentos)
-Imóveis à venda em destaque (+ vistos recentemente)
+Natal Chave de Ouro (banner + empreendimentos com filtros) = destaque
+Vistos recentemente (só para quem já navegou)
 Bairros em destaque (com preço médio)
 Como funciona (3 passos)
 Não achou? Um corretor busca para você
@@ -57,12 +59,14 @@ Rodapé
 ```
 
 ## Preciso de você
-- **Depoimentos reais:** nomes, textos e, se possível, a nota do Google. Sem isso eu deixo a seção pronta e escondida até você mandar. Não vou inventar depoimentos.
+- **Google:** aprovar a conexão da conta Google que administra o perfil da Uhome (vai aparecer um cartão aqui no chat).
+- **Corretores:** os que estiverem sem foto no cadastro ficam de fora do carrossel até ter foto.
 - **Números da Uhome:** anos de mercado e imóveis vendidos, para os selos.
 
 ## Detalhes técnicos
 - Contagem única: hook `useTotalImoveis` (queryKey compartilhada) usado em HeroSection, PorQueUhome e SeoLinksSection, substituindo os números fixos.
-- Faixa de imóveis: reaproveitar SearchPropertyCard e as queries existentes (`status = disponivel`, com foto, `.range`), com abas via filtros prontos. Vistos recentemente a partir de `localStorage.imoveis_vistos`.
+- Destaque Natal: evoluir HomeCampanhaBanner com chips de filtro e countdown reaproveitado do CampanhaPage. Vistos recentemente a partir de `localStorage.imoveis_vistos`.
+- Avaliações: conector Google Business Profile ligado ao projeto; uma edge function lê as avaliações (my_business v4 reviews) e guarda um cache numa tabela pública de leitura, atualizada 1x por dia. O site só lê esse cache.
 - Corretores: leitura pública dos perfis já sincronizados (só os campos públicos).
 - Lead "corretor busca para você": inserir na tabela de leads existente; a sincronização com o CRM continua pelos gatilhos do banco, nunca pelo site.
 - Preço médio por bairro: RPC agregada com cache de 10 minutos.

@@ -1,5 +1,6 @@
+import { useRef } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import { useCorretor } from "@/contexts/CorretorContext";
 import { useCampanhaDestaque, useProdutosFoco, formatPreco } from "@/lib/produtosFoco";
 import { NATAL_ART, NatalLuzes, Ouro, natalBg } from "@/components/foco/NatalArt";
@@ -9,6 +10,8 @@ export function HomeCampanhaBanner() {
   const { prefixLink } = useCorretor();
   const { campanha: c, black } = useCampanhaDestaque();
   const { data: produtos = [] } = useProdutosFoco();
+  const trilho = useRef<HTMLDivElement>(null);
+  const rolar = (dir: number) => trilho.current?.scrollBy({ left: dir * (trilho.current.clientWidth * 0.8), behavior: "smooth" });
   if (!c && !produtos.length) return null;
   const linkTodos = c ? `/campanha/${c.slug}` : "/em-foco";
 
@@ -45,9 +48,13 @@ export function HomeCampanhaBanner() {
               {c ? <img src={NATAL_ART.chave} alt="" className="h-5 w-auto" /> : <Sparkles className="h-5 w-5 text-primary" />}
               {c ? "Empreendimentos do Natal" : "Uhome em Foco"}
             </h2>
-            <Link to={prefixLink(linkTodos)} className="whitespace-nowrap font-body text-sm font-semibold text-primary">Ver todos →</Link>
+            <div className="flex items-center gap-2">
+              <Link to={prefixLink(linkTodos)} className="whitespace-nowrap font-body text-sm font-semibold text-primary">Ver todos →</Link>
+              <button onClick={() => rolar(-1)} aria-label="Anteriores" className="hidden h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-secondary md:flex"><ChevronLeft className="h-4 w-4" /></button>
+              <button onClick={() => rolar(1)} aria-label="Próximos" className="hidden h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-secondary md:flex"><ChevronRight className="h-4 w-4" /></button>
+            </div>
           </div>
-          <div className="-mx-4 mt-4 flex snap-x gap-4 overflow-x-auto px-4 pb-2 sm:-mx-8 sm:px-8">
+          <div ref={trilho} className="scrollbar-none mt-4 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 [scrollbar-width:none]">
             {produtos.map((p) => (
               <Link key={p.id} to={prefixLink(`/em-foco/${p.slug}`)} className="group w-[72vw] max-w-[260px] flex-shrink-0 snap-start overflow-hidden rounded-2xl border border-border/60 bg-card sm:w-64">
                 <div className="relative aspect-[4/3] overflow-hidden bg-muted">

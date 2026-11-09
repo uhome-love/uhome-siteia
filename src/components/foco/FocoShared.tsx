@@ -44,9 +44,12 @@ export function ProdutoFocoCard({ p, selo, campanha }: { p: ProdutoFoco; selo?: 
             {selo}
           </span>
         )}
-        {p.status_obra && (
-          <span className="absolute bottom-3 left-3 rounded-full bg-background/90 px-3 py-1 font-body text-[11px] font-semibold text-foreground backdrop-blur">
-            {p.status_obra}
+        {(p.status_obra || p.entrega) && (
+          <span className="absolute bottom-3 left-3 flex flex-wrap gap-1.5">
+            {p.status_obra && <span className="rounded-full bg-background/90 px-3 py-1 font-body text-[11px] font-semibold text-foreground backdrop-blur">{p.status_obra}</span>}
+            {p.entrega && !/pronto/i.test(p.status_obra ?? "") && (
+              <span className="rounded-full bg-foreground/80 px-3 py-1 font-body text-[11px] font-semibold text-background backdrop-blur">Entrega {p.entrega}</span>
+            )}
           </span>
         )}
       </div>

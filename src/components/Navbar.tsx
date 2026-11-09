@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import {
-  Menu, Sparkles, BarChart3, Building2, MapPin, HelpCircle, Megaphone, Star, ChevronDown, Search, Gift, BookOpen,
+  Menu, Sparkles, BarChart3, Building2, MapPin, HelpCircle, Megaphone, Star, ChevronDown, Search, Gift,
 } from "lucide-react";
 
 import { UhomeLogo } from "@/components/UhomeLogo";
@@ -10,6 +10,7 @@ import { useCorretor } from "@/contexts/CorretorContext";
 import { useQueryClient } from "@tanstack/react-query";
 import { prefetchBusca } from "@/lib/prefetch";
 import { useCampanhaDestaque } from "@/lib/produtosFoco";
+import { NATAL_ART } from "@/components/foco/NatalArt";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -55,13 +56,6 @@ export function Navbar() {
     : { to: "/em-foco", label: "Uhome em Foco", campanha: false };
   const destaqueAtivo = path.includes("/campanha/") || path.includes("/em-foco");
 
-  const mais = [
-    { to: "/avaliar-imovel", label: "Quanto vale meu imóvel?", icon: BarChart3 },
-    { to: "/bairros", label: "Bairros", icon: MapPin },
-    { to: "/condominios", label: "Condomínios", icon: Building2 },
-    { to: "/blog", label: "Blog", icon: BookOpen },
-    { to: "/faq", label: "Ajuda", icon: HelpCircle },
-  ];
 
   const tab = (active: boolean) =>
     `${linkBase} ${active ? "bg-foreground text-background" : "text-muted-foreground hover:bg-secondary hover:text-foreground"}`;
@@ -75,51 +69,42 @@ export function Navbar() {
 
         {/* Desktop */}
         <div className="hidden min-w-0 flex-1 items-center justify-center gap-1 lg:flex">
-          <Link
-            to={prefixLink("/busca?finalidade=venda")}
-            onMouseEnter={handlePrefetchBusca}
-            onMouseDown={handlePrefetchBusca}
-            className={tab(isSearchPage && !modoIA)}
-          >
-            Comprar
-          </Link>
-          <Link to={prefixLink("/busca?modo=ia")} className={tab(isSearchPage && modoIA)}>
-            <Sparkles className="h-3.5 w-3.5" /> Busca IA
-          </Link>
+          <NavDropdown
+            label="Comprar"
+            active={isSearchPage}
+            onHover={handlePrefetchBusca}
+            items={[
+              { to: "/busca?finalidade=venda", label: "Buscar imóveis", desc: "Filtros e mapa", icon: Search },
+              { to: "/busca?modo=ia", label: "Busca com IA", desc: "Descreva o imóvel ideal", icon: Sparkles },
+              { to: "/bairros", label: "Bairros", desc: "Guia dos melhores endereços", icon: MapPin },
+              { to: "/condominios", label: "Condomínios", desc: "Prédios e empreendimentos", icon: Building2 },
+              { to: "/imoveis-porto-alegre", label: "Imóveis em Porto Alegre", desc: "Tudo sobre a capital", icon: Star },
+            ].map((i) => ({ ...i, to: prefixLink(i.to) }))}
+          />
           <Link
             to={prefixLink(destaque.to)}
-            className={
-              destaque.campanha
-                ? `${linkBase} border border-natal-gold/50 bg-natal text-natal-gold hover:bg-natal-deep`
-                : tab(destaqueAtivo)
-            }
+            className={`${linkBase} ${destaqueAtivo ? "bg-secondary text-foreground" : "text-foreground hover:bg-secondary"}`}
           >
-            {destaque.campanha ? <Gift className="h-3.5 w-3.5" /> : <Star className="h-3.5 w-3.5" />}
+            {destaque.campanha ? (
+              <img src={NATAL_ART.chave} alt="" className="h-3 w-auto" />
+            ) : (
+              <Star className="h-3.5 w-3.5 text-primary" />
+            )}
             {destaque.label}
+            {destaque.campanha && <span className="h-1.5 w-1.5 rounded-full bg-natal-gold" aria-hidden />}
           </Link>
-          <DropdownMenu modal={false}>
-            <DropdownMenuTrigger className={`${linkBase} text-muted-foreground hover:bg-secondary hover:text-foreground data-[state=open]:bg-secondary`}>
-              Mais <ChevronDown className="h-3.5 w-3.5" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="center" className="w-60 rounded-xl p-1.5">
-              {mais.map((m) => (
-                <DropdownMenuItem key={m.to} asChild className="cursor-pointer rounded-lg px-3 py-2.5">
-                  <Link to={prefixLink(m.to)} className="flex items-center gap-3 font-body text-sm">
-                    <m.icon className="h-4 w-4 text-muted-foreground" /> {m.label}
-                  </Link>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <NavDropdown
+            label="Proprietários"
+            active={path.includes("/anunciar") || path.includes("/avaliar-imovel")}
+            items={[
+              { to: "/anunciar", label: "Anunciar imóvel", desc: "Venda com a Uhome", icon: Megaphone },
+              { to: "/avaliar-imovel", label: "Quanto vale meu imóvel?", desc: "Avaliação gratuita", icon: BarChart3 },
+            ].map((i) => ({ ...i, to: prefixLink(i.to) }))}
+          />
+          <Link to={prefixLink("/faq")} className={tab(path.endsWith("/faq"))}>Ajuda</Link>
         </div>
 
-        <div className="ml-auto hidden flex-shrink-0 items-center gap-2 lg:flex">
-          <Link
-            to={prefixLink("/anunciar")}
-            className="inline-flex h-9 items-center whitespace-nowrap rounded-full border border-border px-4 font-body text-[13px] font-semibold text-foreground transition-colors hover:border-foreground"
-          >
-            Anunciar imóvel
-          </Link>
+        <div className="ml-auto hidden flex-shrink-0 items-center lg:flex">
           <UserMenu />
         </div>
 
@@ -147,6 +132,7 @@ export function Navbar() {
               <MobileNavLink to={prefixLink("/busca?modo=ia")} icon={<Sparkles className="h-4 w-4" />} label="Busca com IA" />
               <MobileNavLink to={prefixLink("/bairros")} icon={<MapPin className="h-4 w-4" />} label="Bairros" />
               <MobileNavLink to={prefixLink("/condominios")} icon={<Building2 className="h-4 w-4" />} label="Condomínios" />
+              <MobileNavLink to={prefixLink("/imoveis-porto-alegre")} icon={<Star className="h-4 w-4" />} label="Imóveis em Porto Alegre" />
             </Group>
 
             <Link
@@ -166,13 +152,42 @@ export function Navbar() {
             </Group>
 
             <Group title="Uhome">
-              <MobileNavLink to={prefixLink("/blog")} icon={<BookOpen className="h-4 w-4" />} label="Blog" />
               <MobileNavLink to={prefixLink("/faq")} icon={<HelpCircle className="h-4 w-4" />} label="Ajuda" />
             </Group>
           </div>
         </SheetContent>
       </Sheet>
     </nav>
+  );
+}
+
+type NavItem = { to: string; label: string; desc: string; icon: React.ComponentType<{ className?: string }> };
+
+function NavDropdown({ label, items, active, onHover }: { label: string; items: NavItem[]; active?: boolean; onHover?: () => void }) {
+  return (
+    <DropdownMenu modal={false}>
+      <DropdownMenuTrigger
+        onMouseEnter={onHover}
+        className={`${linkBase} ${active ? "bg-secondary text-foreground" : "text-muted-foreground hover:bg-secondary hover:text-foreground"} data-[state=open]:bg-secondary data-[state=open]:text-foreground`}
+      >
+        {label} <ChevronDown className="h-3.5 w-3.5 opacity-60" />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" sideOffset={10} className="w-72 rounded-2xl p-2">
+        {items.map((m) => (
+          <DropdownMenuItem key={m.to} asChild className="cursor-pointer rounded-xl p-2.5">
+            <Link to={m.to} className="flex items-start gap-3">
+              <span className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-secondary text-foreground">
+                <m.icon className="h-4 w-4" />
+              </span>
+              <span>
+                <span className="block font-body text-sm font-semibold text-foreground">{m.label}</span>
+                <span className="block font-body text-xs text-muted-foreground">{m.desc}</span>
+              </span>
+            </Link>
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 

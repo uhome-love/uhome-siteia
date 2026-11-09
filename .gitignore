@@ -14,8 +14,8 @@ middleware.ts
 middleware.js
 next.config.js
 next.config.ts
-pages/
-app/
+/pages/
+/app/
 
 # Variáveis de ambiente
 .env

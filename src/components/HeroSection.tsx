@@ -10,7 +10,6 @@ import { bairrosData } from "@/data/bairros";
 import { CIDADES_PERMITIDAS } from "@/services/imoveis";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { prefetchBusca } from "@/lib/prefetch";
-import { useCorretor } from "@/contexts/CorretorContext";
 import { blackAtiva, useCampanhasAtivas } from "@/lib/produtosFoco";
 
 function HeroFocoButtons() {

@@ -799,6 +799,73 @@ async function renderEmpreendimento(slug: string) {
     `<h1>${esc(emp.nome)}</h1><p>${esc(desc)}</p>${emp.imagem_principal ? `<img src="${esc(emp.imagem_principal)}" alt="${esc(emp.nome)}" width="800" height="600" />` : ""}`);
 }
 
+/* ── Uhome em Foco / campanhas ───────────────────────── */
+
+function absAsset(u?: string | null) {
+  if (!u) return OG_DEFAULT;
+  return u.startsWith("http") ? u : `${SITE}${u}`;
+}
+
+function precoCurto(v?: number | null) {
+  if (!v) return "";
+  if (v >= 1_000_000) return `R$ ${(v / 1_000_000).toLocaleString("pt-BR", { maximumFractionDigits: 2 })} mi`;
+  return `R$ ${Math.round(v / 1000).toLocaleString("pt-BR")} mil`;
+}
+
+async function corretorNome(slug?: string) {
+  if (!slug) return null;
+  const { data } = await supabase.from("profiles").select("nome").eq("slug_ref", slug).eq("ativo", true).maybeSingle();
+  return data?.nome ?? null;
+}
+
+async function renderProdutoFoco(slug: string, corretorSlug?: string) {
+  const { data: p } = await supabase
+    .from("produtos_foco")
+    .select("slug, nome, bairro, cidade, incorporadora, preco_a_partir, resumo, capa_url, galeria")
+    .eq("slug", slug)
+    .eq("ativo", true)
+    .maybeSingle();
+  if (!p) return null;
+  const nomeCorretor = await corretorNome(corretorSlug);
+  const preco = precoCurto(p.preco_a_partir);
+  const title = nomeCorretor
+    ? `${p.nome} · enviado por ${nomeCorretor} | Uhome`
+    : `${p.nome} | ${p.bairro}, ${p.cidade} | Uhome em Foco`;
+  const desc = `${p.nome} em ${p.bairro}, ${p.cidade}${preco ? `, a partir de ${preco}` : ""}. ${p.resumo ?? ""}`;
+  const canonical = `${SITE}/em-foco/${slug}`;
+  const imgs = ((p.galeria as { url: string }[]) ?? []).slice(0, 6).map((g) => absAsset(g.url));
+  const ld = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Residence",
+    name: p.nome,
+    description: p.resumo,
+    image: imgs,
+    url: canonical,
+    address: { "@type": "PostalAddress", addressLocality: p.cidade, addressRegion: "RS", addressCountry: "BR" },
+  });
+  return html(title, desc, absAsset(p.capa_url), canonical, [orgJsonLd(), ld],
+    `<h1>${esc(p.nome)}</h1><p>${esc(desc)}</p>${imgs.map((u) => `<img src="${esc(u)}" alt="${esc(p.nome)}" />`).join("")}`);
+}
+
+async function renderEmFoco() {
+  const { data } = await supabase.from("produtos_foco").select("slug, nome, bairro, capa_url").eq("ativo", true).eq("em_foco", true).order("ordem");
+  const list = data ?? [];
+  const desc = "Os empreendimentos com as melhores condições do momento em Porto Alegre e Canoas: lançamentos, obras e prontos para morar.";
+  return html("Uhome em Foco: lançamentos e oportunidades | Uhome", desc, absAsset(list[0]?.capa_url), `${SITE}/em-foco`, [orgJsonLd()],
+    `<h1>Uhome em Foco</h1><p>${esc(desc)}</p><ul>${list.map((p) => `<li><a href="${SITE}/em-foco/${esc(p.slug)}">${esc(p.nome)} — ${esc(p.bairro ?? "")}</a></li>`).join("")}</ul>`);
+}
+
+async function renderCampanha(slug: string) {
+  const { data: c } = await supabase.from("campanhas").select("id, nome, titulo, subtitulo, banner_url").eq("slug", slug).eq("ativo", true).maybeSingle();
+  if (!c) return null;
+  const { data: links } = await supabase.from("campanha_produtos").select("produto_id").eq("campanha_id", c.id);
+  const ids = (links ?? []).map((l) => l.produto_id);
+  const { data: prods } = ids.length ? await supabase.from("produtos_foco").select("slug, nome, capa_url").in("id", ids) : { data: [] };
+  const desc = c.subtitulo ?? "";
+  return html(`${c.titulo ?? c.nome} | Uhome`, desc, absAsset(c.banner_url || prods?.[0]?.capa_url), `${SITE}/campanha/${slug}`, [orgJsonLd()],
+    `<h1>${esc(c.titulo ?? c.nome)}</h1><p>${esc(desc)}</p><ul>${(prods ?? []).map((p) => `<li><a href="${SITE}/em-foco/${esc(p.slug)}">${esc(p.nome)}</a></li>`).join("")}</ul>`);
+}
+
 /* ── bairros list page ───────────────────────────────── */
 
 async function renderBairros() {
@@ -1195,6 +1262,12 @@ Deno.serve(async (req) => {
     } else if (path.startsWith("/empreendimentos/")) {
       const slug = path.replace("/empreendimentos/", "").replace(/\/$/, "");
       rendered = await renderEmpreendimento(slug);
+    } else if (path === "/em-foco" || path === "/lancamentos" || path === "/destaques") {
+      rendered = await renderEmFoco();
+    } else if (path.startsWith("/em-foco/")) {
+      rendered = await renderProdutoFoco(path.replace("/em-foco/", "").replace(/\/$/, ""), corretorSlug);
+    } else if (path.startsWith("/campanha/") || path === "/natal") {
+      rendered = await renderCampanha(path === "/natal" ? "natal-chave-de-ouro" : path.replace("/campanha/", "").replace(/\/$/, ""));
     } else if (path.match(/\/vitrine\/[a-f0-9-]+/)) {
       const parts = path.split("/").filter(Boolean);
       if (parts[0] === "vitrine") {

@@ -31,11 +31,18 @@ Trabalho em 4 etapas. Cada etapa é entregue e testada antes da próxima. Busca,
 - Pesquisa de palavras-chave em Porto Alegre, Litoral e Serra, só de compra.
 - Primeira campanha criada **pausada**, para você aprovar antes de gastar.
 
-## Etapa 4 — Google orgânico
+- Todo lead de anúncio chega ao CRM qualificado e com contexto: campanha, palavra buscada, anúncio clicado, página e conversa com a LIA.
+
+## Etapa 4 — Google orgânico (meta: liderar buscas de imobiliária e imóveis no RS)
+- Pesquisa das buscas mais importantes ("imobiliária Porto Alegre", "apartamento à venda + bairro", lançamentos) e dos concorrentes que aparecem hoje.
+- Ninguém consegue garantir a 1ª posição no Google; o plano faz tudo que mais pesa para chegar lá e acompanha a evolução mês a mês.
 - Revisão de títulos, descrições, dados estruturados e mapa do site.
 - Páginas por bairro e faixa de preço com conteúdo real.
 - Velocidade: primeira foto prioritária, fotos leves no celular.
 - Conectar o Google Search Console para acompanhar resultados.
+
+## Qualidade geral (em todas as etapas)
+- Revisão de velocidade, beleza, organização e funcionamento em computador e celular, página por página, sem quebrar busca, mapa, sincronização e Natal.
 
 ## O que preciso de você
 - Preferência: a conversa do site roda **dentro do CRM** (o site só repassa as mensagens), para a LIA ser uma só. Se o CRM ainda não aceitar conversas vindas do site, preparo um texto pronto para você colar lá.

@@ -815,9 +815,9 @@ const Search = () => {
       <div className={`relative flex flex-wrap items-center justify-between gap-2 border-b border-border bg-background px-4 py-3 sm:px-6 sm:py-4 ${sortOpen ? "z-30" : "z-0"}`}>
         <div className="flex items-center gap-2">
           <div>
-            <div className="font-body text-lg font-extrabold leading-tight text-foreground sm:text-[22px]">
-              {animatedTotal.toLocaleString("pt-BR")} imóveis
-            </div>
+            <h1 className="font-body text-lg font-extrabold leading-tight text-foreground sm:text-[22px]">
+              {animatedTotal.toLocaleString("pt-BR")} imóveis<span className="sr-only"> à venda em {filters.cidade || "Porto Alegre"}</span>
+            </h1>
             <div className="mt-0.5 font-body text-xs text-muted-foreground sm:text-sm">
               à venda em {filters.cidade || "Porto Alegre"}
               {filters.bairro ? (() => {

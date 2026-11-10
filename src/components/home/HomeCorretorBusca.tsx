@@ -39,7 +39,7 @@ export function HomeCorretorBusca() {
   };
 
   return (
-    <section className="py-8 sm:py-10">
+    <section id="corretor-busca" className="scroll-mt-20 py-8 sm:py-10">
       <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-8 lg:grid-cols-[1fr_1.1fr] lg:items-center">
         <div>
           <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary"><UserSearch className="h-6 w-6" /></span>

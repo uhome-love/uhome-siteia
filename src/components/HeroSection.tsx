@@ -193,13 +193,7 @@ export function HeroSection() {
           <div
             className="max-w-lg animate-[heroSlideIn_0.7s_cubic-bezier(0.16,1,0.3,1)_both]"
           >
-            <p
-              className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 font-body text-xs font-semibold text-white/90 backdrop-blur-sm animate-[heroFadeIn_0.5s_0.5s_both]"
-            >
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
-              <HeroPropertyCount /> imóveis disponíveis
-            </p>
-            <p className="mb-4 font-body text-xs font-semibold uppercase tracking-[0.2em] text-white/70">
+            <p className="mb-3 font-body text-xs font-semibold uppercase tracking-[0.2em] text-white/70 sm:mb-4">
               Porto Alegre & Região
             </p>
             <h1
@@ -208,10 +202,16 @@ export function HeroSection() {
             >
               Encontre o imóvel perfeito para você
             </h1>
-            <p className="mt-4 max-w-md font-body text-base leading-relaxed text-white/70">
-              Apartamentos, casas e coberturas nos melhores bairros. Busca inteligente por IA e curadoria especializada.
+            <p className="mt-3 max-w-md font-body text-sm leading-relaxed text-white/75 sm:mt-4 sm:text-base">
+              <HeroPropertyCount /> imóveis com curadoria Uhome, busca inteligente e atendimento humano.
             </p>
-            <HeroFocoButtons />
+            <div className="hidden sm:block"><HeroFocoButtons /></div>
+            <a
+              href="#corretor-busca"
+              className="mt-4 hidden items-center gap-1.5 font-body text-sm font-semibold text-white underline-offset-4 hover:underline lg:inline-flex"
+            >
+              Quero ajuda para encontrar →
+            </a>
           </div>
 
           {/* Right — card (CSS animation for instant LCP) */}
@@ -221,7 +221,7 @@ export function HeroSection() {
             {/* Toggle */}
             <div className="mb-4 flex gap-2 sm:mb-6">
               {(["comprar", "ia"] as const).map((m) => {
-                const label = m === "comprar" ? "Buscar imóveis" : m === "ia" ? "Busca IA" : "Anunciar imóvel";
+                const label = m === "comprar" ? "Buscar imóveis" : m === "ia" ? "Descrever com IA" : "Anunciar imóvel";
                 const mobileLabel = m === "comprar" ? "Buscar" : m === "ia" ? "IA" : "Anunciar";
                 return (
                   <button

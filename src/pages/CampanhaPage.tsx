@@ -6,7 +6,8 @@ import { Footer } from "@/components/Footer";
 import { useCanonical } from "@/hooks/useCanonical";
 import { useCorretor } from "@/contexts/CorretorContext";
 import { blackAtiva, useCampanha } from "@/lib/produtosFoco";
-import { ProdutoFocoCard } from "@/components/foco/FocoShared";
+import { ProdutoFocoCard, useWhatsAppProduto } from "@/components/foco/FocoShared";
+import { ComparadorNatal } from "@/components/foco/ComparadorNatal";
 import { WHATSAPP_NUMBER } from "@/lib/whatsapp";
 import { Reveal } from "@/components/ui/reveal";
 import { Button } from "@/components/ui/button";
@@ -37,6 +38,7 @@ export default function CampanhaPage() {
   const cidades = Array.from(new Set((data?.produtos ?? []).map(p => p.cidade).filter((x): x is string => !!x)));
   const lista = filtrarProdutosCampanha(data?.produtos ?? [], cidade, faixa);
   const { dias, horas, min } = useCountdown(fimExibido);
+  const wa = useWhatsAppProduto();
 
   useEffect(() => {
     if (!c) return;
@@ -120,6 +122,7 @@ export default function CampanhaPage() {
             ))}
           </div>
         </section></Reveal>
+        {(data?.produtos?.length ?? 0) > 1 && <Reveal><ComparadorNatal produtos={data!.produtos} linkFor={prefixLink} onContato={isDirectAccess && corretor ? (p) => window.open(wa(p), "_blank", "noopener") : undefined} /></Reveal>}
         <Reveal><section className="mx-auto max-w-3xl px-5 pb-12 sm:px-8">
           <h2 className="text-h2 text-foreground">Perguntas frequentes</h2>
           <div className="mt-5 divide-y divide-border rounded-2xl border border-border">

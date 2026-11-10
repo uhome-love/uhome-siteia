@@ -1,6 +1,7 @@
 // CRM Bridge - endpoint compartilhado entre Site Uhome e CRM uhomesales
 // Auth: header x-crm-token validado contra secret CRM_BRIDGE_TOKEN
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { montarLinksNatal, validarCorretor } from "../_shared/natalLinks.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -298,6 +299,47 @@ Deno.serve(async (req) => {
         });
         if (error) throw error;
         return json({ ok: true, profile_id: data });
+      }
+
+      // ─── NATAL: links personalizados ───────────────────────────
+      case "list_natal_links": {
+        const { corretor_slug, email } = payload;
+        if (!corretor_slug && !email) return json({ error: "corretor_slug or email required" }, 400);
+        let q = supabase.from("profiles").select("slug_ref, ativo, nome, foto_url, telefone").limit(1);
+        q = corretor_slug ? q.eq("slug_ref", String(corretor_slug)) : q.ilike("email", String(email));
+        const { data: prof } = await q.maybeSingle();
+        const erro = validarCorretor(prof as any);
+        if (erro) return json({ ok: false, error: erro }, 404);
+
+        const hoje = new Date().toLocaleDateString("en-CA", { timeZone: "America/Sao_Paulo" });
+        const { data: camps } = await supabase
+          .from("campanhas")
+          .select("id, slug, nome, titulo, inicio, fim")
+          .eq("ativo", true)
+          .or(`inicio.is.null,inicio.lte.${hoje}`)
+          .or(`fim.is.null,fim.gte.${hoje}`)
+          .order("destaque_home", { ascending: false })
+          .order("ordem");
+        const camp = (camps ?? []).find((c: any) => /natal/i.test(c.slug)) ?? camps?.[0];
+        if (!camp) return json({ ok: false, error: "Nenhuma campanha vigente" }, 404);
+
+        const { data: cp } = await supabase
+          .from("campanha_produtos")
+          .select("ordem, produtos_foco(slug, nome, bairro, cidade, capa_url, preco_texto, preco_a_partir, entrega, ativo)")
+          .eq("campanha_id", camp.id)
+          .order("ordem");
+        const produtos = (cp ?? [])
+          .map((r: any) => r.produtos_foco)
+          .filter((p: any) => p && p.ativo)
+          .map(({ ativo: _a, ...p }: any) => p);
+
+        const links = montarLinksNatal(prof!.slug_ref!, camp.slug, produtos);
+        return json({
+          ok: true,
+          corretor: { nome: prof!.nome, slug: prof!.slug_ref, foto_url: prof!.foto_url, tem_foto: !!prof!.foto_url },
+          campanha: { slug: camp.slug, nome: camp.nome, fim: camp.fim },
+          ...links,
+        });
       }
 
       default:

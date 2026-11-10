@@ -12,6 +12,9 @@ import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { prefetchBusca } from "@/lib/prefetch";
 import { useCampanhaDestaque } from "@/lib/produtosFoco";
 import { NATAL_ART } from "@/components/foco/NatalArt";
+import gasometroDesktop from "@/assets/gasometro-desktop.webp.asset.json";
+import gasometroTablet from "@/assets/gasometro-tablet.webp.asset.json";
+import gasometroMobile from "@/assets/gasometro-mobile.webp.asset.json";
 
 function HeroFocoButtons() {
   const { prefixLink } = useCorretor();
@@ -154,28 +157,20 @@ export function HeroSection() {
 
   return (
     <section className="relative flex min-h-[auto] items-center overflow-hidden pt-16 lg:min-h-[92vh]">
-      {/* Background image with inline LQIP for instant render */}
-      <div className="absolute inset-0">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage: "url('data:image/webp;base64,UklGRpwAAABXRUJQVlA4IJAAAABQBQCdASogABUAPzmIvVYvKKYjsBgIAeAnCUAXqwZRln/gIEt8srGbZB7cNRSBPXCDzIAA/u1hdlpwC0fcoCPWgz2rrrMvizytVPvWNnsA0ALTZmbIgCJJp04T2g2T9ofXib9J7XB8dQHqh3RPLcMTTlLDWD/+e/hipRG3YVd/uyD8m9zkYCarAYijkbIGYAA=')",
-          }}
-          aria-hidden="true"
-        />
+      {/* Responsive cover sourced from the supplied Gasômetro image. */}
+      <div className="absolute inset-0 bg-muted">
         <picture>
-          <source media="(max-width: 640px)" srcSet="/hero-bg-mobile.webp" type="image/webp" />
-          <source media="(max-width: 1024px)" srcSet="/hero-bg-tablet.webp" type="image/webp" />
+          <source media="(max-width: 640px)" srcSet={gasometroMobile.url} type="image/webp" />
+          <source media="(max-width: 1024px)" srcSet={gasometroTablet.url} type="image/webp" />
           <img
-            src="/hero-bg.webp"
+            src={gasometroDesktop.url}
             alt=""
             {...{ fetchpriority: "high" }}
             decoding="async"
             sizes="100vw"
-            width={1920}
-            height={1280}
-            className="uh-kenburns absolute inset-0 h-full w-full object-cover"
-            style={{ objectPosition: "center center" }}
+            width={1612}
+            height={768}
+            className="uh-kenburns absolute inset-0 h-full w-full object-cover object-[35%_center] lg:object-center"
           />
         </picture>
         <div

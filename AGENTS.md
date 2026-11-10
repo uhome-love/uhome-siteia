@@ -5,3 +5,4 @@
 - The campaign flagged `destaque_home` (via `useCampanhaDestaque`) replaces "Uhome em Foco" in navbar, hero and `/em-foco` while vigente; after it ends `/em-foco` returns automatically. Why: one showcase per period, no deploy needed.
 - Official Natal art (lights, key, seal, Homi) lives in `src/components/foco/NatalArt.tsx` as Lovable Assets; `--natal-*` tokens follow the campaign brand kit.
 - Campaign price/city filtering is client-side in `campanhaFilters.ts`; keep the original catalog and broker prefixes intact so filters do not change campaign membership or attribution.
+- Product photos, floor plans and maps share `MaterialGallery` with Radix focus management, keyboard navigation, swipe and zoom; this keeps material inspection consistent without altering source assets.

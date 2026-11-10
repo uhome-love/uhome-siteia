@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { MapPin, Calendar, Building2, Check, MessageCircle, Gift, ChevronLeft, ChevronRight, X, Loader2, Navigation } from "lucide-react";
+import { MapPin, Calendar, Building2, Check, MessageCircle, Gift, Loader2, Navigation } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { EmpreendimentoLeadForm } from "@/components/EmpreendimentoLeadForm";
@@ -10,6 +10,8 @@ import { setJsonLd, removeJsonLd } from "@/lib/jsonld";
 import { absUrl, blackAtiva, formatPreco, useCampanha, useCampanhasAtivas, useProdutoFoco, SITE_URL, type MidiaFoco } from "@/lib/produtosFoco";
 import { CorretorContatoCard, ProdutoFocoCard, useWhatsAppProduto } from "@/components/foco/FocoShared";
 import { Reveal } from "@/components/ui/reveal";
+import { Button } from "@/components/ui/button";
+import { MaterialGallery } from "@/components/foco/MaterialGallery";
 
 function setMeta(attr: "name" | "property", key: string, content: string) {
   let el = document.querySelector(`meta[${attr}="${key}"]`);
@@ -19,37 +21,6 @@ function setMeta(attr: "name" | "property", key: string, content: string) {
     document.head.appendChild(el);
   }
   el.setAttribute("content", content);
-}
-
-function Lightbox({ fotos, index, onClose }: { fotos: MidiaFoco[]; index: number; onClose: () => void }) {
-  const [i, setI] = useState(index);
-  useEffect(() => {
-    const k = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-      if (e.key === "ArrowRight") setI((x) => (x + 1) % fotos.length);
-      if (e.key === "ArrowLeft") setI((x) => (x - 1 + fotos.length) % fotos.length);
-    };
-    window.addEventListener("keydown", k);
-    document.body.style.overflow = "hidden";
-    return () => {
-      window.removeEventListener("keydown", k);
-      document.body.style.overflow = "";
-    };
-  }, [fotos.length, onClose]);
-  const f = fotos[i];
-  return (
-    <div className="fixed inset-0 z-[100] flex flex-col bg-noir/95 text-noir-foreground" role="dialog" aria-modal="true">
-      <div className="flex items-center justify-between p-4">
-        <p className="font-body text-sm opacity-80">{i + 1} / {fotos.length} {f.legenda ? `· ${f.legenda}` : ""}</p>
-        <button onClick={onClose} aria-label="Fechar galeria" className="rounded-full p-2 hover:bg-noir-foreground/10"><X className="h-6 w-6" /></button>
-      </div>
-      <div className="relative flex flex-1 items-center justify-center px-2 pb-6">
-        <img src={f.url} alt={f.legenda ?? ""} className="max-h-full max-w-full object-contain" />
-        <button aria-label="Foto anterior" onClick={() => setI((x) => (x - 1 + fotos.length) % fotos.length)} className="absolute left-3 rounded-full bg-noir-foreground/10 p-3 hover:bg-noir-foreground/20"><ChevronLeft className="h-6 w-6" /></button>
-        <button aria-label="Próxima foto" onClick={() => setI((x) => (x + 1) % fotos.length)} className="absolute right-3 rounded-full bg-noir-foreground/10 p-3 hover:bg-noir-foreground/20"><ChevronRight className="h-6 w-6" /></button>
-      </div>
-    </div>
-  );
 }
 
 export default function ProdutoFocoPage() {
@@ -71,9 +42,9 @@ export default function ProdutoFocoPage() {
     const desc = `${p.nome} em ${p.bairro}, ${p.cidade}${p.preco_a_partir ? `, a partir de ${formatPreco(p.preco_a_partir)}` : ""}. ${p.resumo ?? ""}`.slice(0, 158);
     document.title = `${p.nome} | ${p.bairro}, ${p.cidade} | Uhome em Foco`;
     setMeta("name", "description", desc);
-    setMeta("property", "og:title", modoCorretor ? `${p.nome} · enviado por ${corretor!.nome}` : `${p.nome} | Uhome`);
+    setMeta("property", "og:title", modoCorretor ? `${p.nome} · enviado por ${corretor?.nome ?? "Uhome"}` : `${p.nome} | Uhome`);
     setMeta("property", "og:description", desc);
-    if (p.capa_url) setMeta("property", "og:image", absUrl(p.capa_url)!);
+    if (p.capa_url) setMeta("property", "og:image", absUrl(p.capa_url) ?? p.capa_url);
     setJsonLd("produto-foco", {
       "@context": "https://schema.org",
       "@type": "Residence",
@@ -122,13 +93,21 @@ export default function ProdutoFocoPage() {
   const bk = black ? fi.black : null;
   const fotos = p.galeria;
   const waUrl = wa(p);
+  const secoes = [
+    { id: "visao-geral", label: "Visão geral", show: true },
+    { id: "condicoes", label: "Condições", show: precos.length > 0 || !!bk },
+    { id: "galeria", label: "Galeria", show: fotos.length > 0 },
+    { id: "plantas", label: "Plantas", show: !!fi.tipologias?.length || p.plantas.length > 0 },
+    { id: "lazer", label: "Lazer", show: !!fi.lazer?.length || !!fi.unidade?.length },
+    { id: "localizacao", label: "Localização", show: true },
+  ].filter(x => x.show);
 
   return (
     <div className="min-h-screen bg-background pb-24 lg:pb-0">
       <Navbar />
       <main className="pt-14">
         {/* Abertura */}
-        <section className="relative h-[72vh] min-h-[460px] max-h-[760px] w-full overflow-hidden bg-noir">
+        <section className="relative h-[65svh] min-h-[480px] max-h-[640px] w-full overflow-hidden bg-noir">
           {p.capa_url && <img src={p.capa_url} alt={p.nome} fetchPriority="high" className="uh-kenburns absolute inset-0 h-full w-full object-cover opacity-90" />}
           <div className="absolute inset-0 bg-gradient-to-t from-noir via-noir/40 to-transparent" />
           <div className="uh-rise relative mx-auto flex h-full max-w-7xl flex-col justify-end px-5 pb-10 text-noir-foreground sm:px-8">
@@ -141,8 +120,8 @@ export default function ProdutoFocoPage() {
               {p.status_obra && <span className="rounded-full bg-noir-foreground/15 px-3 py-1 font-body text-xs font-semibold backdrop-blur">{p.status_obra}</span>}
             </div>
             {p.logo_url && <img src={p.logo_url} alt={p.incorporadora ?? ""} className="mt-5 h-8 max-h-10 w-auto max-w-[160px] self-start object-contain drop-shadow-[0_2px_6px_hsl(var(--foreground)/0.6)] sm:h-10" />}
-            <h1 className="mt-3 font-heading text-4xl font-bold sm:text-6xl">{p.nome}</h1>
-            <p className="mt-2 flex items-center gap-1.5 font-body text-base opacity-90"><MapPin className="h-4 w-4" />{p.bairro}, {p.cidade} · {p.incorporadora}</p>
+            <h1 className="mt-3 font-heading text-4xl font-bold break-words sm:text-5xl">{p.nome}</h1>
+            <p className="mt-2 flex max-w-2xl items-start gap-1.5 font-body text-base opacity-90"><MapPin className="mt-1 h-4 w-4 shrink-0" />{[p.bairro, p.cidade, p.incorporadora].filter(Boolean).join(" · ")}</p>
             <div className="mt-6 flex flex-wrap items-end gap-6">
               {p.preco_a_partir && (
                 <div>
@@ -151,12 +130,10 @@ export default function ProdutoFocoPage() {
                 </div>
               )}
               <a href={waUrl} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center gap-2 rounded-full ${natal && !black ? "bg-natal-gold text-natal-deep" : "bg-primary text-primary-foreground"} px-6 py-3.5 font-body text-sm font-bold shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98]`}>
-                <MessageCircle className="h-4 w-4" /> {modoCorretor ? `Falar com ${corretor!.nome.split(" ")[0]}` : "Quero as condições"}
+                <MessageCircle className="h-4 w-4" /> {modoCorretor ? `Falar com ${corretor?.nome.split(" ")[0]}` : "Quero as condições"}
               </a>
               {fotos.length > 0 && (
-                <button onClick={() => setBox({ fotos, i: 0 })} className="rounded-full border border-noir-foreground/40 px-5 py-3 font-body text-sm font-semibold hover:bg-noir-foreground/10">
-                  Ver {fotos.length} fotos
-                </button>
+                <Button variant="ghost" size="lg" onClick={() => setBox({ fotos, i: 0 })} className="border border-noir-foreground/40 text-noir-foreground hover:bg-noir-foreground/10 hover:text-noir-foreground">Ver {fotos.length} fotos</Button>
               )}
             </div>
           </div>
@@ -164,14 +141,12 @@ export default function ProdutoFocoPage() {
 
         <nav aria-label="Seções" className="sticky top-14 z-30 border-b border-border/60 bg-background/90 backdrop-blur">
           <div className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-5 py-2 sm:px-8 [scrollbar-width:none]">
-            {[["visao-geral","Visão geral"],["condicoes","Condições"],["galeria","Galeria"],["plantas","Plantas"],["lazer","Lazer"],["localizacao","Localização"]].map(([id,l]) => (
-              <a key={id} href={`#${id}`} className="whitespace-nowrap rounded-full px-3 py-1.5 font-body text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">{l}</a>
-            ))}
+            {secoes.map(({id,label}) => <Button key={id} asChild variant="ghost" size="sm"><a href={`#${id}`}>{label}</a></Button>)}
           </div>
         </nav>
 
-        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:px-8 lg:grid-cols-[1fr_380px]">
-          <div className="min-w-0 space-y-14">
+        <div className="mx-auto grid max-w-7xl gap-8 px-5 py-8 sm:px-8 lg:grid-cols-[1fr_380px]">
+          <div className="min-w-0 space-y-10">
             {/* Resumo */}
             <section id="visao-geral" className="scroll-mt-32">
               <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
@@ -181,7 +156,7 @@ export default function ProdutoFocoPage() {
                   { i: MapPin, l: "Bairro", v: p.bairro },
                   { i: Check, l: "Situação", v: p.status_obra },
                 ].filter((x) => x.v).map((x) => (
-                  <div key={x.l} className="rounded-xl border border-border/60 p-4">
+                  <div key={x.l} className="border-b border-border/60 py-4">
                     <x.i className="h-4 w-4 text-primary" />
                     <p className="mt-2 font-body text-xs text-muted-foreground">{x.l}</p>
                     <p className="break-words font-body text-sm font-semibold leading-snug text-foreground">{x.v}</p>
@@ -199,13 +174,13 @@ export default function ProdutoFocoPage() {
                     <p className="flex items-center gap-2 font-body text-xs font-bold uppercase tracking-widest text-natal-gold">
                       <Gift className="h-4 w-4" /> {black ? "Black Natal Uhome · até 29/11" : natal ? "Condição de Natal · até 18/12" : "Condições"}
                     </p>
-                    {bk?.titulo && <h2 className="mt-3 text-h2 text-foreground">{bk.titulo}</h2>}
+                    {bk?.titulo && <h2 className="mt-3 text-h2 text-inherit">{bk.titulo}</h2>}
                     {bk?.texto && <p className="mt-2 font-body text-sm opacity-90">{bk.texto}</p>}
                     <ul className="mt-5 space-y-2">
                       {precos.map((x) => (
-                        <li key={x.tipologia} className="flex items-baseline justify-between gap-4 border-b border-current/10 pb-2 font-body text-sm">
+                        <li key={x.tipologia} className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-current/10 pb-2 font-body text-sm">
                           <span className="opacity-90">{x.tipologia}</span>
-                          <span className="whitespace-nowrap font-bold">{x.texto}</span>
+                          <span className="break-words font-bold">{x.texto}</span>
                         </li>
                       ))}
                     </ul>
@@ -227,13 +202,15 @@ export default function ProdutoFocoPage() {
               <section id="galeria" className="scroll-mt-32">
                 <h2 className="text-h2 text-foreground">Galeria</h2>
                 <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
-                  {fotos.map((f, i) => (
-                    <button key={f.url} onClick={() => setBox({ fotos, i })} className={`group relative overflow-hidden rounded-xl bg-muted ${i === 0 ? "col-span-2 row-span-2" : ""}`}>
+                  {fotos.slice(0, 5).map((f, i) => (
+                    <Button variant="ghost" key={f.url} aria-label={`Abrir foto ${i + 1} de ${p.nome}`} onClick={() => setBox({ fotos, i })} className={`group relative h-auto overflow-hidden rounded-lg bg-muted p-0 hover:bg-muted ${i === 0 ? "col-span-2 row-span-2" : ""}`}>
                       <img src={f.url} alt={f.legenda ?? p.nome} loading="lazy" decoding="async" className="aspect-[4/3] h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                      {i === 4 && fotos.length > 5 && <span className="absolute inset-0 flex items-center justify-center bg-noir/60 font-heading text-lg text-noir-foreground">+{fotos.length - 5} fotos</span>}
                       {f.legenda && <span className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-noir/70 to-transparent p-2 text-left font-body text-xs text-noir-foreground opacity-0 transition-opacity group-hover:opacity-100">{f.legenda}</span>}
-                    </button>
+                    </Button>
                   ))}
                 </div>
+                <Button variant="outline" className="mt-4" onClick={() => setBox({ fotos, i: 0 })}>Ver todas as {fotos.length} fotos</Button>
               </section>
             )}
 
@@ -262,10 +239,10 @@ export default function ProdutoFocoPage() {
                 {p.plantas.length > 0 && (
                   <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
                     {p.plantas.map((f, i) => (
-                      <button key={f.url} onClick={() => setBox({ fotos: p.plantas, i })} className="overflow-hidden rounded-xl border border-border/60 bg-card p-2 text-left hover:shadow-md">
+                      <Button variant="ghost" key={f.url} aria-label={`Ampliar planta ${i + 1} de ${p.nome}`} onClick={() => setBox({ fotos: p.plantas, i })} className="block h-auto overflow-hidden rounded-lg border border-border/60 bg-card p-2 text-left hover:shadow-md">
                         <img src={f.url} alt={f.legenda ?? "Planta"} loading="lazy" className="aspect-square w-full object-contain" />
-                        <p className="mt-1 line-clamp-2 font-body text-xs text-muted-foreground">{f.legenda}</p>
-                      </button>
+                        <p className="mt-1 line-clamp-2 font-body text-xs text-muted-foreground">{f.legenda ?? `Planta ${i + 1}`}</p>
+                      </Button>
                     ))}
                   </div>
                 )}
@@ -311,7 +288,7 @@ export default function ProdutoFocoPage() {
               {p.mapas.length > 0 && (
                 <div className="mt-5 grid gap-3 sm:grid-cols-2">
                   {p.mapas.map((f, i) => (
-                    <button key={f.url} onClick={() => setBox({ fotos: p.mapas, i })} className="overflow-hidden rounded-xl bg-muted"><img src={f.url} alt={f.legenda ?? "Mapa"} loading="lazy" className="w-full object-cover" /></button>
+                    <Button variant="ghost" key={f.url} aria-label={`Ampliar mapa ${i + 1} de ${p.nome}`} onClick={() => setBox({ fotos: p.mapas, i })} className="h-auto overflow-hidden rounded-lg bg-muted p-0"><img src={f.url} alt={f.legenda ?? "Mapa"} loading="lazy" className="w-full object-contain" /></Button>
                   ))}
                 </div>
               )}
@@ -340,7 +317,7 @@ export default function ProdutoFocoPage() {
             ) : (
               <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
                 <h2 className="font-heading text-xl font-bold text-foreground">Receba as condições do {p.nome}</h2>
-                <p className="mt-1 font-body text-sm text-muted-foreground">Um especialista Uhome te responde em minutos.</p>
+                <p className="mt-1 font-body text-sm text-muted-foreground">Converse com um especialista sobre disponibilidade e condições.</p>
                 <div className="mt-4"><EmpreendimentoLeadForm empreendimentoNome={p.nome} empreendimentoSlug={`em-foco/${p.slug}`} bairro={p.bairro ?? undefined} /></div>
                 <a href={waUrl} target="_blank" rel="noopener noreferrer" className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-border px-5 py-3 font-body text-sm font-semibold text-foreground hover:bg-secondary">
                   <MessageCircle className="h-4 w-4" /> Prefiro o WhatsApp
@@ -363,12 +340,12 @@ export default function ProdutoFocoPage() {
       {/* Barra fixa no celular */}
       <div className="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-border bg-background/95 p-3 backdrop-blur lg:hidden" style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}>
         <a href={waUrl} target="_blank" rel="noopener noreferrer" className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3.5 font-body text-sm font-bold ${natal && !black ? "bg-natal-gold text-natal-deep" : "bg-primary text-primary-foreground"}`}>
-          <MessageCircle className="h-4 w-4" /> {modoCorretor ? `WhatsApp de ${corretor!.nome.split(" ")[0]}` : "Chamar no WhatsApp"}
+          <MessageCircle className="h-4 w-4" /> {modoCorretor ? `WhatsApp de ${corretor?.nome.split(" ")[0]}` : "Chamar no WhatsApp"}
         </a>
         {!modoCorretor && <a href="#contato" className="rounded-xl border border-border px-4 py-3.5 font-body text-sm font-semibold text-foreground">Condições</a>}
       </div>
 
-      {box && <Lightbox fotos={box.fotos} index={box.i} onClose={() => setBox(null)} />}
+      {box && <MaterialGallery fotos={box.fotos} index={box.i} onClose={() => setBox(null)} />}
       <Footer />
     </div>
   );

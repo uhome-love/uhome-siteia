@@ -3,6 +3,8 @@ import { createRoot } from "react-dom/client";
 import { HelmetProvider } from "react-helmet-async";
 import { captureUtmParams, captureLeadIdentity } from "./lib/session";
 import App from "./App.tsx";
+import { initGA4 } from "./lib/gtag";
+initGA4();
 
 // Capture UTMs + referrer on first page load (first-touch attribution)
 captureUtmParams();

@@ -13,6 +13,7 @@
 - [ ] Painel admin de campanhas (trocar produtos, datas e banner sem pedir)
 
 ## Fase 2 — Auditoria e evolução do site
+- [x] Etapa 3: organizar o resumo inicial do imóvel e conferir no computador e no celular
 - [ ] Medição real de velocidade e teste de busca, filtros, mapa, IA e mobile
 - [ ] Conectar Google Search Console e corrigir mapa do site
 - [ ] Conversão página por página (home, busca, imóvel, formulários, WhatsApp)

@@ -241,8 +241,8 @@ const PropertyDetail = () => {
   const areaPrincipal = areaPriv || areaTotal;
 
   const statItems = [
-    areaPriv > 0 ? { icon: Maximize, value: `${areaPriv}m²`, label: "Área Priv." } : null,
-    areaTotal > 0 && areaTotal !== areaPriv ? { icon: Maximize, value: `${areaTotal}m²`, label: "Área Total" } : null,
+    areaPriv > 0 ? { icon: Maximize, value: `${areaPriv.toLocaleString("pt-BR")} m²`, label: "Área privativa" } : null,
+    areaTotal > 0 && areaTotal !== areaPriv ? { icon: Maximize, value: `${areaTotal.toLocaleString("pt-BR")} m²`, label: "Área total" } : null,
     (imovel.quartos ?? 0) > 0 ? { icon: Bed, value: String(imovel.quartos), label: "Quartos" } : null,
     (imovel.banheiros ?? 0) > 0 ? { icon: Bath, value: String(imovel.banheiros), label: "Banheiros" } : null,
     (imovel.vagas ?? 0) > 0 ? { icon: Car, value: String(imovel.vagas), label: "Vagas" } : null,
@@ -497,7 +497,7 @@ const PropertyDetail = () => {
       )}
 
       {/* Content */}
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
         <div className="flex flex-col gap-8 sm:gap-10 lg:flex-row">
           {/* Left column */}
           <motion.div
@@ -506,12 +506,10 @@ const PropertyDetail = () => {
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
             className="flex-1 space-y-8 lg:max-w-[63%]"
           >
-            {/* Property code + Breadcrumb */}
-            <div className="space-y-1">
-              <span className="font-mono text-[11px] text-muted-foreground/60">
-                Cód. {extractPropertyCode(imovel.slug, imovel.id)}
-              </span>
-              <nav className="font-body text-xs text-muted-foreground">
+            <section aria-label="Resumo do imóvel" className="min-w-0 space-y-5">
+            {/* Breadcrumb and property reference */}
+            <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+              <nav aria-label="Navegação do imóvel" className="min-w-0 break-words font-body text-xs leading-relaxed text-muted-foreground">
                 <Link to={prefixLink("/busca")} className="hover:text-foreground">Imóveis</Link>
                 {" › "}
                 <Link to={prefixLink(`/busca?bairro=${encodeURIComponent(imovel.bairro)}`)} className="hover:text-foreground">{imovel.bairro}</Link>
@@ -529,6 +527,9 @@ const PropertyDetail = () => {
                 {" › "}
                 <span className="text-foreground">{capitalize(imovel.tipo)}</span>
               </nav>
+              <span className="shrink-0 font-mono text-xs text-muted-foreground">
+                Cód. {extractPropertyCode(imovel.slug, imovel.id)}
+              </span>
             </div>
 
             {/* Badge + title */}
@@ -550,55 +551,51 @@ const PropertyDetail = () => {
                   </span>
                 )}
               </div>
-              <h1 className="mt-3 font-body text-[clamp(1.5rem,4vw,2rem)] font-extrabold leading-tight tracking-tight text-foreground" style={{ textWrap: "balance" }}>
+              <h1 className="mt-3 break-words font-body text-2xl font-extrabold leading-tight tracking-normal text-foreground sm:text-3xl">
                 {imovel.titulo}
               </h1>
-              <div className="mt-2 flex items-center gap-3 font-body text-sm text-muted-foreground">
-                <span className="flex items-center gap-1.5">
-                  <MapPin className="h-4 w-4" />
-                  {imovel.bairro}, {imovel.cidade}
+              <div className="mt-2 font-body text-base text-muted-foreground">
+                <span className="flex items-start gap-1.5">
+                  <MapPin className="mt-1 h-4 w-4 shrink-0" aria-hidden="true" />
+                  <span className="min-w-0 break-words">{imovel.bairro}, {imovel.cidade}</span>
                 </span>
               </div>
               {imovel.condominio_nome && (
                 <Link
                   to={`/condominios/${imovel.condominio_nome.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`}
-                  className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-border bg-secondary/50 px-3 py-1 font-body text-xs font-medium text-foreground hover:bg-secondary transition-colors"
+                  className="mt-2 inline-flex max-w-full items-start gap-1.5 font-body text-sm font-medium text-primary underline-offset-4 hover:underline"
                 >
-                  <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
-                  {imovel.condominio_nome}
+                  <Building2 className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                  <span className="min-w-0 break-words">{imovel.condominio_nome}</span>
                 </Link>
               )}
             </div>
 
             {/* Price */}
-            <div>
-              <p className="font-body text-[clamp(1.75rem,4vw,2.25rem)] font-extrabold text-primary" data-price={imovel.preco}>{priceFormatted}</p>
-              {(imovel.preco_condominio ?? 0) > 0 && (
-                <p className="mt-1 font-body text-sm text-muted-foreground">
-                  + R$ {imovel.preco_condominio!.toLocaleString("pt-BR")}/mês condomínio
-                </p>
-              )}
-              {(imovel.preco_iptu ?? 0) > 0 && (
-                <p className="font-body text-sm text-muted-foreground">
-                  {formatIptu(imovel)}
-                </p>
-              )}
+            <div className="border-t border-border pt-4">
+              <p className="font-body text-xs font-medium text-muted-foreground">Valor de venda</p>
+              <p className="mt-1 break-words font-body text-3xl font-extrabold leading-tight tracking-normal text-foreground sm:text-4xl" data-price={imovel.preco}>{priceFormatted}</p>
+              <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1 font-body text-sm leading-relaxed text-muted-foreground">
+                {typeof imovel.preco_condominio === "number" && imovel.preco_condominio > 0 && (
+                  <p>Condomínio: R$ {imovel.preco_condominio.toLocaleString("pt-BR")}/mês</p>
+                )}
+                {(imovel.preco_iptu ?? 0) > 0 && <p>{formatIptu(imovel)}</p>}
+              </div>
             </div>
 
-            {/* Stats pills */}
-            <div className="flex flex-wrap gap-2 sm:gap-3">
+            {/* Scannable property specifications */}
+            <dl className="grid grid-cols-2 gap-x-4 gap-y-4 border-y border-border py-4 sm:grid-cols-3 xl:grid-cols-5">
               {statItems.map(({ icon: Icon, value, label }) => (
-                <div key={label} className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2.5 sm:gap-3 sm:px-5 sm:py-3.5">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-secondary sm:h-9 sm:w-9">
-                    <Icon className="h-3.5 w-3.5 text-muted-foreground sm:h-4 sm:w-4" />
-                  </div>
-                  <div>
-                    <p className="font-body text-sm font-bold text-foreground sm:text-base">{value}</p>
-                    <p className="font-body text-[10px] text-muted-foreground sm:text-[11px]">{label}</p>
+                <div key={label} className="flex min-w-0 items-start gap-2.5">
+                  <Icon className="mt-1 h-5 w-5 shrink-0 text-muted-foreground" aria-hidden="true" />
+                  <div className="min-w-0 font-body">
+                    <dt className="text-xs leading-relaxed text-muted-foreground">{label}</dt>
+                    <dd className="break-words text-base font-bold text-foreground">{value}</dd>
                   </div>
                 </div>
               ))}
-            </div>
+            </dl>
+            </section>
 
             {/* Mobile CTA moved to fixed bottom bar */}
 

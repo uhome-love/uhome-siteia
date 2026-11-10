@@ -3,7 +3,8 @@
 Trabalho em 4 etapas. Cada etapa é entregue e testada antes da próxima. Busca, mapa, sincronização e páginas de Natal continuam funcionando.
 
 ## Etapa 1 — LIA no lugar do WhatsApp
-- O botão flutuante passa a ser a **LIA**, com foto/avatar e o texto "Fale com a LIA".
+- O botão flutuante passa a ser a **LIA**, com o rosto do avatar oficial enviado (recorte redondo) e o texto "Fale com a LIA".
+- As imagens enviadas da LIA (avatar oficial e cenas: agendou, qualifica, qualidade, futuro etc.) são usadas na abertura da conversa, numa faixa "Conheça a LIA" na Home e nas páginas para Google Ads. Todas otimizadas para carregar rápido.
 - Ao abrir: uma conversa no próprio site com a LIA, além do botão "Continuar no WhatsApp", que abre o WhatsApp oficial da LIA com a mensagem e o imóvel já preenchidos.
 - A LIA recebe o contexto completo: página, imóvel (código, preço, bairro), campanha, corretor do link, origem do anúncio (UTM/gclid) e buscas feitas.
 - A LIA qualifica o lead no CRM (orçamento, região, prazo, financiamento), com todo o histórico da conversa.

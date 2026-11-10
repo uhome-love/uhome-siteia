@@ -232,7 +232,8 @@ async function handleLead(
   }
 
   if (leadCRM) {
-    await moverParaFilaCEO(supabaseCRM, leadCRM.pipeline_lead_id, corretorCRMId, record, observacoes)
+    const existente = await moverParaFilaCEO(supabaseCRM, leadCRM.pipeline_lead_id, corretorCRMId, record, observacoes)
+    await registrarEntradaSite(supabaseCRM, leadCRM.pipeline_lead_id, record, { existente })
     await supabaseSite
       .from('public_leads')
       .update({
@@ -290,10 +291,11 @@ async function handleAgendamento(
     .single()
 
   if (leadCRM) {
-    await moverParaFilaCEO(supabaseCRM, leadCRM.pipeline_lead_id, corretorCRMId, record, obsAgend, {
+    const existente = await moverParaFilaCEO(supabaseCRM, leadCRM.pipeline_lead_id, corretorCRMId, record, obsAgend, {
       proxima_acao: `Visita solicitada pelo site: ${record.data_visita}${record.turno ? ' (' + record.turno + ')' : ''}${record.horario ? ' ' + record.horario : ''}`,
       data_proxima_acao: record.data_visita ?? null,
     })
+    await registrarEntradaSite(supabaseCRM, leadCRM.pipeline_lead_id, record, { existente, visita: true })
     // Com corretor definido (link personalizado), a visita já nasce na agenda dele.
     if (corretorCRMId && record.data_visita) {
       const { error: vErr } = await supabaseCRM.from('visitas').insert({
@@ -345,13 +347,28 @@ async function moverParaFilaCEO(
   record: Record<string, unknown>,
   observacoes: string,
   extra: Record<string, unknown> = {},
-) {
-  if (!pipelineLeadId) return
+): Promise<boolean> {
+  if (!pipelineLeadId) return false
+  // Lead que já existia no CRM (mesmo telefone): mantém as observações antigas e acrescenta as novas.
+  const { data: atual } = await supabaseCRM
+    .from('pipeline_leads')
+    .select('created_at, observacoes')
+    .eq('id', pipelineLeadId)
+    .maybeSingle()
+  const existente = !!atual?.created_at && Date.now() - new Date(atual.created_at).getTime() > 2 * 60 * 1000
   const patch: Record<string, unknown> = {
     dados_site: { site_lead_id: record.id, contexto: record.contexto ?? null, origem_componente: record.origem_componente ?? null },
-    observacoes,
+    observacoes: existente && atual?.observacoes ? `${atual.observacoes}\n---\n${observacoes}` : observacoes,
     ...extra,
     updated_at: new Date().toISOString(),
+  }
+  // Respostas do formulário (landings de campanha): aparecem no quadro "Respostas do formulário" do lead.
+  const respostas = respostasFormulario(record.contexto)
+  if (respostas.length) {
+    const ctx = record.contexto as Record<string, any>
+    patch.form_respostas = respostas
+    patch.formulario = humanizeOrigem(record.origem_componente as string) ?? 'Formulário do site'
+    if (ctx?.campanha) patch.campanha = ctx.campanha
   }
   if (!corretorCRMId) {
     Object.assign(patch, {
@@ -364,6 +381,80 @@ async function moverParaFilaCEO(
   }
   const { error } = await supabaseCRM.from('pipeline_leads').update(patch).eq('id', pipelineLeadId)
   if (error) console.error('[sync-to-crm] fila CEO falhou:', error.message)
+  return existente
+}
+
+// ─── Linha do tempo do CRM ───────────────────────────────────────
+function respostasFormulario(ctx: unknown): { pergunta: string; resposta: string }[] {
+  const q = (ctx as Record<string, any> | null)?.qualificacao
+  if (!q || typeof q !== 'object') return []
+  return Object.entries(q)
+    .filter(([, v]) => v !== null && v !== undefined && String(v).trim() !== '')
+    .map(([pergunta, v]) => ({ pergunta, resposta: String(v) }))
+}
+
+/**
+ * Registra a entrada do lead na linha do tempo do CRM (pipeline_atividades, tipo "entrada"),
+ * no mesmo formato dos leads do Meta: título com o interesse e, na descrição, origem,
+ * campanha, respostas do formulário, resumo da LIA e página.
+ */
+async function registrarEntradaSite(
+  supabaseCRM: any,
+  pipelineLeadId: string | null | undefined,
+  record: Record<string, unknown>,
+  opts: { existente: boolean; visita?: boolean },
+) {
+  if (!pipelineLeadId) return
+  try {
+    const ctx = (record.contexto && typeof record.contexto === 'object' ? record.contexto : {}) as Record<string, any>
+    const origemLabel = humanizeOrigem(record.origem_componente as string) ?? (opts.visita ? 'Agendamento de Visita' : 'Site')
+    const destino = (record.imovel_titulo as string) || ctx.produto || ctx.campanha || origemLabel
+    const titulo = opts.visita
+      ? `📅 Visita solicitada pelo site — ${destino}`
+      : opts.existente
+        ? `🔄 Novo interesse via Site — ${destino}`
+        : `Lead gerado via Site — ${destino}`
+
+    // Evita duplicar se a mesma entrada for processada duas vezes.
+    const desde = new Date(Date.now() - 10 * 60 * 1000).toISOString()
+    const { count } = await supabaseCRM
+      .from('pipeline_atividades')
+      .select('id', { count: 'exact', head: true })
+      .eq('pipeline_lead_id', pipelineLeadId)
+      .eq('tipo', 'entrada')
+      .eq('titulo', titulo)
+      .gte('created_at', desde)
+    if (count && count > 0) return
+
+    const topo: string[] = [`Origem: ${origemLabel}`]
+    if (ctx.campanha && ctx.campanha !== destino) topo.push(`Campanha: ${ctx.campanha}`)
+    const anuncio = [record.utm_source, record.utm_medium, record.utm_campaign].filter(Boolean).join(' / ')
+    if (anuncio) topo.push(`Anúncio: ${anuncio}`)
+    if (record.utm_term) topo.push(`Palavra buscada: ${record.utm_term}`)
+
+    const linhas: string[] = [topo.join(' • ')]
+    if (opts.visita && record.data_visita) {
+      linhas.push(`Visita: ${record.data_visita}${record.turno ? ` (${record.turno})` : ''}${record.horario ? ` às ${record.horario}` : ''}`)
+    }
+    const respostas = respostasFormulario(ctx)
+    if (respostas.length) linhas.push(`Respostas do formulário:\n${respostas.map((r) => `• ${r.pergunta}: ${r.resposta}`).join('\n')}`)
+    if (ctx.resumo) linhas.push(`Resumo da LIA: ${ctx.resumo}`)
+    const slug = (record.imovel_slug as string) ?? null
+    if (slug) linhas.push(`Imóvel: https://uhome.com.br/imovel/${slug}`)
+    if (record.origem_pagina) linhas.push(`Página: ${String(record.origem_pagina).split('?')[0]}`)
+
+    const { error } = await supabaseCRM.from('pipeline_atividades').insert({
+      pipeline_lead_id: pipelineLeadId,
+      tipo: 'entrada',
+      titulo,
+      descricao: linhas.join('\n'),
+      status: 'concluida',
+      created_by: '00000000-0000-0000-0000-000000000000',
+    })
+    if (error) console.error('[sync-to-crm] linha do tempo falhou:', error.message)
+  } catch (e) {
+    console.error('[sync-to-crm] linha do tempo erro:', e)
+  }
 }
 
 // ─── Captação handler ────────────────────────────────────────────

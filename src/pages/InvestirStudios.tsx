@@ -11,7 +11,7 @@ import { LP_DATA } from "@/features/investir-studios/data";
 import { initLanding, type LeadQualificado } from "@/features/investir-studios/controller";
 import { ORIGEM_COMPONENTE, contextoLead, tituloInteresse } from "@/features/investir-studios/lead";
 import { submitLead } from "@/services/leads";
-import { trackClickWhatsapp } from "@/lib/gtag";
+import { gaEvent, trackClickWhatsapp } from "@/lib/gtag";
 import { montarContextoLia } from "@/lib/liaContext";
 import { getCorretorRef } from "@/lib/session";
 import { useCanonical } from "@/hooks/useCanonical";
@@ -21,8 +21,10 @@ const IMG = "/lp/investir-studios/img";
 const HTML = { __html: markup };
 
 function pushDataLayer(event: string, params: Record<string, unknown> = {}) {
+  const dados = { landing: "investir_studios", ...params };
   window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push({ event, landing: "investir_studios", ...params });
+  window.dataLayer.push({ event, ...dados });
+  gaEvent(event, dados);
 }
 
 async function registrarLead(l: LeadQualificado) {

@@ -282,12 +282,12 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
           <button
             onClick={async (e) => { e.preventDefault(); e.stopPropagation(); const r = await toggleFavorito(imovel.id); if (r === "needs_auth") setShowAuth(true); }}
             aria-label={liked ? "Remover dos favoritos" : "Adicionar aos favoritos"}
-            className="absolute right-3 top-3 z-10"
+            className="absolute right-2.5 top-2.5 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-background/80 shadow-sm backdrop-blur-sm transition-transform hover:scale-110 active:scale-95"
           >
             <Heart
-              className="h-6 w-6 drop-shadow-md transition-colors"
-              fill={liked ? "#ff385c" : "rgba(255,255,255,0.85)"}
-              stroke={liked ? "#ff385c" : "rgba(0,0,0,0.3)"}
+              className="h-5 w-5 transition-colors"
+              fill={liked ? "#ff385c" : "transparent"}
+              stroke={liked ? "#ff385c" : "currentColor"}
               strokeWidth={1.5}
             />
           </button>
@@ -413,12 +413,12 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
           <button
             onClick={async (e) => { e.preventDefault(); e.stopPropagation(); const r = await toggleFavorito(imovel.id); if (r === "needs_auth") setShowAuth(true); }}
             aria-label={liked ? "Remover dos favoritos" : "Adicionar aos favoritos"}
-            className="absolute right-3 top-3 z-10"
+            className="absolute right-2.5 top-2.5 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-background/80 shadow-sm backdrop-blur-sm transition-transform hover:scale-110 active:scale-95"
           >
             <Heart
-              className="h-6 w-6 drop-shadow-md transition-colors"
-              fill={liked ? "#ff385c" : "rgba(255,255,255,0.85)"}
-              stroke={liked ? "#ff385c" : "rgba(0,0,0,0.3)"}
+              className="h-5 w-5 transition-colors"
+              fill={liked ? "#ff385c" : "transparent"}
+              stroke={liked ? "#ff385c" : "currentColor"}
               strokeWidth={1.5}
             />
           </button>

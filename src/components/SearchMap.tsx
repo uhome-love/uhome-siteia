@@ -825,10 +825,10 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
 
       {/* Map toolbar — draw, nearby, auto-search */}
       {onBoundsSearch && !drawMode && !hasDrawn && (
-        <div className="absolute left-1/2 z-20 flex -translate-x-1/2 flex-wrap items-center justify-center gap-2 sm:bottom-4" style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 3rem)" }}>
+        <div role="toolbar" aria-label="Ferramentas do mapa" className="absolute left-1/2 z-20 flex -translate-x-1/2 items-center gap-0.5 rounded-full border border-border bg-card/95 p-1 shadow-xl backdrop-blur-md sm:bottom-5" style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 3rem)" }}>
           <button
             onClick={() => window.dispatchEvent(new CustomEvent("uhome:draw-area"))}
-            className="flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-2 font-body text-[12px] font-semibold text-muted-foreground shadow-lg transition-all hover:border-foreground/30 active:scale-[0.97]"
+            className="flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 font-body text-[12px] font-semibold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.97]"
           >
             <PenTool className="h-3.5 w-3.5" />
             Desenhar área
@@ -836,7 +836,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
           {onPertoDeVoce && (
             <button
               onClick={handlePertoDeVoceInternal}
-              className="flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-2 font-body text-[12px] font-semibold text-muted-foreground shadow-lg transition-all hover:border-foreground/30 active:scale-[0.97]"
+              className="flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 font-body text-[12px] font-semibold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.97]"
             >
               <Navigation className="h-3.5 w-3.5" />
               Perto de você
@@ -844,10 +844,11 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
           )}
           <button
             onClick={() => setAutoSearch(prev => !prev)}
-            className={`flex items-center gap-1.5 rounded-full px-3 py-2 font-body text-[12px] font-semibold shadow-lg transition-all active:scale-[0.97] ${
+            aria-pressed={autoSearch}
+            className={`flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 font-body text-[12px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.97] ${
               autoSearch
-                ? "border border-primary bg-primary/10 text-primary"
-                : "border border-border bg-card text-muted-foreground"
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground"
             }`}
           >
             {autoSearch ? (

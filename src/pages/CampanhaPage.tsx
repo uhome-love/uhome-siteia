@@ -102,7 +102,7 @@ export default function CampanhaPage() {
         </section>
 
         <Reveal><section className="mx-auto max-w-7xl px-5 py-14 sm:px-8">
-          <h2 className="font-heading text-3xl font-bold text-foreground">Empreendimentos participantes</h2>
+          <h2 className="text-h2 text-foreground">Empreendimentos participantes</h2>
           <p className="mt-2 font-body text-muted-foreground">{data.produtos.length} produtos selecionados, do primeiro apê ao alto padrão.</p>
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {data.produtos.map((p) => (

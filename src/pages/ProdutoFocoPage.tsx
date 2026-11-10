@@ -199,7 +199,7 @@ export default function ProdutoFocoPage() {
                     <p className="flex items-center gap-2 font-body text-xs font-bold uppercase tracking-widest text-natal-gold">
                       <Gift className="h-4 w-4" /> {black ? "Black Natal Uhome · até 29/11" : natal ? "Condição de Natal · até 18/12" : "Condições"}
                     </p>
-                    {bk?.titulo && <h2 className="mt-3 font-heading text-2xl font-bold">{bk.titulo}</h2>}
+                    {bk?.titulo && <h2 className="mt-3 text-h2 text-foreground">{bk.titulo}</h2>}
                     {bk?.texto && <p className="mt-2 font-body text-sm opacity-90">{bk.texto}</p>}
                     <ul className="mt-5 space-y-2">
                       {precos.map((x) => (
@@ -225,7 +225,7 @@ export default function ProdutoFocoPage() {
             {/* Galeria */}
             {fotos.length > 0 && (
               <section id="galeria" className="scroll-mt-32">
-                <h2 className="font-heading text-2xl font-bold text-foreground">Galeria</h2>
+                <h2 className="text-h2 text-foreground">Galeria</h2>
                 <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
                   {fotos.map((f, i) => (
                     <button key={f.url} onClick={() => setBox({ fotos, i })} className={`group relative overflow-hidden rounded-xl bg-muted ${i === 0 ? "col-span-2 row-span-2" : ""}`}>
@@ -240,7 +240,7 @@ export default function ProdutoFocoPage() {
             {/* Tipologias e plantas */}
             {(fi.tipologias?.length || p.plantas.length) ? (
               <section id="plantas" className="scroll-mt-32">
-                <h2 className="font-heading text-2xl font-bold text-foreground">Plantas e tipologias</h2>
+                <h2 className="text-h2 text-foreground">Plantas e tipologias</h2>
                 {fi.tipologias?.length ? (
                   <div className="mt-5 overflow-x-auto rounded-xl border border-border/60">
                     <table className="w-full font-body text-sm">
@@ -277,7 +277,7 @@ export default function ProdutoFocoPage() {
               <section id="lazer" className="scroll-mt-32 grid gap-8 sm:grid-cols-2">
                 {fi.lazer?.length ? (
                   <div>
-                    <h2 className="font-heading text-2xl font-bold text-foreground">Lazer</h2>
+                    <h2 className="text-h2 text-foreground">Lazer</h2>
                     <ul className="mt-4 grid grid-cols-1 gap-2">
                       {fi.lazer.map((l) => <li key={l} className="flex gap-2 font-body text-sm text-foreground"><Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />{l}</li>)}
                     </ul>
@@ -285,7 +285,7 @@ export default function ProdutoFocoPage() {
                 ) : null}
                 {fi.unidade?.length ? (
                   <div>
-                    <h2 className="font-heading text-2xl font-bold text-foreground">Na sua unidade</h2>
+                    <h2 className="text-h2 text-foreground">Na sua unidade</h2>
                     <ul className="mt-4 grid grid-cols-1 gap-2">
                       {fi.unidade.map((l) => <li key={l} className="flex gap-2 font-body text-sm text-foreground"><Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />{l}</li>)}
                     </ul>
@@ -296,7 +296,7 @@ export default function ProdutoFocoPage() {
 
             {/* Localização */}
             <section id="localizacao" className="scroll-mt-32">
-              <h2 className="font-heading text-2xl font-bold text-foreground">Localização</h2>
+              <h2 className="text-h2 text-foreground">Localização</h2>
               <p className="mt-2 font-body text-muted-foreground">{[p.endereco, p.bairro, p.cidade].filter(Boolean).join(", ")}{fi.referencia ? ` · ${fi.referencia}` : ""}</p>
               {fi.maps_url && (
                 <a href={fi.maps_url} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-2 font-body text-sm font-semibold text-primary"><Navigation className="h-4 w-4" />Abrir no mapa</a>
@@ -320,7 +320,7 @@ export default function ProdutoFocoPage() {
             {/* Ficha técnica */}
             {fi.ficha_tecnica?.length ? (
               <section>
-                <h2 className="font-heading text-2xl font-bold text-foreground">Ficha técnica</h2>
+                <h2 className="text-h2 text-foreground">Ficha técnica</h2>
                 <dl className="mt-4 divide-y divide-border/60 rounded-xl border border-border/60">
                   {fi.ficha_tecnica.map((x) => (
                     <div key={x.item} className="grid gap-1 p-3 sm:grid-cols-[200px_1fr]">
@@ -352,7 +352,7 @@ export default function ProdutoFocoPage() {
         </div>
         {outros.length > 0 && (
           <Reveal className="mx-auto max-w-7xl px-5 pb-16 sm:px-8">
-            <h2 className="font-heading text-2xl font-bold text-foreground">Outros produtos do Natal</h2>
+            <h2 className="text-h2 text-foreground">Outros produtos do Natal</h2>
             <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {outros.map((o) => <ProdutoFocoCard key={o.id} p={o} selo={black ? "Black Natal" : "Condição de Natal"} campanha={black ? "black" : "natal"} />)}
             </div>

@@ -2,6 +2,8 @@
 
 Objetivo: deixar as páginas que vão receber anúncios no melhor nível de conversão, beleza e confiança, sem mexer na estrutura (busca, mapa, sincronização Jetimob, CRM).
 
+Prioridade: celular primeiro. A maioria das buscas é no celular, então cada página é desenhada e validada antes em 360px e 390px (botões grandes ao alcance do polegar, texto legível sem zoom, carregamento rápido no 4G, nada cobrindo o conteúdo) e só depois no computador.
+
 ## 1. Checagem do site publicado (primeiro passo)
 - Confirmar que o site no ar carrega o Google Analytics e o Google Ads, e que um contato de teste conta como conversão (marcado como teste).
 - Investigar um alerta: um acesso automático à página de Natal recebeu "bloqueado" (403). Se o robô do Google Ads também for barrado, os anúncios podem ser reprovados. Verificar e, se for o caso, liberar os robôs do Google (sem abrir para robôs ruins).

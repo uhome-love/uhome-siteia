@@ -29,6 +29,13 @@
       "when": 1794190154444,
       "tag": "0003_google_reviews_cache",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794334985881,
+      "tag": "0004_migration",
+      "breakpoints": true
     }
   ]
 }

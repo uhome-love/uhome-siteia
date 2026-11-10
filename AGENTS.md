@@ -6,3 +6,5 @@
 - Official Natal art (lights, key, seal, Homi) lives in `src/components/foco/NatalArt.tsx` as Lovable Assets; `--natal-*` tokens follow the campaign brand kit.
 - Campaign price/city filtering is client-side in `campanhaFilters.ts`; keep the original catalog and broker prefixes intact so filters do not change campaign membership or attribution.
 - Product photos, floor plans and maps share `MaterialGallery` with Radix focus management, keyboard navigation, swipe and zoom; this keeps material inspection consistent without altering source assets.
+- LIA on the site: `lia-chat` edge function (Responses API + tools over imoveis/produtos_foco) writes leads/visits to `public_leads`/`agendamentos`, which reach the CRM only via existing DB triggers; prompt rules mirror the CRM LIA brain. Why: one LIA, one lead pipeline.
+- Site leads without a broker link go to the CRM "Fila do CEO" (pipeline_leads pendente_distribuicao) in `sync-to-crm`; no plantão fallback. Why: owner distributes site leads manually.

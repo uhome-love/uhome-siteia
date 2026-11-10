@@ -53,18 +53,7 @@ Deno.serve(async (req) => {
     corretorCRMId = perfil?.uhomesales_id ?? null
   }
 
-  // Fallback: corretor de plantão
-  if (!corretorCRMId) {
-    const { data: plantao } = await supabaseCRM
-      .from('profiles')
-      .select('id')
-      .eq('role', 'corretor')
-      .eq('de_plantao', true)
-      .eq('ativo', true)
-      .limit(1)
-      .maybeSingle()
-    corretorCRMId = plantao?.id ?? null
-  }
+  // Sem corretor de link: o lead vai para a Fila do CEO (distribuição manual no CRM).
 
   // Validate corretor exists in CRM profiles to avoid FK violations
   if (corretorCRMId) {
@@ -164,6 +153,7 @@ const ORIGEM_LABELS: Record<string, string> = {
   empreendimento_lead: 'Página do Empreendimento',
   lead_inline: 'Formulário na Página',
   busca_alerta: 'Alerta de Busca',
+  lia_chat: 'LIA no site',
 }
 
 function humanizeOrigem(componente: string | null | undefined): string | null {
@@ -194,6 +184,7 @@ async function handleLead(
   if (record.origem_pagina) obsLines.push(`Página: ${record.origem_pagina}`)
   if (record.utm_source) obsLines.push(`UTM: ${record.utm_source}${record.utm_campaign ? ` / ${record.utm_campaign}` : ''}`)
   if (record.device) obsLines.push(`Device: ${record.device}`)
+  obsLines.push(...contextoLinhas(record.contexto))
   const observacoes = obsLines.join('\n')
 
   // Build imovel_interesse with code for easy identification in CRM
@@ -240,6 +231,7 @@ async function handleLead(
   }
 
   if (leadCRM) {
+    await moverParaFilaCEO(supabaseCRM, leadCRM.pipeline_lead_id, corretorCRMId, record, observacoes)
     await supabaseSite
       .from('public_leads')
       .update({
@@ -267,7 +259,9 @@ async function handleAgendamento(
   if (imovelCodigo) agendLines.push(`Código: ${imovelCodigo}`)
   if (record.imovel_bairro) agendLines.push(`Bairro: ${record.imovel_bairro}`)
   if (imovelSlug) agendLines.push(`Link: https://uhome.com.br/imovel/${imovelSlug}`)
+  if (record.turno) agendLines.push(`Turno preferido: ${record.turno}`)
   if (record.origem_pagina) agendLines.push(`Página: ${record.origem_pagina}`)
+  agendLines.push(...contextoLinhas(record.contexto))
   const obsAgend = agendLines.join('\n')
 
   const tituloAgend = (record.imovel_titulo as string) ?? null
@@ -294,7 +288,81 @@ async function handleAgendamento(
     .select()
     .single()
 
+  if (leadCRM) {
+    await moverParaFilaCEO(supabaseCRM, leadCRM.pipeline_lead_id, corretorCRMId, record, obsAgend, {
+      proxima_acao: `Visita solicitada pelo site: ${record.data_visita}${record.turno ? ' (' + record.turno + ')' : ''}${record.horario ? ' ' + record.horario : ''}`,
+      data_proxima_acao: record.data_visita ?? null,
+    })
+    // Com corretor definido (link personalizado), a visita já nasce na agenda dele.
+    if (corretorCRMId && record.data_visita) {
+      const { error: vErr } = await supabaseCRM.from('visitas').insert({
+        corretor_id: corretorCRMId,
+        created_by: corretorCRMId,
+        data_visita: record.data_visita,
+        hora_visita: /^\d{2}:\d{2}/.test(String(record.horario ?? '')) ? String(record.horario).slice(0, 5) : null,
+        nome_cliente: record.nome,
+        telefone: record.telefone,
+        empreendimento: interesseAgend,
+        pipeline_lead_id: leadCRM.pipeline_lead_id ?? null,
+        lead_site_id: record.id,
+        origem: 'site_uhome',
+        origem_detalhe: (record.contexto as any)?.canal === 'lia' ? 'LIA no site' : 'Agendamento no site',
+        observacoes: obsAgend,
+      })
+      if (vErr) console.error('[sync-to-crm] visita não criada:', vErr.message)
+    }
+  }
+
   return { ok: !error, crm_lead_id: leadCRM?.id ?? null, error: error?.message }
+}
+
+// ─── Fila do CEO + contexto ──────────────────────────────────────
+function contextoLinhas(ctx: unknown): string[] {
+  if (!ctx || typeof ctx !== 'object') return []
+  const c = ctx as Record<string, any>
+  const l: string[] = []
+  if (c.canal === 'lia') l.push('Canal: conversa com a LIA no site')
+  if (c.resumo) l.push(`Resumo da LIA: ${c.resumo}`)
+  const q = c.qualificacao
+  if (q && typeof q === 'object') {
+    for (const [k, v] of Object.entries(q)) if (v) l.push(`${k}: ${v}`)
+  }
+  if (c.produto) l.push(`Produto de interesse: ${c.produto}`)
+  if (c.campanha) l.push(`Campanha: ${c.campanha}`)
+  if (c.gclid) l.push(`Google Ads gclid: ${c.gclid}`)
+  if (c.utm_term) l.push(`Palavra buscada: ${c.utm_term}`)
+  if (Array.isArray(c.paginas) && c.paginas.length) l.push(`Páginas vistas: ${c.paginas.slice(-10).join(' → ')}`)
+  if (Array.isArray(c.imoveis_vistos) && c.imoveis_vistos.length) l.push(`Imóveis vistos: ${c.imoveis_vistos.slice(-10).join(', ')}`)
+  if (c.ultima_busca) l.push(`Última busca: ${c.ultima_busca}`)
+  return l
+}
+
+async function moverParaFilaCEO(
+  supabaseCRM: any,
+  pipelineLeadId: string | null | undefined,
+  corretorCRMId: string | null,
+  record: Record<string, unknown>,
+  observacoes: string,
+  extra: Record<string, unknown> = {},
+) {
+  if (!pipelineLeadId) return
+  const patch: Record<string, unknown> = {
+    dados_site: { site_lead_id: record.id, contexto: record.contexto ?? null, origem_componente: record.origem_componente ?? null },
+    observacoes,
+    ...extra,
+    updated_at: new Date().toISOString(),
+  }
+  if (!corretorCRMId) {
+    Object.assign(patch, {
+      corretor_id: null,
+      aceite_status: 'pendente_distribuicao',
+      motivo_pendencia: 'fila_ceo_site',
+      distribuido_em: null,
+      aceito_em: null,
+    })
+  }
+  const { error } = await supabaseCRM.from('pipeline_leads').update(patch).eq('id', pipelineLeadId)
+  if (error) console.error('[sync-to-crm] fila CEO falhou:', error.message)
 }
 
 // ─── Captação handler ────────────────────────────────────────────

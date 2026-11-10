@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       agendamentos: {
         Row: {
+          contexto: Json | null
           corretor_ref_id: string | null
           corretor_ref_slug: string | null
           created_at: string | null
@@ -29,8 +30,10 @@ export type Database = {
           origem_ref: string | null
           status: string | null
           telefone: string
+          turno: string | null
         }
         Insert: {
+          contexto?: Json | null
           corretor_ref_id?: string | null
           corretor_ref_slug?: string | null
           created_at?: string | null
@@ -44,8 +47,10 @@ export type Database = {
           origem_ref?: string | null
           status?: string | null
           telefone: string
+          turno?: string | null
         }
         Update: {
+          contexto?: Json | null
           corretor_ref_id?: string | null
           corretor_ref_slug?: string | null
           created_at?: string | null
@@ -59,6 +64,7 @@ export type Database = {
           origem_ref?: string | null
           status?: string | null
           telefone?: string
+          turno?: string | null
         }
         Relationships: [
           {
@@ -773,6 +779,42 @@ export type Database = {
         }
         Relationships: []
       }
+      lia_conversas: {
+        Row: {
+          agendamento_id: string | null
+          contexto: Json | null
+          created_at: string
+          etapa: string
+          id: string
+          lead_id: string | null
+          mensagens: Json
+          session_id: string
+          updated_at: string
+        }
+        Insert: {
+          agendamento_id?: string | null
+          contexto?: Json | null
+          created_at?: string
+          etapa?: string
+          id?: string
+          lead_id?: string | null
+          mensagens?: Json
+          session_id: string
+          updated_at?: string
+        }
+        Update: {
+          agendamento_id?: string | null
+          contexto?: Json | null
+          created_at?: string
+          etapa?: string
+          id?: string
+          lead_id?: string | null
+          mensagens?: Json
+          session_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notificacoes: {
         Row: {
           created_at: string
@@ -967,6 +1009,7 @@ export type Database = {
       }
       public_leads: {
         Row: {
+          contexto: Json | null
           corretor_ref_id: string | null
           corretor_ref_slug: string | null
           created_at: string | null
@@ -998,6 +1041,7 @@ export type Database = {
           utm_term: string | null
         }
         Insert: {
+          contexto?: Json | null
           corretor_ref_id?: string | null
           corretor_ref_slug?: string | null
           created_at?: string | null
@@ -1029,6 +1073,7 @@ export type Database = {
           utm_term?: string | null
         }
         Update: {
+          contexto?: Json | null
           corretor_ref_id?: string | null
           corretor_ref_slug?: string | null
           created_at?: string | null

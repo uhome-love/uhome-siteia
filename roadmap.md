@@ -22,3 +22,11 @@
 - [ ] IA que qualifica o lead e envia resumo ao CRM
 - [ ] Campanhas Google/Meta apontando para as landings
 - [x] Home alto nível: destaque Natal com filtros, número único, avaliações Google, corretores com foto, Como funciona, "corretor busca para você", bairros com preço
+
+## Máquina de leads (plano 10/11)
+- [x] Etapa 1: LIA no site (chat, imóveis reais, Natal, visita e lead no CRM, fila CEO)
+- [ ] Faixa "Conheça a LIA" na Home com as cenas enviadas
+- [ ] Etapa 2: conversão em todo o site (formulários com contexto completo)
+- [ ] Etapa 3: Google Ads (medição, páginas de destino, campanha pausada) — aguarda conexão da conta
+- [ ] Etapa 4: Google orgânico — aguarda Search Console
+- Bloqueio: número do WhatsApp oficial da LIA (hoje usa o WhatsApp atual da Uhome)

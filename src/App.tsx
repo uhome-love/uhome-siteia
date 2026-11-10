@@ -13,7 +13,7 @@ import { AppRoutes } from "@/routes/AppRoutes";
 import { lazyRetry } from "@/lib/lazyRetry"; // hmr-trigger
 
 const ExitIntentModal = lazyRetry(() => import("./components/ExitIntentModal.tsx").then((m) => ({ default: m.ExitIntentModal })));
-const FloatingWhatsApp = lazyRetry(() => import("./components/FloatingWhatsApp.tsx"));
+const LiaChat = lazyRetry(() => import("./components/lia/LiaChat.tsx"));
 const WhatsAppLeadModal = lazyRetry(() => import("./components/WhatsAppLeadModal.tsx").then((m) => ({ default: m.WhatsAppLeadModal })));
 
 const queryClient = new QueryClient({
@@ -49,7 +49,7 @@ const App = () => (
                 <AppRoutes />
               </Suspense>
               <ExitIntentModal />
-              <FloatingWhatsApp />
+              <Suspense fallback={null}><LiaChat /></Suspense>
             </TooltipProvider>
           </CorretorProvider>
         </AuthProvider>

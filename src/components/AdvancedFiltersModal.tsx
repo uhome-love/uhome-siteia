@@ -18,9 +18,10 @@ const andarOptions = [
 interface Props {
   open: boolean;
   onClose: () => void;
+  total?: number;
 }
 
-export function AdvancedFiltersModal({ open, onClose }: Props) {
+export function AdvancedFiltersModal({ open, onClose, total }: Props) {
   const { filters, setFilter } = useSearchStore();
   const [condoInput, setCondoInput] = useState(filters.condominio || "");
   const [condoList, setCondoList] = useState<string[]>([]);
@@ -225,7 +226,7 @@ export function AdvancedFiltersModal({ open, onClose }: Props) {
                 onClick={onClose}
                 className="rounded-full bg-primary px-6 py-3 font-body text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90 active:scale-[0.97]"
               >
-                Ver resultados
+                {typeof total === "number" ? `Ver ${total.toLocaleString("pt-BR")} imóveis` : "Ver resultados"}
               </button>
             </div>
           </motion.div>

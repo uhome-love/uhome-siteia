@@ -956,6 +956,30 @@ const Search = () => {
                 isMobile={isMobile}
                 sentinelRef={sentinelRef}
               />
+              {!modoIA && total > 0 && total < 6 && (filters.bairro || filters.bounds || filters.precoMax || filters.quartos) && (
+                <div className="mt-6 flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border bg-muted/40 p-5 text-center sm:flex-row sm:justify-between sm:text-left">
+                  <p className="font-body text-sm text-muted-foreground">
+                    Poucos imóveis com esses filtros. Que tal ampliar a busca?
+                  </p>
+                  <div className="flex flex-wrap justify-center gap-2">
+                    {(filters.bairro || filters.bounds) && (
+                      <button onClick={() => setFilters({ bairro: "", bounds: null })} className="rounded-full border border-primary/30 bg-card px-3.5 py-1.5 font-body text-xs font-semibold text-primary hover:bg-primary/5">
+                        Ver toda a cidade
+                      </button>
+                    )}
+                    {filters.precoMax > 0 && (
+                      <button onClick={() => setFilter("precoMax", Math.round(filters.precoMax * 1.2))} className="rounded-full border border-primary/30 bg-card px-3.5 py-1.5 font-body text-xs font-semibold text-primary hover:bg-primary/5">
+                        Preço até +20%
+                      </button>
+                    )}
+                    {filters.quartos > 1 && (
+                      <button onClick={() => setFilter("quartos", filters.quartos - 1)} className="rounded-full border border-primary/30 bg-card px-3.5 py-1.5 font-body text-xs font-semibold text-primary hover:bg-primary/5">
+                        {filters.quartos - 1}+ quartos
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -1139,7 +1163,7 @@ const Search = () => {
       {/* Auth modal triggered after alert preferences */}
       <AuthModal open={showAuthAfterAlert} onClose={() => setShowAuthAfterAlert(false)} />
       <MobileFiltersSheet open={mobileFilters} onClose={() => setMobileFilters(false)} total={total} />
-      <AdvancedFiltersModal open={advancedFilters} onClose={() => setAdvancedFilters(false)} />
+      <AdvancedFiltersModal open={advancedFilters} onClose={() => setAdvancedFilters(false)} total={total} />
       <PerformanceDebug />
     </div>
   );

@@ -29,9 +29,12 @@ export function buildChips(f: SearchFilters): Chip[] {
   return c;
 }
 
+const EXTRA_KEYS = new Set(["banheiros", "cond", "iptu", "condominio", "bounds"]);
+
 export function ActiveFilterChips() {
   const { filters, setFilters } = useSearchStore();
-  const chips = buildChips(filters);
+  // Filtros que já têm pílula com "x" na barra de cima não se repetem aqui.
+  const chips = buildChips(filters).filter((c) => EXTRA_KEYS.has(c.key));
   if (chips.length === 0) return null;
   return (
     <div className="flex items-center gap-2 overflow-x-auto border-b border-border px-4 py-2 scrollbar-hide sm:px-6" aria-label="Filtros aplicados">

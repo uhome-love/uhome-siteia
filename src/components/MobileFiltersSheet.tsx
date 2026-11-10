@@ -292,6 +292,26 @@ export function MobileFiltersSheet({ open, onClose, total }: Props) {
               {/* Valor */}
               <section className="mt-8">
                 <p className="font-body text-base font-bold text-foreground">Valor</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {[
+                    { label: "Até 300 mil", min: 0, max: 300000 },
+                    { label: "300 a 600 mil", min: 300000, max: 600000 },
+                    { label: "600 mil a 1 mi", min: 600000, max: 1000000 },
+                    { label: "Acima de 1 mi", min: 1000000, max: 0 },
+                  ].map((r) => {
+                    const sel = filters.precoMin === r.min && filters.precoMax === r.max;
+                    return (
+                      <button
+                        key={r.label}
+                        type="button"
+                        onClick={() => { setFilter("precoMin", sel ? 0 : r.min); setFilter("precoMax", sel ? 0 : r.max); }}
+                        className={`rounded-full border px-3.5 py-1.5 font-body text-sm transition-colors ${sel ? "border-primary bg-primary/10 font-semibold text-primary" : "border-border text-foreground hover:border-primary/40"}`}
+                      >
+                        {r.label}
+                      </button>
+                    );
+                  })}
+                </div>
                 <div className="mt-3 flex items-center gap-3">
                   <div className="relative flex-1">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 font-body text-base text-muted-foreground">R$</span>

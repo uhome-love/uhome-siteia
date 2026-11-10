@@ -120,9 +120,29 @@ export default function CampanhaPage() {
             ))}
           </div>
         </section></Reveal>
+        <Reveal><section className="mx-auto max-w-3xl px-5 pb-12 sm:px-8">
+          <h2 className="text-h2 text-foreground">Perguntas frequentes</h2>
+          <div className="mt-5 divide-y divide-border rounded-2xl border border-border">
+            {[
+              { q: "Até quando vale a campanha?", a: "Para contratos assinados de 02/11 a 18/12/2026." },
+              { q: "Como funciona o presente de Natal?", a: c.config.urna ?? "Quem assina e paga dentro do período tira um cartão da urna premiada." },
+              { q: "Os preços já são os finais?", a: "Os valores são \"a partir de\" e dependem da unidade e da disponibilidade. Um especialista confirma a condição da unidade que você escolher." },
+              { q: "Posso visitar antes de decidir?", a: "Sim. Fale com a gente e marcamos a visita ao decorado ou ao local no melhor dia para você." },
+            ].map((f) => (
+              <details key={f.q} className="group p-4">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-heading text-base font-semibold text-foreground">{f.q}<span className="text-natal-red transition-transform group-open:rotate-45">+</span></summary>
+                <p className="mt-2 font-body text-sm text-muted-foreground">{f.a}</p>
+              </details>
+            ))}
+          </div>
+        </section></Reveal>
       </main>
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-natal-gold/30 bg-natal-deep/95 p-3 backdrop-blur lg:hidden" style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}>
-        <Button asChild size="lg" className="w-full bg-natal-gold text-natal-deep hover:bg-natal-gold/90"><a href={`https://wa.me/${numero}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer"><MessageCircle /> {isDirectAccess && corretor ? `Falar com ${corretor.nome.split(" ")[0]}` : "Falar sobre as condições"}</a></Button>
+        {isDirectAccess && corretor ? (
+          <Button asChild size="lg" className="w-full bg-natal-gold text-natal-deep hover:bg-natal-gold/90"><a href={`https://wa.me/${numero}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer"><MessageCircle /> Falar com {corretor.nome.split(" ")[0]}</a></Button>
+        ) : (
+          <Button size="lg" className="w-full bg-natal-gold text-natal-deep hover:bg-natal-gold/90" onClick={() => window.dispatchEvent(new CustomEvent("uhome:abrir-lia", { detail: { mensagem: "Quero saber as condições do Natal Chave de Ouro" } }))}><MessageCircle /> Quero as condições de Natal</Button>
+        )}
       </div>
       <Footer />
     </div>

@@ -13,6 +13,10 @@ import { Reveal } from "@/components/ui/reveal";
 import { Button } from "@/components/ui/button";
 import { MaterialGallery } from "@/components/foco/MaterialGallery";
 
+function abrirLia(mensagem: string) {
+  window.dispatchEvent(new CustomEvent("uhome:abrir-lia", { detail: { mensagem } }));
+}
+
 function setMeta(attr: "name" | "property", key: string, content: string) {
   let el = document.querySelector(`meta[${attr}="${key}"]`);
   if (!el) {
@@ -339,10 +343,20 @@ export default function ProdutoFocoPage() {
 
       {/* Barra fixa no celular */}
       <div className="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-border bg-background/95 p-3 backdrop-blur lg:hidden" style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}>
-        <a href={waUrl} target="_blank" rel="noopener noreferrer" className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3.5 font-body text-sm font-bold ${natal && !black ? "bg-natal-gold text-natal-deep" : "bg-primary text-primary-foreground"}`}>
-          <MessageCircle className="h-4 w-4" /> {modoCorretor ? `WhatsApp de ${corretor?.nome.split(" ")[0]}` : "Chamar no WhatsApp"}
-        </a>
-        {!modoCorretor && <a href="#contato" className="rounded-xl border border-border px-4 py-3.5 font-body text-sm font-semibold text-foreground">Condições</a>}
+        {modoCorretor ? (
+          <a href={waUrl} target="_blank" rel="noopener noreferrer" className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3.5 font-body text-sm font-bold ${natal && !black ? "bg-natal-gold text-natal-deep" : "bg-primary text-primary-foreground"}`}>
+            <MessageCircle className="h-4 w-4" /> WhatsApp de {corretor?.nome.split(" ")[0]}
+          </a>
+        ) : (
+          <>
+            <button type="button" onClick={() => abrirLia(`Quero as condições${natal ? " de Natal" : ""} do ${p.nome}`)} className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3.5 font-body text-sm font-bold ${natal && !black ? "bg-natal-gold text-natal-deep" : "bg-primary text-primary-foreground"}`}>
+              <MessageCircle className="h-4 w-4" /> Quero as condições
+            </button>
+            <button type="button" onClick={() => abrirLia(`Quero agendar uma visita no ${p.nome}`)} className="flex items-center gap-1.5 rounded-xl border border-border px-4 py-3.5 font-body text-sm font-semibold text-foreground">
+              <Calendar className="h-4 w-4" /> Visitar
+            </button>
+          </>
+        )}
       </div>
 
       {box && <MaterialGallery fotos={box.fotos} index={box.i} onClose={() => setBox(null)} />}

@@ -41,6 +41,7 @@ export function LiaChat() {
   const [enviando, setEnviando] = useState(false);
   const fimRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const pendenteRef = useRef<string | null>(null);
 
   const isProdutoPage = location.pathname.includes("/imovel/") || /\/(em-foco|campanha)\/[^/]+/.test(location.pathname) || isLandingCampanha(location.pathname);
   const hasBottomBar = location.pathname.startsWith("/busca") || isProdutoPage;
@@ -50,7 +51,12 @@ export function LiaChat() {
   useEffect(() => { sessionStorage.setItem(KEY, JSON.stringify(msgs.slice(-40))); fimRef.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs]);
   useEffect(() => { if (aberto && !enviando) inputRef.current?.focus(); }, [aberto, enviando]);
   useEffect(() => {
-    const abrir = () => setAberto(true);
+    const abrir = (e: Event) => {
+      const m = (e as CustomEvent<{ mensagem?: string }>).detail?.mensagem;
+      if (m) pendenteRef.current = m;
+      setVisible(true);
+      setAberto(true);
+    };
     window.addEventListener("uhome:abrir-lia", abrir);
     return () => window.removeEventListener("uhome:abrir-lia", abrir);
   }, []);
@@ -90,6 +96,15 @@ export function LiaChat() {
       setEnviando(false);
     }
   }
+
+  useEffect(() => {
+    if (aberto && pendenteRef.current && !enviando) {
+      const m = pendenteRef.current;
+      pendenteRef.current = null;
+      enviar(m);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [aberto]);
 
   if (!visible) return null;
 

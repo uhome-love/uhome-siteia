@@ -6,6 +6,7 @@ import { useCorretor } from "@/contexts/CorretorContext";
 import { buildWhatsAppUrl, buildCorretorWhatsAppUrl } from "@/lib/whatsapp";
 import { captureGclid, montarContextoLia, registrarPagina } from "@/lib/liaContext";
 import liaAvatar from "@/assets/lia-avatar.webp.asset.json";
+import { isLandingCampanha } from "@/lib/landingPages";
 
 type Msg = { role: "user" | "assistant"; content: string };
 const KEY = "uhome_lia_conversa";
@@ -38,7 +39,7 @@ export function LiaChat() {
   const fimRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const isProdutoPage = location.pathname.includes("/imovel/") || /\/(em-foco|campanha)\/[^/]+/.test(location.pathname);
+  const isProdutoPage = location.pathname.includes("/imovel/") || /\/(em-foco|campanha)\/[^/]+/.test(location.pathname) || isLandingCampanha(location.pathname);
   const hasBottomBar = location.pathname.startsWith("/busca") || isProdutoPage;
 
   useEffect(() => { captureGclid(); const t = setTimeout(() => setVisible(true), 2500); return () => clearTimeout(t); }, []);

@@ -30,6 +30,7 @@ import {
   GuiaBairros,
   Index,
   IntegracaoDiagnostico,
+  InvestirStudios,
   MegaCyrela,
   Onboarding,
   Privacidade,
@@ -77,6 +78,7 @@ export function AppRoutes() {
       <Route path="/venda" element={<Navigate to="/busca?finalidade=venda" replace />} />
       <Route path="/vitrine/:id" element={<Vitrine />} />
       <Route path="/mega-cyrela" element={<MegaCyrela />} />
+      <Route path="/investir-studios" element={<InvestirStudios />} />
       <Route path="/sobre" element={<Sobre />} />
       <Route path="/guia-bairros" element={<GuiaBairros />} />
       <Route path="/casas-porto-alegre" element={<TipoImovel />} />

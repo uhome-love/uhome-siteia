@@ -43,7 +43,9 @@ export function LiaChat() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const pendenteRef = useRef<string | null>(null);
 
-  const isProdutoPage = location.pathname.includes("/imovel/") || /\/(em-foco|campanha)\/[^/]+/.test(location.pathname) || isLandingCampanha(location.pathname);
+  // Landing de campanha: a barra de contato própria aparece até 1080px; a LIA só entra acima disso.
+  const isLanding = isLandingCampanha(location.pathname);
+  const isProdutoPage = location.pathname.includes("/imovel/") || /\/(em-foco|campanha)\/[^/]+/.test(location.pathname) || isLanding;
   const hasBottomBar = location.pathname.startsWith("/busca") || isProdutoPage;
 
   useEffect(() => { captureGclid(); const t = setTimeout(() => setVisible(true), 2500); return () => clearTimeout(t); }, []);
@@ -188,7 +190,7 @@ export function LiaChat() {
           aria-label="Fale com a LIA, atendente virtual da Uhome"
           className={`fixed right-4 z-50 flex items-center gap-2 rounded-full border border-border bg-background p-1 shadow-xl transition-transform hover:scale-[1.03] active:scale-95 sm:right-6 sm:pr-4 ${
             hasBottomBar ? "bottom-24 sm:bottom-6" : "bottom-5 sm:bottom-6"
-          } ${isProdutoPage ? "hidden sm:flex" : "flex"}`}
+          } ${isLanding ? "hidden min-[1081px]:flex" : isProdutoPage ? "hidden sm:flex" : "flex"}`}
         >
           <span className="relative">
             <img src={liaAvatar.url} alt="" width={52} height={52} className="h-[52px] w-[52px] rounded-full object-cover" />

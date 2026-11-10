@@ -47,7 +47,7 @@ export default function FeaturedNeighborhoods() {
   }, []);
 
   return (
-    <section className="py-8 sm:py-10">
+    <section className="section-y">
       <div className="container-uhome">
         <motion.div
           initial={{ opacity: 0, y: 16 }}

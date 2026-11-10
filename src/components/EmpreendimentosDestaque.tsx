@@ -43,7 +43,7 @@ export function EmpreendimentosDestaque() {
   if (items.length === 0) return null;
 
   return (
-    <section className="py-8 sm:py-10">
+    <section className="section-y">
       <div className="container-uhome">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -53,7 +53,7 @@ export function EmpreendimentosDestaque() {
         >
           <div className="mb-8 flex items-end justify-between">
             <div>
-              <h2 className="text-2xl font-bold sm:text-3xl">Empreendimentos em Destaque</h2>
+              <h2 className="text-h2 text-foreground">Empreendimentos em Destaque</h2>
               <p className="mt-1 text-sm text-muted-foreground">Lançamentos exclusivos selecionados para você</p>
             </div>
             <Link

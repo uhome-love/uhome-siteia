@@ -36,14 +36,14 @@ export function HomeConfianca() {
   if (!g && !corretores.length) return null;
 
   return (
-    <section className="py-8 sm:py-10">
+    <section className="section-y">
       <div className="mx-auto max-w-7xl px-4 sm:px-8">
         {g && g.avaliacoes.length > 0 && (
           <>
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
                 <p className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-primary">Quem comprou com a Uhome</p>
-                <h2 className="mt-3 font-body text-[clamp(1.6rem,3.5vw,2.4rem)] font-extrabold leading-tight tracking-tight text-foreground">
+                <h2 className="mt-3 text-h2 text-foreground">
                   Nota {g.nota.toLocaleString("pt-BR")} no Google
                 </h2>
                 <div className="mt-2 flex items-center gap-2">
@@ -80,7 +80,7 @@ export function HomeConfianca() {
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
                 <p className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-primary">Nosso time</p>
-                <h2 className="mt-3 font-body text-[clamp(1.4rem,3vw,2rem)] font-extrabold leading-tight tracking-tight text-foreground">
+                <h2 className="mt-3 text-h2 text-foreground">
                   Conheça nossos corretores
                 </h2>
                 <p className="mt-2 font-body text-sm text-muted-foreground">Fale direto com um especialista, sem intermediários.</p>

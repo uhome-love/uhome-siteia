@@ -4,6 +4,7 @@ import { useCorretor } from "@/contexts/CorretorContext";
 import { WHATSAPP_NUMBER } from "@/lib/whatsapp";
 import { trackWhatsAppClick } from "@/services/whatsappTracker";
 import { formatPreco, mensagemProduto, type ProdutoFoco } from "@/lib/produtosFoco";
+import { Button } from "@/components/ui/button";
 
 /** Abre o WhatsApp do corretor (link personalizado) ou da Uhome. */
 export function useWhatsAppProduto() {
@@ -17,13 +18,15 @@ export function useWhatsAppProduto() {
   };
 }
 
-export function ProdutoFocoCard({ p, selo, campanha }: { p: ProdutoFoco; selo?: string; campanha?: "natal" | "black" }) {
+export function ProdutoFocoCard({ p, selo, campanha, contato = false }: { p: ProdutoFoco; selo?: string; campanha?: "natal" | "black"; contato?: boolean }) {
   const { prefixLink } = useCorretor();
+  const wa = useWhatsAppProduto();
   const preco = formatPreco(p.preco_a_partir);
   return (
+    <div className="flex h-full min-w-0 flex-col overflow-hidden rounded-lg border border-border/60 bg-card transition-shadow hover:shadow-lg">
     <Link
       to={prefixLink(`/em-foco/${p.slug}`)}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+      className="group flex min-w-0 flex-1 flex-col focus-visible:outline focus-visible:outline-ring"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
         {p.capa_url && (
@@ -56,8 +59,8 @@ export function ProdutoFocoCard({ p, selo, campanha }: { p: ProdutoFoco; selo?: 
       <div className="flex flex-1 flex-col gap-1.5 p-5">
         <p className="font-body text-xs font-medium uppercase tracking-wider text-muted-foreground">{p.incorporadora}</p>
         <h3 className="font-heading text-lg font-bold text-foreground">{p.nome}</h3>
-        <p className="flex items-center gap-1 font-body text-sm text-muted-foreground">
-          <MapPin className="h-3.5 w-3.5" /> {p.bairro}, {p.cidade}
+        <p className="flex items-start gap-1 font-body text-sm text-muted-foreground">
+          <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" /> {[p.bairro, p.cidade].filter(Boolean).join(", ")}
         </p>
         <div className="mt-auto flex items-end justify-between pt-3">
           {preco ? (
@@ -70,6 +73,8 @@ export function ProdutoFocoCard({ p, selo, campanha }: { p: ProdutoFoco; selo?: 
         </div>
       </div>
     </Link>
+    {contato && <div className="px-5 pb-5"><Button asChild variant="secondary" className="w-full"><a href={wa(p)} target="_blank" rel="noopener noreferrer"><MessageCircle /> Consultar condições</a></Button></div>}
+    </div>
   );
 }
 

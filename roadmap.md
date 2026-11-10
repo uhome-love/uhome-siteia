@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Fase 1 — Campanhas
+- [x] Compactar campanha Natal, filtros e contato contextual; validar computador e celular
 - [x] Cadastro dos 10 empreendimentos de Natal com fotos, plantas, preços e entregas
 - [x] Vitrine "Uhome em Foco" (/em-foco, /lancamentos, /destaques)
 - [x] Landing page completa de cada produto

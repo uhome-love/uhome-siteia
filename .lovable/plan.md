@@ -11,6 +11,10 @@ Trabalho em 4 etapas. Cada etapa é entregue e testada antes da próxima. Busca,
 - Missão igual à do WhatsApp: levar a pessoa a escolher **um dia e um turno** para conhecer o imóvel e passar ao corretor com resumo.
 - Qualifica renda, entrada, FGTS, prazo e uso; se a pessoa pedir um humano, passa ao corretor na hora; se pedir para parar, encerra.
 - A conversa e o resumo entram no CRM como lead qualificado, com todo o histórico.
+- **A LIA conhece todos os imóveis do site**: busca no catálogo real (bairro, preço, quartos, código) e sugere opções com link, foto e preço, sem inventar nada.
+- **Conhece o Natal Chave de Ouro**: os 10 empreendimentos, condições, prazos de entrega e diferenciais da Uhome (curadoria, avaliação 4,9 no Google, corretores especialistas).
+- **Tom humano e foco em conversão**: conversa curta e calorosa, sempre termina com uma pergunta e conduz para demonstrar interesse ou marcar visita.
+- **Visita agendada já cria a visita no CRM**, pronta com data, turno, imóvel/produto de interesse e o resumo da conversa — vale para a LIA e para o botão "Agendar visita".
 - **Todo lead vindo do site entra na fila CEO** do CRM (conversa da LIA, formulários e botões), com contexto completo: páginas vistas, imóveis e produtos abertos, buscas e filtros, campanha, corretor do link, origem do anúncio e o resumo da LIA.
 - Em links personalizados de corretor, o contato continua indo para o corretor.
 - Vale para todas as páginas: Home, busca, imóvel, Natal e produtos.

@@ -338,7 +338,7 @@ Deno.serve(async (req) => {
   let acao: string | null = null;
   try {
     for (let i = 0; i < 6; i++) {
-      const r: any = await generateResponse({ model: MODEL, instructions, input, tools: respTools } as any);
+      const r: any = await generateResponse({ model: MODEL, instructions, input, tools: respTools, reasoning: { effort: "low" } } as any);
       const out: any[] = r.output ?? [];
       const calls = out.filter((o) => o.type === "function_call");
       if (!calls.length) {

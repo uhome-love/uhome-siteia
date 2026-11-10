@@ -161,6 +161,10 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
     (imovel.quartos ?? 0) > 0 ? `${imovel.quartos} quarto${imovel.quartos! > 1 ? "s" : ""}` : null,
     (imovel.vagas ?? 0) > 0 ? `${imovel.vagas} vaga${imovel.vagas! > 1 ? "s" : ""}` : null,
   ].filter(Boolean);
+  // Comerciais/terrenos sem área nem quartos: mostra o tipo para não deixar a linha vazia
+  if (statsArr.length === 0 && imovel.tipo) {
+    statsArr.push(imovel.tipo.charAt(0).toUpperCase() + imovel.tipo.slice(1));
+  }
   const stats = statsArr.join(" · ");
 
   // Smart badges: base + price-based (loaded async, only when visible)

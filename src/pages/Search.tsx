@@ -919,13 +919,20 @@ const Search = () => {
                   <Sparkles className="h-10 w-10 text-muted-foreground/30" />
                   <p className="mt-4 font-body text-lg font-bold text-foreground">Nenhum imóvel encontrado</p>
                   <p className="mt-1 font-body text-sm text-muted-foreground">
-                    Tente descrever de outra forma ou ajuste os termos da busca.
+                    Tente descrever de outra forma (ex.: "apartamento 2 quartos perto do Moinhos até 800 mil") ou fale com um corretor.
                   </p>
+                  <a href="/#corretor-busca" className="mt-5 rounded-full bg-primary px-4 py-2 font-body text-sm font-semibold text-primary-foreground hover:bg-primary/90">Um corretor busca para mim</a>
                 </>
               ) : (
                 <>
-                  <p className="font-body text-lg font-bold text-foreground">Nenhum imóvel encontrado</p>
-                  <p className="mt-1 font-body text-sm text-muted-foreground">Tente ajustar seus filtros.</p>
+                  <p className="font-body text-lg font-bold text-foreground">Nenhum imóvel com esses filtros</p>
+                  <p className="mt-1 max-w-sm text-center font-body text-sm text-muted-foreground">
+                    Tente ampliar a faixa de preço ou a região — ou peça para um corretor Uhome buscar para você, inclusive imóveis fora do site.
+                  </p>
+                  <div className="mt-5 flex flex-wrap justify-center gap-2">
+                    <a href="/busca" className="rounded-full border-[1.5px] border-border px-4 py-2 font-body text-sm font-semibold text-foreground hover:border-foreground/40">Limpar filtros</a>
+                    <a href="/#corretor-busca" className="rounded-full bg-primary px-4 py-2 font-body text-sm font-semibold text-primary-foreground hover:bg-primary/90">Um corretor busca para mim</a>
+                  </div>
                 </>
               )}
             </div>

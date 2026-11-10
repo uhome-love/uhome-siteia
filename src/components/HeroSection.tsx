@@ -234,9 +234,12 @@ export function HeroSection() {
                         : "border-border font-normal text-foreground/70 hover:border-foreground/30"
                     }`}
                   >
-                    {m === "ia" && <Sparkles className="h-3.5 w-3.5" />}
+                    {m === "ia" && <Sparkles className="h-3.5 w-3.5 text-primary" />}
                     <span className="hidden sm:inline">{label}</span>
                     <span className="sm:hidden">{mobileLabel}</span>
+                    {m === "ia" && modo !== "ia" && (
+                      <span className="ml-1 rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold uppercase leading-none text-primary-foreground">Novo</span>
+                    )}
                   </button>
                 );
               })}

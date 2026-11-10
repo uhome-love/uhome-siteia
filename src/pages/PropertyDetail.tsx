@@ -29,6 +29,7 @@ import { useFavoritos } from "@/hooks/useFavoritos";
 import { trackWhatsAppClick } from "@/services/whatsappTracker";
 import { StickyPropertyCTA } from "@/components/StickyPropertyCTA";
 import { formatIptu } from "@/lib/iptu";
+import { custoMensalFixo, primeiraParcelaSAC } from "@/lib/financiamento";
 
 function extractPropertyCode(slug: string, id: string): string {
   const parts = slug.split("-");
@@ -206,10 +207,10 @@ const PropertyDetail = () => {
         <Navbar />
         <div className="flex flex-col items-center justify-center pt-32">
           <p className="font-body text-xl font-bold text-foreground">
-            {loadError ? "Erro ao carregar imóvel" : "Imóvel não encontrado"}
+            {loadError ? "Erro ao carregar imóvel" : "Este imóvel saiu de venda"}
           </p>
-          <p className="mt-2 font-body text-sm text-muted-foreground">
-            {loadError ?? "Este imóvel pode ter sido removido ou o link está incorreto."}
+          <p className="mt-2 max-w-md text-center font-body text-sm text-muted-foreground">
+            {loadError ?? "Ele pode ter sido vendido ou retirado do site. Temos milhares de outros imóveis à venda — veja opções parecidas ou fale com um corretor."}
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             {loadError && (
@@ -581,6 +582,26 @@ const PropertyDetail = () => {
                 )}
                 {(imovel.preco_iptu ?? 0) > 0 && <p>{formatIptu(imovel)}</p>}
               </div>
+              {(() => {
+                const custo = custoMensalFixo(imovel);
+                const temCond = (imovel.preco_condominio ?? 0) > 0;
+                const temIptu = (imovel.preco_iptu ?? 0) > 0;
+                const parcela = primeiraParcelaSAC(imovel.preco);
+                return (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {temCond && temIptu && custo > 0 && (
+                      <span className="rounded-lg bg-muted px-3 py-1.5 font-body text-[13px] text-foreground">
+                        Custo mensal: <strong>R$ {custo.toLocaleString("pt-BR")}</strong> <span className="text-muted-foreground">(cond. + IPTU)</span>
+                      </span>
+                    )}
+                    {!isIndisponivel && parcela > 0 && (
+                      <a href="#simulador" className="rounded-lg bg-primary/10 px-3 py-1.5 font-body text-[13px] font-medium text-primary transition-colors hover:bg-primary/15">
+                        Parcelas a partir de R$ {Math.round(parcela).toLocaleString("pt-BR")}/mês · simular →
+                      </a>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Scannable property specifications */}
@@ -660,7 +681,9 @@ const PropertyDetail = () => {
             <div className="h-px bg-border" />
 
             {/* Financing */}
-            <FinancingSimulator propertyPrice={imovel.preco} />
+            <div id="simulador" className="scroll-mt-28">
+              <FinancingSimulator propertyPrice={imovel.preco} />
+            </div>
           </motion.div>
 
           {/* Right — Lead Sidebar */}

@@ -49,6 +49,11 @@ Trabalho em 4 etapas. Cada etapa é entregue e testada antes da próxima. Busca,
 - O número do WhatsApp oficial da LIA.
 - Autorizar a conexão da conta do Google Ads na Etapa 3.
 
+## Integração site e CRM
+- Usa a ponte que já existe entre o site e o CRM (a mesma chave secreta), ampliada para: conversas da LIA, leads na fila CEO, visitas agendadas, contexto completo do visitante e conversões do Google Ads.
+- Tudo com confirmação de entrega: se o CRM estiver fora do ar, o site guarda e reenvia, sem perder nenhum lead.
+- Teste ponta a ponta: lead e visita de teste criados no site e conferidos no CRM.
+
 ## Detalhes técnicos
 - Chat no site via edge function `lia-chat` no site que repassa para o hub da LIA no CRM (autenticada com `CRM_BRIDGE_TOKEN`); se o CRM não tiver endpoint, prompt para criá-lo no projeto CRM.
 - Contexto do lead reaproveita o first-touch de UTM no localStorage e o radar de intenção; leads continuam indo ao CRM só por triggers do banco.

@@ -306,7 +306,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         filter: ["has", "point_count"],
         paint: {
           "circle-color": "#5B6CF9",
-          "circle-opacity": 0.16,
+          "circle-opacity": 0.1,
           "circle-radius": [
             "interpolate", ["linear"], ["get", "point_count"],
             1, 26, 25, 32, 100, 39, 500, 47,
@@ -322,13 +322,13 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         source: "imoveis",
         filter: ["has", "point_count"],
         paint: {
-          "circle-color": "#5B6CF9",
+          "circle-color": "#FFFFFF",
           "circle-radius": [
             "interpolate", ["linear"], ["get", "point_count"],
-            1, 18, 25, 23, 100, 29, 500, 36,
+            1, 16, 25, 20, 100, 25, 500, 31,
           ],
-          "circle-stroke-width": 2.5,
-          "circle-stroke-color": "#FFFFFF",
+          "circle-stroke-width": 2,
+          "circle-stroke-color": "#5B6CF9",
           "circle-opacity": 1,
           "circle-radius-transition": { duration: 260, delay: 0 },
         },
@@ -346,7 +346,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
           "text-allow-overlap": true,
           "text-ignore-placement": true,
         },
-        paint: { "text-color": "#FFFFFF" },
+        paint: { "text-color": "#3A47C9" },
       });
 
       // Pill images — high-DPI with 9-slice stretch so corners never distort

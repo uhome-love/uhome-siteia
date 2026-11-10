@@ -1,3 +1,4 @@
+import { ActiveFilterChips } from "@/components/search/ActiveFilterChips";
 import React, { useState, useEffect, useCallback, useMemo, useRef, lazy, Suspense } from "react";
 import { useCorretor } from "@/contexts/CorretorContext";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -753,7 +754,10 @@ const Search = () => {
           )}
         </div>
       ) : (
-        <SearchFiltersBar onOpenMobileFilters={() => setMobileFilters(true)} onOpenAdvancedFilters={() => setAdvancedFilters(true)} />
+        <>
+          <SearchFiltersBar onOpenMobileFilters={() => setMobileFilters(true)} onOpenAdvancedFilters={() => setAdvancedFilters(true)} />
+          <ActiveFilterChips />
+        </>
       )}
 
       {/* AI resumo badge + interpreted filters */}

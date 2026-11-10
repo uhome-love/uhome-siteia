@@ -7,7 +7,10 @@ Trabalho em 4 etapas. Cada etapa é entregue e testada antes da próxima. Busca,
 - As imagens enviadas da LIA (avatar oficial e cenas: agendou, qualifica, qualidade, futuro etc.) são usadas na abertura da conversa, numa faixa "Conheça a LIA" na Home e nas páginas para Google Ads. Todas otimizadas para carregar rápido.
 - Ao abrir: uma conversa no próprio site com a LIA, além do botão "Continuar no WhatsApp", que abre o WhatsApp oficial da LIA com a mensagem e o imóvel já preenchidos.
 - A LIA recebe o contexto completo: página, imóvel (código, preço, bairro), campanha, corretor do link, origem do anúncio (UTM/gclid) e buscas feitas.
-- A LIA qualifica o lead no CRM (orçamento, região, prazo, financiamento), com todo o histórico da conversa.
+- A LIA do site usa o **mesmo cérebro do CRM** enviado: mesmas regras (nunca inventar número, nunca prometer aprovação de financiamento, uma pergunta por vez, sem formatação), mesmo fluxo (entrada → atendendo → qualificado → corretor) e as fichas dos 20 produtos.
+- Missão igual à do WhatsApp: levar a pessoa a escolher **um dia e um turno** para conhecer o imóvel e passar ao corretor com resumo.
+- Qualifica renda, entrada, FGTS, prazo e uso; se a pessoa pedir um humano, passa ao corretor na hora; se pedir para parar, encerra.
+- A conversa e o resumo entram no CRM como lead qualificado, com todo o histórico.
 - Em links personalizados de corretor, o contato continua indo para o corretor.
 - Vale para todas as páginas: Home, busca, imóvel, Natal e produtos.
 
@@ -30,7 +33,7 @@ Trabalho em 4 etapas. Cada etapa é entregue e testada antes da próxima. Busca,
 - Conectar o Google Search Console para acompanhar resultados.
 
 ## O que preciso de você
-- No CRM: confirmar como a LIA recebe conversas de fora (o hub da LIA tem uma entrada para o site?). Vou ler o projeto do CRM e, se faltar, preparo um texto pronto para você colar lá.
+- Preferência: a conversa do site roda **dentro do CRM** (o site só repassa as mensagens), para a LIA ser uma só. Se o CRM ainda não aceitar conversas vindas do site, preparo um texto pronto para você colar lá.
 - O número do WhatsApp oficial da LIA.
 - Autorizar a conexão da conta do Google Ads na Etapa 3.
 

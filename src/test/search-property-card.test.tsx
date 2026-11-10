@@ -89,7 +89,7 @@ describe("SearchPropertyCard", () => {
 
   it("renders badge for new property", () => {
     renderCard();
-    const badges = screen.getAllByText("Novidade");
+    const badges = screen.getAllByText("Novo no site");
     expect(badges.length).toBeGreaterThan(0);
   });
 });

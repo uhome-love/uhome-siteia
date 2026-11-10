@@ -317,7 +317,7 @@ const PropertyDetail = () => {
         </div>
         </div>
         {images.length > 1 && (
-          <div className="mx-auto mt-3 max-w-7xl flex justify-end">
+          <div className="mx-auto mt-3 flex max-w-7xl justify-end px-4 sm:px-6 lg:px-8">
             <button
               onClick={() => { setCurrentImage(0); setGalleryOpen(true); }}
               className="flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 font-body text-[13px] font-semibold text-foreground transition-colors hover:bg-secondary active:scale-[0.97]"

@@ -75,7 +75,7 @@ export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, 
   };
 
   const priceLabel = imovelPreco ? formatPreco(imovelPreco) : null;
-  const viewsText = viewCount === 1 ? "1 pessoa viu hoje" : `${viewCount > 0 ? viewCount : 5} pessoas viram hoje`;
+  const viewsText = viewCount === 1 ? "1 pessoa viu hoje" : viewCount > 1 ? `${viewCount} pessoas viram hoje` : null;
 
   if (corretor) {
     const primeiroNome = corretor.nome.split(" ")[0];
@@ -117,10 +117,12 @@ export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, 
         </button>
 
         <div className="mt-5 space-y-2">
+          {viewsText && (
           <p className="flex items-center gap-2 font-body text-xs text-muted-foreground">
             <span>⚡</span>
             <span>{viewsText}</span>
           </p>
+          )}
           <p className="flex items-center gap-2 font-body text-xs text-muted-foreground">
             <span>✅</span>
             <span>Corretor disponível agora</span>
@@ -213,10 +215,12 @@ export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, 
       </button>
 
       <div className="mt-5 space-y-2">
+        {viewsText && (
         <p className="flex items-center gap-2 font-body text-xs text-muted-foreground">
           <span>⚡</span>
           <span>{viewsText}</span>
         </p>
+        )}
         <p className="flex items-center gap-2 font-body text-xs text-muted-foreground">
           <span>✅</span>
           <span>Corretor disponível agora</span>

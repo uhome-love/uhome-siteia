@@ -47,7 +47,7 @@ function getBaseBadges(imovel: Imovel): SmartBadge[] {
     const dias = Math.floor(
       (Date.now() - new Date(imovel.publicado_em).getTime()) / 86400000
     );
-    if (dias <= 15) badges.push({ label: "Novidade", style: "novo", icon: <Clock className="h-3 w-3" /> });
+    if (dias <= 7) badges.push({ label: "Novo no site", style: "novo", icon: <Clock className="h-3 w-3" /> });
   }
 
   // Visualizado — lowest priority
@@ -60,7 +60,7 @@ function getBaseBadges(imovel: Imovel): SmartBadge[] {
 }
 
 const badgeClasses: Record<BadgeStyle, string> = {
-  novo: "bg-primary/90 text-primary-foreground font-semibold shadow-sm",
+  novo: "bg-white/95 text-foreground font-semibold shadow-sm backdrop-blur-sm",
   
   exclusivo: "bg-foreground text-background font-semibold shadow-sm",
   visto: "bg-white/90 text-foreground font-semibold shadow-sm backdrop-blur-sm",

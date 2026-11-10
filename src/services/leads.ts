@@ -15,6 +15,8 @@ interface LeadData {
   imovel_preco?: number;
   origem_pagina?: string;
   origem_componente: string;
+  /** Contexto livre (qualificação, campanha, clique do anúncio); o sync-to-crm escreve nas observações do CRM. */
+  contexto?: Record<string, unknown>;
 }
 
 export async function submitLead(data: LeadData) {
@@ -84,6 +86,7 @@ export async function submitLead(data: LeadData) {
     corretor_ref_id,
     corretor_ref_slug: refSlug || null,
     origem_ref: refSlug ? 'link_corretor' : 'organico',
+    contexto: data.contexto ?? null,
   };
 
   const { error } = await supabase

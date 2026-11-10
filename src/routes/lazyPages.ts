@@ -28,6 +28,7 @@ export const EmFoco = lazyRetry(() => import("../pages/EmFoco.tsx"));
 export const ProdutoFocoPage = lazyRetry(() => import("../pages/ProdutoFocoPage.tsx"));
 export const CampanhaPage = lazyRetry(() => import("../pages/CampanhaPage.tsx"));
 export const MegaCyrela = lazyRetry(() => import("../pages/MegaCyrela.tsx"));
+export const InvestirStudios = lazyRetry(() => import("../pages/InvestirStudios.tsx"));
 export const SeoLanding = lazyRetry(() => import("../pages/SeoLanding.tsx"));
 export const Vitrine = lazyRetry(() => import("../pages/Vitrine.tsx"));
 export const Sobre = lazyRetry(() => import("../pages/Sobre.tsx"));

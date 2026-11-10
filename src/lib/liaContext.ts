@@ -54,6 +54,7 @@ export function montarContextoLia(pathname: string, corretorSlug: string | null)
   }
   if (/\/em-foco\/[^/]+/.test(pathname) && h1) ctx.produto = h1;
   if (/\/campanha\//.test(pathname)) ctx.campanha = h1 || "Natal Chave de Ouro";
+  if (pathname.startsWith("/investir-studios")) ctx.campanha = "Studios Cyrela para investir (condição de fim de ano)";
   if (pathname.startsWith("/busca")) ctx.ultima_busca = window.location.search.slice(1) || "busca geral";
   return ctx;
 }

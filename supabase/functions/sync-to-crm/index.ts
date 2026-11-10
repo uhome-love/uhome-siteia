@@ -154,6 +154,7 @@ const ORIGEM_LABELS: Record<string, string> = {
   lead_inline: 'Formulário na Página',
   busca_alerta: 'Alerta de Busca',
   lia_chat: 'LIA no site',
+  lp_studios_cyrela: 'Landing Studios Cyrela (investimento)',
 }
 
 function humanizeOrigem(componente: string | null | undefined): string | null {

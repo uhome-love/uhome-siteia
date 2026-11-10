@@ -4,6 +4,7 @@ import { X, Loader2, Check } from "lucide-react";
 import { submitLead } from "@/services/leads";
 import { toast } from "sonner";
 import { formatPhone } from "@/lib/phoneMask";
+import { isLandingCampanha } from "@/lib/landingPages";
 
 export const ExitIntentModal = forwardRef<HTMLDivElement>(function ExitIntentModal(_props, ref) {
   const [show, setShow] = useState(false);
@@ -24,6 +25,8 @@ export const ExitIntentModal = forwardRef<HTMLDivElement>(function ExitIntentMod
     document.addEventListener("mousemove", trackMouse);
 
     const canShow = () => {
+      // Landings de anúncio têm formulário próprio
+      if (isLandingCampanha(window.location.pathname)) return false;
       // Don't show if a dropdown/popover/select is open
       const openEl = document.querySelector(
         '[data-state="open"], [aria-expanded="true"]'

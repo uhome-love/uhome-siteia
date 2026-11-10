@@ -1,3 +1,4 @@
+import { reportAdsConversion } from "@/lib/gtag";
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { X, Send, Loader2 } from "lucide-react";
@@ -25,6 +26,7 @@ function lerConversa(): Msg[] {
 function track(event: string, data: Record<string, unknown> = {}) {
   (window as any).dataLayer?.push({ event, ...data });
   window.gtag?.("event", event, data);
+  reportAdsConversion(event, data);
 }
 
 const SUGESTOES = ["Quero ver opções de Natal", "Procuro um apartamento", "Quero agendar uma visita"];

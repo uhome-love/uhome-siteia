@@ -13,6 +13,25 @@ function push(event: string, params: Record<string, unknown> = {}) {
   window.dataLayer = window.dataLayer || [];
   window.dataLayer.push({ event, ...params });
   window.gtag?.("event", event, params);
+  reportAdsConversion(event, params);
+}
+
+/* Google Ads (conta Site Uhome) */
+const ADS_ID = "AW-18567893155";
+const ADS = {
+  lead: `${ADS_ID}/bHQ5CLDL6LUdEKOh7pVF`,
+  visita: `${ADS_ID}/IGu4CLPL6LUdEKOh7pVF`,
+  whatsapp: `${ADS_ID}/Y4peCLbL6LUdEKOh7pVF`,
+};
+
+/** Converte eventos do site em conversões do Google Ads. */
+export function reportAdsConversion(event: string, params: Record<string, unknown> = {}) {
+  let send_to: string | undefined;
+  if (event === "generate_lead") {
+    const tipo = String(params.lead_tipo ?? params.lead_source ?? "");
+    send_to = /visita|agend/i.test(tipo) ? ADS.visita : ADS.lead;
+  } else if (event === "click_whatsapp") send_to = ADS.whatsapp;
+  if (send_to) window.gtag?.("event", "conversion", { send_to });
 }
 
 /** Track form lead submissions */
@@ -72,6 +91,7 @@ export function initGA4() {
   window.gtag("set", "developer_id.dZjgwMW", true);
   window.gtag("js", new Date());
   window.gtag("config", id, { send_page_view: false });
+  window.gtag("config", ADS_ID);
   const load = () => {
     const s = document.createElement("script");
     s.async = true;

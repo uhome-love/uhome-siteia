@@ -43,6 +43,13 @@
       "when": 1794428343394,
       "tag": "0005_restringe_imoveis_e_leads_a_admin",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794429003327,
+      "tag": "0006_valida_insercoes_publicas",
+      "breakpoints": true
     }
   ]
 }

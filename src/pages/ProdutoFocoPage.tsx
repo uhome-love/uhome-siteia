@@ -8,7 +8,7 @@ import { useCanonical } from "@/hooks/useCanonical";
 import { useCorretor } from "@/contexts/CorretorContext";
 import { setJsonLd, removeJsonLd } from "@/lib/jsonld";
 import { absUrl, blackAtiva, formatPreco, useCampanha, useCampanhasAtivas, useProdutoFoco, SITE_URL, type MidiaFoco } from "@/lib/produtosFoco";
-import { CorretorContatoCard, ProdutoFocoCard, useWhatsAppProduto } from "@/components/foco/FocoShared";
+import { CorretorContatoCard, ProdutoFocoCard, trackProdutoWhatsApp, useWhatsAppProduto } from "@/components/foco/FocoShared";
 import { Reveal } from "@/components/ui/reveal";
 import { Button } from "@/components/ui/button";
 import { MaterialGallery } from "@/components/foco/MaterialGallery";
@@ -133,7 +133,7 @@ export default function ProdutoFocoPage() {
                   <p className="font-heading text-4xl font-bold">{formatPreco(p.preco_a_partir)}</p>
                 </div>
               )}
-              <a href={waUrl} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center gap-2 rounded-full ${natal && !black ? "bg-natal-gold text-natal-deep" : "bg-primary text-primary-foreground"} px-6 py-3.5 font-body text-sm font-bold shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98]`}>
+              <a href={waUrl} onClick={() => trackProdutoWhatsApp(p)} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center gap-2 rounded-full ${natal && !black ? "bg-natal-gold text-natal-deep" : "bg-primary text-primary-foreground"} px-6 py-3.5 font-body text-sm font-bold shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98]`}>
                 <MessageCircle className="h-4 w-4" /> {modoCorretor ? `Falar com ${corretor?.nome.split(" ")[0]}` : "Quero as condições"}
               </a>
               {fotos.length > 0 && (
@@ -323,7 +323,7 @@ export default function ProdutoFocoPage() {
                 <h2 className="font-heading text-xl font-bold text-foreground">Receba as condições do {p.nome}</h2>
                 <p className="mt-1 font-body text-sm text-muted-foreground">Converse com um especialista sobre disponibilidade e condições.</p>
                 <div className="mt-4"><EmpreendimentoLeadForm empreendimentoNome={p.nome} empreendimentoSlug={`em-foco/${p.slug}`} bairro={p.bairro ?? undefined} /></div>
-                <a href={waUrl} target="_blank" rel="noopener noreferrer" className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-border px-5 py-3 font-body text-sm font-semibold text-foreground hover:bg-secondary">
+                <a href={waUrl} onClick={() => trackProdutoWhatsApp(p)} target="_blank" rel="noopener noreferrer" className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-border px-5 py-3 font-body text-sm font-semibold text-foreground hover:bg-secondary">
                   <MessageCircle className="h-4 w-4" /> Prefiro o WhatsApp
                 </a>
               </div>
@@ -344,7 +344,7 @@ export default function ProdutoFocoPage() {
       {/* Barra fixa no celular */}
       <div className="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-border bg-background/95 p-3 backdrop-blur lg:hidden" style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}>
         {modoCorretor ? (
-          <a href={waUrl} target="_blank" rel="noopener noreferrer" className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3.5 font-body text-sm font-bold ${natal && !black ? "bg-natal-gold text-natal-deep" : "bg-primary text-primary-foreground"}`}>
+          <a href={waUrl} onClick={() => trackProdutoWhatsApp(p)} target="_blank" rel="noopener noreferrer" className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3.5 font-body text-sm font-bold ${natal && !black ? "bg-natal-gold text-natal-deep" : "bg-primary text-primary-foreground"}`}>
             <MessageCircle className="h-4 w-4" /> WhatsApp de {corretor?.nome.split(" ")[0]}
           </a>
         ) : (

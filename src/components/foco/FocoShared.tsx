@@ -6,6 +6,11 @@ import { trackWhatsAppClick } from "@/services/whatsappTracker";
 import { formatPreco, mensagemProduto, type ProdutoFoco } from "@/lib/produtosFoco";
 import { Button } from "@/components/ui/button";
 
+/** Registra o clique real no WhatsApp de um produto. Chamar só no onClick, nunca na renderização. */
+export function trackProdutoWhatsApp(p: Pick<ProdutoFoco, "nome" | "slug">) {
+  trackWhatsAppClick({ imovel_slug: `em-foco/${p.slug}`, imovel_titulo: p.nome, origem_pagina: window.location.pathname });
+}
+
 /** Abre o WhatsApp do corretor (link personalizado) ou da Uhome. */
 export function useWhatsAppProduto() {
   const { corretor, slug, isDirectAccess } = useCorretor();
@@ -13,7 +18,6 @@ export function useWhatsAppProduto() {
     const tel = isDirectAccess ? corretor?.telefone?.replace(/\D/g, "") : "";
     const numero = tel ? (tel.startsWith("55") ? tel : `55${tel}`) : WHATSAPP_NUMBER;
     const msg = mensagemProduto(p, isDirectAccess ? slug : null, isDirectAccess ? corretor?.nome : undefined);
-    trackWhatsAppClick({ imovel_slug: `em-foco/${p.slug}`, imovel_titulo: p.nome, origem_pagina: window.location.pathname });
     return `https://wa.me/${numero}?text=${encodeURIComponent(msg)}`;
   };
 }
@@ -73,7 +77,7 @@ export function ProdutoFocoCard({ p, selo, campanha, contato = false }: { p: Pro
         </div>
       </div>
     </Link>
-    {contato && <div className="px-5 pb-5"><Button asChild variant="secondary" className="w-full"><a href={wa(p)} target="_blank" rel="noopener noreferrer"><MessageCircle /> Consultar condições</a></Button></div>}
+    {contato && <div className="px-5 pb-5"><Button asChild variant="secondary" className="w-full"><a href={wa(p)} onClick={() => trackProdutoWhatsApp(p)} target="_blank" rel="noopener noreferrer"><MessageCircle /> Consultar condições</a></Button></div>}
     </div>
   );
 }
@@ -102,6 +106,7 @@ export function CorretorContatoCard({ produto }: { produto: ProdutoFoco }) {
       </div>
       <a
         href={wa(produto)}
+        onClick={() => trackProdutoWhatsApp(produto)}
         target="_blank"
         rel="noopener noreferrer"
         className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3.5 font-body text-sm font-bold text-primary-foreground transition-transform active:scale-[0.98]"

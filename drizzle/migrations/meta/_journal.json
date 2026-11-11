@@ -36,6 +36,13 @@
       "when": 1794334985881,
       "tag": "0004_migration",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794428343394,
+      "tag": "0005_restringe_imoveis_e_leads_a_admin",
+      "breakpoints": true
     }
   ]
 }

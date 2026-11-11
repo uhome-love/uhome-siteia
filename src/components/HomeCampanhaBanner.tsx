@@ -15,8 +15,8 @@ const FAIXAS = [
 /** Banner da campanha ativa + faixa de produtos, logo abaixo da busca da página principal. */
 export function HomeCampanhaBanner() {
   const { prefixLink } = useCorretor();
-  const { campanha: c, black } = useCampanhaDestaque();
-  const { data: produtos = [] } = useProdutosFoco();
+  const { campanha: c, black, isLoading: carregandoCampanha } = useCampanhaDestaque();
+  const { data: produtos = [], isLoading: carregandoProdutos } = useProdutosFoco();
   const trilho = useRef<HTMLDivElement>(null);
   const [faixa, setFaixa] = useState("todas");
   const [cidade, setCidade] = useState("todas");
@@ -30,6 +30,15 @@ export function HomeCampanhaBanner() {
   const lista = produtos.filter((p) => (cidade === "todas" || p.cidade === cidade) && (p.preco_a_partir ?? 0) >= F.min && (p.preco_a_partir ?? 0) < F.max);
   const chip = (on: boolean) => `h-9 whitespace-nowrap rounded-full border px-4 font-body text-[13px] font-medium transition-colors ${on ? "border-foreground bg-foreground text-background" : "border-border bg-card text-foreground hover:border-foreground/40"}`;
   const rolar = (dir: number) => trilho.current?.scrollBy({ left: dir * (trilho.current.clientWidth * 0.8), behavior: "smooth" });
+  // Reserva o espaço enquanto carrega, para o conteúdo abaixo não "pular".
+  if (carregandoCampanha || carregandoProdutos) {
+    return (
+      <section aria-hidden className="mx-auto max-w-7xl px-4 pt-8 sm:px-8">
+        <div className="h-[282px] animate-pulse rounded-3xl bg-muted lg:h-[238px]" />
+        <div className="mt-8 h-[436px] lg:h-[413px]" />
+      </section>
+    );
+  }
   if (!c && !produtos.length) return null;
   const linkTodos = c ? `/campanha/${c.slug}` : "/em-foco";
 
@@ -44,7 +53,7 @@ export function HomeCampanhaBanner() {
           <div className="relative grid items-center gap-4 px-6 pb-6 pt-5 sm:px-10 sm:pb-7 lg:grid-cols-[1fr_auto]">
             <div className="relative z-10">
               <div className="flex items-center gap-4">
-                <img src={NATAL_ART.selo} alt="Natal Chave de Ouro" className="h-12 w-auto flex-shrink-0 sm:h-14" />
+                <img src={NATAL_ART.selo} alt="Natal Chave de Ouro" width={48} height={48} className="h-12 w-auto flex-shrink-0 sm:h-14" />
                 <h2 className="font-natal text-2xl font-extrabold leading-tight sm:text-4xl">
                   {black ? <>Black Natal <Ouro>Uhome</Ouro></> : <>Natal <Ouro>Chave de Ouro</Ouro></>}
                 </h2>

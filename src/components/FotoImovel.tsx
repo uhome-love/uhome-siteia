@@ -1,4 +1,4 @@
-import { useState, useEffect, forwardRef, useCallback } from "react";
+import { useState, useEffect, forwardRef, useCallback, useRef } from "react";
 import { Home } from "lucide-react";
 
 interface FotoImovelProps {
@@ -28,14 +28,25 @@ export const FotoImovel = forwardRef<HTMLImageElement, FotoImovelProps>(function
     onError?.();
   }, [onError]);
 
-  // Timeout: if image takes > 10s, show fallback
+  // O prazo de 10s só começa quando a foto chega perto da tela. Antes, fotos
+  // "lazy" fora da tela estouravam o prazo sem nem começar a baixar, e os cards sumiam.
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [naTela, setNaTela] = useState(loading === "eager");
   useEffect(() => {
-    if (loaded || erro) return;
+    if (naTela || !wrapRef.current || typeof IntersectionObserver === "undefined") { if (!naTela) setNaTela(true); return; }
+    const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { setNaTela(true); io.disconnect(); } }, { rootMargin: "200px" });
+    io.observe(wrapRef.current);
+    return () => io.disconnect();
+  }, [naTela]);
+
+  // Timeout: if image takes > 10s after entering view, show fallback
+  useEffect(() => {
+    if (loaded || erro || !naTela) return;
     const t = setTimeout(() => {
       if (!loaded) handleErr();
     }, 10000);
     return () => clearTimeout(t);
-  }, [loaded, erro, src, handleErr]);
+  }, [loaded, erro, src, handleErr, naTela]);
 
   if (erro) {
     return (
@@ -49,7 +60,7 @@ export const FotoImovel = forwardRef<HTMLImageElement, FotoImovelProps>(function
   }
 
   return (
-    <div className="relative h-full w-full overflow-hidden" style={style}>
+    <div ref={wrapRef} className="relative h-full w-full overflow-hidden" style={style}>
       {/* Skeleton placeholder — visible until image loads */}
       {!loaded && (
         <div

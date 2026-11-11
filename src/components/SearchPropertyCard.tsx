@@ -103,7 +103,10 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
     const fp = fotoPrincipal(imovel);
     return fp ? [fp] : [];
   })();
-  const fotos = lazyFotos && lazyFotos.length > 0 ? lazyFotos : baseFotos;
+  // Foto principal falhou com o card já na tela (ou acima dela): mostra o aviso
+  // "Foto em breve" em vez de sumir com o card, para a lista não "pular".
+  const [fotoFalhouNaTela, setFotoFalhouNaTela] = useState(false);
+  const fotos = fotoFalhouNaTela ? [] : lazyFotos && lazyFotos.length > 0 ? lazyFotos : baseFotos;
 
   // Load full photo set lazily
   const loadFullFotos = useCallback(() => {
@@ -214,6 +217,13 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
     if (idx > 0) loadFullFotos();
   }, [loadFullFotos]);
 
+  const handlePrimaryFail = () => {
+    const r = cardRef.current?.getBoundingClientRect();
+    if (r && r.top < window.innerHeight) { setFotoFalhouNaTela(true); return; }
+    setPrimaryPhotoFailed(true);
+    onPhotoFail?.(imovel.id);
+  };
+
   // Hide card entirely when the primary photo fails to load (broken Jetimob URL or timeout)
   if (primaryPhotoFailed) return null;
 
@@ -255,7 +265,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
                   decoding="async"
                   className="h-full w-full object-cover"
                   style={{ aspectRatio: "4/3" }}
-                  onError={i === 0 ? () => { setPrimaryPhotoFailed(true); onPhotoFail?.(imovel.id); } : undefined}
+                  onError={i === 0 ? handlePrimaryFail : undefined}
                 />
               </div>
             ))}
@@ -363,7 +373,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
             decoding="async"
             className="h-full w-full object-cover transition-transform duration-500"
             style={{ transform: hovering ? "scale(1.03)" : "scale(1)" }}
-            onError={fotoAtiva === 0 ? () => { setPrimaryPhotoFailed(true); onPhotoFail?.(imovel.id); } : undefined}
+            onError={fotoAtiva === 0 ? handlePrimaryFail : undefined}
           />
           ) : (
             <div className="flex h-full w-full items-center justify-center bg-muted">

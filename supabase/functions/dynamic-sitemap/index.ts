@@ -127,8 +127,17 @@ function buildSitemapIndex(today: string) {
 // ══════════════════════════════════════════════════════════
 // PAGES SITEMAP (institutional + SEO categories)
 // ══════════════════════════════════════════════════════════
-function buildPagesSitemap(today: string) {
+async function buildPagesSitemap(today: string) {
+  const nowIso = new Date().toISOString();
+  const [{ data: camps }, { data: prods }] = await Promise.all([
+    supabase.from("campanhas").select("slug").eq("ativo", true).lte("inicio", nowIso).gte("fim", nowIso),
+    supabase.from("produtos_foco").select("slug").eq("ativo", true),
+  ]);
   const entries = [
+    urlEntry(`${SITE}/investir-studios`, today, "weekly", "0.85"),
+    urlEntry(`${SITE}/em-foco`, today, "weekly", "0.85"),
+    ...(camps ?? []).filter((c) => c.slug).map((c) => urlEntry(`${SITE}/campanha/${c.slug}`, today, "daily", "0.9")),
+    ...(prods ?? []).filter((p) => p.slug).map((p) => urlEntry(`${SITE}/em-foco/${p.slug}`, today, "weekly", "0.85")),
     urlEntry(`${SITE}/`, today, "daily", "1.0"),
     urlEntry(`${SITE}/imoveis-porto-alegre`, today, "daily", "0.95"),
     urlEntry(`${SITE}/busca`, today, "daily", "0.9"),
@@ -413,7 +422,7 @@ Deno.serve(async (req) => {
 
     switch (type) {
       case "pages":
-        return xmlResponse(buildPagesSitemap(today));
+        return xmlResponse(await buildPagesSitemap(today));
 
       case "imoveis": {
         const totalImoveis = await getImoveisCount();

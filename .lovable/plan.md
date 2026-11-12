@@ -11,6 +11,19 @@ Sim, dá. O site já anota cada imóvel visto, cada busca e cada clique no Whats
 5. **Avisar quando um lead parado volta** — se um lead em descarte ou inativo volta e vê imóveis, o CRM recebe um alerta "lead voltou ao site", com os imóveis de interesse, para reativar.
 6. **Resumo de interesse** — no lead, um resumo automático: bairros, faixa de preço e tipo de imóvel que mais olhou.
 
+## Como ligar o site aos leads de forma inteligente
+Usamos 4 caminhos ao mesmo tempo, do mais certeiro ao mais amplo:
+1. **Link com código do lead** (o mais forte) — toda mensagem que o corretor ou o CRM manda (vitrine, WhatsApp, nutrição) leva um código único do lead. Clicou, o site já sabe quem é, em qualquer aparelho.
+2. **Contato informado no site** — nome e WhatsApp deixados no formulário, na LIA, no agendamento ou no login ligam aquele aparelho ao lead que já existe no CRM (busca pelo telefone), em vez de criar um lead novo.
+3. **Histórico anterior** — o que a pessoa fez antes de se identificar naquele aparelho entra junto no lead.
+4. **Anúncio do Google** — o código do clique no anúncio liga a visita ao lead, e depois o resultado (visita, venda) volta ao Google para ele trazer gente parecida.
+
+O que o corretor ganha:
+- **Linha do tempo no lead:** "ontem viu 3 vezes o Open Bosque, simulou entrada, buscou 3 quartos no Petrópolis".
+- **Temperatura automática:** voltou várias vezes, viu o mesmo imóvel, simulou ou clicou no WhatsApp = lead esquentando.
+- **Alerta na hora:** lead do corretor, ou em descarte/inativo, voltou ao site agora → aviso para ligar com o imóvel certo na mão.
+- **Sugestão de abordagem:** o CRM mostra os imóveis mais vistos e parecidos para mandar como vitrine.
+
 ## Limites honestos
 - Só reconhece quem já se identificou **naquele aparelho e navegador**, ou quem chegou por um link do CRM. Se a pessoa trocar do celular para o computador sem clicar num link nosso, ela aparece como visitante novo.
 - Se apagar os dados do navegador, deixa de ser reconhecida até se identificar de novo.

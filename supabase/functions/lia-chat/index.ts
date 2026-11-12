@@ -196,7 +196,7 @@ async function buscarImoveis(a: any) {
   if (error) return { erro: "busca indisponível" };
   return {
     imoveis: (data ?? []).map((i) => ({
-      titulo: i.titulo, tipo: i.tipo, bairro: i.bairro, cidade: i.cidade, preco: i.preco, quartos: i.quartos,
+      titulo: i.titulo, tipo: i.tipo, bairro: i.bairro, cidade: i.cidade, preco: Number(i.preco) > 0 ? Number(i.preco) : "sob consulta", quartos: i.quartos,
       area_privativa: i.area_util ?? i.area_total, vagas: i.vagas, codigo: i.jetimob_id ? `${i.jetimob_id}-UH`.replace(/-UH-UH$/, "-UH") : null,
       link: `${SITE}/imovel/${i.slug}`, slug: i.slug, foto: i.foto_principal,
     })),
@@ -375,7 +375,7 @@ function registrarQualificacao(a: any, ctx: Ctx) {
 function coletarCartoes(res: any, ctx: Ctx) {
   const lista = Array.isArray(res?.imoveis) ? res.imoveis : [];
   const novos = lista.filter((i: any) => i.slug && i.foto_principal !== null).slice(0, 3).map((i: any) => ({
-    slug: i.slug, titulo: i.titulo, bairro: i.bairro, preco: i.preco, quartos: i.quartos,
+    slug: i.slug, titulo: i.titulo, bairro: i.bairro, preco: Number(i.preco) > 0 ? Number(i.preco) : null, quartos: i.quartos,
     area: i.area_privativa ?? i.area_util ?? null, foto: i.foto ?? i.foto_principal ?? null,
   })).filter((c: any) => c.foto);
   if (novos.length) ctx.cartoes = novos;

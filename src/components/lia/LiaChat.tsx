@@ -228,7 +228,7 @@ export function LiaChat() {
 }
 
 function CartaoImovel({ c }: { c: Cartao }) {
-  const preco = c.preco ? c.preco.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }) : null;
+  const preco = typeof c.preco === "number" && c.preco > 0 ? c.preco.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }) : null;
   const info = [c.quartos ? `${c.quartos} quarto${c.quartos > 1 ? "s" : ""}` : null, c.area ? `${Math.round(c.area)} m²` : null].filter(Boolean).join(" · ");
   return (
     <a href={`/imovel/${c.slug}`} className="flex w-[85%] gap-3 overflow-hidden rounded-2xl border border-border bg-background p-2 shadow-sm hover:border-primary/40">

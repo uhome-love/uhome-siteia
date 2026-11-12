@@ -30,7 +30,16 @@ Grupo extra "Momento Natal" fica com "black de natal imóveis" e "natal uhome".
 - Links extras: Natal Chave de Ouro, Agendar Visita, Falar com a LIA, Imóveis em Porto Alegre.
 - Frases de destaque: Atendimento Consultivo, Entrada a Partir de 10%, Visita Agendada, Lançamentos Selecionados.
 
-## 5. Acompanhamento
+## 5. Filtros de qualidade (para não pagar por curioso)
+- Só Pesquisa do Google; sem sites parceiros; só quem está em Porto Alegre/Canoas.
+- Palavras só em frase/exata, sempre com nome do imóvel ou "venda/comprar" + cidade. Nada de "apartamento barato", "aluguel", "planta baixa", "decoração".
+- Anúncio já filtra: mostra o padrão real do imóvel (ex.: "3 e 4 suítes", "apartamento pronto") para quem não tem perfil nem clicar.
+- Horário: anúncios só das 7h às 23h (madrugada traz clique ruim).
+- Celular e computador com o mesmo peso; revisar depois pelos contatos reais.
+- Contato que conta para o Google: só formulário enviado, conversa com a LIA com telefone e visita agendada. Clique no WhatsApp vira secundário (não guia o lance).
+- Nos próximos passos: devolver ao Google quais contatos viraram visita/venda no CRM, para ele buscar mais gente igual.
+
+## 6. Acompanhamento
 Em 3 dias: impressões, cliques, termos reais buscados; negativar o que vier ruim e ajustar títulos com mais cliques.
 
 ## Detalhes técnicos

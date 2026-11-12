@@ -54,6 +54,7 @@ const tools = [
         type: "object",
         properties: {
           codigo: { type: "string", description: "Código do imóvel, ex 16366-UH" },
+          texto: { type: "string", description: "Nome do empreendimento/condomínio, rua ou construtora, ex: Golden Lake" },
           bairro: { type: "string" },
           cidade: { type: "string" },
           tipo: { type: "string", description: "Apartamento, Casa, Cobertura, Terreno..." },
@@ -63,6 +64,22 @@ const tools = [
         },
         additionalProperties: false,
       },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "detalhe_imovel",
+      description: "Ficha completa de um imóvel do catálogo: descrição, condomínio, IPTU, andar, vagas, banheiros, área, diferenciais, fase da obra. Use SEMPRE antes de dizer que um dado não está informado.",
+      parameters: { type: "object", properties: { slug: { type: "string" }, codigo: { type: "string" } }, additionalProperties: false },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "imoveis_parecidos",
+      description: "Até 3 imóveis parecidos com um imóvel (mesma cidade/bairro, quartos e faixa de preço).",
+      parameters: { type: "object", properties: { slug: { type: "string" } }, required: ["slug"], additionalProperties: false },
     },
   },
   {
@@ -144,6 +161,10 @@ async function buscarImoveis(a: any) {
     .not("foto_principal", "is", null)
     .limit(5);
   if (a.codigo) q = q.ilike("jetimob_id", String(a.codigo).replace(/-?uh$/i, "") + "%");
+  if (a.texto) {
+    const t = String(a.texto).replace(/[%,()]/g, " ").trim().slice(0, 60);
+    if (t) q = q.or(`titulo.ilike.%${t}%,condominio_nome.ilike.%${t}%,endereco_completo.ilike.%${t}%,descricao.ilike.%${t}%`);
+  }
   if (a.bairro) q = q.ilike("bairro", `%${a.bairro}%`);
   if (a.cidade) q = q.ilike("cidade", `%${a.cidade}%`);
   if (a.tipo) q = q.ilike("tipo", `%${a.tipo}%`);
@@ -159,6 +180,40 @@ async function buscarImoveis(a: any) {
       link: `${SITE}/imovel/${i.slug}`, slug: i.slug,
     })),
   };
+}
+
+async function detalheImovel(a: any) {
+  let q = sb.from("imoveis").select("slug,titulo,tipo,bairro,cidade,endereco_completo,preco,preco_condominio,preco_iptu,iptu_periodicidade,quartos,banheiros,vagas,area_util,area_total,andar,fase,condominio_nome,diferenciais,descricao,jetimob_id,status");
+  if (a.slug) q = q.eq("slug", String(a.slug));
+  else if (a.codigo) q = q.ilike("jetimob_id", String(a.codigo).replace(/-?uh$/i, "") + "%");
+  else return { erro: "informe slug ou codigo" };
+  const { data } = await q.limit(1).maybeSingle();
+  if (!data) return { erro: "imóvel não encontrado" };
+  return {
+    ...data,
+    descricao: data.descricao ? String(data.descricao).replace(/<[^>]+>/g, " ").slice(0, 1800) : null,
+    area_privativa: data.area_util ?? null,
+    disponivel: data.status === "disponivel",
+    link: `${SITE}/imovel/${data.slug}`,
+  };
+}
+
+async function imoveisParecidos(a: any) {
+  const { data: base } = await sb.from("imoveis").select("slug,cidade,bairro,quartos,preco,tipo").eq("slug", String(a.slug)).maybeSingle();
+  if (!base?.preco) return { erro: "imóvel base não encontrado" };
+  const busca = (bairro: boolean) => {
+    let q = sb.from("imoveis").select("slug,titulo,bairro,cidade,preco,quartos,area_util,vagas")
+      .eq("status", "disponivel").eq("finalidade", "venda").not("foto_principal", "is", null)
+      .neq("slug", base.slug).eq("cidade", base.cidade)
+      .gte("preco", base.preco * 0.8).lte("preco", base.preco * 1.2).limit(3);
+    if (base.quartos) q = q.gte("quartos", base.quartos);
+    if (base.tipo) q = q.ilike("tipo", `%${base.tipo}%`);
+    if (bairro && base.bairro) q = q.eq("bairro", base.bairro);
+    return q;
+  };
+  let { data } = await busca(true);
+  if (!data || data.length < 2) ({ data } = await busca(false));
+  return { imoveis: (data ?? []).map((i) => ({ ...i, area_privativa: i.area_util, link: `${SITE}/imovel/${i.slug}` })) };
 }
 
 function linkProduto(slug: string, ctx: Ctx) {
@@ -293,6 +348,8 @@ async function executar(nome: string, args: any, ctx: Ctx) {
   try {
     switch (nome) {
       case "buscar_imoveis": return await buscarImoveis(args);
+      case "detalhe_imovel": return await detalheImovel(args);
+      case "imoveis_parecidos": return await imoveisParecidos(args);
       case "produtos_natal": return await produtosNatal(ctx);
       case "detalhe_produto": return await detalheProduto(args, ctx);
       case "registrar_interesse": return await registrarInteresse(args, ctx);

@@ -279,7 +279,8 @@ function contextoCRM(ctx: Ctx, extra: Record<string, unknown>) {
     ultima_busca: c.ultima_busca ?? null,
     perfil_lia: Object.keys(ctx.qualificacao ?? {}).length ? ctx.qualificacao : null,
     temperatura: ctx.qualificacao?.temperatura ?? null,
-    campanha: c.campanha ?? null,
+    campanha: c.campanha ?? c.utm_campaign ?? null,
+    pago: Boolean(c.gclid || c.utm_medium === "cpc"),
     produto: c.produto ?? null,
     gclid: c.gclid ?? null,
     utm_term: c.utm_term ?? null,
@@ -293,7 +294,12 @@ async function registrarInteresse(a: any, ctx: Ctx) {
   if (ctx.conversa?.lead_id) return { ok: true, ja_registrado: true };
   const imv = await dadosImovel(a.imovel_slug ?? ctx.contexto.imovel?.slug);
   const c = ctx.contexto;
-  const qualificacao = { Uso: a.uso, Região: a.regiao, Quartos: a.quartos, "Faixa de valor": a.faixa_valor, Entrada: a.entrada, FGTS: a.fgts, Renda: a.renda, Prazo: a.prazo, ...ctx.qualificacao };
+  const qualificacao: Record<string, unknown> = { Uso: a.uso, Região: a.regiao, Quartos: a.quartos, "Faixa de valor": a.faixa_valor, Entrada: a.entrada, FGTS: a.fgts, Renda: a.renda, Prazo: a.prazo };
+  for (const [k, v] of Object.entries(ctx.qualificacao ?? {})) {
+    const igual = Object.keys(qualificacao).find((q) => q.toLowerCase() === k.toLowerCase());
+    if (igual && (qualificacao as any)[igual]) continue;
+    (qualificacao as any)[k] = v;
+  }
   const { data, error } = await sb
     .from("public_leads")
     .insert({

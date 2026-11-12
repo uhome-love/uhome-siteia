@@ -270,6 +270,27 @@ async function handleAgendamento(
     ? `${tituloAgend} (${imovelCodigo})`
     : tituloAgend
 
+  // Mesma pessoa já virou lead nos últimos 7 dias (ex.: LIA registrou o contato antes da visita):
+  // atualiza esse lead em vez de criar um duplicado no CRM.
+  const desde = new Date(Date.now() - 7 * 864e5).toISOString()
+  const { data: existente } = record.telefone && !corretorCRMId
+    ? await supabaseCRM.from('leads').select('id,pipeline_lead_id,observacoes')
+        .eq('telefone', record.telefone).eq('origem', 'site_uhome').gte('created_at', desde)
+        .order('created_at', { ascending: false }).limit(1).maybeSingle()
+    : { data: null }
+  if (existente) {
+    const obs = `${obsAgend}\n\n${existente.observacoes ?? ''}`.slice(0, 8000)
+    const { error: upErr } = await supabaseCRM.from('leads').update({
+      status: 'agendado', observacoes: obs,
+      ...(interesseAgend ? { imovel_interesse: interesseAgend } : {}),
+    }).eq('id', existente.id)
+    await moverParaFilaCEO(supabaseCRM, existente.pipeline_lead_id, corretorCRMId, record, obs, {
+      proxima_acao: `Visita solicitada pelo site: ${record.data_visita}${record.turno ? ' (' + record.turno + ')' : ''}${record.horario ? ' ' + record.horario : ''}`,
+      data_proxima_acao: record.data_visita ?? null,
+    })
+    return { ok: !upErr, crm_lead_id: existente.id, error: upErr?.message }
+  }
+
   const { data: leadCRM, error } = await supabaseCRM
     .from('leads')
     .insert({

@@ -9,7 +9,8 @@ import { captureGclid, montarContextoLia, registrarPagina } from "@/lib/liaConte
 import liaAvatar from "@/assets/lia-avatar.webp.asset.json";
 import { isLandingCampanha } from "@/lib/landingPages";
 
-type Msg = { role: "user" | "assistant"; content: string };
+type Cartao = { slug: string; titulo: string; bairro?: string; preco?: number; quartos?: number; area?: number; foto: string };
+type Msg = { role: "user" | "assistant"; content: string; cartoes?: Cartao[] };
 const KEY = "uhome_lia_conversa";
 const SID_KEY = "uhome_lia_sid";
 
@@ -30,6 +31,14 @@ function track(event: string, data: Record<string, unknown> = {}) {
 }
 
 const SUGESTOES = ["Quero ver opções de Natal", "Procuro um apartamento", "Quero agendar uma visita"];
+const RAPIDOS = ["Ver valores", "Agendar visita", "Simular entrada"];
+
+function aberturaPorPagina(path: string): { texto: string; sugestoes: string[] } | null {
+  if (/\/imovel\//.test(path)) return { texto: "Oi! Eu sou a LIA, da Uhome 😊 Vi que você está olhando este imóvel. Quer saber valores, condomínio ou marcar uma visita?", sugestoes: ["Quanto é o condomínio?", "Tem parecidos?", "Quero visitar"] };
+  if (/\/(em-foco|campanha)\/[^/]+/.test(path)) return { texto: "Oi! Eu sou a LIA, da Uhome 😊 Posso te passar valores, plantas e as condições de Natal deste empreendimento. O que você quer saber primeiro?", sugestoes: ["Ver valores", "Condições de Natal", "Quero visitar o decorado"] };
+  if (path.includes("investir-studios")) return { texto: "Oi! Eu sou a LIA, da Uhome 😊 Te ajudo a escolher um studio para investir: localização, valores e retorno esperado. Você pensa em renda com aluguel por temporada ou longo prazo?", sugestoes: ["Ver studios disponíveis", "Quanto preciso de entrada?", "Falar com especialista"] };
+  return null;
+}
 
 export function LiaChat() {
   const location = useLocation();
@@ -63,9 +72,11 @@ export function LiaChat() {
     return () => window.removeEventListener("uhome:abrir-lia", abrir);
   }, []);
 
+  const abertura = aberturaPorPagina(location.pathname);
+  const sugestoes = abertura?.sugestoes ?? SUGESTOES;
   const saudacao = corretor
     ? `Oi! Eu sou a LIA, do atendimento da Uhome. Vou te ajudar e deixar tudo pronto para o ${corretor.nome.split(" ")[0]}. O que você está procurando?`
-    : "Oi! Eu sou a LIA, do atendimento da Uhome 😊 Te ajudo a encontrar o imóvel certo e a marcar uma visita. O que você está procurando?";
+    : abertura?.texto ?? "Oi! Eu sou a LIA, do atendimento da Uhome 😊 Te ajudo a encontrar o imóvel certo e a marcar uma visita. O que você está procurando?";
 
   const whatsUrl = () => {
     const slug = location.pathname.match(/\/imovel\/([^/]+)/)?.[1];
@@ -89,11 +100,12 @@ export function LiaChat() {
       });
       if (error) throw error;
       const bolhas: string[] = data?.bolhas ?? [];
-      setMsgs((m) => [...m, ...bolhas.map((b) => ({ role: "assistant" as const, content: b }))]);
+      const cartoes: Cartao[] = Array.isArray(data?.cartoes) ? data.cartoes.slice(0, 3) : [];
+      setMsgs((m) => [...m, ...bolhas.map((b, i) => ({ role: "assistant" as const, content: b, ...(i === bolhas.length - 1 && cartoes.length ? { cartoes } : {}) }))]);
       if (data?.acao === "visita") { track("generate_lead", { lead_tipo: "visita_lia", pagina: location.pathname }); }
       if (data?.acao === "lead") { track("generate_lead", { lead_tipo: "lead_lia", pagina: location.pathname }); }
     } catch {
-      setMsgs((m) => [...m, { role: "assistant", content: "Tive uma instabilidade aqui. Pode continuar comigo pelo WhatsApp no botão abaixo?" }]);
+      setMsgs((m) => [...m, { role: "assistant", content: "Ops, a conexão falhou por um instante. Pode mandar de novo? Se preferir, continue comigo pelo WhatsApp logo abaixo." }]);
     } finally {
       setEnviando(false);
     }
@@ -134,7 +146,7 @@ export function LiaChat() {
             {msgs.map((m, i) => <Bolha key={i} {...m} />)}
             {msgs.length === 0 && (
               <div className="flex flex-wrap gap-2 pt-2">
-                {SUGESTOES.map((s) => (
+                {sugestoes.map((s) => (
                   <button key={s} onClick={() => enviar(s)} className="rounded-full border border-primary/30 bg-background px-3 py-1.5 font-body text-xs font-medium text-primary hover:bg-primary/5">
                     {s}
                   </button>
@@ -146,6 +158,15 @@ export function LiaChat() {
                 <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground [animation-delay:-0.2s]" />
                 <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground [animation-delay:-0.1s]" />
                 <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground" />
+              </div>
+            )}
+            {msgs.length > 0 && !enviando && msgs[msgs.length - 1].role === "assistant" && (
+              <div className="flex flex-wrap gap-2 pt-1">
+                {RAPIDOS.map((s) => (
+                  <button key={s} onClick={() => enviar(s)} className="rounded-full border border-primary/30 bg-background px-3 py-1.5 font-body text-xs font-medium text-primary hover:bg-primary/5">
+                    {s}
+                  </button>
+                ))}
               </div>
             )}
             <div ref={fimRef} />
@@ -206,11 +227,26 @@ export function LiaChat() {
   );
 }
 
-function Bolha({ role, content }: Msg) {
+function CartaoImovel({ c }: { c: Cartao }) {
+  const preco = c.preco ? c.preco.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }) : null;
+  const info = [c.quartos ? `${c.quartos} quarto${c.quartos > 1 ? "s" : ""}` : null, c.area ? `${Math.round(c.area)} m²` : null].filter(Boolean).join(" · ");
+  return (
+    <a href={`/imovel/${c.slug}`} className="flex w-[85%] gap-3 overflow-hidden rounded-2xl border border-border bg-background p-2 shadow-sm hover:border-primary/40">
+      <img src={c.foto} alt={c.titulo} loading="lazy" width={80} height={64} className="h-16 w-20 shrink-0 rounded-xl object-cover" />
+      <span className="min-w-0 py-0.5">
+        {preco && <span className="block font-body text-sm font-bold text-foreground">{preco}</span>}
+        <span className="block truncate font-body text-xs text-muted-foreground">{c.bairro}</span>
+        {info && <span className="block font-body text-xs text-muted-foreground">{info}</span>}
+      </span>
+    </a>
+  );
+}
+
+function Bolha({ role, content, cartoes }: Msg) {
   const user = role === "user";
   const partes = content.split(/(https?:\/\/[^\s]+)/g);
   return (
-    <div className={`flex ${user ? "justify-end" : "justify-start"}`}>
+    <div className={`flex flex-col ${user ? "items-end" : "items-start"}`}>
       <p className={`max-w-[85%] whitespace-pre-line break-words rounded-2xl px-4 py-2.5 font-body text-sm leading-relaxed shadow-sm ${user ? "rounded-br-md bg-primary text-primary-foreground" : "rounded-bl-md bg-background text-foreground"}`}>
         {partes.map((p, i) =>
           /^https?:\/\//.test(p) ? (
@@ -222,6 +258,7 @@ function Bolha({ role, content }: Msg) {
           ),
         )}
       </p>
+      {cartoes?.length ? <div className="mt-2 flex flex-col gap-2">{cartoes.map((c) => <CartaoImovel key={c.slug} c={c} />)}</div> : null}
     </div>
   );
 }

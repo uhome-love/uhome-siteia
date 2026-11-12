@@ -129,6 +129,27 @@ const tools = [
   {
     type: "function",
     function: {
+      name: "registrar_qualificacao",
+      description: "Guarda o que você já descobriu do perfil da pessoa (chame sempre que aprender algo novo: finalidade, faixa, prazo, pagamento, bairros, quartos). Não exige contato.",
+      parameters: {
+        type: "object",
+        properties: {
+          finalidade: { type: "string", enum: ["morar", "investir", "morar_e_investir"] },
+          faixa_valor: { type: "string" },
+          prazo: { type: "string", description: "Ex.: imediato, até 3 meses, 6 meses, só pesquisando" },
+          pagamento: { type: "string", description: "Ex.: financiamento com entrada, à vista, permuta" },
+          bairros: { type: "string" },
+          quartos: { type: "string" },
+          temperatura: { type: "string", enum: ["quente", "morno", "frio"], description: "quente = prazo até 3 meses e faixa compatível; frio = só pesquisando" },
+          observacoes: { type: "string" },
+        },
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
       name: "agendar_visita",
       description: "Registra a visita com dia e turno escolhidos pela pessoa. Cria a visita no CRM.",
       parameters: {
@@ -150,12 +171,12 @@ const tools = [
   },
 ] as const;
 
-type Ctx = { session_id: string; contexto: Record<string, any>; corretor: { id: string; slug_ref: string; nome: string | null } | null; hoje: string; conversa: any };
+type Ctx = { session_id: string; contexto: Record<string, any>; qualificacao: Record<string, any>; cartoes: any[]; corretor: { id: string; slug_ref: string; nome: string | null } | null; hoje: string; conversa: any };
 
 async function buscarImoveis(a: any) {
   let q = sb
     .from("imoveis")
-    .select("slug,titulo,tipo,bairro,cidade,preco,quartos,area_util,area_total,vagas,jetimob_id")
+    .select("slug,titulo,tipo,bairro,cidade,preco,quartos,area_util,area_total,vagas,jetimob_id,foto_principal")
     .eq("status", "disponivel")
     .eq("finalidade", "venda")
     .not("foto_principal", "is", null)
@@ -177,7 +198,7 @@ async function buscarImoveis(a: any) {
     imoveis: (data ?? []).map((i) => ({
       titulo: i.titulo, tipo: i.tipo, bairro: i.bairro, cidade: i.cidade, preco: i.preco, quartos: i.quartos,
       area_privativa: i.area_util ?? i.area_total, vagas: i.vagas, codigo: i.jetimob_id ? `${i.jetimob_id}-UH`.replace(/-UH-UH$/, "-UH") : null,
-      link: `${SITE}/imovel/${i.slug}`, slug: i.slug,
+      link: `${SITE}/imovel/${i.slug}`, slug: i.slug, foto: i.foto_principal,
     })),
   };
 }
@@ -202,7 +223,7 @@ async function imoveisParecidos(a: any) {
   const { data: base } = await sb.from("imoveis").select("slug,cidade,bairro,quartos,preco,tipo").eq("slug", String(a.slug)).maybeSingle();
   if (!base?.preco) return { erro: "imóvel base não encontrado" };
   const busca = (bairro: boolean) => {
-    let q = sb.from("imoveis").select("slug,titulo,bairro,cidade,preco,quartos,area_util,vagas")
+    let q = sb.from("imoveis").select("slug,titulo,bairro,cidade,preco,quartos,area_util,vagas,foto_principal")
       .eq("status", "disponivel").eq("finalidade", "venda").not("foto_principal", "is", null)
       .neq("slug", base.slug).eq("cidade", base.cidade)
       .gte("preco", base.preco * 0.8).lte("preco", base.preco * 1.2).limit(3);
@@ -256,6 +277,8 @@ function contextoCRM(ctx: Ctx, extra: Record<string, unknown>) {
     paginas: c.paginas ?? [],
     imoveis_vistos: c.imoveis_vistos ?? [],
     ultima_busca: c.ultima_busca ?? null,
+    perfil_lia: Object.keys(ctx.qualificacao ?? {}).length ? ctx.qualificacao : null,
+    temperatura: ctx.qualificacao?.temperatura ?? null,
     campanha: c.campanha ?? null,
     produto: c.produto ?? null,
     gclid: c.gclid ?? null,
@@ -270,7 +293,7 @@ async function registrarInteresse(a: any, ctx: Ctx) {
   if (ctx.conversa?.lead_id) return { ok: true, ja_registrado: true };
   const imv = await dadosImovel(a.imovel_slug ?? ctx.contexto.imovel?.slug);
   const c = ctx.contexto;
-  const qualificacao = { Uso: a.uso, Região: a.regiao, Quartos: a.quartos, "Faixa de valor": a.faixa_valor, Entrada: a.entrada, FGTS: a.fgts, Renda: a.renda, Prazo: a.prazo };
+  const qualificacao = { Uso: a.uso, Região: a.regiao, Quartos: a.quartos, "Faixa de valor": a.faixa_valor, Entrada: a.entrada, FGTS: a.fgts, Renda: a.renda, Prazo: a.prazo, ...ctx.qualificacao };
   const { data, error } = await sb
     .from("public_leads")
     .insert({
@@ -344,6 +367,20 @@ async function agendarVisita(a: any, ctx: Ctx) {
   return { ok: true, data, turno: TURNO_LABEL[turno] };
 }
 
+function registrarQualificacao(a: any, ctx: Ctx) {
+  for (const [k, v] of Object.entries(a ?? {})) if (typeof v === "string" && v.trim()) ctx.qualificacao[k] = v.trim().slice(0, 200);
+  return { ok: true, perfil: ctx.qualificacao };
+}
+
+function coletarCartoes(res: any, ctx: Ctx) {
+  const lista = Array.isArray(res?.imoveis) ? res.imoveis : [];
+  const novos = lista.filter((i: any) => i.slug && i.foto_principal !== null).slice(0, 3).map((i: any) => ({
+    slug: i.slug, titulo: i.titulo, bairro: i.bairro, preco: i.preco, quartos: i.quartos,
+    area: i.area_privativa ?? i.area_util ?? null, foto: i.foto ?? i.foto_principal ?? null,
+  })).filter((c: any) => c.foto);
+  if (novos.length) ctx.cartoes = novos;
+}
+
 async function executar(nome: string, args: any, ctx: Ctx) {
   try {
     switch (nome) {
@@ -354,6 +391,7 @@ async function executar(nome: string, args: any, ctx: Ctx) {
       case "detalhe_produto": return await detalheProduto(args, ctx);
       case "registrar_interesse": return await registrarInteresse(args, ctx);
       case "agendar_visita": return await agendarVisita(args, ctx);
+      case "registrar_qualificacao": return registrarQualificacao(args, ctx);
       default: return { erro: "ferramenta desconhecida" };
     }
   } catch (e) {
@@ -384,8 +422,8 @@ Deno.serve(async (req) => {
     if (data?.slug_ref) corretor = { id: data.id, slug_ref: data.slug_ref, nome: data.nome };
   }
 
-  const { data: conversa } = await sb.from("lia_conversas").select("id,lead_id,agendamento_id,etapa").eq("session_id", body.session_id).maybeSingle();
-  const ctx: Ctx = { session_id: body.session_id, contexto, corretor, hoje: iso, conversa };
+  const { data: conversa } = await sb.from("lia_conversas").select("id,lead_id,agendamento_id,etapa,contexto").eq("session_id", body.session_id).maybeSingle();
+  const ctx: Ctx = { session_id: body.session_id, contexto, qualificacao: { ...((conversa?.contexto as any)?.qualificacao ?? {}) }, cartoes: [], corretor, hoje: iso, conversa };
 
   const instructions = montarPromptLia({ hojeISO: iso, diaSemana: dia, contexto: contextoTexto(contexto), corretorNome: corretor?.nome });
   const input: any[] = body.mensagens.map((m) => ({ role: m.role, content: m.content }));
@@ -407,6 +445,7 @@ Deno.serve(async (req) => {
         let args: any = {};
         try { args = JSON.parse(c.arguments || "{}"); } catch { /* vazio */ }
         const res: any = await executar(c.name, args, ctx);
+        if (c.name === "buscar_imoveis" || c.name === "imoveis_parecidos") coletarCartoes(res, ctx);
         if (res?.ok && c.name === "agendar_visita") acao = "visita";
         else if (res?.ok && c.name === "registrar_interesse" && !acao) acao = "lead";
         input.push({ type: "function_call_output", call_id: c.call_id, output: JSON.stringify(res) });
@@ -424,7 +463,7 @@ Deno.serve(async (req) => {
     {
       session_id: body.session_id,
       mensagens: historico,
-      contexto,
+      contexto: { ...contexto, qualificacao: ctx.qualificacao },
       lead_id: ctx.conversa?.lead_id ?? null,
       agendamento_id: ctx.conversa?.agendamento_id ?? null,
       etapa: ctx.conversa?.etapa ?? "atendendo",
@@ -432,5 +471,5 @@ Deno.serve(async (req) => {
     { onConflict: "session_id" },
   );
 
-  return json({ bolhas, acao, corretor: corretor ? { nome: corretor.nome } : null });
+  return json({ bolhas, acao, cartoes: ctx.cartoes, corretor: corretor ? { nome: corretor.nome } : null });
 });

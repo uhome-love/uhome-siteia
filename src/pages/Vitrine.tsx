@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo, useRef, useCallback } from "react";
+import { setLeadIdentity } from "@/lib/session";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { type Imovel, fotoPrincipal, formatPreco } from "@/services/imoveis";
@@ -76,7 +77,7 @@ export default function Vitrine() {
       const { data: v } = await (supabase as any)
         .from("vitrines")
         .select(
-          "id, corretor_slug, corretor_id, lead_nome, titulo, subtitulo, mensagem, mensagem_corretor, imovel_codigos, imoveis_resolvidos, visualizacoes"
+          "id, corretor_slug, corretor_id, lead_nome, titulo, subtitulo, mensagem, mensagem_corretor, lead_telefone, imovel_codigos, imoveis_resolvidos, visualizacoes"
         )
         .eq("id", id)
         .maybeSingle();
@@ -88,6 +89,7 @@ export default function Vitrine() {
       }
 
       setVitrine(v);
+      if (v.lead_telefone) setLeadIdentity({ telefone: v.lead_telefone }, "vitrine");
 
       // 1) Buscar imóveis ao vivo
       const codigos: string[] = v.imovel_codigos ?? [];

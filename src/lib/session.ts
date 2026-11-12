@@ -26,26 +26,52 @@ interface UtmData {
   device?: string;
 }
 
-/** Capture lead identity params (?telefone=, ?email=) into sessionStorage */
+/** Capture lead identity params (?telefone=, ?email=) from CRM links and remember the person. */
 export function captureLeadIdentity(): void {
   try {
     const params = new URLSearchParams(window.location.search);
     const tel = params.get('telefone');
     const email = params.get('email');
-    if (tel) sessionStorage.setItem(LEAD_TELEFONE_KEY, tel);
-    if (email) sessionStorage.setItem(LEAD_EMAIL_KEY, email);
+    if (tel || email) setLeadIdentity({ telefone: tel || undefined, email: email || undefined }, 'link_crm');
   } catch { /* silent */ }
 }
 
-/** Get captured lead identity (telefone/email from URL params) */
+/** Get remembered lead identity (persists across visits on this browser). */
 export function getLeadIdentity(): { telefone?: string; email?: string } {
   try {
-    const telefone = sessionStorage.getItem(LEAD_TELEFONE_KEY) || undefined;
-    const email = sessionStorage.getItem(LEAD_EMAIL_KEY) || undefined;
+    const telefone = localStorage.getItem(LEAD_TELEFONE_KEY) || sessionStorage.getItem(LEAD_TELEFONE_KEY) || undefined;
+    const email = localStorage.getItem(LEAD_EMAIL_KEY) || sessionStorage.getItem(LEAD_EMAIL_KEY) || undefined;
     return { telefone, email };
   } catch {
     return {};
   }
+}
+
+/**
+ * Remember who this visitor is (after a form, LIA, visit booking or CRM link)
+ * and link everything they did anonymously on this browser to their lead in the CRM.
+ */
+export function setLeadIdentity(id: { telefone?: string; email?: string }, origem: string): void {
+  try {
+    const tel = id.telefone?.replace(/\D/g, '');
+    const telOk = tel && tel.length >= 10 && tel.length <= 13 ? tel : undefined;
+    const email = id.email?.trim().toLowerCase() || undefined;
+    if (!telOk && !email) return;
+    const atual = getLeadIdentity();
+    if (telOk) localStorage.setItem(LEAD_TELEFONE_KEY, telOk);
+    if (email) localStorage.setItem(LEAD_EMAIL_KEY, email);
+    if (atual.telefone?.replace(/\D/g, '') === telOk && (!email || atual.email === email)) return; // já vinculado
+    let visitor_id = localStorage.getItem('uhome_visitor_id');
+    if (!visitor_id) { visitor_id = crypto.randomUUID(); localStorage.setItem('uhome_visitor_id', visitor_id); }
+    const url = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/site-identidade`;
+    const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+    fetch(url, {
+      method: 'POST',
+      keepalive: true,
+      headers: { 'Content-Type': 'application/json', apikey: key, Authorization: `Bearer ${key}` },
+      body: JSON.stringify({ visitor_id, telefone: telOk, email, origem }),
+    }).catch(() => { /* silent */ });
+  } catch { /* silent */ }
 }
 
 /** Capture UTMs from URL + referrer + device on first visit (first-touch attribution) */

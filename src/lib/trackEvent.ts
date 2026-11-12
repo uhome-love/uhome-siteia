@@ -31,6 +31,8 @@ interface TrackEventParams {
  */
 function postToCRM(params: TrackEventParams, identidade: { telefone?: string; email?: string }) {
   if (!UHOMESALES_ANON_KEY) return; // skip if key is empty
+  // Só vale para o CRM quando sabemos quem é a pessoa; visitante anônimo fica só no site.
+  if (!identidade.telefone && !identidade.email) return;
 
   const tiposCRM: Record<string, string> = {
     'busca_realizada': 'buscou_ia',
@@ -56,7 +58,6 @@ function postToCRM(params: TrackEventParams, identidade: { telefone?: string; em
     pagina: window.location.href,
   };
 
-  console.log('[CRM POST]', body.tipo, body.identidade);
 
   fetch(UHOMESALES_SITE_EVENTS_URL, {
     method: "POST",

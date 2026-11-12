@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { getSessionId, getTrackingData, classifyOrigemCanal, getCorretorRef, getCorretorRefId } from "@/lib/session";
+import { getSessionId, getTrackingData, classifyOrigemCanal, getCorretorRef, getCorretorRefId, setLeadIdentity } from "@/lib/session";
 import { trackEvent } from "@/lib/trackEvent";
 import { trackGenerateLead } from "@/lib/gtag";
 
@@ -36,6 +36,8 @@ export async function submitLead(data: LeadData) {
       corretor_ref_id = profile?.id || null;
     } catch { /* silent */ }
   }
+
+  setLeadIdentity({ telefone: data.telefone, email: data.email }, data.origem_componente);
 
   // Deduplicate: skip if same phone submitted in last 24h
   const digitsOnly = data.telefone.replace(/\D/g, "");

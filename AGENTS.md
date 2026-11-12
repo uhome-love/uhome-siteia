@@ -8,3 +8,4 @@
 - Product photos, floor plans and maps share `MaterialGallery` with Radix focus management, keyboard navigation, swipe and zoom; this keeps material inspection consistent without altering source assets.
 - LIA on the site: `lia-chat` edge function (Responses API + tools over imoveis/produtos_foco) writes leads/visits to `public_leads`/`agendamentos`, which reach the CRM only via existing DB triggers; prompt rules mirror the CRM LIA brain. Why: one LIA, one lead pipeline.
 - Site leads without a broker link go to the CRM "Fila do CEO" (pipeline_leads pendente_distribuicao) in `sync-to-crm`; no plantão fallback. Why: owner distributes site leads manually.
+- Visitor identity (phone/email) is remembered in localStorage via `setLeadIdentity` in `src/lib/session.ts` at every contact capture; the `site-identidade` function links prior anonymous `lead_events` and sends a history summary to the CRM. Why: CRM only gets site activity from identified people.

@@ -1,4 +1,5 @@
 import { reportAdsConversion } from "@/lib/gtag";
+import { setLeadIdentity } from "@/lib/session";
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { X, Send, Loader2 } from "lucide-react";
@@ -102,6 +103,7 @@ export function LiaChat() {
       const bolhas: string[] = data?.bolhas ?? [];
       const cartoes: Cartao[] = Array.isArray(data?.cartoes) ? data.cartoes.slice(0, 3) : [];
       setMsgs((m) => [...m, ...bolhas.map((b, i) => ({ role: "assistant" as const, content: b, ...(i === bolhas.length - 1 && cartoes.length ? { cartoes } : {}) }))]);
+      if (data?.identidade) setLeadIdentity({ telefone: data.identidade }, "lia");
       if (data?.acao === "visita") { track("generate_lead", { lead_tipo: "visita_lia", pagina: location.pathname }); }
       if (data?.acao === "lead") { track("generate_lead", { lead_tipo: "lead_lia", pagina: location.pathname }); }
     } catch {

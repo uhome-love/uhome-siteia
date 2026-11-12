@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { setLeadIdentity } from "@/lib/session";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -149,6 +150,7 @@ const Onboarding = () => {
 
     setLoading(true);
     try {
+      setLeadIdentity({ telefone: whatsapp, email: email || undefined }, "onboarding");
       await supabase.from("public_leads").insert({
         nome: nome.trim(),
         telefone: whatsapp.trim(),

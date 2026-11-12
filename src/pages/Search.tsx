@@ -1,4 +1,5 @@
 import { ActiveFilterChips } from "@/components/search/ActiveFilterChips";
+import { setLeadIdentity } from "@/lib/session";
 import React, { useState, useEffect, useCallback, useMemo, useRef, lazy, Suspense } from "react";
 import { useCorretor } from "@/contexts/CorretorContext";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -676,6 +677,7 @@ const Search = () => {
         origem_pagina: "/busca",
         origem_componente: "alerta_busca_modal",
       };
+      if (email) setLeadIdentity({ email }, "alerta_busca");
       await supabase.from("public_leads").insert(alertPayload);
 
       const prefsDesc = [

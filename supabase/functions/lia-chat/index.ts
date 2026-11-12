@@ -171,7 +171,7 @@ const tools = [
   },
 ] as const;
 
-type Ctx = { session_id: string; contexto: Record<string, any>; qualificacao: Record<string, any>; cartoes: any[]; corretor: { id: string; slug_ref: string; nome: string | null } | null; hoje: string; conversa: any };
+type Ctx = { session_id: string; contexto: Record<string, any>; qualificacao: Record<string, any>; cartoes: any[]; identidade?: string; corretor: { id: string; slug_ref: string; nome: string | null } | null; hoje: string; conversa: any };
 
 async function buscarImoveis(a: any) {
   let q = sb
@@ -291,6 +291,7 @@ function contextoCRM(ctx: Ctx, extra: Record<string, unknown>) {
 async function registrarInteresse(a: any, ctx: Ctx) {
   const tel = normalizarTelefone(a.telefone);
   if (!tel) return { erro: "telefone inválido, peça o WhatsApp com DDD" };
+  ctx.identidade = tel;
   if (ctx.conversa?.lead_id) return { ok: true, ja_registrado: true };
   const imv = await dadosImovel(a.imovel_slug ?? ctx.contexto.imovel?.slug);
   const c = ctx.contexto;
@@ -340,6 +341,7 @@ async function registrarInteresse(a: any, ctx: Ctx) {
 async function agendarVisita(a: any, ctx: Ctx) {
   const tel = normalizarTelefone(a.telefone);
   if (!tel) return { erro: "telefone inválido, peça o WhatsApp com DDD" };
+  ctx.identidade = tel;
   const data = validarDataVisita(a.data, ctx.hoje);
   if (!data) return { erro: `data inválida; use uma data entre hoje (${ctx.hoje}) e os próximos 60 dias` };
   const turno = normalizarTurno(a.turno);
@@ -477,5 +479,5 @@ Deno.serve(async (req) => {
     { onConflict: "session_id" },
   );
 
-  return json({ bolhas, acao, cartoes: ctx.cartoes, corretor: corretor ? { nome: corretor.nome } : null });
+  return json({ bolhas, acao, identidade: ctx.identidade ?? null, cartoes: ctx.cartoes, corretor: corretor ? { nome: corretor.nome } : null });
 });

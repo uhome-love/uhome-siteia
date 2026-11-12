@@ -302,6 +302,65 @@ Deno.serve(async (req) => {
       }
 
       // ─── NATAL: links personalizados ───────────────────────────
+      // ─── LIA: conversas do site ───────────────────────────────
+      case "list_lia_conversas": {
+        const limit = Math.min(Math.max(Number(payload.limit) || 50, 1), 200);
+        const offset = Math.max(Number(payload.offset) || 0, 0);
+        let q = supabase
+          .from("lia_conversas")
+          .select("id,session_id,etapa,lead_id,agendamento_id,contexto,mensagens,created_at,updated_at", { count: "exact" })
+          .order("updated_at", { ascending: false })
+          .range(offset, offset + limit - 1);
+        if (payload.desde) q = q.gte("updated_at", String(payload.desde));
+        if (payload.ate) q = q.lte("updated_at", String(payload.ate));
+        if (payload.etapa) q = q.eq("etapa", String(payload.etapa));
+        if (payload.so_com_telefone) q = q.not("lead_id", "is", null);
+        const { data, error, count } = await q;
+        if (error) throw error;
+        const ids = (data ?? []).map((c: any) => c.lead_id).filter(Boolean);
+        const { data: leads } = ids.length
+          ? await supabase.from("public_leads").select("id,nome,telefone,uhomesales_lead_id").in("id", ids)
+          : { data: [] as any[] };
+        const byId = new Map((leads ?? []).map((l: any) => [l.id, l]));
+        const itens = (data ?? []).map((c: any) => {
+          const l: any = c.lead_id ? byId.get(c.lead_id) : null;
+          const ctx = c.contexto ?? {};
+          const msgs = Array.isArray(c.mensagens) ? c.mensagens : [];
+          const ultima = msgs[msgs.length - 1];
+          return {
+            id: c.id,
+            etapa: c.etapa,
+            situacao: c.agendamento_id ? "visita_marcada" : c.lead_id ? "contato_capturado" : "conversando",
+            nome: l?.nome ?? null,
+            telefone: l?.telefone ?? null,
+            crm_lead_id: l?.uhomesales_lead_id ?? null,
+            pagina: ctx.pagina ?? null,
+            imovel: ctx.imovel?.titulo ?? ctx.produto ?? null,
+            utm_campaign: ctx.utm_campaign ?? null,
+            utm_term: ctx.utm_term ?? null,
+            total_mensagens: msgs.length,
+            ultima_mensagem: ultima ? String(ultima.content ?? "").slice(0, 160) : null,
+            created_at: c.created_at,
+            updated_at: c.updated_at,
+          };
+        });
+        return json({ ok: true, total: count ?? 0, itens });
+      }
+
+      case "get_lia_conversa": {
+        if (!payload.id) return json({ error: "id required" }, 400);
+        const { data: c, error } = await supabase.from("lia_conversas").select("*").eq("id", String(payload.id)).maybeSingle();
+        if (error) throw error;
+        if (!c) return json({ error: "not found" }, 404);
+        const { data: lead } = c.lead_id
+          ? await supabase.from("public_leads").select("id,nome,telefone,email,uhomesales_lead_id,imovel_titulo,utm_campaign,utm_term").eq("id", c.lead_id).maybeSingle()
+          : { data: null };
+        const { data: agendamento } = c.agendamento_id
+          ? await supabase.from("agendamentos").select("id,data_visita,turno,horario,imovel_titulo").eq("id", c.agendamento_id).maybeSingle()
+          : { data: null };
+        return json({ ok: true, conversa: c, lead, agendamento });
+      }
+
       case "list_natal_links": {
         const { corretor_slug, email } = payload;
         if (!corretor_slug && !email) return json({ error: "corretor_slug or email required" }, 400);

@@ -139,9 +139,7 @@ export default function Vitrine() {
       });
 
       (supabase as any)
-        .from("vitrines")
-        .update({ visualizacoes: (v.visualizacoes || 0) + 1 })
-        .eq("id", id)
+        .rpc("increment_vitrine_counter", { _vitrine_id: id, _tipo: "view" })
         .then(() => {});
 
       setLoading(false);
@@ -302,19 +300,8 @@ function CorretorBlock({
 
   const handleWaClick = () => {
     (supabase as any)
-      .from("vitrines")
-      .select("cliques_whatsapp")
-      .eq("id", vitrineId)
-      .maybeSingle()
-      .then(({ data }: any) => {
-        if (data) {
-          (supabase as any)
-            .from("vitrines")
-            .update({ cliques_whatsapp: (data.cliques_whatsapp || 0) + 1 })
-            .eq("id", vitrineId)
-            .then(() => {});
-        }
-      });
+      .rpc("increment_vitrine_counter", { _vitrine_id: vitrineId, _tipo: "whatsapp" })
+      .then(() => {});
   };
 
   return (

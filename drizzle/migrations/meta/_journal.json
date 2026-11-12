@@ -50,6 +50,13 @@
       "when": 1794429003327,
       "tag": "0006_valida_insercoes_publicas",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794511656878,
+      "tag": "0007_tighten_vitrines_campanha_produtos_rls",
+      "breakpoints": true
     }
   ]
 }

@@ -1517,6 +1517,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_vitrine_counter: {
+        Args: { _tipo: string; _vitrine_id: string }
+        Returns: undefined
+      }
       upsert_corretor_from_crm: {
         Args: {
           _crm_user_id: string

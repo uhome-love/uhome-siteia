@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { MapPin, Calendar, Building2, Check, MessageCircle, Gift, Loader2, Navigation } from "lucide-react";
+import { MapPin, Calendar, Building2, Check, MessageCircle, Gift, Loader2, Navigation, Send } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { EmpreendimentoLeadForm } from "@/components/EmpreendimentoLeadForm";
@@ -13,9 +13,6 @@ import { Reveal } from "@/components/ui/reveal";
 import { Button } from "@/components/ui/button";
 import { MaterialGallery } from "@/components/foco/MaterialGallery";
 
-function abrirLia(mensagem: string) {
-  window.dispatchEvent(new CustomEvent("uhome:abrir-lia", { detail: { mensagem } }));
-}
 
 /** Rola até o formulário de contato visível (no celular fica logo após as condições). */
 function irParaContato() {
@@ -380,12 +377,12 @@ export default function ProdutoFocoPage() {
           </a>
         ) : (
           <>
-            <button type="button" onClick={() => abrirLia(`Quero as condições${natal ? " de Natal" : ""} do ${p.nome}`)} className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3.5 font-body text-sm font-bold ${natal && !black ? "bg-natal-gold text-natal-deep" : "bg-primary text-primary-foreground"}`}>
-              <MessageCircle className="h-4 w-4" /> Quero as condições
+            <button type="button" onClick={irParaContato} className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3.5 font-body text-sm font-bold ${natal && !black ? "bg-natal-gold text-natal-deep" : "bg-primary text-primary-foreground"}`}>
+              <Send className="h-4 w-4" /> Receber tabela
             </button>
-            <button type="button" onClick={() => abrirLia(`Quero agendar uma visita no ${p.nome}`)} className="flex items-center gap-1.5 rounded-xl border border-border px-4 py-3.5 font-body text-sm font-semibold text-foreground">
-              <Calendar className="h-4 w-4" /> Visitar
-            </button>
+            <a href={waUrl} target="_blank" rel="noopener noreferrer" onClick={() => trackProdutoWhatsApp(p)} className="flex items-center gap-1.5 rounded-xl border border-border px-4 py-3.5 font-body text-sm font-semibold text-foreground">
+              <MessageCircle className="h-4 w-4" /> WhatsApp
+            </a>
           </>
         )}
       </div>

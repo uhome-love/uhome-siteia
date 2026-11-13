@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { useWhatsAppLeadStore } from "@/stores/whatsappLeadStore";
 
 export const SearchCTACard = forwardRef<HTMLDivElement>(function SearchCTACard(_props, ref) {
-  const [formOpen, setFormOpen] = useState(false);
+  const [formOpen, setFormOpen] = useState(true);
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
   const [email, setEmail] = useState("");
@@ -44,6 +44,7 @@ export const SearchCTACard = forwardRef<HTMLDivElement>(function SearchCTACard(_
         email: email.trim() || undefined,
         origem_componente: "busca_cta",
         origem_pagina: window.location.href,
+        imovel_titulo: "Busca: " + (new URLSearchParams(window.location.search).get("bairro") || new URLSearchParams(window.location.search).get("cidade") || "Porto Alegre"),
       });
       setSuccess(true);
       toast.success("Recebemos seu contato! Um corretor falará com você em breve.");
@@ -67,10 +68,10 @@ export const SearchCTACard = forwardRef<HTMLDivElement>(function SearchCTACard(_
       <div className="flex items-center justify-between gap-4 px-6 py-5">
         <div>
           <p className="font-body text-base font-bold text-foreground">
-            Gostou de algum imóvel?
+            Não achou o ideal?
           </p>
           <p className="mt-1 font-body text-sm text-muted-foreground">
-            Fale com um corretor agora e receba uma lista personalizada.
+            Deixe seu WhatsApp: um especialista te manda opções que combinam com a sua busca.
           </p>
         </div>
         <button

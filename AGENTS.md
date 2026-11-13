@@ -1,6 +1,7 @@
 - Jetimob sync: full daily scan (deactivates removed listings) + incremental run of first/last listing pages triggered by the watchdog tick (about every 10 min, only when no full scan is running); Jetimob lists by registration date, so new listings land on the last pages.
 - A DB trigger keeps existing imoveis coordinates when the sync sends null, so geocoded locations survive re-syncs.
 - Campaign/"Uhome em Foco" products live in `produtos_foco` (public content in `ficha` jsonb, images as Lovable Assets URLs) and `campanhas` + `campanha_produtos`; kept separate from legacy `empreendimentos` so old pages keep working. Campaign visibility and Black week are date-driven (America/Sao_Paulo) in `src/lib/produtosFoco.ts`, so campaigns switch on/off without deploys.
+- Campaign-wide offer lines (`campanhas.config.condicoes_gerais`, `config.urna`) feed both product pages and LIA tools. Why: ads, page and LIA must promise the same offer.
 - Broker-personalized product pages reuse the `/c/:corretorSlug` prefix; in that mode pages show the broker card and WhatsApp instead of the lead form. `ssr-render` serves link previews for `/em-foco`, `/em-foco/:slug` and `/campanha/:slug`.
 - The campaign flagged `destaque_home` (via `useCampanhaDestaque`) replaces "Uhome em Foco" in navbar, hero and `/em-foco` while vigente; after it ends `/em-foco` returns automatically. Why: one showcase per period, no deploy needed.
 - Official Natal art (lights, key, seal, Homi) lives in `src/components/foco/NatalArt.tsx` as Lovable Assets; `--natal-*` tokens follow the campaign brand kit.

@@ -242,7 +242,7 @@ function linkProduto(slug: string, ctx: Ctx) {
 }
 
 async function produtosNatal(ctx: Ctx) {
-  const { data: camp } = await sb.from("campanhas").select("id,nome,inicio,fim").eq("ativo", true).order("ordem").limit(3);
+  const { data: camp } = await sb.from("campanhas").select("id,nome,inicio,fim,config").eq("ativo", true).order("ordem").limit(3);
   const vigente = (camp ?? []).find((c) => (!c.inicio || c.inicio <= ctx.hoje) && (!c.fim || c.fim >= ctx.hoje));
   const { data: prods } = await sb
     .from("produtos_foco")
@@ -250,17 +250,32 @@ async function produtosNatal(ctx: Ctx) {
     .eq("ativo", true)
     .order("ordem");
   return {
-    campanha: vigente ? { nome: vigente.nome, inicio: vigente.inicio, fim: vigente.fim } : null,
+    campanha: vigente ? { nome: vigente.nome, inicio: vigente.inicio, fim: vigente.fim, ...condicoesCampanha(vigente.config) } : null,
     produtos: (prods ?? []).map((p) => ({ ...p, link: linkProduto(p.slug, ctx) })),
+  };
+}
+
+/** Condições gerais e brinde da campanha, cadastrados em campanhas.config. */
+function condicoesCampanha(config: any) {
+  return {
+    condicoes_gerais: Array.isArray(config?.condicoes_gerais) ? config.condicoes_gerais : [],
+    brinde: config?.urna ?? null,
   };
 }
 
 async function detalheProduto(a: any, ctx: Ctx) {
   const { data } = await sb.from("produtos_foco").select("id,slug,nome,incorporadora,bairro,cidade,endereco,preco_texto,entrega,status_obra,resumo,ficha").eq("slug", String(a.slug)).maybeSingle();
   if (!data) return { erro: "produto não encontrado" };
-  const { data: cond } = await sb.from("campanha_produtos").select("condicao").eq("produto_id", data.id).limit(1).maybeSingle();
+  const { data: cond } = await sb.from("campanha_produtos").select("condicao, campanhas(nome,inicio,fim,ativo,config)").eq("produto_id", data.id).limit(1).maybeSingle();
   const { id: _id, ...rest } = data;
-  return { ...rest, condicao_campanha: cond?.condicao ?? null, link: linkProduto(data.slug, ctx) };
+  const camp: any = (cond as any)?.campanhas;
+  const vigente = camp?.ativo && (!camp.inicio || camp.inicio <= ctx.hoje) && (!camp.fim || camp.fim >= ctx.hoje);
+  return {
+    ...rest,
+    condicao_campanha: cond?.condicao ?? null,
+    campanha: vigente ? { nome: camp.nome, fim: camp.fim, ...condicoesCampanha(camp.config) } : null,
+    link: linkProduto(data.slug, ctx),
+  };
 }
 
 async function dadosImovel(slug?: string) {

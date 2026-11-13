@@ -51,7 +51,7 @@ export interface Campanha {
   inicio: string | null;
   fim: string | null;
   destaque_home: boolean;
-  config: { black?: { inicio: string; fim: string; titulo: string; texto: string }; urna?: string };
+  config: { black?: { inicio: string; fim: string; titulo: string; texto: string }; urna?: string; condicoes_gerais?: string[] };
 }
 
 export const SITE_URL = "https://uhome.com.br";

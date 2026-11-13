@@ -17,6 +17,12 @@ function abrirLia(mensagem: string) {
   window.dispatchEvent(new CustomEvent("uhome:abrir-lia", { detail: { mensagem } }));
 }
 
+/** Rola até o formulário de contato visível (no celular fica logo após as condições). */
+function irParaContato() {
+  const alvo = Array.from(document.querySelectorAll<HTMLElement>("[data-contato]")).find((el) => el.offsetParent !== null);
+  alvo?.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
 function setMeta(attr: "name" | "property", key: string, content: string) {
   let el = document.querySelector(`meta[${attr}="${key}"]`);
   if (!el) {
@@ -97,6 +103,19 @@ export default function ProdutoFocoPage() {
   const bk = black ? fi.black : null;
   const fotos = p.galeria;
   const waUrl = wa(p);
+  const condGerais = natal?.config?.condicoes_gerais ?? [];
+  const tituloContato = natal ? `Receba a tabela e a condição de Natal do ${p.nome}` : `Receba as condições do ${p.nome}`;
+  const contatoCard = (
+    <div data-contato className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+      <h2 className="font-heading text-xl font-bold text-foreground">{tituloContato}</h2>
+      <p className="mt-1 font-body text-sm text-muted-foreground">Um especialista te envia preços, plantas e unidades disponíveis pelo WhatsApp. Sem compromisso.</p>
+      <div className="mt-4"><EmpreendimentoLeadForm empreendimentoNome={p.nome} empreendimentoSlug={`em-foco/${p.slug}`} bairro={p.bairro ?? undefined} cta="Receber tabela e plantas" /></div>
+      <a href={waUrl} onClick={() => trackProdutoWhatsApp(p)} target="_blank" rel="noopener noreferrer" className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-border px-5 py-3 font-body text-sm font-semibold text-foreground hover:bg-secondary">
+        <MessageCircle className="h-4 w-4" /> Prefiro o WhatsApp
+      </a>
+      <p className="mt-3 text-center font-body text-xs text-muted-foreground">Uhome · nota 4,9 no Google</p>
+    </div>
+  );
   const secoes = [
     { id: "visao-geral", label: "Visão geral", show: true },
     { id: "condicoes", label: "Condições", show: precos.length > 0 || !!bk },
@@ -126,6 +145,11 @@ export default function ProdutoFocoPage() {
             {p.logo_url && <img src={p.logo_url} alt={p.incorporadora ?? ""} className="mt-5 h-8 max-h-10 w-auto max-w-[160px] self-start object-contain drop-shadow-[0_2px_6px_hsl(var(--foreground)/0.6)] sm:h-10" />}
             <h1 className="mt-3 font-heading text-4xl font-bold break-words sm:text-5xl">{p.nome}</h1>
             <p className="mt-2 flex max-w-2xl items-start gap-1.5 font-body text-base opacity-90"><MapPin className="mt-1 h-4 w-4 shrink-0" />{[p.bairro, p.cidade, p.incorporadora].filter(Boolean).join(" · ")}</p>
+            {natal && condGerais.length > 0 && (
+              <p className="mt-3 flex flex-wrap gap-x-3 gap-y-1 font-body text-sm font-semibold text-natal-gold">
+                {condGerais.map((c) => <span key={c} className="inline-flex items-center gap-1"><Check className="h-4 w-4" />{c}</span>)}
+              </p>
+            )}
             <div className="mt-6 flex flex-wrap items-end gap-6">
               {p.preco_a_partir && (
                 <div>
@@ -133,9 +157,15 @@ export default function ProdutoFocoPage() {
                   <p className="font-heading text-4xl font-bold">{formatPreco(p.preco_a_partir)}</p>
                 </div>
               )}
-              <a href={waUrl} onClick={() => trackProdutoWhatsApp(p)} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center gap-2 rounded-full ${natal && !black ? "bg-natal-gold text-natal-deep" : "bg-primary text-primary-foreground"} px-6 py-3.5 font-body text-sm font-bold shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98]`}>
-                <MessageCircle className="h-4 w-4" /> {modoCorretor ? `Falar com ${corretor?.nome.split(" ")[0]}` : "Quero as condições"}
-              </a>
+              {modoCorretor ? (
+                <a href={waUrl} onClick={() => trackProdutoWhatsApp(p)} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center gap-2 rounded-full ${natal && !black ? "bg-natal-gold text-natal-deep" : "bg-primary text-primary-foreground"} px-6 py-3.5 font-body text-sm font-bold shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98]`}>
+                  <MessageCircle className="h-4 w-4" /> Falar com {corretor?.nome.split(" ")[0]}
+                </a>
+              ) : (
+                <button type="button" onClick={irParaContato} className={`inline-flex items-center gap-2 rounded-full ${natal && !black ? "bg-natal-gold text-natal-deep" : "bg-primary text-primary-foreground"} px-6 py-3.5 font-body text-sm font-bold shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98]`}>
+                  <Gift className="h-4 w-4" /> Receber tabela e condições
+                </button>
+              )}
               {fotos.length > 0 && (
                 <Button variant="ghost" size="lg" onClick={() => setBox({ fotos, i: 0 })} className="border border-noir-foreground/40 text-noir-foreground hover:bg-noir-foreground/10 hover:text-noir-foreground">Ver {fotos.length} fotos</Button>
               )}
@@ -180,6 +210,11 @@ export default function ProdutoFocoPage() {
                     </p>
                     {bk?.titulo && <h2 className="mt-3 text-h2 text-inherit">{bk.titulo}</h2>}
                     {bk?.texto && <p className="mt-2 font-body text-sm opacity-90">{bk.texto}</p>}
+                    {natal && condGerais.length > 0 && (
+                      <ul className="mt-4 space-y-1">
+                        {condGerais.map((t) => <li key={t} className="flex gap-2 font-body text-sm font-semibold"><Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-natal-gold" />{t}</li>)}
+                      </ul>
+                    )}
                     <ul className="mt-5 space-y-2">
                       {precos.map((x) => (
                         <li key={x.tipologia} className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-current/10 pb-2 font-body text-sm">
@@ -200,6 +235,9 @@ export default function ProdutoFocoPage() {
                 </div>
               </section>
             )}
+
+            {/* Contato no celular, logo depois das condições */}
+            {!modoCorretor && <div className="lg:hidden" id="contato-celular">{contatoCard}</div>}
 
             {/* Galeria */}
             {fotos.length > 0 && (
@@ -319,14 +357,7 @@ export default function ProdutoFocoPage() {
             {modoCorretor ? (
               <CorretorContatoCard produto={p} />
             ) : (
-              <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-                <h2 className="font-heading text-xl font-bold text-foreground">Receba as condições do {p.nome}</h2>
-                <p className="mt-1 font-body text-sm text-muted-foreground">Converse com um especialista sobre disponibilidade e condições.</p>
-                <div className="mt-4"><EmpreendimentoLeadForm empreendimentoNome={p.nome} empreendimentoSlug={`em-foco/${p.slug}`} bairro={p.bairro ?? undefined} /></div>
-                <a href={waUrl} onClick={() => trackProdutoWhatsApp(p)} target="_blank" rel="noopener noreferrer" className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-border px-5 py-3 font-body text-sm font-semibold text-foreground hover:bg-secondary">
-                  <MessageCircle className="h-4 w-4" /> Prefiro o WhatsApp
-                </a>
-              </div>
+              <div className="hidden lg:block">{contatoCard}</div>
             )}
             <Link to={prefixLink("/em-foco")} className="mt-4 block text-center font-body text-sm font-semibold text-primary">Ver outros produtos em foco</Link>
           </aside>

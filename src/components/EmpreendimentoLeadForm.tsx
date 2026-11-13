@@ -10,9 +10,10 @@ interface EmpreendimentoLeadFormProps {
   empreendimentoNome: string;
   empreendimentoSlug: string;
   bairro?: string;
+  cta?: string;
 }
 
-export function EmpreendimentoLeadForm({ empreendimentoNome, empreendimentoSlug, bairro }: EmpreendimentoLeadFormProps) {
+export function EmpreendimentoLeadForm({ empreendimentoNome, empreendimentoSlug, bairro, cta = "Quero saber mais" }: EmpreendimentoLeadFormProps) {
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
   const [email, setEmail] = useState("");
@@ -62,13 +63,19 @@ export function EmpreendimentoLeadForm({ empreendimentoNome, empreendimentoSlug,
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
       <Input
+        aria-label="Seu nome"
+        autoComplete="name"
         placeholder="Seu nome"
         value={nome}
         onChange={(e) => setNome(e.target.value)}
         required
       />
       <Input
-        placeholder="WhatsApp"
+        aria-label="WhatsApp"
+        type="tel"
+        inputMode="tel"
+        autoComplete="tel"
+        placeholder="WhatsApp com DDD"
         value={telefone}
         onChange={(e) => setTelefone(formatPhone(e.target.value))}
         required
@@ -81,7 +88,7 @@ export function EmpreendimentoLeadForm({ empreendimentoNome, empreendimentoSlug,
       />
       <Button type="submit" className="w-full gap-2" disabled={loading}>
         {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-        Quero saber mais
+        {cta}
       </Button>
     </form>
   );

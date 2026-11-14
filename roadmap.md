@@ -30,3 +30,12 @@
 - [ ] Etapa 3: Google Ads (medição, páginas de destino, campanha pausada) — aguarda conexão da conta
 - [ ] Etapa 4: Google orgânico — aguarda Search Console
 - Bloqueio: número do WhatsApp oficial da LIA (hoje usa o WhatsApp atual da Uhome)
+
+## Máquina de leads (plano 14/11)
+- [x] Etapa 1: contagem da oferta de Natal no topo da página do imóvel
+- [ ] Etapa 1: capas e artes do Natal — aguardando imagens do usuário
+- [x] Etapa 2: novas palavras negativas nas 3 campanhas
+- [ ] Etapa 2: troca de lance para contatos — aguardando 15-20 contatos
+- [ ] Etapa 3: Meta Ads — aguardando ligar a conta do Meta e aprovar verba
+- [ ] Etapa 4: páginas de bairro/construtora (SEO)
+- [ ] Etapa 4: respostas às 15 avaliações — aguardando aprovação dos textos

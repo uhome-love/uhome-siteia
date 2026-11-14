@@ -95,6 +95,12 @@ export default function ProdutoFocoPage() {
     );
   }
 
+  const diasNatalTexto = () => {
+    const hoje = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
+    const fim = new Date(hoje.getFullYear(), 11, 18, 23, 59);
+    const d = Math.ceil((fim.getTime() - hoje.getTime()) / 86400000);
+    return d > 1 ? `faltam ${d} dias · até 18/12` : d === 1 ? "último dia: hoje" : "até 18/12";
+  };
   const fi = p.ficha ?? {};
   const precos = fi.precos ?? [];
   const bk = black ? fi.black : null;
@@ -143,7 +149,7 @@ export default function ProdutoFocoPage() {
               {p.status_obra && <span className="rounded-full bg-noir-foreground/15 px-3 py-1 font-body text-xs font-semibold backdrop-blur">{p.status_obra}</span>}
             </div>
             {p.logo_url && <img src={p.logo_url} alt={p.incorporadora ?? ""} className="mt-5 h-8 max-h-10 w-auto max-w-[160px] self-start object-contain drop-shadow-[0_2px_6px_hsl(var(--foreground)/0.6)] sm:h-10" />}
-            {natal && condGerais.length > 0 && <p className="mt-4 font-body text-sm font-bold uppercase tracking-wide text-natal-gold">{condGerais[0]} · válido até 18/12</p>}
+            {natal && condGerais.length > 0 && <p className="mt-4 font-body text-sm font-bold uppercase tracking-wide text-natal-gold">{condGerais[0]} · {diasNatalTexto()}</p>}
             <h1 className="mt-2 font-heading text-4xl font-bold break-words sm:text-5xl">{p.nome}</h1>
             <p className="mt-2 flex max-w-2xl items-start gap-1.5 font-body text-base opacity-90"><MapPin className="mt-1 h-4 w-4 shrink-0" />{[p.bairro, p.cidade, p.incorporadora].filter(Boolean).join(" · ")}</p>
             {natal && condGerais.length > 0 && (

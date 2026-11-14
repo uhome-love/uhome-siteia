@@ -54,8 +54,8 @@ export function EmpreendimentoLeadForm({ empreendimentoNome, empreendimentoSlug,
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
           <Check className="h-6 w-6 text-primary" />
         </div>
-        <p className="text-sm font-semibold">Obrigado pelo interesse!</p>
-        <p className="text-xs text-muted-foreground">Um especialista entrará em contato em breve.</p>
+        <p className="text-base font-semibold">Pronto, {nome.split(" ")[0]}! Recebemos seu pedido.</p>
+        <p className="text-sm text-muted-foreground">Em poucos minutos um consultor da Uhome chama você no WhatsApp {telefone} com a tabela, as plantas e a simulação da entrada{empreendimentoNome ? ` do ${empreendimentoNome}` : ""}.</p>
       </div>
     );
   }
@@ -79,12 +79,6 @@ export function EmpreendimentoLeadForm({ empreendimentoNome, empreendimentoSlug,
         value={telefone}
         onChange={(e) => setTelefone(formatPhone(e.target.value))}
         required
-      />
-      <Input
-        placeholder="E-mail (opcional)"
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
       />
       <Button type="submit" className="w-full gap-2" disabled={loading}>
         {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}

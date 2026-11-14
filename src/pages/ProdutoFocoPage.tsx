@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { MapPin, Calendar, Building2, Check, MessageCircle, Gift, Loader2, Navigation, Send } from "lucide-react";
+import { MapPin, Calendar, Building2, Check, MessageCircle, Gift, Loader2, Navigation, Send, Star, ShieldCheck, X } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { EmpreendimentoLeadForm } from "@/components/EmpreendimentoLeadForm";
@@ -105,12 +105,15 @@ export default function ProdutoFocoPage() {
   const contatoCard = (
     <div data-contato className="rounded-2xl border border-border bg-card p-6 shadow-sm">
       <h2 className="font-heading text-xl font-bold text-foreground">{tituloContato}</h2>
-      <p className="mt-1 font-body text-sm text-muted-foreground">Um especialista te envia preços, plantas e unidades disponíveis pelo WhatsApp. Sem compromisso.</p>
+      <p className="mt-1 font-body text-sm text-muted-foreground">Receba em poucos minutos no WhatsApp a tabela atualizada, as plantas e a simulação da entrada. Sem compromisso.</p>
       <div className="mt-4"><EmpreendimentoLeadForm empreendimentoNome={p.nome} empreendimentoSlug={`em-foco/${p.slug}`} bairro={p.bairro ?? undefined} cta="Receber tabela e plantas" /></div>
       <a href={waUrl} onClick={() => trackProdutoWhatsApp(p)} target="_blank" rel="noopener noreferrer" className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-border px-5 py-3 font-body text-sm font-semibold text-foreground hover:bg-secondary">
         <MessageCircle className="h-4 w-4" /> Prefiro o WhatsApp
       </a>
-      <p className="mt-3 text-center font-body text-xs text-muted-foreground">Uhome · nota 4,9 no Google</p>
+      <div className="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 font-body text-xs text-muted-foreground">
+        <span className="inline-flex items-center gap-1"><Star className="h-3.5 w-3.5 fill-current text-natal-gold" />4,9 no Google · 68 avaliações</span>
+        <span className="inline-flex items-center gap-1"><ShieldCheck className="h-3.5 w-3.5" />CRECI-RS 25682J</span>
+      </div>
     </div>
   );
   const secoes = [
@@ -140,7 +143,8 @@ export default function ProdutoFocoPage() {
               {p.status_obra && <span className="rounded-full bg-noir-foreground/15 px-3 py-1 font-body text-xs font-semibold backdrop-blur">{p.status_obra}</span>}
             </div>
             {p.logo_url && <img src={p.logo_url} alt={p.incorporadora ?? ""} className="mt-5 h-8 max-h-10 w-auto max-w-[160px] self-start object-contain drop-shadow-[0_2px_6px_hsl(var(--foreground)/0.6)] sm:h-10" />}
-            <h1 className="mt-3 font-heading text-4xl font-bold break-words sm:text-5xl">{p.nome}</h1>
+            {natal && condGerais.length > 0 && <p className="mt-4 font-body text-sm font-bold uppercase tracking-wide text-natal-gold">{condGerais[0]} · válido até 18/12</p>}
+            <h1 className="mt-2 font-heading text-4xl font-bold break-words sm:text-5xl">{p.nome}</h1>
             <p className="mt-2 flex max-w-2xl items-start gap-1.5 font-body text-base opacity-90"><MapPin className="mt-1 h-4 w-4 shrink-0" />{[p.bairro, p.cidade, p.incorporadora].filter(Boolean).join(" · ")}</p>
             {natal && condGerais.length > 0 && (
               <p className="mt-3 flex flex-wrap gap-x-3 gap-y-1 font-body text-sm font-semibold text-natal-gold">
@@ -169,6 +173,16 @@ export default function ProdutoFocoPage() {
             </div>
           </div>
         </section>
+
+        {fotos.length > 1 && (
+          <div className="flex snap-x gap-2 overflow-x-auto px-5 pt-4 lg:hidden [scrollbar-width:none]">
+            {fotos.slice(1, 6).map((f, i) => (
+              <button key={f.url} type="button" aria-label={`Abrir foto ${i + 2} de ${p.nome}`} onClick={() => setBox({ fotos, i: i + 1 })} className="w-[70%] shrink-0 snap-start overflow-hidden rounded-xl bg-muted">
+                <img src={f.url} alt={f.legenda ?? p.nome} loading="lazy" decoding="async" className="aspect-[4/3] w-full object-cover" />
+              </button>
+            ))}
+          </div>
+        )}
 
         <nav aria-label="Seções" className="sticky top-14 z-30 border-b border-border/60 bg-background/90 backdrop-blur">
           <div className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-5 py-2 sm:px-8 [scrollbar-width:none]">
@@ -387,8 +401,40 @@ export default function ProdutoFocoPage() {
         )}
       </div>
 
+      {!modoCorretor && <LembreteTabela nome={p.nome} />}
       {box && <MaterialGallery fotos={box.fotos} index={box.i} onClose={() => setBox(null)} />}
       <Footer />
+    </div>
+  );
+}
+
+/** Cartão discreto que aparece uma vez por visita quando a pessoa já rolou 60% da página. */
+function LembreteTabela({ nome }: { nome: string }) {
+  const [show, setShow] = useState(false);
+  const feito = useRef(false);
+  useEffect(() => {
+    const k = `lembrete-tabela:${nome}`;
+    if (sessionStorage.getItem(k)) return;
+    const onScroll = () => {
+      const h = document.documentElement;
+      if (feito.current || (h.scrollTop + h.clientHeight) / h.scrollHeight < 0.6) return;
+      const contato = Array.from(document.querySelectorAll<HTMLElement>("[data-contato]")).find((el) => el.offsetParent !== null);
+      const r = contato?.getBoundingClientRect();
+      if (r && r.top < h.clientHeight && r.bottom > 0) return;
+      feito.current = true;
+      sessionStorage.setItem(k, "1");
+      setShow(true);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [nome]);
+  if (!show) return null;
+  return (
+    <div role="dialog" aria-label="Receber tabela" className="fixed inset-x-3 bottom-24 z-50 rounded-2xl border border-border bg-card p-4 shadow-xl lg:inset-x-auto lg:bottom-6 lg:right-6 lg:w-80">
+      <button type="button" aria-label="Fechar" onClick={() => setShow(false)} className="absolute right-2 top-2 rounded-full p-1 text-muted-foreground hover:bg-secondary"><X className="h-4 w-4" /></button>
+      <p className="pr-6 font-heading text-base font-bold text-foreground">Quer a tabela do {nome}?</p>
+      <p className="mt-1 font-body text-sm text-muted-foreground">Enviamos preços, plantas e a condição de Natal no seu WhatsApp.</p>
+      <Button className="mt-3 w-full" onClick={() => { setShow(false); irParaContato(); }}>Quero receber</Button>
     </div>
   );
 }

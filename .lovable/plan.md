@@ -11,6 +11,7 @@ Ordem pensada para gerar lead qualificado primeiro, sem aumentar a verba agora.
 - Barra fixa no rodapé do celular com "Receber tabela" e WhatsApp, sempre à vista.
 - Selo com a oferta de Natal e a contagem até 18/12 no topo da página.
 - Primeira foto escolhida a dedo (fachada ou área de lazer) em cada um dos 10 imóveis.
+- Imagens que você vai montar e me mandar: arte da oferta de Natal no formato do celular (em pé, 1080x1350) e no formato largo (1200x628), e 1 foto de capa boa de cada imóvel que hoje tenha capa fraca (eu te passo a lista).
 - Formulário mais curto: só nome e WhatsApp, com a pergunta "quando pensa em comprar?" depois do envio.
 - Depoimentos reais e a nota 4,9 do Google perto do formulário.
 

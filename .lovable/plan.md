@@ -34,3 +34,43 @@
 - Números de LAST_14_DAYS. A parcela de impressões perdida vem de search_budget_lost_impression_share e search_rank_lost_impression_share.
 - Negativas e anúncios entram por google_ads mutate, com cartão de aprovação. As extensões de ligação e de formulário usam assets ligados à campanha.
 - O envio de visitas ao Google usa o gclid guardado no lead (já chega ao CRM) e o upload de conversões offline.
+
+## Parte 2: páginas que convertem (celular primeiro)
+As pessoas clicam, mas a página que abre não convence. Vou melhorar as 4 páginas que recebem os anúncios: página de cada imóvel do Natal, campanha Natal Chave de Ouro, Investir em Studios e busca de Porto Alegre.
+
+**Gancho logo na primeira tela (celular)**
+- Título com benefício e oferta: "Open Arvoredo: entrada a partir de 10% no Natal Chave de Ouro". Hoje o título é só o nome do imóvel.
+- 3 selos curtos: bairro, fase da obra e "a partir de R$ X" (só se o imóvel tiver preço cadastrado).
+- Chamada de urgência real: "Condição válida até 18/12" e o sorteio da urna com 30 presentes.
+- Botão grande, fixo no rodapé do celular: "Receber tabela e condição" ao lado de um WhatsApp menor.
+
+**Material atrativo**
+- Foto principal mais leve e nítida no celular. Mostrar 3 fotos deslizáveis logo abaixo da oferta, antes de qualquer texto longo.
+- "Por que este imóvel": 3 motivos curtos tirados da ficha (localização, lazer, planta). Fica no lugar do texto corrido.
+- Plantas com metragem e quartos em cartões fáceis de ler.
+
+**Oferta e motivo para deixar o contato**
+- Formulário curto, só com nome e WhatsApp, e uma promessa clara: "Receba em 2 minutos a tabela atualizada, as plantas e a simulação da entrada".
+- Prova de confiança perto do formulário: nota 4,9 no Google, 68 avaliações e CRECI. Preciso que você me passe o número do CRECI.
+- Depois do envio: tela de obrigado com a próxima etapa ("um consultor chama você no WhatsApp") e um botão para agendar visita.
+
+**Recuperar quem ia sair**
+- Ao rolar 60% da página sem converter: um cartão discreto "Quer a tabela do [imóvel]?". Aparece uma vez por visita.
+- A LIA abre já falando do imóvel e da oferta da página.
+
+**Studios e busca de Porto Alegre**
+- Studios: primeira tela com o ganho para o investidor (renda de aluguel por temporada não entra, pois o site é só de venda; usar valorização e localização), mais o formulário "Receber estudo de investimento".
+- Busca: faixa no topo com "Receba os imóveis que combinam com você" e formulário curto.
+
+**Desktop**
+- Mesmo conteúdo, com o formulário fixo ao lado enquanto a pessoa rola.
+
+**Regras mantidas**
+- Nada de MCMV, preço baixo ou FGTS.
+- Só imóveis da campanha.
+- Contatos seguem para a Fila do CEO no CRM e contam como conversão no Google Ads.
+
+**Como confiro**
+- Teste no celular (390px) e no computador, com fotos de tela de cada página.
+- Envio real até o CRM, depois apagado.
+- Comparação da taxa de contato em 7 dias.

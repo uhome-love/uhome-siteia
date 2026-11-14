@@ -34,7 +34,7 @@
 ## Máquina de leads (plano 14/11)
 - [x] Etapa 1: contagem da oferta de Natal no topo da página do imóvel
 - [ ] Etapa 1: capas e artes do Natal — aguardando imagens do usuário
-- [x] Etapa 2: novas palavras negativas nas 3 campanhas
+- [x] Etapa 2: bloquear "vaga" no Studios (portais Viva Real/Zap/OLX ficam liberados, a pedido)
 - [ ] Etapa 2: troca de lance para contatos — aguardando 15-20 contatos
 - [ ] Etapa 3: Meta Ads — aguardando ligar a conta do Meta e aprovar verba
 - [ ] Etapa 4: páginas de bairro/construtora (SEO)

@@ -148,7 +148,7 @@ export default function ProdutoFocoPage() {
             <p className="mt-2 flex max-w-2xl items-start gap-1.5 font-body text-base opacity-90"><MapPin className="mt-1 h-4 w-4 shrink-0" />{[p.bairro, p.cidade, p.incorporadora].filter(Boolean).join(" · ")}</p>
             {natal && condGerais.length > 0 && (
               <p className="mt-3 flex flex-wrap gap-x-3 gap-y-1 font-body text-sm font-semibold text-natal-gold">
-                {condGerais.map((c) => <span key={c} className="inline-flex items-center gap-1"><Check className="h-4 w-4" />{c}</span>)}
+                {condGerais.slice(1).map((c) => <span key={c} className="inline-flex items-center gap-1"><Check className="h-4 w-4" />{c}</span>)}
               </p>
             )}
             <div className="mt-6 flex flex-wrap items-end gap-6">

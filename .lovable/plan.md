@@ -74,3 +74,16 @@ As pessoas clicam, mas a página que abre não convence. Vou melhorar as 4 pági
 - Teste no celular (390px) e no computador, com fotos de tela de cada página.
 - Envio real até o CRM, depois apagado.
 - Comparação da taxa de contato em 7 dias.
+
+## Parte 3: imagens e materiais
+- Conferir a foto principal de cada um dos 10 imóveis do Natal e da página de Studios: nitidez, enquadramento no celular, peso do arquivo e se abre rápido.
+- Foto escura, cortada ou de baixa qualidade: primeiro procuro outra foto real entre as que já temos. Se não houver, faço só ajuste de luz e recorte. Nunca invento detalhes do imóvel.
+- Criar uma imagem de destaque padrão para a oferta de Natal, com o selo, "entrada a partir de 10%" e a urna, usando a arte oficial da campanha. Ela vai na primeira tela e no cartão de obrigado.
+- Peso das imagens: versões menores para o celular, para a primeira foto aparecer em menos de 2,5 segundos.
+
+## Validação de ponta a ponta
+1. Páginas dos 10 imóveis, Natal, Studios e busca no celular (390px) e no computador, com foto de tela antes e depois.
+2. Medir a velocidade e a estabilidade da tela no celular em cada página.
+3. Simular um clique do Google, com o código do anúncio, e seguir o caminho: página, formulário, LIA e WhatsApp.
+4. Conferir que o contato chega ao CRM na Fila do CEO, com campanha, palavra buscada e imóvel. Conferir também que a conversão dispara para o Google Ads.
+5. Apagar os dados de teste e mostrar o relatório com o que mudou.

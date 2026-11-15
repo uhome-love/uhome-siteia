@@ -55,7 +55,7 @@ export function EmpreendimentoLeadForm({ empreendimentoNome, empreendimentoSlug,
           <Check className="h-6 w-6 text-primary" />
         </div>
         <p className="text-base font-semibold">Pronto, {nome.split(" ")[0]}! Recebemos seu pedido.</p>
-        <p className="text-sm text-muted-foreground">Em poucos minutos um consultor da Uhome chama você no WhatsApp {telefone} com a tabela, as plantas e a simulação da entrada{empreendimentoNome ? ` do ${empreendimentoNome}` : ""}.</p>
+        <p className="text-sm text-muted-foreground">Em poucos minutos um consultor da Uhome chama você no WhatsApp com valores, plantas e unidades disponíveis{empreendimentoNome ? ` do ${empreendimentoNome}` : ""}.</p>
       </div>
     );
   }

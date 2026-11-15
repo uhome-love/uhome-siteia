@@ -108,12 +108,12 @@ export default function ProdutoFocoPage() {
   const fotos = p.galeria;
   const waUrl = wa(p);
   const condGerais = natal?.config?.condicoes_gerais ?? [];
-  const tituloContato = natal ? `Receba a tabela e a condição de Natal do ${p.nome}` : `Receba as condições do ${p.nome}`;
+  const tituloContato = natal ? `Receba a condição de Natal do ${p.nome}` : `Receba as condições do ${p.nome}`;
   const contatoCard = (
     <div data-contato className="rounded-2xl border border-border bg-card p-6 shadow-sm">
       <h2 className="font-heading text-xl font-bold text-foreground">{tituloContato}</h2>
-      <p className="mt-1 font-body text-sm text-muted-foreground">Receba em poucos minutos no WhatsApp a tabela atualizada, as plantas e a simulação da entrada. Sem compromisso.</p>
-      <div className="mt-4"><EmpreendimentoLeadForm empreendimentoNome={p.nome} empreendimentoSlug={`em-foco/${p.slug}`} bairro={p.bairro ?? undefined} cta="Receber tabela e plantas" /></div>
+      <p className="mt-1 font-body text-sm text-muted-foreground">Um especialista da Uhome te chama no WhatsApp com valores, plantas e unidades disponíveis. Sem compromisso.</p>
+      <div className="mt-4"><EmpreendimentoLeadForm empreendimentoNome={p.nome} empreendimentoSlug={`em-foco/${p.slug}`} bairro={p.bairro ?? undefined} cta="Quero as condições" /></div>
       <a href={waUrl} onClick={() => trackProdutoWhatsApp(p)} target="_blank" rel="noopener noreferrer" className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-border px-5 py-3 font-body text-sm font-semibold text-foreground hover:bg-secondary">
         <MessageCircle className="h-4 w-4" /> Prefiro o WhatsApp
       </a>
@@ -171,7 +171,7 @@ export default function ProdutoFocoPage() {
                 </a>
               ) : (
                 <button type="button" onClick={irParaContato} className={`inline-flex items-center gap-2 rounded-full ${natal && !black ? "bg-natal-gold text-natal-deep" : "bg-primary text-primary-foreground"} px-6 py-3.5 font-body text-sm font-bold shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98]`}>
-                  <Gift className="h-4 w-4" /> Receber tabela e condições
+                  <Gift className="h-4 w-4" /> {natal ? "Quero as condições de Natal" : "Quero as condições"}
                 </button>
               )}
               {fotos.length > 0 && (
@@ -193,7 +193,7 @@ export default function ProdutoFocoPage() {
 
         {natal && slug && PECAS_PRODUTO[slug] && (
           <div className="mx-auto max-w-3xl px-5 pt-6 sm:px-8 lg:max-w-5xl">
-            <PecaNatal peca={PECAS_PRODUTO[slug]} alt={`${p.nome}: condição de Natal, entrada a partir de 10% até 18/12. Receba a tabela no WhatsApp`} onClick={irParaContato} />
+            <PecaNatal peca={PECAS_PRODUTO[slug]} alt={`${p.nome}: condição de Natal, entrada a partir de 10% até 18/12. Fale com um especialista no WhatsApp`} onClick={irParaContato} />
           </div>
         )}
 
@@ -405,7 +405,7 @@ export default function ProdutoFocoPage() {
         ) : (
           <>
             <button type="button" onClick={irParaContato} className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3.5 font-body text-sm font-bold ${natal && !black ? "bg-natal-gold text-natal-deep" : "bg-primary text-primary-foreground"}`}>
-              <Send className="h-4 w-4" /> Receber tabela
+              <Send className="h-4 w-4" /> Quero as condições
             </button>
             <a href={waUrl} target="_blank" rel="noopener noreferrer" onClick={() => trackProdutoWhatsApp(p)} className="flex items-center gap-1.5 rounded-xl border border-border px-4 py-3.5 font-body text-sm font-semibold text-foreground">
               <MessageCircle className="h-4 w-4" /> WhatsApp
@@ -414,7 +414,7 @@ export default function ProdutoFocoPage() {
         )}
       </div>
 
-      {!modoCorretor && <LembreteTabela nome={p.nome} />}
+      {!modoCorretor && <LembreteTabela nome={p.nome} natal={!!natal} />}
       {box && <MaterialGallery fotos={box.fotos} index={box.i} onClose={() => setBox(null)} />}
       <Footer />
     </div>
@@ -422,7 +422,7 @@ export default function ProdutoFocoPage() {
 }
 
 /** Cartão discreto que aparece uma vez por visita quando a pessoa já rolou 60% da página. */
-function LembreteTabela({ nome }: { nome: string }) {
+function LembreteTabela({ nome, natal }: { nome: string; natal: boolean }) {
   const [show, setShow] = useState(false);
   const feito = useRef(false);
   useEffect(() => {
@@ -443,11 +443,11 @@ function LembreteTabela({ nome }: { nome: string }) {
   }, [nome]);
   if (!show) return null;
   return (
-    <div role="dialog" aria-label="Receber tabela" className="fixed inset-x-3 bottom-24 z-50 rounded-2xl border border-border bg-card p-4 shadow-xl lg:inset-x-auto lg:bottom-6 lg:right-6 lg:w-80">
+    <div role="dialog" aria-label="Quero as condições" className="fixed inset-x-3 bottom-24 z-50 rounded-2xl border border-border bg-card p-4 shadow-xl lg:inset-x-auto lg:bottom-6 lg:right-6 lg:w-80">
       <button type="button" aria-label="Fechar" onClick={() => setShow(false)} className="absolute right-2 top-2 rounded-full p-1 text-muted-foreground hover:bg-secondary"><X className="h-4 w-4" /></button>
-      <p className="pr-6 font-heading text-base font-bold text-foreground">Quer a tabela do {nome}?</p>
-      <p className="mt-1 font-body text-sm text-muted-foreground">Enviamos preços, plantas e a condição de Natal no seu WhatsApp.</p>
-      <Button className="mt-3 w-full" onClick={() => { setShow(false); irParaContato(); }}>Quero receber</Button>
+      <p className="pr-6 font-heading text-base font-bold text-foreground">Quer as condições{natal ? " de Natal" : ""} do {nome}?</p>
+      <p className="mt-1 font-body text-sm text-muted-foreground">Um especialista te chama no WhatsApp com valores, plantas e unidades disponíveis.</p>
+      <Button className="mt-3 w-full" onClick={() => { setShow(false); irParaContato(); }}>Quero as condições</Button>
     </div>
   );
 }

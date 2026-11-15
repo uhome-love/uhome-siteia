@@ -21,16 +21,31 @@ export type Database = {
           corretor_ref_slug: string | null
           created_at: string | null
           data_visita: string | null
+          device: string | null
+          fbclid: string | null
+          formulario: string | null
+          gbraid: string | null
+          gclid: string | null
           horario: string | null
           id: string
           imovel_id: string | null
           imovel_slug: string | null
           imovel_titulo: string | null
+          landing_url: string | null
           nome: string
+          origem_componente: string | null
           origem_ref: string | null
+          pagina_url: string | null
+          referrer: string | null
           status: string | null
           telefone: string
           turno: string | null
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
+          wbraid: string | null
         }
         Insert: {
           contexto?: Json | null
@@ -38,16 +53,31 @@ export type Database = {
           corretor_ref_slug?: string | null
           created_at?: string | null
           data_visita?: string | null
+          device?: string | null
+          fbclid?: string | null
+          formulario?: string | null
+          gbraid?: string | null
+          gclid?: string | null
           horario?: string | null
           id?: string
           imovel_id?: string | null
           imovel_slug?: string | null
           imovel_titulo?: string | null
+          landing_url?: string | null
           nome: string
+          origem_componente?: string | null
           origem_ref?: string | null
+          pagina_url?: string | null
+          referrer?: string | null
           status?: string | null
           telefone: string
           turno?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          wbraid?: string | null
         }
         Update: {
           contexto?: Json | null
@@ -55,16 +85,31 @@ export type Database = {
           corretor_ref_slug?: string | null
           created_at?: string | null
           data_visita?: string | null
+          device?: string | null
+          fbclid?: string | null
+          formulario?: string | null
+          gbraid?: string | null
+          gclid?: string | null
           horario?: string | null
           id?: string
           imovel_id?: string | null
           imovel_slug?: string | null
           imovel_titulo?: string | null
+          landing_url?: string | null
           nome?: string
+          origem_componente?: string | null
           origem_ref?: string | null
+          pagina_url?: string | null
+          referrer?: string | null
           status?: string | null
           telefone?: string
           turno?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          wbraid?: string | null
         }
         Relationships: [
           {
@@ -1015,6 +1060,10 @@ export type Database = {
           created_at: string | null
           device: string | null
           email: string | null
+          fbclid: string | null
+          formulario: string | null
+          gbraid: string | null
+          gclid: string | null
           id: string
           imovel_bairro: string | null
           imovel_id: string | null
@@ -1022,11 +1071,13 @@ export type Database = {
           imovel_slug: string | null
           imovel_titulo: string | null
           landing_page: string | null
+          landing_url: string | null
           nome: string
           origem_canal: string | null
           origem_componente: string | null
           origem_pagina: string | null
           origem_ref: string | null
+          pagina_url: string | null
           referrer: string | null
           session_id: string | null
           sincronizado_em: string | null
@@ -1039,6 +1090,7 @@ export type Database = {
           utm_medium: string | null
           utm_source: string | null
           utm_term: string | null
+          wbraid: string | null
         }
         Insert: {
           contexto?: Json | null
@@ -1047,6 +1099,10 @@ export type Database = {
           created_at?: string | null
           device?: string | null
           email?: string | null
+          fbclid?: string | null
+          formulario?: string | null
+          gbraid?: string | null
+          gclid?: string | null
           id?: string
           imovel_bairro?: string | null
           imovel_id?: string | null
@@ -1054,11 +1110,13 @@ export type Database = {
           imovel_slug?: string | null
           imovel_titulo?: string | null
           landing_page?: string | null
+          landing_url?: string | null
           nome: string
           origem_canal?: string | null
           origem_componente?: string | null
           origem_pagina?: string | null
           origem_ref?: string | null
+          pagina_url?: string | null
           referrer?: string | null
           session_id?: string | null
           sincronizado_em?: string | null
@@ -1071,6 +1129,7 @@ export type Database = {
           utm_medium?: string | null
           utm_source?: string | null
           utm_term?: string | null
+          wbraid?: string | null
         }
         Update: {
           contexto?: Json | null
@@ -1079,6 +1138,10 @@ export type Database = {
           created_at?: string | null
           device?: string | null
           email?: string | null
+          fbclid?: string | null
+          formulario?: string | null
+          gbraid?: string | null
+          gclid?: string | null
           id?: string
           imovel_bairro?: string | null
           imovel_id?: string | null
@@ -1086,11 +1149,13 @@ export type Database = {
           imovel_slug?: string | null
           imovel_titulo?: string | null
           landing_page?: string | null
+          landing_url?: string | null
           nome?: string
           origem_canal?: string | null
           origem_componente?: string | null
           origem_pagina?: string | null
           origem_ref?: string | null
+          pagina_url?: string | null
           referrer?: string | null
           session_id?: string | null
           sincronizado_em?: string | null
@@ -1103,6 +1168,7 @@ export type Database = {
           utm_medium?: string | null
           utm_source?: string | null
           utm_term?: string | null
+          wbraid?: string | null
         }
         Relationships: [
           {

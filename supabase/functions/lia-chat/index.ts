@@ -284,6 +284,19 @@ async function dadosImovel(slug?: string) {
   return data;
 }
 
+const RASTREIO_KEYS = ["pagina_url", "formulario", "device", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "gclid", "gbraid", "wbraid", "fbclid", "referrer", "landing_url"] as const;
+function rastreioColunas(c: Record<string, any>) {
+  const r = (c.rastreio_colunas && typeof c.rastreio_colunas === "object" ? c.rastreio_colunas : {}) as Record<string, unknown>;
+  const out: Record<string, string | null> = {};
+  for (const k of RASTREIO_KEYS) {
+    const v = r[k] ?? c[k];
+    out[k] = typeof v === "string" ? v.slice(0, 2000) : null;
+  }
+  out.formulario = out.formulario ?? "Conversa com a LIA";
+  if (out.referrer === null) out.referrer = "";
+  return out;
+}
+
 function contextoCRM(ctx: Ctx, extra: Record<string, unknown>) {
   const c = ctx.contexto;
   return {
@@ -299,6 +312,7 @@ function contextoCRM(ctx: Ctx, extra: Record<string, unknown>) {
     produto: c.produto ?? null,
     gclid: c.gclid ?? null,
     utm_term: c.utm_term ?? null,
+    rastreamento: c.rastreamento ?? null,
     ...extra,
   };
 }
@@ -329,14 +343,8 @@ async function registrarInteresse(a: any, ctx: Ctx) {
       imovel_preco: imv?.preco ?? null,
       origem_pagina: c.pagina ?? null,
       origem_componente: "lia_chat",
-      utm_source: c.utm_source ?? null,
-      utm_medium: c.utm_medium ?? null,
-      utm_campaign: c.utm_campaign ?? null,
-      utm_term: c.utm_term ?? null,
-      utm_content: c.utm_content ?? null,
-      referrer: c.referrer ?? null,
+      ...rastreioColunas(c),
       landing_page: c.landing_page ?? null,
-      device: c.device ?? null,
       origem_canal: "lia",
       session_id: ctx.session_id,
       corretor_ref_id: ctx.corretor?.id ?? null,
@@ -378,6 +386,8 @@ async function agendarVisita(a: any, ctx: Ctx) {
       corretor_ref_id: ctx.corretor?.id ?? null,
       corretor_ref_slug: ctx.corretor?.slug_ref ?? null,
       origem_ref: "lia_chat",
+      origem_componente: "lia_chat",
+      ...rastreioColunas(ctx.contexto),
       contexto: contextoCRM(ctx, { resumo: a.resumo, modalidade: a.modalidade ?? "presencial", produto: a.produto ?? ctx.contexto.produto ?? null }),
     })
     .select("id")

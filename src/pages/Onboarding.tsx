@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { getLeadTracking } from "@/lib/leadTracking";
 import { setLeadIdentity } from "@/lib/session";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -156,8 +157,9 @@ const Onboarding = () => {
         telefone: whatsapp.trim(),
         email: email.trim() || null,
         origem_pagina: "/onboarding",
-        origem_componente: "wizard_onboarding",
         tipo_interesse: "comprar",
+        ...getLeadTracking("wizard_onboarding").colunas,
+        contexto: getLeadTracking("wizard_onboarding").contexto,
       });
 
       if (email.trim()) {

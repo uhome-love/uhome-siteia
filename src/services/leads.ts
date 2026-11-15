@@ -2,6 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getSessionId, getTrackingData, classifyOrigemCanal, getCorretorRef, getCorretorRefId, setLeadIdentity } from "@/lib/session";
 import { trackEvent } from "@/lib/trackEvent";
 import { trackGenerateLead } from "@/lib/gtag";
+import { getLeadTracking } from "@/lib/leadTracking";
 
 interface LeadData {
   nome: string;
@@ -15,6 +16,8 @@ interface LeadData {
   imovel_preco?: number;
   origem_pagina?: string;
   origem_componente: string;
+  /** Nome legível do formulário (opcional; senão vem do origem_componente). */
+  formulario?: string;
   /** Contexto livre (qualificação, campanha, clique do anúncio); o sync-to-crm escreve nas observações do CRM. */
   contexto?: Record<string, unknown>;
 }
@@ -37,6 +40,7 @@ export async function submitLead(data: LeadData) {
     } catch { /* silent */ }
   }
 
+  const rastreio = getLeadTracking(data.origem_componente, data.formulario);
   setLeadIdentity({ telefone: data.telefone, email: data.email }, data.origem_componente);
 
   // Deduplicate: skip if same phone submitted in last 24h
@@ -80,15 +84,22 @@ export async function submitLead(data: LeadData) {
     utm_campaign: tracking.utm_campaign || null,
     utm_term: tracking.utm_term || null,
     utm_content: tracking.utm_content || null,
-    referrer: tracking.referrer || null,
+    referrer: rastreio.colunas.referrer,
     landing_page: tracking.landing_page || null,
-    device: tracking.device || null,
+    device: rastreio.colunas.device,
+    pagina_url: rastreio.colunas.pagina_url,
+    formulario: rastreio.colunas.formulario,
+    gclid: rastreio.colunas.gclid,
+    gbraid: rastreio.colunas.gbraid,
+    wbraid: rastreio.colunas.wbraid,
+    fbclid: rastreio.colunas.fbclid,
+    landing_url: rastreio.colunas.landing_url,
     origem_canal,
     session_id,
     corretor_ref_id,
     corretor_ref_slug: refSlug || null,
     origem_ref: refSlug ? 'link_corretor' : 'organico',
-    contexto: data.contexto ?? null,
+    contexto: { ...(data.contexto ?? {}), ...rastreio.contexto },
   };
 
   const { error } = await supabase

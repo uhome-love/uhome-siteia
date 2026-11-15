@@ -5,6 +5,7 @@ import { submitLead } from "@/services/leads";
 import { toast } from "sonner";
 import { getCorretorRef, getCorretorRefId } from "@/lib/session";
 import { formatPhone } from "@/lib/phoneMask";
+import { getLeadTracking } from "@/lib/leadTracking";
 
 interface Props {
   imovelId: string;
@@ -54,6 +55,7 @@ export function AgendamentoVisita({ imovelId, imovelSlug, imovelTitulo, imovelBa
         corretor_ref_id: refId || null,
         corretor_ref_slug: refSlug || null,
         origem_ref: refSlug ? 'link_corretor' : 'organico',
+        ...getLeadTracking("agendamento_visita").colunas,
       };
       await supabase.from("agendamentos" as any).insert(agendamentoPayload);
       await submitLead({

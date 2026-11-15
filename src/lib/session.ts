@@ -24,6 +24,11 @@ interface UtmData {
   landing_page?: string;
   first_visit_at?: string;
   device?: string;
+  gclid?: string;
+  gbraid?: string;
+  wbraid?: string;
+  fbclid?: string;
+  landing_url?: string;
 }
 
 /** Capture lead identity params (?telefone=, ?email=) from CRM links and remember the person. */
@@ -79,7 +84,7 @@ export function captureUtmParams(): void {
   const params = new URLSearchParams(window.location.search);
 
   const incoming: UtmData = {};
-  const keys: (keyof UtmData)[] = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+  const keys: (keyof UtmData)[] = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'gbraid', 'wbraid', 'fbclid'];
   for (const k of keys) {
     const v = params.get(k);
     if (v) incoming[k] = v;
@@ -91,16 +96,25 @@ export function captureUtmParams(): void {
     // First visit — save everything
     const data: UtmData = {
       ...incoming,
-      referrer: document.referrer || undefined,
+      referrer: document.referrer || '',
       landing_page: window.location.pathname + window.location.search,
+      landing_url: window.location.href,
       first_visit_at: new Date().toISOString(),
       device: /Mobi|Android/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
     };
     try { localStorage.setItem(UTM_KEY, JSON.stringify(data)); } catch { /* silent */ }
-  } else if (Object.keys(incoming).length > 0 && !existing.utm_source) {
-    // Existing visit without utm_source but new UTMs arrived — update UTMs only (keep first touch meta)
-    const merged = { ...existing, ...incoming };
-    try { localStorage.setItem(UTM_KEY, JSON.stringify(merged)); } catch { /* silent */ }
+  } else if (Object.keys(incoming).length > 0) {
+    // Visita anterior: só completa o que faltava (nunca sobrescreve a primeira origem)
+    const merged: UtmData = { ...existing };
+    let mudou = false;
+    const clickKeys: (keyof UtmData)[] = ['gclid', 'gbraid', 'wbraid', 'fbclid'];
+    const temClique = clickKeys.some((k) => existing[k]);
+    for (const k of keys) {
+      const isClick = clickKeys.includes(k);
+      const pode = isClick ? !temClique : !existing.utm_source;
+      if (pode && incoming[k] && !existing[k]) { (merged as any)[k] = incoming[k]; mudou = true; }
+    }
+    if (mudou) try { localStorage.setItem(UTM_KEY, JSON.stringify(merged)); } catch { /* silent */ }
   }
 }
 

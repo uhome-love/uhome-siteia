@@ -155,6 +155,18 @@ const ORIGEM_LABELS: Record<string, string> = {
   busca_alerta: 'Alerta de Busca',
   lia_chat: 'LIA no site',
   lp_studios_cyrela: 'Landing Studios Cyrela (investimento)',
+  hero_form: 'Formulário do topo',
+  alerta_busca_modal: 'Alerta de Busca',
+  wizard_onboarding: 'Cadastro guiado',
+}
+
+const RASTREIO_CAMPOS = ['pagina_url', 'origem_componente', 'formulario', 'device', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'gclid', 'gbraid', 'wbraid', 'fbclid', 'referrer', 'landing_url'] as const
+function rastreioDoRecord(record: Record<string, unknown>) {
+  const out: Record<string, unknown> = {}
+  for (const k of RASTREIO_CAMPOS) out[k] = record[k] ?? (k === 'referrer' ? '' : null)
+  if (!out.pagina_url) out.pagina_url = record.origem_pagina ?? null
+  if (!out.landing_url) out.landing_url = record.landing_page ?? null
+  return out
 }
 
 function humanizeOrigem(componente: string | null | undefined): string | null {
@@ -185,6 +197,13 @@ async function handleLead(
   if (record.origem_pagina) obsLines.push(`Página: ${record.origem_pagina}`)
   if (record.utm_source) obsLines.push(`UTM: ${record.utm_source}${record.utm_campaign ? ` / ${record.utm_campaign}` : ''}`)
   if (record.device) obsLines.push(`Device: ${record.device}`)
+  if (record.formulario) obsLines.push(`Formulário: ${record.formulario}`)
+  if (record.utm_term) obsLines.push(`Palavra pesquisada: ${record.utm_term}`)
+  if (record.gclid) obsLines.push(`Google Ads gclid: ${record.gclid}`)
+  else if (record.gbraid || record.wbraid) obsLines.push(`Google Ads: ${record.gbraid ? 'gbraid ' + record.gbraid : 'wbraid ' + record.wbraid}`)
+  if (record.fbclid) obsLines.push(`Meta fbclid: ${record.fbclid}`)
+  if (record.landing_url) obsLines.push(`Primeira página: ${record.landing_url}`)
+  if (record.referrer !== undefined && record.referrer !== null) obsLines.push(`Veio de: ${record.referrer || 'acesso direto'}`)
   obsLines.push(...contextoLinhas(record.contexto))
   const observacoes = obsLines.join('\n')
 
@@ -353,6 +372,18 @@ function contextoLinhas(ctx: unknown): string[] {
   if (c.campanha) l.push(`Campanha: ${c.campanha}`)
   if (c.gclid) l.push(`Google Ads gclid: ${c.gclid}`)
   if (c.utm_term) l.push(`Palavra buscada: ${c.utm_term}`)
+  const r = c.rastreamento
+  if (r && typeof r === 'object') {
+    if (r.fonte) l.push(`Fonte: ${r.fonte}`)
+    if (r.primeira_visita_em) l.push(`1ª visita: ${new Date(r.primeira_visita_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}`)
+    if (r.numero_visitas) l.push(`Nº de visitas: ${r.numero_visitas}`)
+    if (r.tempo_no_site_min !== undefined) l.push(`Tempo no site (visita atual): ${r.tempo_no_site_min} min`)
+    if (Array.isArray(r.imoveis_vistos) && r.imoveis_vistos.length) l.push(`Últimos imóveis vistos: ${r.imoveis_vistos.join(', ')}`)
+    if (r.favoritos) l.push(`Favoritos: ${r.favoritos}`)
+    if (Array.isArray(r.buscas) && r.buscas.length) l.push(`Buscas: ${r.buscas.join(' | ')}`)
+    if (r.conversou_com_lia) l.push('Conversou com a LIA: sim')
+    if (r.ja_enviou_contato_antes) l.push('Cliente que voltou: já tinha enviado contato antes')
+  }
   if (Array.isArray(c.paginas) && c.paginas.length) l.push(`Páginas vistas: ${c.paginas.slice(-10).join(' → ')}`)
   if (Array.isArray(c.imoveis_vistos) && c.imoveis_vistos.length) l.push(`Imóveis vistos: ${c.imoveis_vistos.slice(-10).join(', ')}`)
   if (c.ultima_busca) l.push(`Última busca: ${c.ultima_busca}`)
@@ -369,7 +400,7 @@ async function moverParaFilaCEO(
 ) {
   if (!pipelineLeadId) return
   const patch: Record<string, unknown> = {
-    dados_site: { site_lead_id: record.id, contexto: record.contexto ?? null, origem_componente: record.origem_componente ?? null },
+    dados_site: { site_lead_id: record.id, contexto: record.contexto ?? null, ...rastreioDoRecord(record), fonte: (record.contexto as any)?.rastreamento?.fonte ?? null },
     observacoes,
     ...extra,
     updated_at: new Date().toISOString(),

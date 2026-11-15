@@ -1,4 +1,5 @@
 import { ActiveFilterChips } from "@/components/search/ActiveFilterChips";
+import { getLeadTracking } from "@/lib/leadTracking";
 import { setLeadIdentity } from "@/lib/session";
 import React, { useState, useEffect, useCallback, useMemo, useRef, lazy, Suspense } from "react";
 import { useCorretor } from "@/contexts/CorretorContext";
@@ -675,7 +676,8 @@ const Search = () => {
         email: email || "-",
         tipo_interesse: "alerta_busca",
         origem_pagina: "/busca",
-        origem_componente: "alerta_busca_modal",
+        ...getLeadTracking("alerta_busca_modal").colunas,
+        contexto: getLeadTracking("alerta_busca_modal").contexto,
       };
       if (email) setLeadIdentity({ email }, "alerta_busca");
       await supabase.from("public_leads").insert(alertPayload);

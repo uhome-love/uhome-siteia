@@ -1,5 +1,6 @@
 // Contexto do visitante enviado à LIA e ao CRM: páginas vistas, imóveis, busca, origem do anúncio.
 import { getTrackingData } from "@/lib/session";
+import { getLeadTracking } from "@/lib/leadTracking";
 
 const TRAIL_KEY = "uhome_lia_paginas";
 const GCLID_KEY = "uhome_gclid";
@@ -38,6 +39,9 @@ export function montarContextoLia(pathname: string, corretorSlug: string | null)
     gclid: getGclid(),
     ...t,
   };
+  const r = getLeadTracking("lia_chat");
+  ctx.rastreio_colunas = r.colunas;
+  ctx.rastreamento = r.contexto.rastreamento;
   const vistos = lerJSON<unknown[]>(localStorage, "imoveis_vistos", []);
   if (Array.isArray(vistos)) {
     ctx.imoveis_vistos = vistos

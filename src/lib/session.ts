@@ -56,8 +56,9 @@ export function getLeadIdentity(): { telefone?: string; email?: string } {
  * Remember who this visitor is (after a form, LIA, visit booking or CRM link)
  * and link everything they did anonymously on this browser to their lead in the CRM.
  */
-export function setLeadIdentity(id: { telefone?: string; email?: string }, origem: string): void {
+export function setLeadIdentity(id: { telefone?: string; email?: string; nome?: string }, origem: string): void {
   try {
+    if (id.nome?.trim()) localStorage.setItem('uhome_lead_nome', id.nome.trim());
     const tel = id.telefone?.replace(/\D/g, '');
     const telOk = tel && tel.length >= 10 && tel.length <= 13 ? tel : undefined;
     const email = id.email?.trim().toLowerCase() || undefined;

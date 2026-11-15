@@ -41,7 +41,7 @@ export async function submitLead(data: LeadData) {
   }
 
   const rastreio = getLeadTracking(data.origem_componente, data.formulario);
-  setLeadIdentity({ telefone: data.telefone, email: data.email }, data.origem_componente);
+  setLeadIdentity({ telefone: data.telefone, email: data.email, nome: data.nome }, data.origem_componente);
 
   // Deduplicate: skip if same phone submitted in last 24h
   const digitsOnly = data.telefone.replace(/\D/g, "");

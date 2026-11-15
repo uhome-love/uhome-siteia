@@ -1411,40 +1411,109 @@ export type Database = {
       }
       whatsapp_clicks: {
         Row: {
+          contexto: Json | null
           corretor_ref_id: string | null
           corretor_ref_slug: string | null
           created_at: string | null
+          destino: string | null
+          device: string | null
+          email: string | null
+          fbclid: string | null
+          fonte: string | null
+          formulario: string | null
+          gbraid: string | null
+          gclid: string | null
           id: string
           imovel_id: string | null
           imovel_slug: string | null
           imovel_titulo: string | null
+          landing_url: string | null
+          mensagem: string | null
+          nome: string | null
+          origem_componente: string | null
           origem_pagina: string | null
           origem_ref: string | null
+          pagina_url: string | null
+          referrer: string | null
           session_id: string | null
+          telefone: string | null
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
+          visitor_id: string | null
+          wbraid: string | null
         }
         Insert: {
+          contexto?: Json | null
           corretor_ref_id?: string | null
           corretor_ref_slug?: string | null
           created_at?: string | null
+          destino?: string | null
+          device?: string | null
+          email?: string | null
+          fbclid?: string | null
+          fonte?: string | null
+          formulario?: string | null
+          gbraid?: string | null
+          gclid?: string | null
           id?: string
           imovel_id?: string | null
           imovel_slug?: string | null
           imovel_titulo?: string | null
+          landing_url?: string | null
+          mensagem?: string | null
+          nome?: string | null
+          origem_componente?: string | null
           origem_pagina?: string | null
           origem_ref?: string | null
+          pagina_url?: string | null
+          referrer?: string | null
           session_id?: string | null
+          telefone?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          visitor_id?: string | null
+          wbraid?: string | null
         }
         Update: {
+          contexto?: Json | null
           corretor_ref_id?: string | null
           corretor_ref_slug?: string | null
           created_at?: string | null
+          destino?: string | null
+          device?: string | null
+          email?: string | null
+          fbclid?: string | null
+          fonte?: string | null
+          formulario?: string | null
+          gbraid?: string | null
+          gclid?: string | null
           id?: string
           imovel_id?: string | null
           imovel_slug?: string | null
           imovel_titulo?: string | null
+          landing_url?: string | null
+          mensagem?: string | null
+          nome?: string | null
+          origem_componente?: string | null
           origem_pagina?: string | null
           origem_ref?: string | null
+          pagina_url?: string | null
+          referrer?: string | null
           session_id?: string | null
+          telefone?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          visitor_id?: string | null
+          wbraid?: string | null
         }
         Relationships: [
           {

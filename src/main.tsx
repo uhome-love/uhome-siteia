@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { HelmetProvider } from "react-helmet-async";
 import { captureUtmParams, captureLeadIdentity } from "./lib/session";
 import { registrarVisita } from "./lib/leadTracking";
+import { instalarRastreioWhatsApp } from "./services/whatsappTracker";
 import App from "./App.tsx";
 import { initGA4 } from "./lib/gtag";
 initGA4();
@@ -12,6 +13,7 @@ captureUtmParams();
 // Capture ?telefone= and ?email= from URL for lead identity (Radar de Intenção)
 captureLeadIdentity();
 registrarVisita();
+instalarRastreioWhatsApp();
 // All fonts lazy-loaded — system font stack covers initial render
 import "./index.css";
 

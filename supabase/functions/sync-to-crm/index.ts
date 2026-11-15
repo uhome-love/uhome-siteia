@@ -447,16 +447,51 @@ async function handleCaptacao(
 }
 
 // ─── WhatsApp click handler ──────────────────────────────────────
-// WhatsApp clicks no longer create a separate CRM lead because the real
-// lead (with name + phone) already flows through public_leads → sync-to-crm.
-// We just log it silently to avoid duplicate "WhatsApp - Geral" entries.
+// Cada clique em WhatsApp vai ao CRM pelo mesmo endpoint de leads de landing (receive-landing-lead).
 async function handleWhatsAppClick(
   _supabaseCRM: any,
   record: Record<string, unknown>,
-  _corretorCRMId: string | null
+  corretorCRMId: string | null
 ) {
-  console.log(`[sync-to-crm] WhatsApp click logged (no CRM lead created): ${record.imovel_slug ?? 'geral'}`)
-  return { ok: true, crm_lead_id: null, error: undefined }
+  const base = Deno.env.get('UHOMESALES_SUPABASE_URL')!
+  const key = Deno.env.get('UHOMESALES_SERVICE_ROLE_KEY')!
+  const payload = {
+    tipo: 'clique_whatsapp',
+    site_click_id: record.id,
+    visitor_id: record.visitor_id ?? null,
+    session_id: record.session_id ?? null,
+    nome: record.nome ?? null,
+    telefone: record.telefone ?? null,
+    email: record.email ?? null,
+    pagina_url: record.pagina_url ?? record.origem_pagina ?? null,
+    empreendimento: record.imovel_titulo ?? null,
+    imovel_slug: record.imovel_slug ?? null,
+    mensagem: record.mensagem ?? null,
+    whatsapp_destino: record.destino ?? null,
+    origem_componente: record.origem_componente ?? null,
+    formulario: record.formulario ?? 'Clique no WhatsApp',
+    device: record.device ?? null,
+    fonte: record.fonte ?? null,
+    utm_source: record.utm_source ?? null, utm_medium: record.utm_medium ?? null,
+    utm_campaign: record.utm_campaign ?? null, utm_content: record.utm_content ?? null, utm_term: record.utm_term ?? null,
+    gclid: record.gclid ?? null, gbraid: record.gbraid ?? null, wbraid: record.wbraid ?? null, fbclid: record.fbclid ?? null,
+    referrer: record.referrer ?? '',
+    landing_url: record.landing_url ?? null,
+    corretor_id: corretorCRMId,
+    corretor_ref_slug: record.corretor_ref_slug ?? null,
+    contexto: record.contexto ?? null,
+    created_at: record.created_at ?? null,
+  }
+  const res = await fetch(`${base}/functions/v1/receive-landing-lead`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}`, apikey: key },
+    body: JSON.stringify(payload),
+  })
+  const txt = await res.text()
+  let body: any = null
+  try { body = JSON.parse(txt) } catch { /* texto */ }
+  if (!res.ok) return { ok: false, crm_lead_id: null, error: `receive-landing-lead ${res.status}: ${txt.slice(0, 300)}` }
+  return { ok: true, crm_lead_id: body?.lead_id ?? body?.id ?? null, error: undefined }
 }
 
 // ─── CRM Notification ────────────────────────────────────────────

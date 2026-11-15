@@ -105,6 +105,11 @@ Deno.serve(async (req) => {
     erro: result.error ?? null
   })
 
+  // Alerta por e-mail ao Lucas a cada novo lead do site (via Gmail dele)
+  if (tipo === 'lead' && !String(record.nome ?? '').toUpperCase().includes('TESTE')) {
+    await enviarAlertaLead(record).catch((e) => console.error('[sync-to-crm] alerta e-mail:', (e as Error).message))
+  }
+
   // Send notification to CRM if corretor is assigned
   if (result.ok && corretorCRMId) {
     await createCRMNotification(supabaseCRM, corretorCRMId, tipo, record)
@@ -510,4 +515,52 @@ async function createCRMNotification(
   } catch {
     console.error('[CRM Email] Failed to send notification email')
   }
+}
+
+
+// ─── Alerta por e-mail (Gmail do Lucas) ──────────────────────────
+const ALERTA_PARA = 'lucas@uhome.com.br'
+function b64(str: string) {
+  return btoa(Array.from(new TextEncoder().encode(str), (b) => String.fromCharCode(b)).join(''))
+}
+function hdr(v: string) { return /^[\x00-\x7F]*$/.test(v) ? v : `=?UTF-8?B?${b64(v)}?=` }
+async function enviarAlertaLead(r: Record<string, unknown>) {
+  const lovKey = Deno.env.get('LOVABLE_API_KEY')
+  const gmKey = Deno.env.get('GOOGLE_MAIL_API_KEY')
+  if (!lovKey || !gmKey) { console.warn('[sync-to-crm] Gmail não configurado'); return }
+  const ctx = (r.contexto ?? {}) as Record<string, any>
+  const rt = (ctx.rastreamento ?? {}) as Record<string, any>
+  const tel = String(r.telefone ?? '').replace(/\D/g, '')
+  const linhas = [
+    `Nome: ${r.nome ?? '-'}`,
+    `Telefone: ${r.telefone ?? '-'}${tel.length >= 10 ? `  (WhatsApp: https://wa.me/${tel.startsWith('55') ? tel : '55' + tel})` : ''}`,
+    r.email ? `E-mail: ${r.email}` : '',
+    r.imovel_titulo ? `Imóvel: ${r.imovel_titulo}` : '',
+    r.imovel_slug ? `Link: https://uhome.com.br/imovel/${r.imovel_slug}` : '',
+    `Formulário: ${r.formulario ?? humanizeOrigem(r.origem_componente as string) ?? '-'}`,
+    `Fonte: ${rt.fonte ?? r.origem_canal ?? r.utm_source ?? 'não informada'}`,
+    r.utm_campaign ? `Campanha: ${r.utm_campaign}` : '',
+    r.utm_term ? `Palavra pesquisada: ${r.utm_term}` : '',
+    `Página: ${r.pagina_url ?? r.origem_pagina ?? '-'}`,
+    r.device ? `Aparelho: ${r.device}` : '',
+    ctx.resumo ? `Resumo da LIA: ${ctx.resumo}` : '',
+    '',
+    'O lead já está no CRM (Fila do CEO, se não veio por link de corretor).',
+  ].filter((l) => l !== '')
+  const assunto = `Novo lead do site: ${r.nome ?? 'sem nome'}${r.imovel_titulo ? ' · ' + r.imovel_titulo : ''}`
+  const raw = [
+    `To: ${ALERTA_PARA}`,
+    `Subject: ${hdr(assunto)}`,
+    'MIME-Version: 1.0',
+    'Content-Type: text/plain; charset="UTF-8"',
+    'Content-Transfer-Encoding: base64',
+    '',
+    b64(linhas.join('\n')),
+  ].join('\r\n')
+  const res = await fetch('https://connector-gateway.lovable.dev/google_mail/gmail/v1/users/me/messages/send', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${lovKey}`, 'X-Connection-Api-Key': gmKey, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ raw: b64(raw).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '') }),
+  })
+  if (!res.ok) throw new Error(`Gmail [${res.status}]: ${await res.text()}`)
 }

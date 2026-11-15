@@ -11,3 +11,4 @@
 - Site leads without a broker link go to the CRM "Fila do CEO" (pipeline_leads pendente_distribuicao) in `sync-to-crm`; no plantão fallback. Why: owner distributes site leads manually.
 - Visitor identity (phone/email) is remembered in localStorage via `setLeadIdentity` in `src/lib/session.ts` at every contact capture; the `site-identidade` function links prior anonymous `lead_events` and sends a history summary to the CRM. Why: CRM only gets site activity from identified people.
 - Lead tracking (first-touch UTM/click IDs, page, form, device, behavior summary) is built only in `src/lib/leadTracking.ts` and attached to every lead insert; sync-to-crm forwards it in `dados_site`. Why: one source so every form sends the same context to the CRM.
+- New-lead email alerts are sent from sync-to-crm through the linked Gmail connection (owner's own mailbox), skipped for names containing TESTE. Why: no verified sender domain needed.

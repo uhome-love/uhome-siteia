@@ -30,3 +30,18 @@ Objetivo: todo contato do site chega ao CRM dizendo de onde a pessoa veio (prime
 - `sync-to-crm`: incluir os novos campos no `record`/payload enviado ao CRM sem tirar nada; manter também nas observações.
 - Teste em `src/test/` para: primeira visita não é sobrescrita, click IDs capturados, referrer vazio vira `""`, device classificado.
 - Validação: enviar um lead de teste com `?utm_source=google&gclid=teste`, conferir a linha e o que foi ao CRM, depois apagar só esse teste.
+
+## Contexto extra para a tela do lead no CRM
+
+Hoje a tela mostra "Fonte: Não informada" mesmo quando dá para saber. Passa a ir também, dentro de `contexto` (o CRM já escreve isso no histórico):
+
+- **Fonte legível** sempre preenchida: "Google Ads — Natal Chave de Ouro", "Google orgânico", "Instagram", "Acesso direto", "Link do corretor" (calculada da UTM, código de clique e referrer).
+- **Palavra pesquisada no Google** (`utm_term`) quando vier do anúncio.
+- **Data da primeira visita** e **quantas visitas** a pessoa já fez.
+- **Tempo no site** na visita atual.
+- **Imóveis vistos** (últimos 5, com nome e link) e **favoritados**.
+- **Buscas feitas** (filtros resumidos, últimas 3).
+- **Conversou com a LIA?** sim/não.
+- **Cliente que voltou**: se esse telefone já enviou contato antes.
+
+Sugestão para o CRM (fora deste projeto): na caixa "Veio do site", mostrar Campanha, Palavra pesquisada, 1ª visita, Nº de visitas e Imóveis vistos.

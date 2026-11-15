@@ -5,7 +5,8 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { useCanonical } from "@/hooks/useCanonical";
 import { useCorretor } from "@/contexts/CorretorContext";
-import { blackAtiva, useCampanha } from "@/lib/produtosFoco";
+import { blackAtiva, campanhaVigente, useCampanha } from "@/lib/produtosFoco";
+import { PECA_BLACK, PECA_GERAL, PecaNatal } from "@/components/foco/PecasNatal";
 import { ProdutoFocoCard, trackProdutoWhatsApp, useWhatsAppProduto } from "@/components/foco/FocoShared";
 import { ComparadorNatal } from "@/components/foco/ComparadorNatal";
 import { WHATSAPP_NUMBER } from "@/lib/whatsapp";
@@ -106,6 +107,12 @@ export default function CampanhaPage() {
           {corretor.foto_url && <img src={corretor.foto_url} alt={corretor.nome} loading="lazy" className="h-14 w-14 shrink-0 rounded-full object-cover" />}
           <div className="min-w-0"><p className="font-body text-xs text-muted-foreground">Seu corretor Uhome</p><p className="break-words font-heading font-semibold">{corretor.nome}</p>{corretor.creci && <p className="text-xs text-muted-foreground">CRECI {corretor.creci}</p>}</div>
         </div></section>}
+        {c && c.tema === "natal" && campanhaVigente(c) && (
+          <div className="mx-auto max-w-3xl px-5 pt-8 sm:px-8 lg:max-w-5xl">
+            <PecaNatal peca={black ? PECA_BLACK : PECA_GERAL} alt={black ? "Black Natal Uhome: entrada a partir de 10%, só até 29/11. Ver empreendimentos" : "Natal Chave de Ouro: entrada a partir de 10%, válido até 18/12. Ver empreendimentos"} onClick={() => document.getElementById("empreendimentos")?.scrollIntoView({ behavior: "smooth" })} />
+          </div>
+        )}
+
         <Reveal><section id="empreendimentos" className="mx-auto max-w-7xl scroll-mt-20 px-5 py-8 sm:px-8">
           <h2 className="text-h2 text-foreground">Empreendimentos participantes</h2>
           <p className="mt-2 font-body text-muted-foreground">{data.produtos.length} produtos selecionados, do primeiro apê ao alto padrão.</p>

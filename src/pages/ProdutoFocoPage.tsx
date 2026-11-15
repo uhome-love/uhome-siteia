@@ -12,6 +12,7 @@ import { CorretorContatoCard, ProdutoFocoCard, trackProdutoWhatsApp, useWhatsApp
 import { Reveal } from "@/components/ui/reveal";
 import { Button } from "@/components/ui/button";
 import { MaterialGallery } from "@/components/foco/MaterialGallery";
+import { PECAS_PRODUTO, PecaNatal } from "@/components/foco/PecasNatal";
 
 
 /** Rola até o formulário de contato visível (no celular fica logo após as condições). */
@@ -187,6 +188,12 @@ export default function ProdutoFocoPage() {
                 <img src={f.url} alt={f.legenda ?? p.nome} loading="lazy" decoding="async" className="aspect-[4/3] w-full object-cover" />
               </button>
             ))}
+          </div>
+        )}
+
+        {natal && slug && PECAS_PRODUTO[slug] && (
+          <div className="mx-auto max-w-3xl px-5 pt-6 sm:px-8 lg:max-w-5xl">
+            <PecaNatal peca={PECAS_PRODUTO[slug]} alt={`${p.nome}: condição de Natal, entrada a partir de 10% até 18/12. Receba a tabela no WhatsApp`} onClick={irParaContato} />
           </div>
         )}
 

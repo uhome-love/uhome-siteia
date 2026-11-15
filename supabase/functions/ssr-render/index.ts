@@ -818,6 +818,21 @@ async function corretorNome(slug?: string) {
   return data?.nome ?? null;
 }
 
+// Artes de Natal para prévia de link (WhatsApp/redes) enquanto a campanha vale (até 18/12; Black 23–29/11).
+const PREVIA_NATAL: Record<string, string> = {
+  "open-bosque": "/__l5e/assets-v1/0117eb84-2040-4fe1-8f4e-e6d6d62626dc/previa-natal-open-bosque-1200x628.jpg",
+  "open-arvoredo": "/__l5e/assets-v1/c1126ddd-6374-45f7-854f-ba4b7444a03e/previa-natal-open-arvoredo-1200x628.jpg",
+  "orygem": "/__l5e/assets-v1/c6516d46-a9bd-465d-996f-6102df5ef9d3/previa-natal-orygem-1200x628.jpg",
+  "skyglass-parque-moinhos": "/__l5e/assets-v1/5642495e-4c4a-438d-9d33-76db4d1adbd2/previa-natal-skyglass-1200x628.jpg",
+  "golden-lake": "/__l5e/assets-v1/02100dff-60f0-4c5a-aa12-b895a77df9d8/previa-natal-golden-lake-1200x628.jpg",
+  "casa-tua-canoas": "/__l5e/assets-v1/0da083fc-0ed8-4d23-86ab-ef5e8d591997/previa-natal-casa-tua-canoas-1200x628.jpg",
+};
+const PREVIA_NATAL_GERAL = "/__l5e/assets-v1/ab050e6d-2ccb-4133-a728-4f413d080002/previa-natal-geral-1200x628.jpg";
+const PREVIA_BLACK = "/__l5e/assets-v1/91fceac7-055c-479b-a290-1fea1f7670cd/previa-black-natal-1200x628.jpg";
+function hojeSP() { return new Date().toLocaleDateString("en-CA", { timeZone: "America/Sao_Paulo" }); }
+function natalVigente() { const d = hojeSP(); return d >= "2026-11-02" && d <= "2026-12-18"; }
+function blackVigente() { const d = hojeSP(); return d >= "2026-11-23" && d <= "2026-11-29"; }
+
 async function renderProdutoFoco(slug: string, corretorSlug?: string) {
   const { data: p } = await supabase
     .from("produtos_foco")
@@ -843,7 +858,8 @@ async function renderProdutoFoco(slug: string, corretorSlug?: string) {
     url: canonical,
     address: { "@type": "PostalAddress", addressLocality: p.cidade, addressRegion: "RS", addressCountry: "BR" },
   });
-  return html(title, desc, absAsset(p.capa_url), canonical, [orgJsonLd(), ld],
+  const og = natalVigente() && PREVIA_NATAL[slug] ? PREVIA_NATAL[slug] : p.capa_url;
+  return html(title, desc, absAsset(og), canonical, [orgJsonLd(), ld],
     `<h1>${esc(p.nome)}</h1><p>${esc(desc)}</p>${imgs.map((u) => `<img src="${esc(u)}" alt="${esc(p.nome)}" />`).join("")}`);
 }
 
@@ -862,7 +878,7 @@ async function renderCampanha(slug: string) {
   const ids = (links ?? []).map((l) => l.produto_id);
   const { data: prods } = ids.length ? await supabase.from("produtos_foco").select("slug, nome, capa_url").in("id", ids) : { data: [] };
   const desc = c.subtitulo ?? "";
-  return html(`${c.titulo ?? c.nome} | Uhome`, desc, absAsset(c.banner_url || prods?.[0]?.capa_url), `${SITE}/campanha/${slug}`, [orgJsonLd()],
+  return html(`${c.titulo ?? c.nome} | Uhome`, desc, absAsset(natalVigente() ? (blackVigente() ? PREVIA_BLACK : PREVIA_NATAL_GERAL) : (c.banner_url || prods?.[0]?.capa_url)), `${SITE}/campanha/${slug}`, [orgJsonLd()],
     `<h1>${esc(c.titulo ?? c.nome)}</h1><p>${esc(desc)}</p><ul>${(prods ?? []).map((p) => `<li><a href="${SITE}/em-foco/${esc(p.slug)}">${esc(p.nome)}</a></li>`).join("")}</ul>`);
 }
 

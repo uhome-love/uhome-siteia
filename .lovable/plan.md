@@ -12,14 +12,11 @@
    - tipologias de 1 e 2 dormitórios, com garden no térreo. O 3 dormitórios está esgotado e não entra.
 5. Publicar e mandar prints no celular.
 
-## O que NÃO vou mudar sem você confirmar
+## Preço e entrega (confirmados por você)
 
-Os sites trazem números diferentes dos que estão hoje no nosso site:
-- **Preço:** os sites dizem "a partir de R$ 247 mil"; o nosso diz R$ 240 mil.
-- **Entrega:** os sites dizem "2029"; o nosso diz "Dezembro de 2028".
-- **Renda mínima:** um dos sites mostra R$ 5.000 para o 1 dormitório.
-
-Vou manter preço e entrega como estão, a menos que você (ou o Lucas) confirme os valores novos.
+- Preço "a partir de" passa de R$ 240 mil para **R$ 247 mil**, na página, nos cartões e no filtro de valor.
+- Entrega passa de "Dezembro de 2028" para **"Março de 2029"**.
+- Renda mínima: nada muda.
 
 ## Detalhes técnicos
 - Download em /tmp; envio com `lovable-assets create`; atualização de `produtos_foco.galeria`, `plantas` e `ficha` (tipologias, lazer, endereço) via SQL, só no slug `open-bosque`.

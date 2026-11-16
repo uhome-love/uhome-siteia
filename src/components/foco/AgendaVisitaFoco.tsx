@@ -7,6 +7,7 @@ import { formatPhone } from "@/lib/phoneMask";
 import { getLeadTracking } from "@/lib/leadTracking";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { contatoSchema } from "@/components/foco/InfoLeadFoco";
 import type { ProdutoFoco } from "@/lib/produtosFoco";
 
 const TURNOS = ["Manhã", "Tarde", "Noite"] as const;
@@ -34,7 +35,9 @@ export function AgendaVisitaFoco({ p, planta }: { p: ProdutoFoco; planta?: strin
 
   const enviar = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!dia || !turno || nome.trim().length < 2 || !telOk) { setErro("Escolha o dia, o período e informe nome e WhatsApp."); return; }
+    if (!dia || !turno) { setErro("Escolha o dia e o período."); return; }
+    const v = contatoSchema.safeParse({ nome, telefone: tel });
+    if (!v.success) { setErro(v.error.issues[0].message); return; }
     setErro(""); setLoading(true);
     try {
       const ref = getCorretorRef();
@@ -70,7 +73,7 @@ export function AgendaVisitaFoco({ p, planta }: { p: ProdutoFoco; planta?: strin
   }
 
   return (
-    <form data-contato onSubmit={enviar} className="rounded-2xl border border-border bg-card p-5 sm:p-6">
+    <form noValidate data-contato onSubmit={enviar} className="rounded-2xl border border-border bg-card p-5 sm:p-6">
       {planta && <p className="mb-3 rounded-lg bg-secondary px-3 py-2 font-body text-sm text-foreground">Planta escolhida: <strong>{planta}</strong></p>}
       <p className="font-body text-sm font-semibold text-foreground">Dia</p>
       <div className="mt-2 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
@@ -93,8 +96,8 @@ export function AgendaVisitaFoco({ p, planta }: { p: ProdutoFoco; planta?: strin
         ))}
       </div>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        <Input aria-label="Seu nome" placeholder="Seu nome" value={nome} onChange={(e) => setNome(e.target.value)} className="h-12 text-base" />
-        <Input aria-label="Seu WhatsApp" placeholder="WhatsApp com DDD" inputMode="tel" value={tel} onChange={(e) => setTel(formatPhone(e.target.value))} className="h-12 text-base" />
+        <Input aria-label="Seu nome" placeholder="Seu nome *" required value={nome} onChange={(e) => setNome(e.target.value)} className="h-12 text-base" />
+        <Input aria-label="Seu WhatsApp" placeholder="WhatsApp com DDD *" required inputMode="tel" value={tel} onChange={(e) => setTel(formatPhone(e.target.value))} className="h-12 text-base" />
       </div>
       {erro && <p className="mt-3 font-body text-sm text-destructive">{erro}</p>}
       <Button type="submit" size="lg" disabled={loading} className="mt-4 w-full">

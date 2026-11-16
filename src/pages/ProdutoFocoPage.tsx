@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { MapPin, Building2, MessageCircle, Gift, Loader2, Navigation, Star, ShieldCheck, CalendarDays, ChevronDown } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { UhomeLogo } from "@/components/UhomeLogo";
+import { InfoLeadFoco } from "@/components/foco/InfoLeadFoco";
 import { AgendaVisitaFoco } from "@/components/foco/AgendaVisitaFoco";
 import { useCanonical } from "@/hooks/useCanonical";
 import { useCorretor } from "@/contexts/CorretorContext";
@@ -134,9 +135,11 @@ export default function ProdutoFocoPage() {
     { id: "plantas", l: "Plantas", s: temPlantas },
     { id: "pagamento", l: "Pagamento", s: precos.length > 0 || !!natal },
     { id: "local", l: "Localização", s: true },
+    { id: "informacoes", l: "Informações", s: !modoCorretor },
     { id: "visita", l: "Visita", s: true },
     { id: "duvidas", l: "Dúvidas", s: faq.length > 0 },
   ].filter((a) => a.s);
+  const pedirInfo = () => document.getElementById("informacoes")?.scrollIntoView({ behavior: "smooth" });
   const regiao = [...outros].sort((a, b) => Number(b.bairro === p.bairro) - Number(a.bairro === p.bairro) || Number(b.cidade === p.cidade) - Number(a.cidade === p.cidade)).slice(0, 3);
   const agendar = (pl?: string) => {
     if (modoCorretor) { window.open(waUrl, "_blank", "noopener"); trackProdutoWhatsApp(p); return; }
@@ -199,6 +202,7 @@ export default function ProdutoFocoPage() {
                 {natal && condGerais[0] && <p className="mt-1 font-body text-sm font-semibold text-primary">{condGerais[0]}</p>}
               </div>
               <Button size="lg" onClick={() => agendar()} className={`hidden sm:inline-flex ${corBotao}`}><CalendarDays className="h-4 w-4" />{modoCorretor ? `Falar com ${corretor?.nome.split(" ")[0]}` : "Agendar visita"}</Button>
+              {!modoCorretor && <Button size="lg" variant="outline" onClick={pedirInfo} className="hidden sm:inline-flex">Quero mais informações</Button>}
             </div>
           </div>
         </section>
@@ -315,6 +319,14 @@ export default function ProdutoFocoPage() {
             {fi.maps_url && <a href={fi.maps_url} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-2 font-body text-sm font-semibold text-primary"><Navigation className="h-4 w-4" />Abrir no mapa</a>}
           </section>
 
+          {!modoCorretor && (
+            <section id="informacoes" className="scroll-mt-28">
+              <h2 className="text-h2 text-foreground">{natal ? `Receba as condições de Natal do ${p.nome}` : `Receba as condições do ${p.nome}`}</h2>
+              <p className="mt-1 font-body text-muted-foreground">Um especialista da Uhome te chama no WhatsApp com valores, plantas e unidades disponíveis.</p>
+              <div className="mt-5 max-w-2xl"><InfoLeadFoco p={p} /></div>
+            </section>
+          )}
+
           {/* Visita */}
           <section id="visita" className="scroll-mt-28">
             <h2 className="text-h2 text-foreground">Agende sua visita</h2>
@@ -364,7 +376,8 @@ export default function ProdutoFocoPage() {
         <button type="button" onClick={() => agendar()} className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3.5 font-body text-sm font-bold ${corBotao}`}>
           <CalendarDays className="h-4 w-4" />{modoCorretor ? `Falar com ${corretor?.nome.split(" ")[0]}` : "Agendar visita"}
         </button>
-        <a href={waUrl} target="_blank" rel="noopener noreferrer" onClick={() => trackProdutoWhatsApp(p)} className="flex items-center gap-1.5 rounded-xl border border-border px-4 py-3.5 font-body text-sm font-semibold text-foreground"><MessageCircle className="h-4 w-4" />WhatsApp</a>
+        {!modoCorretor && <button type="button" onClick={pedirInfo} className="flex flex-1 items-center justify-center rounded-xl border border-border py-3.5 font-body text-sm font-bold text-foreground">Mais informações</button>}
+        <a href={waUrl} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" onClick={() => trackProdutoWhatsApp(p)} className="flex items-center justify-center rounded-xl border border-border px-4 py-3.5 text-foreground"><MessageCircle className="h-5 w-5" /></a>
       </div>
 
       {box && <MaterialGallery fotos={box.fotos} index={box.i} onClose={() => setBox(null)} />}

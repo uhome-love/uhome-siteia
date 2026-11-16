@@ -1,4 +1,4 @@
-# Materiais do Open Bosque nos dois sites indicados
+# Materiais de Open Bosque, Open Arvoredo, Orygem e Casa Tua Porto Alegre
 
 ## O que vou fazer
 
@@ -12,7 +12,15 @@
    - tipologias de 1 e 2 dormitórios, com garden no térreo. O 3 dormitórios está esgotado e não entra.
 5. Publicar e mandar prints no celular.
 
-## Preço e entrega (confirmados por você)
+## Outros 3 produtos (mesmo processo de fotos e plantas)
+
+- **Open Arvoredo:** materiais do site da Open (construtoraopen.com.br/empreendimento/open-arvoredo). Hoje a página tem 7 fotos e 4 plantas.
+- **Orygem Residence Club:** materiais do site da Encorp. Hoje tem 12 fotos e 8 plantas.
+- **Casa Tua Porto Alegre:** materiais do site da Encorp. Hoje tem 12 fotos e 8 plantas. O Casa Tua Canoas não muda.
+
+Nesses três, troco ou completo só as fotos e as plantas, sempre com uma qualidade igual ou melhor que a atual. Preço, entrega e condições continuam como estão. Se algum site mostrar um número diferente do nosso, eu aviso e não altero.
+
+## Preço e entrega do Open Bosque (confirmados por você)
 
 - Preço "a partir de" passa de R$ 240 mil para **R$ 247 mil**, na página, nos cartões e no filtro de valor.
 - Entrega passa de "Dezembro de 2028" para **"Março de 2029"**.

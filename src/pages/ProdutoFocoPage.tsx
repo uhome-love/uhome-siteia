@@ -81,6 +81,13 @@ export default function ProdutoFocoPage() {
     };
   }, [p, modoCorretor, corretor]);
 
+  const [ativa, setAtiva] = useState("");
+  useEffect(() => {
+    const obs = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && setAtiva(e.target.id)), { rootMargin: "-40% 0px -55% 0px" });
+    document.querySelectorAll("main section[id]").forEach((el) => obs.observe(el));
+    return () => obs.disconnect();
+  }, [p?.slug]);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background"><Navbar />
@@ -146,10 +153,10 @@ export default function ProdutoFocoPage() {
           <nav aria-label="Seções" className="hidden gap-1 md:flex">
             {ancoras.map((a) => <Button key={a.id} asChild variant="ghost" size="sm"><a href={`#${a.id}`}>{a.l}</a></Button>)}
           </nav>
-          <Button size="sm" onClick={() => agendar()}>{modoCorretor ? `Falar com ${corretor?.nome.split(" ")[0]}` : "Agendar visita"}</Button>
+          <Button size="sm" onClick={() => agendar()} className={corBotao}>{modoCorretor ? `Falar com ${corretor?.nome.split(" ")[0]}` : "Agendar visita"}</Button>
         </div>
-        <nav aria-label="Seções" className="flex gap-1 overflow-x-auto border-t border-border/40 px-3 py-1.5 md:hidden [scrollbar-width:none]">
-          {ancoras.map((a) => <Button key={a.id} asChild variant="ghost" size="sm" className="shrink-0"><a href={`#${a.id}`}>{a.l}</a></Button>)}
+        <nav aria-label="Seções" className="flex gap-1 overflow-x-auto border-t border-border/40 px-3 py-1.5 pr-10 md:hidden [scrollbar-width:none] [mask-image:linear-gradient(to_right,black_85%,transparent)]">
+          {ancoras.map((a) => <Button key={a.id} asChild variant={ativa === a.id ? "secondary" : "ghost"} size="sm" className="shrink-0"><a href={`#${a.id}`} aria-current={ativa === a.id ? "true" : undefined}>{a.l}</a></Button>)}
         </nav>
       </header>
 
@@ -160,7 +167,7 @@ export default function ProdutoFocoPage() {
             <div ref={trilho} onScroll={(e) => { const el = e.currentTarget; setFotoAtual(Math.round(el.scrollLeft / el.clientWidth)); }} className="flex snap-x snap-mandatory overflow-x-auto [scrollbar-width:none]">
               {(fotos.length ? fotos : p.capa_url ? [{ url: p.capa_url }] : []).map((f, i) => (
                 <button type="button" key={f.url} aria-label={`Abrir foto ${i + 1} de ${p.nome}`} onClick={() => setBox({ fotos, i })} className="w-full shrink-0 snap-center">
-                  <img src={f.url} alt={(f as any).legenda ?? p.nome} fetchPriority={i === 0 ? "high" : undefined} loading={i === 0 ? "eager" : "lazy"} className="aspect-[4/3] w-full object-cover sm:aspect-[16/7]" />
+                  <img src={f.url} alt={semProvisoria((f as any).legenda) ?? p.nome} fetchPriority={i === 0 ? "high" : undefined} loading={i === 0 ? "eager" : "lazy"} className="aspect-[4/3] w-full object-cover sm:aspect-[16/7]" />
                 </button>
               ))}
             </div>
@@ -179,7 +186,8 @@ export default function ProdutoFocoPage() {
           <div className="px-5 pt-6 sm:px-0">
             <p className="font-body text-xs font-semibold uppercase tracking-wider text-muted-foreground">{[p.incorporadora, p.status_obra].filter(Boolean).join(" · ")}</p>
             <h1 className="mt-1 font-heading text-3xl font-bold text-foreground sm:text-5xl">{p.nome}</h1>
-            <p className="mt-2 flex items-start gap-1.5 font-body text-base text-muted-foreground"><MapPin className="mt-1 h-4 w-4 shrink-0" />{[p.bairro, p.cidade].filter(Boolean).join(", ")}{fi.frase ? ` · ${fi.frase}` : ""}</p>
+            <p className="mt-2 flex items-start gap-1.5 font-body text-base text-muted-foreground"><MapPin className="mt-1 h-4 w-4 shrink-0" />{[p.bairro, p.cidade].filter(Boolean).join(", ")}</p>
+            {fi.frase && <p className="mt-2 font-body text-lg font-semibold text-foreground">{fi.frase[0].toUpperCase() + fi.frase.slice(1)}</p>}
             {chips.length > 0 && (
               <ul className="mt-4 flex flex-wrap gap-2">
                 {chips.map((c) => <li key={c} className="rounded-full border border-border px-3 py-1 font-body text-sm text-foreground">{c}</li>)}
@@ -236,9 +244,9 @@ export default function ProdutoFocoPage() {
                 return (
                   <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
                     {lista.slice(0, 6).map((f, i) => (
-                      <button type="button" key={f.url} aria-label={`Abrir ${f.legenda ?? "foto"}`} onClick={() => setBox({ fotos: lista, i })} className={`group relative overflow-hidden rounded-xl bg-muted ${i === 0 ? "col-span-2 row-span-2" : ""}`}>
-                        <img src={f.url} alt={f.legenda ?? p.nome} loading="lazy" className="aspect-[4/3] h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                        {f.legenda && <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-noir/70 to-transparent p-2 text-left font-body text-xs text-noir-foreground">{f.legenda}</span>}
+                      <button type="button" key={f.url} aria-label={`Abrir ${semProvisoria(f.legenda) ?? "foto"}`} onClick={() => setBox({ fotos: lista, i })} className={`group relative overflow-hidden rounded-xl bg-muted ${i === 0 ? "col-span-2 row-span-2" : ""}`}>
+                        <img src={f.url} alt={semProvisoria(f.legenda) ?? p.nome} loading="lazy" className="aspect-[4/3] h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                        {f.legenda && <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-noir/70 to-transparent p-2 text-left font-body text-xs text-noir-foreground">{semProvisoria(f.legenda)}</span>}
                       </button>
                     ))}
                   </div>
@@ -251,13 +259,13 @@ export default function ProdutoFocoPage() {
           {temPlantas && (
             <section id="plantas" className="scroll-mt-28">
               <h2 className="text-h2 text-foreground">Escolha a planta</h2>
-              <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              <div className="-mx-5 mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-2 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0">
                 {(fi.tipologias ?? []).map((t, i) => {
                   const preco = precos.find((x) => x.tipologia === t.nome) ?? (t.dorm ? precos.find((x) => x.tipologia.includes(`${t.dorm} dorm`)) : undefined) ?? (fi.tipologias!.length === precos.length ? precos[i] : undefined);
                   const img = (t.dorm ? p.plantas.find((x) => (x.legenda ?? "").includes(`${t.dorm} dorm`)) : undefined) ?? (p.plantas.length === fi.tipologias!.length ? p.plantas[i] : undefined);
                   return (
-                    <div key={t.nome + i} className="flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-card">
-                      {img && <button type="button" onClick={() => setBox({ fotos: p.plantas, i })} aria-label={`Ampliar planta ${t.nome}`} className="bg-secondary/40 p-3"><img src={img.url} alt={img.legenda ?? t.nome} loading="lazy" className="mx-auto aspect-[4/3] w-full object-contain" /></button>}
+                    <div key={t.nome + i} className="flex w-[82%] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-border/60 bg-card sm:w-auto">
+                      {img && <button type="button" onClick={() => setBox({ fotos: p.plantas, i })} aria-label={`Ampliar planta ${t.nome}`} className="bg-secondary/40 p-3"><img src={img.url} alt={semProvisoria(img.legenda) ?? t.nome} loading="lazy" className="mx-auto aspect-[4/3] max-h-44 w-full object-contain sm:max-h-none" /></button>}
                       <div className="flex flex-1 flex-col p-5">
                         <p className="font-heading text-lg font-bold text-foreground">{t.nome}</p>
                         <p className="mt-1 font-body text-sm text-muted-foreground">{[t.area, t.vagas ? (/vaga/i.test(t.vagas) ? t.vagas : `${t.vagas} ${t.vagas === "1" ? "vaga" : "vagas"}`) : null].filter(Boolean).join(" · ")}</p>
@@ -271,7 +279,7 @@ export default function ProdutoFocoPage() {
               {!fi.tipologias?.length && p.plantas.length > 0 && (
                 <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
                   {p.plantas.map((f, i) => (
-                    <button type="button" key={f.url} onClick={() => setBox({ fotos: p.plantas, i })} className="rounded-xl border border-border/60 bg-card p-2"><img src={f.url} alt={f.legenda ?? "Planta"} loading="lazy" className="aspect-square w-full object-contain" /></button>
+                    <button type="button" key={f.url} onClick={() => setBox({ fotos: p.plantas, i })} className="rounded-xl border border-border/60 bg-card p-2"><img src={f.url} alt={semProvisoria(f.legenda) ?? "Planta"} loading="lazy" className="aspect-square w-full object-contain" /></button>
                   ))}
                 </div>
               )}
@@ -398,4 +406,8 @@ function faqAuto(p: ProdutoFoco, cond: string[]) {
   out.push({ p: "Como funciona o pagamento?", r: cond.length ? `Condição de Natal até 18/12: ${cond.join(", ").toLowerCase()}. Financiamento conforme o perfil.` : "Um especialista apresenta as condições e simula o financiamento conforme o seu perfil." });
   if (fi.ficha_tecnica?.length) out.push({ p: "Ficha técnica", r: fi.ficha_tecnica.map((x) => `${x.item}: ${x.valor}`).join(". ") + "." });
   return out;
+}
+
+function semProvisoria(t?: string | null) {
+  return t ? t.replace(/\s*\((imagem |foto )?provis[óo]ria\)/gi, "").trim() : t;
 }

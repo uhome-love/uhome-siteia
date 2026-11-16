@@ -23,8 +23,8 @@ function proximosDias(): Date[] {
 
 export function AgendaVisitaFoco({ p, planta }: { p: ProdutoFoco; planta?: string | null }) {
   const dias = proximosDias();
-  const [dia, setDia] = useState<Date | null>(null);
-  const [turno, setTurno] = useState<string>("");
+  const [dia, setDia] = useState<Date | null>(dias[0]);
+  const [turno, setTurno] = useState<string>("Tarde");
   const [nome, setNome] = useState("");
   const [tel, setTel] = useState("");
   const [loading, setLoading] = useState(false);

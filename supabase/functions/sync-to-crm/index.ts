@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { decidirDistribuicao, temCorretorAtivo, variacoesTelefone } from './distribuicao.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -395,6 +396,31 @@ function contextoLinhas(ctx: unknown): string[] {
   return l
 }
 
+async function buscarEstados(supabaseCRM: any, pipelineLeadId: string, record: Record<string, unknown>) {
+  const cols = 'id,corretor_id,arquivado,motivo_descarte,tipo_descarte,observacoes,dados_site,stage_id'
+  const map = new Map<string, any>()
+  const { data: atual } = await supabaseCRM.from('pipeline_leads').select(cols).eq('id', pipelineLeadId).maybeSingle()
+  if (atual) map.set(atual.id, atual)
+  const tels = variacoesTelefone(record.telefone)
+  if (tels.length) {
+    const { data } = await supabaseCRM.from('pipeline_leads').select(cols).in('telefone_normalizado', tels).limit(20)
+    for (const r of data ?? []) map.set(r.id, r)
+  }
+  const email = String(record.email ?? '').trim().toLowerCase()
+  if (email.includes('@')) {
+    const { data } = await supabaseCRM.from('pipeline_leads').select(cols).ilike('email', email).limit(20)
+    for (const r of data ?? []) map.set(r.id, r)
+  }
+  const rows = [...map.values()]
+  const stageIds = [...new Set(rows.map((r) => r.stage_id).filter(Boolean))]
+  const tipos = new Map<string, string>()
+  if (stageIds.length) {
+    const { data } = await supabaseCRM.from('pipeline_stages').select('id,tipo').in('id', stageIds)
+    for (const st of data ?? []) tipos.set(st.id, st.tipo)
+  }
+  return rows.map((r) => ({ ...r, stage_tipo: tipos.get(r.stage_id) ?? null }))
+}
+
 async function moverParaFilaCEO(
   supabaseCRM: any,
   pipelineLeadId: string | null | undefined,
@@ -404,12 +430,29 @@ async function moverParaFilaCEO(
   extra: Record<string, unknown> = {},
 ) {
   if (!pipelineLeadId) return
-  const patch: Record<string, unknown> = {
-    dados_site: { site_lead_id: record.id, contexto: record.contexto ?? null, ...rastreioDoRecord(record), fonte: (record.contexto as any)?.rastreamento?.fonte ?? null },
-    observacoes,
-    ...extra,
-    updated_at: new Date().toISOString(),
+  const dadosSite = { site_lead_id: record.id, contexto: record.contexto ?? null, ...rastreioDoRecord(record), fonte: (record.contexto as any)?.rastreamento?.fonte ?? null }
+  const estados = await buscarEstados(supabaseCRM, pipelineLeadId, record)
+
+  // Pessoa já existe no CRM com corretor ativo: só acrescenta dados, o CRM decide o resto.
+  if (decidirDistribuicao(estados) === 'so_acrescentar') {
+    const alvos = estados.filter(temCorretorAtivo)
+    const extraTxt = extra.proxima_acao ? `\n${extra.proxima_acao}` : ''
+    for (const alvo of alvos) {
+      const obs = alvo.id === pipelineLeadId && alvo.observacoes?.includes(observacoes)
+        ? alvo.observacoes
+        : `${observacoes}${extraTxt}\n\n${alvo.observacoes ?? ''}`.slice(0, 8000)
+      const { error } = await supabaseCRM.from('pipeline_leads').update({
+        dados_site: { ...(alvo.dados_site ?? {}), ...dadosSite },
+        observacoes: obs,
+        updated_at: new Date().toISOString(),
+      }).eq('id', alvo.id)
+      if (error) console.error('[sync-to-crm] acrescentar dados falhou:', error.message)
+    }
+    console.log(`[sync-to-crm] pessoa já com corretor no CRM; só dados acrescentados em ${alvos.length} lead(s)`)
+    return
   }
+
+  const patch: Record<string, unknown> = { dados_site: dadosSite, observacoes, ...extra, updated_at: new Date().toISOString() }
   if (!corretorCRMId) {
     Object.assign(patch, {
       corretor_id: null,

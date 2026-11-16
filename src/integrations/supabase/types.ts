@@ -787,6 +787,7 @@ export type Database = {
           identidade: Json | null
           imovel_slug: string | null
           imovel_titulo: string | null
+          origem: Json | null
           pagina: string | null
           session_id: string | null
           tipo: string
@@ -802,6 +803,7 @@ export type Database = {
           identidade?: Json | null
           imovel_slug?: string | null
           imovel_titulo?: string | null
+          origem?: Json | null
           pagina?: string | null
           session_id?: string | null
           tipo: string
@@ -817,6 +819,7 @@ export type Database = {
           identidade?: Json | null
           imovel_slug?: string | null
           imovel_titulo?: string | null
+          origem?: Json | null
           pagina?: string | null
           session_id?: string | null
           tipo?: string

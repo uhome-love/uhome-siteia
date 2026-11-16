@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { HelmetProvider } from "react-helmet-async";
 import { captureUtmParams, captureLeadIdentity } from "./lib/session";
 import { registrarVisita } from "./lib/leadTracking";
+import { instalarFunilAnuncio } from "./lib/funilAnuncio";
 import { instalarRastreioWhatsApp } from "./services/whatsappTracker";
 import App from "./App.tsx";
 import { initGA4 } from "./lib/gtag";
@@ -14,6 +15,7 @@ captureUtmParams();
 captureLeadIdentity();
 registrarVisita();
 instalarRastreioWhatsApp();
+instalarFunilAnuncio();
 // All fonts lazy-loaded — system font stack covers initial render
 import "./index.css";
 

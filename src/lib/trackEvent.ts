@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { getVisitorId } from "./visitor";
-import { getSessionId, getCorretorRef, getCorretorRefId, getLeadIdentity } from "./session";
+import { getSessionId, getCorretorRef, getCorretorRefId, getLeadIdentity, getTrackingData } from "./session";
+import { fonteLegivel, classificarDevice } from "./leadTracking";
 
 const UHOMESALES_SITE_EVENTS_URL =
   "https://hunbxqzhvuemgntklyzb.supabase.co/functions/v1/site-events";
@@ -13,7 +14,22 @@ type EventTipo =
   | "imovel_visualizado"
   | "busca_realizada"
   | "whatsapp_click"
-  | "formulario_enviado";
+  | "formulario_enviado"
+  | FunilTipo;
+
+export type FunilTipo = "pagina_anuncio_vista" | "rolagem_50" | "galeria_aberta" | "formulario_iniciado";
+
+/** Origem e aparelho, sem nenhum dado pessoal. */
+export function origemResumo() {
+  const t = getTrackingData() as Record<string, any>;
+  return {
+    fonte: fonteLegivel(t, getCorretorRef()),
+    utm_source: t.utm_source || null,
+    utm_campaign: t.utm_campaign || null,
+    tem_gclid: !!(t.gclid || t.gbraid || t.wbraid),
+    device: classificarDevice(navigator.userAgent, window.innerWidth),
+  };
+}
 
 interface TrackEventParams {
   tipo: EventTipo;
@@ -83,6 +99,8 @@ function postToCRM(params: TrackEventParams, identidade: { telefone?: string; em
  * also creates a real-time notification for the corretor.
  * Additionally POSTs to UhomeSales CRM site-events.
  */
+const FUNIL = new Set<string>(["pagina_anuncio_vista", "rolagem_50", "galeria_aberta", "formulario_iniciado"]);
+
 export async function trackEvent(params: TrackEventParams) {
   try {
     const visitor_id = getVisitorId();
@@ -90,6 +108,7 @@ export async function trackEvent(params: TrackEventParams) {
     const corretor_slug = getCorretorRef();
     const corretor_id = getCorretorRefId();
     const identidade = getLeadIdentity();
+    const funil = FUNIL.has(params.tipo);
 
     // 1. Local insert (lead_events)
     await (supabase as any).from("lead_events").insert({
@@ -103,11 +122,13 @@ export async function trackEvent(params: TrackEventParams) {
       imovel_titulo: params.imovel_titulo || null,
       busca_query: params.busca_query || null,
       busca_filtros: params.busca_filtros || null,
-      identidade: (identidade.telefone || identidade.email)
+      origem: origemResumo(),
+      identidade: !funil && (identidade.telefone || identidade.email)
         ? { telefone: identidade.telefone || null, email: identidade.email || null }
         : null,
     });
 
+    if (funil) return; // passos do funil ficam só no site
     // 2. Async POST to UhomeSales CRM (non-blocking)
     postToCRM(params, identidade);
 

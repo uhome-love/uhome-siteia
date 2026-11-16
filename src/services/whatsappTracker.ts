@@ -13,6 +13,15 @@ interface WhatsAppClickData {
 }
 
 let ultimoClique = 0;
+export const LIMITE_WA_MS = 5000;
+/** Limita a 1 registro por sessão a cada 5s (também entre abas, via sessionStorage). */
+export function podeRegistrar(agora: number, store: Pick<Storage, "getItem" | "setItem"> | null = typeof sessionStorage !== "undefined" ? sessionStorage : null): boolean {
+  let ult = ultimoClique;
+  try { ult = Math.max(ult, Number(store?.getItem("uhome_wa_ultimo") || 0)); } catch { /* */ }
+  if (agora - ult < LIMITE_WA_MS) return false;
+  try { store?.setItem("uhome_wa_ultimo", String(agora)); } catch { /* */ }
+  return true;
+}
 
 /** Visitante anônimo deste navegador (mesmo id usado ao vincular identidade). */
 export function getVisitorId(): string {
@@ -80,7 +89,7 @@ export function trackWhatsAppClick(data: WhatsAppClickData = {}): void {
 function enviar(data: WhatsAppClickData): void {
   try {
     const agora = Date.now();
-    if (agora - ultimoClique < 2000) return; // mesmo clique já registrado
+    if (!podeRegistrar(agora)) return; // no máximo 1 clique por sessão a cada 5s
     ultimoClique = agora;
     const registro = montarClique(data);
     const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;

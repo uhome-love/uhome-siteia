@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
-import { Gift, Star, KeyRound, Loader2, MessageCircle, ArrowDown, Clock3 } from "lucide-react";
+import { Gift, Star, KeyRound, Loader2, MessageCircle, Clock3, CalendarDays } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { useCanonical } from "@/hooks/useCanonical";
 import { useCorretor } from "@/contexts/CorretorContext";
-import { blackAtiva, campanhaVigente, useCampanha } from "@/lib/produtosFoco";
-import { PECA_BLACK, PECA_GERAL, PecaNatal } from "@/components/foco/PecasNatal";
+import { blackAtiva, useCampanha } from "@/lib/produtosFoco";
+import { InfoLeadFoco } from "@/components/foco/InfoLeadFoco";
 import { ProdutoFocoCard, trackProdutoWhatsApp, useWhatsAppProduto } from "@/components/foco/FocoShared";
 import { ComparadorNatal } from "@/components/foco/ComparadorNatal";
 import { WHATSAPP_NUMBER } from "@/lib/whatsapp";
@@ -40,6 +40,8 @@ export default function CampanhaPage() {
   const lista = filtrarProdutosCampanha(data?.produtos ?? [], cidade, faixa);
   const { dias, horas, min } = useCountdown(fimExibido);
   const wa = useWhatsAppProduto();
+  const [modo, setModo] = useState<"info" | "visita">("info");
+  const irContato = (m: "info" | "visita") => { setModo(m); document.getElementById("contato")?.scrollIntoView({ behavior: "smooth" }); };
 
   useEffect(() => {
     if (!c) return;
@@ -63,8 +65,6 @@ export default function CampanhaPage() {
       <main className="pt-14">
         <section className={`relative overflow-hidden ${tema}`}>
           <NatalLuzes />
-          <img src={NATAL_ART.homi} alt="" className="uh-float pointer-events-none absolute bottom-0 right-8 hidden h-[280px] w-auto lg:block xl:right-16" />
-          <img src={NATAL_ART.estrela} alt="" aria-hidden className="pointer-events-none absolute right-6 top-12 h-10 w-auto opacity-80 lg:hidden" />
           <div className="uh-rise relative mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:py-10">
             <img src={NATAL_ART.selo} alt="Natal Chave de Ouro" className="h-10 w-auto sm:h-12" />
             <p className="mt-4 inline-flex items-center gap-2 rounded-full border border-natal-gold/40 px-4 py-1.5 font-body text-[11px] font-bold uppercase tracking-[0.2em] text-natal-gold sm:text-xs">
@@ -77,8 +77,9 @@ export default function CampanhaPage() {
             <p className="mt-3 max-w-xl font-body text-sm opacity-75">{c.descricao}</p>
 
             <div className="mt-6 flex flex-wrap gap-3">
-              <Button asChild size="lg" className="bg-natal-gold text-natal-deep hover:bg-natal-gold/90"><a href="#empreendimentos"><ArrowDown /> Ver empreendimentos</a></Button>
-              <Button asChild size="lg" variant="ghost" className="border border-natal-gold/40 text-natal-foreground hover:bg-natal-foreground/10 hover:text-natal-foreground"><a href={`https://wa.me/${numero}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer"><MessageCircle /> {isDirectAccess && corretor ? `Falar com ${corretor.nome.split(" ")[0]}` : "Falar sobre as condições"}</a></Button>
+              <Button asChild size="lg" className="bg-natal-gold text-natal-deep hover:bg-natal-gold/90"><a href="#contato" onClick={() => setModo("visita")}><CalendarDays /> Agendar visita</a></Button>
+              <Button asChild size="lg" variant="ghost" className="border border-natal-gold/40 text-natal-foreground hover:bg-natal-foreground/10 hover:text-natal-foreground"><a href="#contato" onClick={() => setModo("info")}>Receber informações</a></Button>
+              {isDirectAccess && corretor && <Button asChild size="lg" variant="ghost" className="text-natal-foreground hover:bg-natal-foreground/10 hover:text-natal-foreground"><a href={`https://wa.me/${numero}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer"><MessageCircle /> Falar com {corretor.nome.split(" ")[0]}</a></Button>}
             </div>
             <p className="mt-5 flex items-center gap-2 font-body text-sm text-natal-gold"><Clock3 className="h-4 w-4" /> Faltam <span className="tabular-nums font-semibold">{dias} dias · {String(horas).padStart(2, "0")}h · {String(min).padStart(2, "0")}min</span></p>
 
@@ -107,12 +108,6 @@ export default function CampanhaPage() {
           {corretor.foto_url && <img src={corretor.foto_url} alt={corretor.nome} loading="lazy" className="h-14 w-14 shrink-0 rounded-full object-cover" />}
           <div className="min-w-0"><p className="font-body text-xs text-muted-foreground">Seu corretor Uhome</p><p className="break-words font-heading font-semibold">{corretor.nome}</p>{corretor.creci && <p className="text-xs text-muted-foreground">CRECI {corretor.creci}</p>}</div>
         </div></section>}
-        {c && c.tema === "natal" && campanhaVigente(c) && (
-          <div className="mx-auto max-w-3xl px-5 pt-8 sm:px-8 lg:max-w-5xl">
-            <PecaNatal peca={black ? PECA_BLACK : PECA_GERAL} alt={black ? "Black Natal Uhome: entrada a partir de 10%, só até 29/11. Ver empreendimentos" : "Natal Chave de Ouro: entrada a partir de 10%, válido até 18/12. Ver empreendimentos"} onClick={() => document.getElementById("empreendimentos")?.scrollIntoView({ behavior: "smooth" })} />
-          </div>
-        )}
-
         <Reveal><section id="empreendimentos" className="mx-auto max-w-7xl scroll-mt-20 px-5 py-8 sm:px-8">
           <h2 className="text-h2 text-foreground">Empreendimentos participantes</h2>
           <p className="mt-2 font-body text-muted-foreground">{data.produtos.length} produtos selecionados, do primeiro apê ao alto padrão.</p>
@@ -129,6 +124,15 @@ export default function CampanhaPage() {
             ))}
           </div>
         </section></Reveal>
+        {!(isDirectAccess && corretor) && <section id="contato" className="scroll-mt-20 bg-secondary/40">
+          <div className="mx-auto grid max-w-5xl gap-6 px-5 py-10 sm:px-8 lg:grid-cols-2 lg:items-center [&>*]:min-w-0">
+            <div>
+              <h2 className="text-h2 text-foreground">Agende sua visita ou receba as condições de Natal</h2>
+              <p className="mt-2 font-body text-muted-foreground">Deixe nome e WhatsApp. Um especialista da Uhome te chama com valores, plantas e unidades disponíveis. Sem compromisso.</p>
+            </div>
+            <InfoLeadFoco key={modo} modo={modo} produtos={data.produtos} campanha={c.nome} />
+          </div>
+        </section>}
         {(data?.produtos?.length ?? 0) > 1 && <Reveal><ComparadorNatal produtos={data!.produtos} linkFor={prefixLink} onContato={isDirectAccess && corretor ? (p) => { trackProdutoWhatsApp(p); window.open(wa(p), "_blank", "noopener"); } : undefined} /></Reveal>}
         <Reveal><section className="mx-auto max-w-3xl px-5 pb-12 sm:px-8">
           <h2 className="text-h2 text-foreground">Perguntas frequentes</h2>
@@ -151,7 +155,10 @@ export default function CampanhaPage() {
         {isDirectAccess && corretor ? (
           <Button asChild size="lg" className="w-full bg-natal-gold text-natal-deep hover:bg-natal-gold/90"><a href={`https://wa.me/${numero}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer"><MessageCircle /> Falar com {corretor.nome.split(" ")[0]}</a></Button>
         ) : (
-          <Button size="lg" className="w-full bg-natal-gold text-natal-deep hover:bg-natal-gold/90" onClick={() => window.dispatchEvent(new CustomEvent("uhome:abrir-lia", { detail: { mensagem: "Quero saber as condições do Natal Chave de Ouro" } }))}><MessageCircle /> Quero as condições de Natal</Button>
+          <div className="flex gap-2">
+            <Button size="lg" className="min-w-0 flex-1 px-2 bg-natal-gold text-natal-deep hover:bg-natal-gold/90" onClick={() => irContato("visita")}><CalendarDays /> Agendar visita</Button>
+            <Button size="lg" variant="outline" className="min-w-0 flex-1 px-2" onClick={() => irContato("info")}>Informações</Button>
+          </div>
         )}
       </div>
       <Footer />

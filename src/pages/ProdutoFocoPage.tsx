@@ -202,7 +202,7 @@ export default function ProdutoFocoPage() {
                 {natal && condGerais[0] && <p className="mt-1 font-body text-sm font-semibold text-primary">{condGerais[0]}</p>}
               </div>
               <Button size="lg" onClick={() => agendar()} className={`hidden sm:inline-flex ${corBotao}`}><CalendarDays className="h-4 w-4" />{modoCorretor ? `Falar com ${corretor?.nome.split(" ")[0]}` : "Agendar visita"}</Button>
-              {!modoCorretor && <Button size="lg" variant="outline" onClick={pedirInfo} className="hidden sm:inline-flex">Quero mais informações</Button>}
+              {!modoCorretor && <Button size="lg" variant="outline" onClick={pedirInfo} className="hidden sm:inline-flex">Receber informações</Button>}
             </div>
           </div>
         </section>
@@ -376,7 +376,7 @@ export default function ProdutoFocoPage() {
         <button type="button" onClick={() => agendar()} className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3.5 font-body text-sm font-bold ${corBotao}`}>
           <CalendarDays className="h-4 w-4" />{modoCorretor ? `Falar com ${corretor?.nome.split(" ")[0]}` : "Agendar visita"}
         </button>
-        {!modoCorretor && <button type="button" onClick={pedirInfo} className="flex flex-1 items-center justify-center rounded-xl border border-border py-3.5 font-body text-sm font-bold text-foreground">Mais informações</button>}
+        {!modoCorretor && <button type="button" onClick={pedirInfo} className="flex flex-1 items-center justify-center rounded-xl border border-border py-3.5 font-body text-sm font-bold text-foreground">Receber informações</button>}
         <a href={waUrl} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" onClick={() => trackProdutoWhatsApp(p)} className="flex items-center justify-center rounded-xl border border-border px-4 py-3.5 text-foreground"><MessageCircle className="h-5 w-5" /></a>
       </div>
 
@@ -416,7 +416,7 @@ function faqAuto(p: ProdutoFoco, cond: string[]) {
   const vg = (fi.tipologias ?? []).filter((t) => t.vagas).map((t) => `${t.nome}: ${t.vagas}`);
   if (vg.length) out.push({ p: "Tem vaga?", r: vg.join(". ") + "." });
   if (fi.unidade?.length) out.push({ p: "O que vem na unidade?", r: fi.unidade.join(", ") + "." });
-  out.push({ p: "Como funciona o pagamento?", r: cond.length ? `Condição de Natal até 18/12: ${cond.join(", ").toLowerCase()}. Financiamento conforme o perfil.` : "Um especialista apresenta as condições e simula o financiamento conforme o seu perfil." });
+  out.push({ p: "Como funciona o pagamento?", r: cond.length ? `Condição de Natal até 18/12: ${cond.join(", ").toLowerCase()}. Financiamento conforme o perfil.` : "Um especialista apresenta as condições e o financiamento conforme o seu perfil." });
   if (fi.ficha_tecnica?.length) out.push({ p: "Ficha técnica", r: fi.ficha_tecnica.map((x) => `${x.item}: ${x.valor}`).join(". ") + "." });
   return out;
 }

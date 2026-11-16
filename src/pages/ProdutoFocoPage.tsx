@@ -376,7 +376,7 @@ export default function ProdutoFocoPage() {
         <button type="button" onClick={() => agendar()} className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3.5 font-body text-sm font-bold ${corBotao}`}>
           <CalendarDays className="h-4 w-4" />{modoCorretor ? `Falar com ${corretor?.nome.split(" ")[0]}` : "Agendar visita"}
         </button>
-        {!modoCorretor && <button type="button" onClick={pedirInfo} className="flex flex-1 items-center justify-center rounded-xl border border-border py-3.5 font-body text-sm font-bold text-foreground">Receber informações</button>}
+        {!modoCorretor && <button type="button" onClick={pedirInfo} className="flex flex-1 items-center justify-center rounded-xl border border-border py-3.5 font-body text-sm font-bold text-foreground">Informações</button>}
         <a href={waUrl} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" onClick={() => trackProdutoWhatsApp(p)} className="flex items-center justify-center rounded-xl border border-border px-4 py-3.5 text-foreground"><MessageCircle className="h-5 w-5" /></a>
       </div>
 

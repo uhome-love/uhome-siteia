@@ -42,3 +42,47 @@ A fazer:
 - Dedup em sessionStorage com chave tipo+pathname.
 - whatsappTracker.ts: throttle por session_id (5s) antes do envio; migração com gatilho BEFORE INSERT em whatsapp_clicks que descarta repetição da mesma session_id em <5s.
 - Eventos novos não vão para o CRM (só o site), como hoje com visitantes anônimos.
+
+---
+
+## Parte 3 — Nova página de produto da campanha de Natal (/em-foco/:slug)
+
+Objetivo: página limpa, bonita e objetiva, que leve a pessoa a um único passo — pedir as condições no WhatsApp/formulário. Menos faixas e banners, mais informação que decide a compra.
+
+### Problemas da página atual
+- Muitos blocos com o mesmo peso (abertura, resumo, condição, galeria, plantas, lazer, localização, ficha, lembrete, faixa) e várias chamadas competindo.
+- Arte de Natal ocupa espaço de foto do produto; pouca prova visual do imóvel logo no início.
+- Informação que decide (preço, tamanho, quartos, entrega, bairro) espalhada.
+
+### Nova ordem (celular primeiro)
+```text
+1. Foto principal grande do produto (sem texto por cima, só um selo discreto "Natal Chave de Ouro")
+   Nome · bairro · "a partir de R$ X" · botão "Quero as condições de Natal"
+2. Faixa de 4 números: dormitórios · m² · vagas · entrega
+3. Condição de Natal em um cartão único e claro (entrada, prazo até 18/12)
+4. Galeria curada: 6 melhores fotos em grade, "ver todas" abre a galeria
+5. Plantas em abas por tipologia, com preço de cada uma
+6. "Por que este produto" — 3 a 4 destaques com ícone (lazer, localização, padrão)
+7. Localização: mapa + 3 pontos próximos com distância
+8. Formulário curto (nome + WhatsApp) com prova: nota 4,9 no Google, CRECI, atendimento rápido
+9. Ficha técnica recolhida ("ver ficha completa")
+```
+- No computador: mesma ordem, com o formulário fixo à direita.
+- Barra fixa no celular mantida (uma chamada só).
+- Remover: faixa repetida e o cartão que aparece ao rolar (passam a ser redundantes com a barra fixa).
+- Visual: tipografia e cinzas da marca, vermelho do Natal só em detalhes (selo, botão), muito espaço em branco.
+
+### Fotos e materiais
+- Produto: usar só material oficial da incorporadora (fotos, perspectivas, plantas) que já está cadastrado; vou selecionar as melhores e ordenar. Foto de banco de imagens nunca representa o produto (seria propaganda enganosa).
+- Onde faltar material bom de algum produto, listo o que falta para pedir à incorporadora.
+- Fotos de banco de alta qualidade só para o bairro/estilo de vida (ex.: parque, rua), identificadas como ilustrativas.
+
+### Entrega
+- Monto a nova página para os produtos da campanha, mantendo todos os textos de oferta já aprovados (sem promessa de tabela, sem MCMV/baixo preço).
+- Prints no celular e no computador do antes e depois.
+- Publico só depois da sua aprovação dos prints.
+
+## Ordem geral
+1. Parte 2 (limitar cliques repetidos) — rápido e protege os números.
+2. Parte 1 (funil) — já instalado na página nova.
+3. Parte 3 (nova página).

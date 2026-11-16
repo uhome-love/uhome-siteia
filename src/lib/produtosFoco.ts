@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-export interface MidiaFoco { url: string; legenda?: string | null; w?: number; h?: number }
+export interface MidiaFoco { url: string; legenda?: string | null; w?: number; h?: number; categoria?: string | null }
 export interface PrecoFoco { tipologia: string; valor: number; texto: string }
 export interface BlackFoco { titulo: string; texto: string; itens: string[]; feed: string | null; story: string | null }
 export interface FichaFoco {
@@ -16,6 +16,9 @@ export interface FichaFoco {
   maps_url?: string | null;
   precos?: PrecoFoco[];
   black?: BlackFoco | null;
+  frase?: string | null;
+  motivos?: { titulo: string; texto: string }[];
+  faq?: { p: string; r: string }[];
 }
 export interface ProdutoFoco {
   id: string;

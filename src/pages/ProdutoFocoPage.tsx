@@ -375,7 +375,7 @@ export default function ProdutoFocoPage() {
       </footer>
 
       {/* Barra fixa no celular */}
-      <div className="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-border bg-background/95 p-3 backdrop-blur lg:hidden" style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}>
+      <div data-barra-baixo className="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-border bg-background/95 p-3 backdrop-blur lg:hidden" style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}>
         <button type="button" onClick={() => agendar()} className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3.5 font-body text-sm font-bold ${corBotao}`}>
           <CalendarDays className="h-4 w-4" />{modoCorretor ? `Falar com ${corretor?.nome.split(" ")[0]}` : "Agendar visita"}
         </button>

@@ -211,6 +211,7 @@ export function LiaChat() {
         <button
           onClick={() => { setAberto(true); track("lia_aberta", { pagina: location.pathname }); void trackEvent({ tipo: "lia_aberta" }); }}
           aria-label="Fale com a LIA, atendente virtual da Uhome"
+          style={{ marginBottom: "var(--uh-cookie, 0px)" }}
           className={`fixed right-4 z-50 flex items-center gap-2 rounded-full border border-border bg-background p-1 shadow-xl transition-transform hover:scale-[1.03] active:scale-95 sm:right-6 sm:pr-4 ${
             hasBottomBar ? "bottom-24 sm:bottom-6" : "bottom-5 sm:bottom-6"
           } ${isLanding ? "hidden min-[1081px]:flex" : isProdutoPage ? "hidden sm:flex" : "flex"}`}

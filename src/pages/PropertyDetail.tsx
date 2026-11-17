@@ -766,7 +766,7 @@ const PropertyDetail = () => {
       />
 
       {/* Fixed bottom bar — mobile only */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-md px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:hidden">
+      <div data-barra-baixo className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-md px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:hidden">
         <Button
           variant="whatsapp"
           className="w-full text-base font-bold py-3 h-auto"

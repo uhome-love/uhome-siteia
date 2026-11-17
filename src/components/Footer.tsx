@@ -1,3 +1,4 @@
+import { abrirPreferenciasCookies } from "@/components/privacy/CookieNotice";
 import { Link } from "react-router-dom";
 import { UhomeLogo } from "@/components/UhomeLogo";
 import { WHATSAPP_NUMBER, WHATSAPP_DISPLAY } from "@/lib/whatsapp";
@@ -122,6 +123,9 @@ export function Footer() {
             <Link to={prefixLink("/politica-de-privacidade")} className="font-body text-xs text-muted-foreground transition-colors hover:text-foreground">
               Política de Privacidade
             </Link>
+            <button type="button" onClick={abrirPreferenciasCookies} className="font-body text-xs text-muted-foreground transition-colors hover:text-foreground">
+              Preferências de cookies
+            </button>
           </div>
         </div>
       </div>

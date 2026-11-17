@@ -228,8 +228,9 @@ function html(title: string, description: string, rawOgImage: string, canonical:
 }
 
 async function renderHome() {
+  const total = await totalImoveisAtivos();
   const title = "Imóveis à Venda em Porto Alegre | Uhome Imóveis";
-  const desc = "Encontre apartamentos, casas e coberturas à venda em Porto Alegre. Busca inteligente com IA, mais de 21.000 imóveis nos melhores bairros. Uhome — imobiliária digital.";
+  const desc = `Encontre apartamentos, casas e coberturas à venda em Porto Alegre. Busca inteligente com IA, ${total} imóveis nos melhores bairros. Uhome — imobiliária digital.`;
 
   const homeFaqs = [
     { q: "Quanto custa um apartamento em Porto Alegre?", a: "O preço varia de R$ 250 mil em bairros como Cidade Baixa até R$ 5 milhões+ em Moinhos de Vento e Três Figueiras." },
@@ -248,7 +249,7 @@ async function renderHome() {
     })),
   });
 
-  const seoText = `<p>A Uhome é uma imobiliária digital em Porto Alegre especializada na venda de apartamentos, casas, coberturas e studios. Com mais de 21.000 imóveis disponíveis e tecnologia de busca inteligente por IA, ajudamos você a encontrar o imóvel perfeito nos melhores bairros: Moinhos de Vento, Petrópolis, Bela Vista, Três Figueiras, Auxiliadora e Mont'Serrat.</p>`;
+  const seoText = `<p>A Uhome é uma imobiliária digital em Porto Alegre especializada na venda de apartamentos, casas, coberturas e studios. Com ${total} imóveis disponíveis e tecnologia de busca inteligente por IA, ajudamos você a encontrar o imóvel perfeito nos melhores bairros: Moinhos de Vento, Petrópolis, Bela Vista, Três Figueiras, Auxiliadora e Mont'Serrat.</p>`;
 
   const faqHtml = homeFaqs.map((f) => `<h2>${esc(f.q)}</h2><p>${esc(f.a)}</p>`).join("");
 
@@ -833,10 +834,27 @@ function hojeSP() { return new Date().toLocaleDateString("en-CA", { timeZone: "A
 function natalVigente() { const d = hojeSP(); return d >= "2026-11-02" && d <= "2026-12-18"; }
 function blackVigente() { const d = hojeSP(); return d >= "2026-11-23" && d <= "2026-11-29"; }
 
+function semMcmv(t: string) {
+  return t.replace(/,?\s*(no|pelo|do)?\s*Minha Casa Minha Vida/gi, "").replace(/\bMCMV\b/g, "").replace(/\s+,/g, ",").replace(/\s{2,}/g, " ").trim();
+}
+
+async function totalImoveisAtivos(): Promise<string> {
+  const { count } = await supabase.from("imoveis").select("id", { count: "exact", head: true }).eq("status", "disponivel").eq("finalidade", "venda");
+  const n = count ?? 0;
+  if (n < 1000) return "milhares de";
+  return `${(Math.floor(n / 100) * 100).toLocaleString("pt-BR")}+`;
+}
+
+async function renderStudios() {
+  const title = "Studios para investir em Porto Alegre | Uhome";
+  const desc = "Studios e compactos à venda em Porto Alegre selecionados para investimento: boa localização, facilidade de revenda e potencial de renda. Fale com um especialista Uhome.";
+  return html(title, desc, OG_DEFAULT, `${SITE}/investir-studios`, [orgJsonLd()], `<h1>Studios para investir em Porto Alegre</h1><p>${esc(desc)}</p>`);
+}
+
 async function renderProdutoFoco(slug: string, corretorSlug?: string) {
   const { data: p } = await supabase
     .from("produtos_foco")
-    .select("slug, nome, bairro, cidade, incorporadora, preco_a_partir, resumo, capa_url, galeria")
+    .select("slug, nome, bairro, cidade, incorporadora, preco_a_partir, resumo, capa_url, galeria, entrega, tipo, ficha")
     .eq("slug", slug)
     .eq("ativo", true)
     .maybeSingle();
@@ -845,15 +863,18 @@ async function renderProdutoFoco(slug: string, corretorSlug?: string) {
   const preco = precoCurto(p.preco_a_partir);
   const title = nomeCorretor
     ? `${p.nome} · enviado por ${nomeCorretor} | Uhome`
-    : `${p.nome} | ${p.bairro}, ${p.cidade} | Uhome em Foco`;
-  const desc = `${p.nome} em ${p.bairro}, ${p.cidade}${preco ? `, a partir de ${preco}` : ""}. ${p.resumo ?? ""}`;
+    : `${p.nome} · ${p.bairro}, ${p.cidade} | Uhome`;
+  const ficha = (p.ficha ?? {}) as Record<string, unknown>;
+  const tip = typeof ficha.tipologias === "string" ? ficha.tipologias : Array.isArray(ficha.tipologias) ? (() => { const ds = [...new Set((ficha.tipologias as { dorm?: number | string }[]).map((t) => Number(t?.dorm)).filter((n) => n > 0))].sort(); return ds.length ? `${ds.join(ds.length > 2 ? ", " : " e ")} dormitório${ds.length > 1 || ds[0] > 1 ? "s" : ""}` : ""; })() : (p.tipo ?? "");
+  const partes = [tip ? `${p.nome}: ${tip}` : p.nome, preco ? `a partir de ${preco}` : "", p.entrega ? `entrega ${p.entrega}` : ""].filter(Boolean);
+  const desc = `${partes.join(", ")}. ${p.bairro}, ${p.cidade}. ${semMcmv(p.resumo ?? "")}`.trim();
   const canonical = `${SITE}/em-foco/${slug}`;
   const imgs = ((p.galeria as { url: string }[]) ?? []).slice(0, 6).map((g) => absAsset(g.url));
   const ld = JSON.stringify({
     "@context": "https://schema.org",
     "@type": "Residence",
     name: p.nome,
-    description: p.resumo,
+    description: semMcmv(p.resumo ?? ""),
     image: imgs,
     url: canonical,
     address: { "@type": "PostalAddress", addressLocality: p.cidade, addressRegion: "RS", addressCountry: "BR" },
@@ -1010,7 +1031,7 @@ function renderPrivacidade() {
 
 function renderBusca() {
   const title = "Buscar Imóveis em Porto Alegre | Uhome";
-  const desc = "Busque imóveis à venda em Porto Alegre com filtros de bairro, preço, tipo e quartos. Mais de 14.600 opções com busca inteligente por IA.";
+  const desc = "Busque imóveis à venda em Porto Alegre com filtros de bairro, preço, tipo e quartos. Milhares de opções com busca inteligente por IA.";
   return html(title, desc, OG_DEFAULT, `${SITE}/busca`, [orgJsonLd()],
     `<h1>Buscar Imóveis em Porto Alegre</h1><p>${esc(desc)}</p>`);
 }
@@ -1247,6 +1268,8 @@ Deno.serve(async (req) => {
       rendered = await renderEmpreendimentos();
     } else if (path === "/blog") {
       rendered = await renderBlog();
+    } else if (path === "/investir-studios" || path.startsWith("/investir-studios/")) {
+      rendered = await renderStudios();
     } else if (path === "/busca") {
       rendered = renderBusca();
     } else if (path === "/anunciar") {

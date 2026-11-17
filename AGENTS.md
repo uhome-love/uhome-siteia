@@ -17,3 +17,5 @@
 - Google tags load only via `initGA4` in src/lib/gtag.ts (single gtag.js for GA4 + Ads, after window load); no GTM/gtag snippets in index.html. Why: duplicate tags tripled script weight and hurt mobile LCP.
 - Plus Jakarta Sans is self-hosted in public/fonts (400/600/700 woff2, @font-face in index.css, 400/700 preloaded). Why: avoid render-blocking font CSS chains.
 - Foco pages defer below-fold forms/comparison with DeferredFoco and import MaterialGallery only on opening; campaign products use an ordered relationship query. Why: tools and sequential catalog requests must not compete with first-viewport content.
+- Search cards use responsive WebP thumbnails with an original-image fallback, never rewriting stored/gallery URLs; mount only the visible photo layout. Why: avoid oversized and duplicate hidden image downloads.
+- Search map mounting uses the same 1024px breakpoint as its layout, synchronously on first render; below that it loads only when opened. Why: CSS-hidden maps must not download Mapbox or request pins.

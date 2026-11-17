@@ -145,7 +145,8 @@ export function ProgressiveGrid({
 }
 
 const Search = () => {
-  const isMobile = useIsMobile();
+  // Match lg visibility from the very first render: hidden maps must not mount.
+  const isMobile = useIsMobile(1024);
   const { user } = useAuth();
   const { isFavorito, toggleFavorito } = useFavoritos();
   useCanonical();

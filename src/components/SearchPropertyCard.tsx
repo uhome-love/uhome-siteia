@@ -9,6 +9,8 @@ import { useCorretor } from "@/contexts/CorretorContext";
 import { supabase } from "@/integrations/supabase/client";
 import { getBairroStats } from "@/services/bairroStatsCache";
 import { iptuMensal, formatIptuCurto } from "@/lib/iptu";
+import { searchImageUrl, searchImageSrcSet } from "@/lib/searchImages";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Props {
   imovel: Imovel;
@@ -73,6 +75,7 @@ const badgeClasses: Record<BadgeStyle, string> = {
 
 export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function SearchPropertyCard({ imovel, index, highlighted, onHover, isFavorito: isFavoritoProp, toggleFavorito: toggleFavoritoProp, onPhotoFail }, ref) {
   const [hovering, setHovering] = useState(false);
+  const mobilePhotos = useIsMobile(640);
   const [fotoAtiva, setFotoAtiva] = useState(0);
   const [showAuth, setShowAuth] = useState(false);
   const [lazyFotos, setLazyFotos] = useState<string[] | null>(null);
@@ -242,7 +245,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
       onMouseLeave={handleMouseLeave}
     >
       {/* ===== MOBILE: QuintoAndar-style full-width vertical card ===== */}
-      <div className="sm:hidden">
+      {mobilePhotos && <div className="sm:hidden">
         {/* Native scroll-snap carousel */}
         <div className="relative overflow-hidden rounded-xl">
           {fotos.length > 0 ? (
@@ -258,7 +261,10 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
                 className="w-full shrink-0 snap-center"
               >
                 <FotoImovel
-                  src={foto}
+                  src={searchImageUrl(foto, 768)}
+                  srcSet={searchImageSrcSet(foto)}
+                  sizes="(max-width: 639px) calc(100vw - 24px), 400px"
+                  fallbackSrc={foto}
                   alt={`${imovel.titulo} - foto ${i + 1}`}
                   loading={index < 4 && i === 0 ? "eager" : "lazy"}
                   fetchPriority={index === 0 && i === 0 ? "high" : "auto"}
@@ -358,15 +364,18 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
             }
           </p>
         </div>
-      </div>
+      </div>}
 
       {/* ===== DESKTOP: existing vertical card ===== */}
-      <div className="hidden h-full w-full sm:block">
+      {!mobilePhotos && <div className="hidden h-full w-full sm:block">
         {/* Photo */}
         <div className="relative w-full overflow-hidden rounded-xl" style={{ aspectRatio: "4/3" }}>
           {fotos.length > 0 ? (
           <FotoImovel
-            src={fotos[fotoAtiva]}
+            src={searchImageUrl(fotos[fotoAtiva], 768)}
+            srcSet={searchImageSrcSet(fotos[fotoAtiva])}
+            sizes="(min-width: 1280px) calc((55vw - 96px) / 3), (min-width: 1024px) calc((55vw - 72px) / 2), (min-width: 640px) calc((100vw - 72px) / 2), calc(100vw - 24px)"
+            fallbackSrc={fotos[fotoAtiva]}
             alt={imovel.titulo}
             loading={index < 6 ? "eager" : "lazy"}
             fetchPriority={index === 0 ? "high" : "auto"}
@@ -476,7 +485,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
             }
           </p>
         </div>
-      </div>
+      </div>}
     </motion.a>
     </>
   );

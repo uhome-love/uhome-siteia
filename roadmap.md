@@ -7,6 +7,7 @@
 - [ ] Sitemap com /em-foco, campanha, studios
 - [ ] 1. Medição (formulario_iniciado por formulário, lia_mensagem, studios celular, PageSpeed antes)
 - [ ] 2. Busca
+- [x] Correção solicitada: fotos responsivas WebP da busca, fallback original e mapa apenas quando visível; carrossel e mapa conferidos em 390px, tablet 820px e desktop 1280px
 - [ ] 3. Página de produto + mídias
 - [ ] 5. Velocidade
 - [ ] Entrega (prints, testes de formulário até CRM)

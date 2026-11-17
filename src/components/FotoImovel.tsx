@@ -12,21 +12,35 @@ interface FotoImovelProps {
   width?: number;
   height?: number;
   sizes?: string;
+  srcSet?: string;
+  fallbackSrc?: string;
   onError?: () => void;
 }
 
 export const FotoImovel = forwardRef<HTMLImageElement, FotoImovelProps>(function FotoImovel(
-  { src, alt, className = "", style, loading = "lazy", decoding = "async", fetchPriority, width, height, sizes, onError },
+  { src, alt, className = "", style, loading = "lazy", decoding = "async", fetchPriority, width, height, sizes, srcSet, fallbackSrc, onError },
   ref
 ) {
   const [erro, setErro] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [useOriginal, setUseOriginal] = useState(false);
+
+  useEffect(() => {
+    setErro(false);
+    setLoaded(false);
+    setUseOriginal(false);
+  }, [src]);
 
   const handleLoad = useCallback(() => setLoaded(true), []);
   const handleErr = useCallback(() => {
+    if (fallbackSrc && fallbackSrc !== src && !useOriginal) {
+      setUseOriginal(true);
+      setLoaded(false);
+      return;
+    }
     setErro(true);
     onError?.();
-  }, [onError]);
+  }, [onError, fallbackSrc, src, useOriginal]);
 
   // O prazo de 10s só começa quando a foto chega perto da tela. Antes, fotos
   // "lazy" fora da tela estouravam o prazo sem nem começar a baixar, e os cards sumiam.
@@ -70,7 +84,8 @@ export const FotoImovel = forwardRef<HTMLImageElement, FotoImovelProps>(function
       )}
       <img
         ref={ref}
-        src={src}
+        src={useOriginal ? fallbackSrc : src}
+        srcSet={useOriginal ? undefined : srcSet}
         alt={alt}
         loading={loading}
         decoding={decoding}

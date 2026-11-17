@@ -9,7 +9,7 @@ import { lazyRetry } from "@/lib/lazyRetry";
 import { useCanonical } from "@/hooks/useCanonical";
 import { useCorretor } from "@/contexts/CorretorContext";
 import { setJsonLd, removeJsonLd } from "@/lib/jsonld";
-import { absUrl, blackAtiva, formatPreco, useCampanha, useCampanhasAtivas, useProdutoFoco, SITE_URL, type MidiaFoco, type ProdutoFoco } from "@/lib/produtosFoco";
+import { absUrl, blackAtiva, fotoResponsiva, formatPreco, useCampanha, useCampanhasAtivas, useProdutoFoco, SITE_URL, type MidiaFoco, type ProdutoFoco } from "@/lib/produtosFoco";
 import { CorretorContatoCard, ProdutoFocoCard, trackProdutoWhatsApp, useWhatsAppProduto } from "@/components/foco/FocoShared";
 import { Button } from "@/components/ui/button";
 const InfoLeadFoco = lazyRetry(() => import("@/components/foco/InfoLeadFoco").then((m) => ({ default: m.InfoLeadFoco })));
@@ -173,7 +173,7 @@ export default function ProdutoFocoPage() {
             <div ref={trilho} onScroll={(e) => { const el = e.currentTarget; setFotoAtual(Math.round(el.scrollLeft / el.clientWidth)); }} className="flex snap-x snap-mandatory overflow-x-auto [scrollbar-width:none]">
               {(fotos.length ? fotos : p.capa_url ? [{ url: p.capa_url }] : []).map((f, i) => (
                 <button type="button" key={f.url} aria-label={`Abrir foto ${i + 1} de ${p.nome}`} onClick={() => setBox({ fotos, i })} className="w-full shrink-0 snap-center">
-                  <img src={i === 0 || Math.abs(i - fotoAtual) <= 1 ? f.url : undefined} alt={semProvisoria((f as MidiaFoco).legenda) ?? p.nome} fetchPriority={i === 0 ? "high" : "low"} loading={i === 0 ? "eager" : "lazy"} decoding="async" width={1600} height={1200} className="aspect-[4/3] w-full object-cover sm:aspect-[16/7]" />
+                  <img {...(i === 0 || Math.abs(i - fotoAtual) <= 1 ? fotoResponsiva(f as MidiaFoco, "(min-width: 1152px) 1152px, 100vw") : {})} alt={semProvisoria((f as MidiaFoco).legenda) ?? p.nome} fetchPriority={i === 0 ? "high" : "low"} loading={i === 0 ? "eager" : "lazy"} decoding="async" width={1600} height={1200} className="aspect-[4/3] w-full object-cover sm:aspect-[16/7]" />
                 </button>
               ))}
             </div>
@@ -252,7 +252,7 @@ export default function ProdutoFocoPage() {
                   <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
                     {lista.slice(0, 6).map((f, i) => (
                       <button type="button" key={f.url} aria-label={`Abrir ${semProvisoria(f.legenda) ?? "foto"}`} onClick={() => setBox({ fotos: lista, i })} className={`group relative overflow-hidden rounded-xl bg-muted ${i === 0 ? "col-span-2 row-span-2" : ""}`}>
-                        <img src={f.url} alt={semProvisoria(f.legenda) ?? p.nome} loading="lazy" className="aspect-[4/3] h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                        <img {...fotoResponsiva(f, i === 0 ? "(min-width: 640px) 66vw, 100vw" : "(min-width: 640px) 33vw, 50vw")} alt={semProvisoria(f.legenda) ?? p.nome} loading="lazy" decoding="async" className="aspect-[4/3] h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
                         {f.legenda && <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-noir/70 to-transparent p-2 text-left font-body text-xs text-noir-foreground">{semProvisoria(f.legenda)}</span>}
                       </button>
                     ))}

@@ -18,27 +18,8 @@ registrarVisita();
 instalarRastreioWhatsApp();
 instalarFunilAnuncio();
 instalarJornada();
-// Plus Jakarta (400/600/700) is self-hosted in index.css; only secondary fonts load lazily
+// Montserrat (400–800) is self-hosted in index.css; no other font families load
 import "./index.css";
-
-const loadDeferredFonts = () => {
-  import("@fontsource/dm-mono/400.css");
-  import("@fontsource/montserrat/700.css");
-  import("@fontsource/montserrat/800.css");
-};
-
-const scheduleIdleCallback = (
-  globalThis as typeof globalThis & {
-    requestIdleCallback?: (callback: IdleRequestCallback, options?: IdleRequestOptions) => number;
-  }
-).requestIdleCallback;
-
-// Load fonts after initial paint to avoid render-blocking
-if (typeof scheduleIdleCallback === "function") {
-  scheduleIdleCallback(loadDeferredFonts, { timeout: 2000 });
-} else {
-  setTimeout(loadDeferredFonts, 1);
-}
 
 if (import.meta.env.DEV) {
   import("./utils/testCorretorFlow").then(m => m.setupCorretorFlowTest());

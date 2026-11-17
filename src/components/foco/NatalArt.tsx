@@ -3,10 +3,10 @@ import chave from "@/assets/natal/chave_de_ouro.svg.asset.json";
 import selo from "@/assets/natal/selo_natal_chave_de_ouro.svg.asset.json";
 import estrela from "@/assets/natal/estrela_dourada.svg.asset.json";
 import urna from "@/assets/natal/urna_premiada.svg.asset.json";
-import homi from "@/assets/natal/homi_noel.png.asset.json";
-import presentes from "@/assets/natal/presentes_3d.png.asset.json";
-import arvore from "@/assets/natal/arvore_3d.png.asset.json";
-import sino from "@/assets/natal/sino_3d.png.asset.json";
+import homi from "@/assets/natal/homi_noel.webp.asset.json";
+import presentes from "@/assets/natal/presentes_3d.webp.asset.json";
+import arvore from "@/assets/natal/arvore_3d.webp.asset.json";
+import sino from "@/assets/natal/sino_3d.webp.asset.json";
 
 export const NATAL_ART = {
   luzes: luzes.url,

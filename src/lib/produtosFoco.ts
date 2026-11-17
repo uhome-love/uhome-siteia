@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-export interface MidiaFoco { url: string; legenda?: string | null; w?: number; h?: number; categoria?: string | null }
+export interface MidiaFoco { url: string; url_mobile?: string | null; legenda?: string | null; w?: number; h?: number; categoria?: string | null }
 export interface PrecoFoco { tipologia: string; valor: number; texto: string }
 export interface BlackFoco { titulo: string; texto: string; itens: string[]; feed: string | null; story: string | null }
 export interface FichaFoco {
@@ -192,4 +192,9 @@ export function mensagemProduto(p: Pick<ProdutoFoco, "nome" | "bairro" | "slug">
   const link = `${SITE_URL}${corretorSlug ? `/c/${corretorSlug}` : ""}/em-foco/${p.slug}`;
   const saud = corretorNome ? `Olá ${corretorNome.split(" ")[0]}! ` : "Olá! ";
   return `${saud}Tenho interesse no ${p.nome}${p.bairro ? ` (${p.bairro})` : ""}. Pode me passar as condições?\n${link}`;
+}
+
+/** Versão leve para celular (até 800 px) quando existir; a original continua para telas grandes e zoom. */
+export function fotoResponsiva(f: { url: string; url_mobile?: string | null }, sizes = "100vw") {
+  return f.url_mobile ? { src: f.url, srcSet: `${f.url_mobile} 800w, ${f.url} 1600w`, sizes } : { src: f.url };
 }

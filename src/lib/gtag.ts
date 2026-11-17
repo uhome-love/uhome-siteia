@@ -79,10 +79,17 @@ export function gaEvent(name: string, params: Record<string, unknown> = {}) {
 }
 
 /** Carrega GA4 com o ID conectado e registra page_view em navegações SPA. */
+/** Robôs (rastreadores e navegadores automatizados) não carregam tags nem disparam conversões. */
+export const BOT_UA = /bot|crawl|spider|slurp|headless|phantom|puppeteer|playwright|selenium|facebookexternalhit|bingpreview|lighthouse-ci/i;
+export function isBotBrowser(ua = navigator.userAgent, webdriver = navigator.webdriver): boolean {
+  return Boolean(webdriver) || BOT_UA.test(ua);
+}
+
 export function initGA4() {
   const id = (import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_ANALYTICS_API_KEY as string | undefined) || GA4_ID;
   if (typeof window === "undefined" || document.querySelector("script[data-uhome-google]")) return;
   if (/lovableproject\.com|localhost/.test(location.hostname)) return;
+  if (isBotBrowser()) return;
   window.dataLayer = window.dataLayer || [];
   window.gtag = function () {
     // eslint-disable-next-line prefer-rest-params

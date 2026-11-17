@@ -14,10 +14,10 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ['"Plus Jakarta Sans"', "system-ui", "sans-serif"],
-        body: ['"Plus Jakarta Sans"', "system-ui", "sans-serif"],
-        mono: ['"DM Mono"', "monospace"],
-        natal: ['"Montserrat"', '"Plus Jakarta Sans"', "system-ui", "sans-serif"],
+        display: ['"Montserrat"', "system-ui", "sans-serif"],
+        body: ['"Montserrat"', "system-ui", "sans-serif"],
+        mono: ["ui-monospace", "monospace"],
+        natal: ['"Montserrat"', "system-ui", "sans-serif"],
       },
       colors: {
         natal: {

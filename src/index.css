@@ -1,6 +1,8 @@
-@font-face{font-family:'Plus Jakarta Sans';font-style:normal;font-weight:100 500;font-display:swap;src:url('/fonts/pjs-400.woff2') format('woff2');}
-@font-face{font-family:'Plus Jakarta Sans';font-style:normal;font-weight:600;font-display:swap;src:url('/fonts/pjs-600.woff2') format('woff2');}
-@font-face{font-family:'Plus Jakarta Sans';font-style:normal;font-weight:700 900;font-display:swap;src:url('/fonts/pjs-700.woff2') format('woff2');}
+@font-face{font-family:'Montserrat';font-style:normal;font-weight:400;font-display:swap;src:url('/fonts/mont-400.woff2') format('woff2');}
+@font-face{font-family:'Montserrat';font-style:normal;font-weight:500;font-display:swap;src:url('/fonts/mont-500.woff2') format('woff2');}
+@font-face{font-family:'Montserrat';font-style:normal;font-weight:600;font-display:swap;src:url('/fonts/mont-600.woff2') format('woff2');}
+@font-face{font-family:'Montserrat';font-style:normal;font-weight:700;font-display:swap;src:url('/fonts/mont-700.woff2') format('woff2');}
+@font-face{font-family:'Montserrat';font-style:normal;font-weight:800;font-display:swap;src:url('/fonts/mont-800.woff2') format('woff2');}
 
 @tailwind base;
 @tailwind components;
@@ -77,7 +79,7 @@
 @layer base {
   * {
     @apply border-border;
-    font-family: 'Plus Jakarta Sans', -apple-system, system-ui, sans-serif;
+    font-family: 'Montserrat', -apple-system, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -121,16 +123,16 @@
   }
 
   .font-display {
-    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-family: 'Montserrat', system-ui, sans-serif;
     font-weight: 700;
   }
 
   .font-body {
-    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-family: 'Montserrat', system-ui, sans-serif;
   }
 
   .font-mono {
-    font-family: 'DM Mono', monospace;
+    font-family: ui-monospace, monospace;
   }
 
   /* ── Typography scale ── */
@@ -159,7 +161,7 @@
     border-radius: 9999px;
     padding: 12px 24px;
     font-weight: 600;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 14px;
     transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
   }
@@ -179,7 +181,7 @@
     border-radius: 9999px;
     padding: 12px 24px;
     font-weight: 600;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 14px;
     transition: background 0.15s, transform 0.1s;
   }
@@ -196,7 +198,7 @@
     border-radius: 9999px;
     padding: 12px 24px;
     font-weight: 600;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 14px;
     transition: background 0.15s, transform 0.1s;
   }

@@ -1,11 +1,6 @@
 import { trackEvent } from "@/lib/trackEvent";
 import { useEffect, useRef } from "react";
 import { Helmet } from "react-helmet-async";
-import "@fontsource/montserrat/400.css";
-import "@fontsource/montserrat/500.css";
-import "@fontsource/montserrat/600.css";
-import "@fontsource/montserrat/700.css";
-import "@fontsource/montserrat/800.css";
 import "@/features/investir-studios/landing.css";
 import markup from "@/features/investir-studios/markup.html?raw";
 import { LP_DATA } from "@/features/investir-studios/data";

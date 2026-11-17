@@ -1,5 +1,5 @@
 import { CookieNotice } from "@/components/privacy/CookieNotice";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -15,6 +15,18 @@ import { lazyRetry } from "@/lib/lazyRetry"; // hmr-trigger
 
 const ExitIntentModal = lazyRetry(() => import("./components/ExitIntentModal.tsx").then((m) => ({ default: m.ExitIntentModal })));
 const LiaChat = lazyRetry(() => import("./components/lia/LiaChat.tsx"));
+
+/** Lia só baixa depois da primeira pintura e do carregamento da página, para não disputar com o conteúdo principal. */
+function LiaQuandoOcioso() {
+  const [pronta, setPronta] = useState(false);
+  useEffect(() => {
+    const ric = (window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
+    const go = () => (ric ? ric(() => setPronta(true), { timeout: 3000 }) : setTimeout(() => setPronta(true), 1500));
+    if (document.readyState === "complete") go(); else window.addEventListener("load", go, { once: true });
+    return () => window.removeEventListener("load", go);
+  }, []);
+  return pronta ? <LiaQuandoOcioso /> : null;
+}
 const WhatsAppLeadModal = lazyRetry(() => import("./components/WhatsAppLeadModal.tsx").then((m) => ({ default: m.WhatsAppLeadModal })));
 
 const queryClient = new QueryClient({

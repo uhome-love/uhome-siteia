@@ -4,7 +4,7 @@
 - [x] Rodada 4 publicada: central confirmou LCP 1,0/2,4/1,5/1,0 s e CLS zero nas quatro páginas
 - [x] Corrigir CLS: reprodução com CSS tardio 1,000 → 0,000; regras da troca inline, mesma foto conservada
 - [ ] PageSpeed oficial antes/depois home/busca: bloqueado por cota diária da API (429); depois depende de publicação
-- [x] Corrigir Lia sobre barra de ação: rosto oculto no celular e conversa do Open Bosque abre Lia; fluxo conferido
+- [x] WhatsApp original restaurado na barra em-foco; rosto Lia oculto e Lia na navegação inferior conferidos; CLS, site-dobra e Worker intactos
 - [x] Jornada do site: identidade e atribuição, eventos sem dados pessoais, consentimento e robôs
 - [x] Jornada do site: deduplicação WhatsApp, vínculo de lead e envio completo/contínuo ao CRM existente
 - [x] Jornada do site: testes em 3 sessões, consultas de duplicação/robôs e contrato de entrega

@@ -3,7 +3,6 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { MapPin, Building2, MessageCircle, Gift, Loader2, Navigation, Star, ShieldCheck, CalendarDays, ChevronDown } from "lucide-react";
 import { SiteBottomBar } from "@/components/SiteBottomBar";
-import { LiaActionButton } from "@/components/lia/LiaActionButton";
 import { siteTitle } from "@/lib/siteTitle";
 import { Navbar } from "@/components/Navbar";
 import { UhomeLogo } from "@/components/UhomeLogo";
@@ -384,7 +383,7 @@ export default function ProdutoFocoPage() {
           <CalendarDays className="h-4 w-4" />{modoCorretor ? `Falar com ${corretor?.nome.split(" ")[0]}` : "Agendar visita"}
         </button>
         {!modoCorretor && <button type="button" onClick={pedirInfo} className="flex flex-1 items-center justify-center rounded-xl border border-border py-3.5 font-body text-sm font-bold text-foreground">Informações</button>}
-        <LiaActionButton />
+        <a href={waUrl} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" onClick={() => trackProdutoWhatsApp(p)} className="flex items-center justify-center rounded-xl border border-border px-4 py-3.5 text-foreground"><MessageCircle className="h-5 w-5" /></a>
       </div>
 
       {box && <Suspense fallback={null}><MaterialGallery fotos={box.fotos} index={box.i} onClose={() => setBox(null)} /></Suspense>}

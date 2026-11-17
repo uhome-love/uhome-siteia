@@ -92,6 +92,34 @@
       "when": 1794877934901,
       "tag": "0012_migration",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1794892221972,
+      "tag": "0013_site_visitor_journey",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1794892340973,
+      "tag": "0014_journey_atomic_whatsapp",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1794892536788,
+      "tag": "0015_journey_event_idempotency",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1794892884566,
+      "tag": "0016_crm_callback_capabilities",
+      "breakpoints": true
     }
   ]
 }

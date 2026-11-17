@@ -1,0 +1,1 @@
+ALTER TABLE public.lead_events ADD CONSTRAINT lead_events_event_key_constraint UNIQUE(event_key);

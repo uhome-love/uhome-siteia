@@ -65,10 +65,16 @@ function parseFotos(raw: unknown): Array<{ url: string; ordem: number; principal
   return [];
 }
 
+function isOwnAsset(u: string): boolean {
+  return /^https?:\/\/(www\.)?uhome\.com\.br\//i.test(u) || u.startsWith("/__l5e/");
+}
+
 function ogImageUrl(rawUrl: string): string {
   if (!rawUrl) return OG_DEFAULT;
   if (rawUrl === OG_DEFAULT) return rawUrl;
   if (rawUrl.endsWith(".svg")) return OG_DEFAULT;
+  // Own-site assets (campaign arts already 1200x628): use direct URL, wsrv.nl 404s on them
+  if (isOwnAsset(rawUrl)) return rawUrl.startsWith("/") ? `https://uhome.com.br${rawUrl}` : rawUrl;
   // Proxy through wsrv.nl to serve optimized JPEG for social crawlers
   // This converts heavy PNGs (1MB+) to ~50-100KB JPEGs at 1200x630
   try {
@@ -171,6 +177,8 @@ function localBusinessJsonLd() {
 function html(title: string, description: string, rawOgImage: string, canonical: string, jsonLdBlocks: string[], bodyHtml: string) {
   const ogImage = ogImageUrl(rawOgImage);
   const isJpeg = ogImage.includes(".jpg") || ogImage.includes(".jpeg") || ogImage.includes("unsplash.com") || ogImage.includes("output=jpg");
+  const own = isOwnAsset(rawOgImage || "");
+  const imgH = own ? 628 : 630;
   const imgType = isJpeg ? "image/jpeg" : "image/png";
   // Sanitize description for meta tags
   const cleanDesc = truncateDesc(description, 160);
@@ -192,7 +200,7 @@ function html(title: string, description: string, rawOgImage: string, canonical:
   <meta property="og:description" content="${esc(cleanDesc)}" />
   <meta property="og:image" content="${esc(ogImage)}" />
   <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
+  <meta property="og:image:height" content="${imgH}" />
   <meta property="og:image:type" content="${imgType}" />
   <meta property="og:url" content="${esc(canonical)}" />
   <meta property="og:site_name" content="Uhome Imóveis" />

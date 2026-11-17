@@ -11,6 +11,21 @@ Não vou alterar nada no site, no banco, nos anúncios nem no CRM. Também não 
 
 A auditoria parte do site publicado hoje, não do de 12/11.
 
+
+## Acréscimos (prioridade)
+1. **Prioridade 1: formulário começado e não enviado no celular.** Em 16/11, 15 sessões de anúncio no celular começaram um formulário (6 em /em-foco, 9 em /busca) e só 1 enviou. Para cada formulário, vou testar num celular de 390 px até a tela de sucesso:
+   - campos, validação e máscara do telefone;
+   - teclado que aparece;
+   - se a barra fixa, a LIA ou o teclado cobrem o botão;
+   - erros silenciosos no envio e tempo de resposta.
+   Envios de teste só se forem inevitáveis, e serão apagados e listados no relatório. Também vou separar os envios reais dos testes meus e seus, pelos nomes com TESTE, telefones de teste e horários dos testes.
+2. **Página de produto publicada x pedido da fase 1.** Vou listar cada diferença. As três já apontadas entram como confirmadas para verificação:
+   - capa escura com arcos dourados;
+   - Open Arvoredo com 10 fotos (as 19 imagens em alta do zip não entraram);
+   - "Agendar visita" dourado em vez do azul da marca.
+   Vou usar o zip "motor de leads" (auditoria, conteúdo dos produtos, referências, fotos, plantas e vídeos) como régua.
+3. **Funil no resumo do chat.** De 16/11 em diante, por página e aparelho: vista, rolagem, galeria, início de formulário, envio e WhatsApp, separando quem veio de anúncio.
+
 ## Como vou fazer
 1. **Navegador:** abrir as páginas no celular (390x844) e no computador (1440x900), com e sem parâmetros de anúncio, e tirar print da primeira tela e da página inteira. As páginas são:
    - home

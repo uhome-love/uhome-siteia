@@ -8,9 +8,6 @@
     <link rel="dns-prefetch" href="https://s01.jetimgs.com" />
     <link rel="dns-prefetch" href="https://api.mapbox.com" />
     <link rel="dns-prefetch" href="https://events.mapbox.com" />
-    <link rel="preload" as="image" href="/hero-bg-mobile.webp" fetchpriority="high" media="(max-width: 640px)" />
-    <link rel="preload" as="image" href="/hero-bg-tablet.webp" fetchpriority="high" media="(max-width: 1024px)" />
-    <link rel="preload" as="image" href="/hero-bg.webp" fetchpriority="high" media="(min-width: 1025px)" />
 
 
     <title>Imóveis à Venda em Porto Alegre | Uhome Imóveis</title>
@@ -47,23 +44,12 @@
     <meta name="twitter:description" content="14.600+ imóveis em Porto Alegre. Busca inteligente com IA." />
     <meta name="twitter:image" content="https://uhome.com.br/og-default.jpg" />
 
-    <!-- Google Tag Manager — deferred to not block FCP/LCP -->
-    <script>window.addEventListener('load',function(){setTimeout(function(){(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-5838J9Z')},1500)});</script>
-    <!-- End Google Tag Manager -->
-    <!-- Google Ads (Site Uhome) -->
-    <script>window.dataLayer=window.dataLayer||[];window.gtag=window.gtag||function(){dataLayer.push(arguments)};gtag('js',new Date());gtag('config','AW-18567893155');
-    window.addEventListener('load',function(){setTimeout(function(){var j=document.createElement('script');j.async=true;j.src='https://www.googletagmanager.com/gtag/js?id=AW-18567893155';document.head.appendChild(j)},1500)});</script>
+    <link rel="preload" href="/fonts/pjs-400.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/pjs-700.woff2" as="font" type="font/woff2" crossorigin />
+    <!-- Google tags (GA4 + Ads) load once from src/lib/gtag.ts after first paint -->
   </head>
 
   <body>
-    <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5838J9Z"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    <!-- End Google Tag Manager (noscript) -->
     <style>
       #uh-splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;background:#fff;opacity:0;animation:uhIn .35s ease .3s forwards;transition:opacity .3s ease}
       #uh-splash.uh-out{opacity:0!important;animation:none;pointer-events:none}

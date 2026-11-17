@@ -16,15 +16,10 @@ captureLeadIdentity();
 registrarVisita();
 instalarRastreioWhatsApp();
 instalarFunilAnuncio();
-// All fonts lazy-loaded — system font stack covers initial render
+// Plus Jakarta (400/600/700) is self-hosted in index.css; only secondary fonts load lazily
 import "./index.css";
 
 const loadDeferredFonts = () => {
-  import("@fontsource/plus-jakarta-sans/400.css");
-  import("@fontsource/plus-jakarta-sans/700.css");
-  import("@fontsource/plus-jakarta-sans/500.css");
-  import("@fontsource/plus-jakarta-sans/600.css");
-  import("@fontsource/plus-jakarta-sans/800.css");
   import("@fontsource/dm-mono/400.css");
   import("@fontsource/montserrat/700.css");
   import("@fontsource/montserrat/800.css");

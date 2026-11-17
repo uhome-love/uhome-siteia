@@ -167,7 +167,7 @@ export function HeroSection() {
             src={gasometroDesktop.url}
             alt=""
             {...{ fetchpriority: "high" }}
-            decoding="async"
+            loading="eager"
             sizes="100vw"
             width={1612}
             height={768}

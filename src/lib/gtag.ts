@@ -18,6 +18,7 @@ function push(event: string, params: Record<string, unknown> = {}) {
 
 /* Google Ads (conta Site Uhome) */
 const ADS_ID = "AW-18567893155";
+const GA4_ID = "G-Q2X8S2HWFT";
 const ADS = {
   lead: `${ADS_ID}/bHQ5CLDL6LUdEKOh7pVF`,
   visita: `${ADS_ID}/IGu4CLPL6LUdEKOh7pVF`,
@@ -80,8 +81,8 @@ export function gaEvent(name: string, params: Record<string, unknown> = {}) {
 
 /** Carrega GA4 com o ID conectado e registra page_view em navegações SPA. */
 export function initGA4() {
-  const id = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_ANALYTICS_API_KEY as string | undefined;
-  if (!id || typeof window === "undefined" || window.gtag) return;
+  const id = (import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_ANALYTICS_API_KEY as string | undefined) || GA4_ID;
+  if (typeof window === "undefined" || window.gtag) return;
   if (/lovableproject\.com|localhost/.test(location.hostname)) return;
   window.dataLayer = window.dataLayer || [];
   window.gtag = function () {
@@ -98,7 +99,10 @@ export function initGA4() {
     s.src = `https://www.googletagmanager.com/gtag/js?id=${id}`;
     document.head.appendChild(s);
   };
-  setTimeout(load, 1500);
+  // Single gtag.js (GA4 + Ads) after first paint; calls before that are queued in dataLayer.
+  const later = () => setTimeout(load, 1500);
+  if (document.readyState === "complete") later();
+  else addEventListener("load", later, { once: true });
   let last = "";
   const pv = () => {
     const path = location.pathname + location.search;

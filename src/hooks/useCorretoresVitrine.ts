@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseLazy";
 
 export interface CorretorVitrine { id: string; nome: string; foto_url: string; telefone: string | null; creci: string | null; slug_ref: string }
 

@@ -62,6 +62,8 @@ function describeFilters(filters: Record<string, any>): string {
 
 /** Renders all loaded property cards. Pagination is handled by the parent
  *  via loadMore (button on desktop, infinite scroll on mobile). */
+export const PRIMEIROS_CARDS = 4;
+
 export function ProgressiveGrid({
   imoveis,
   total,
@@ -92,10 +94,22 @@ export function ProgressiveGrid({
   sentinelRef: React.RefObject<HTMLDivElement>;
 }) {
   const effectiveLoaded = loadedCount ?? imoveis.length;
+  // Primeira tela: 4 cards; o resto monta quando a pessoa se aproxima do fim deles.
+  const [todos, setTodos] = React.useState(false);
+  const fimPrimeiros = React.useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    if (todos || imoveis.length <= PRIMEIROS_CARDS) return;
+    const el = fimPrimeiros.current;
+    if (!el || typeof IntersectionObserver === "undefined") { setTodos(true); return; }
+    const io = new IntersectionObserver((e) => { if (e.some((x) => x.isIntersecting)) setTodos(true); }, { rootMargin: "800px 0px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [todos, imoveis.length]);
+  const visiveis = todos ? imoveis : imoveis.slice(0, PRIMEIROS_CARDS);
   return (
     <>
       <div className="grid content-start items-start grid-cols-1 gap-y-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
-        {imoveis.map((imovel, i) => (
+        {visiveis.map((imovel, i) => (
           <React.Fragment key={imovel.id}>
             <SearchPropertyCard
               imovel={imovel}
@@ -110,6 +124,7 @@ export function ProgressiveGrid({
           </React.Fragment>
         ))}
       </div>
+      {!todos && imoveis.length > PRIMEIROS_CARDS && <div ref={fimPrimeiros} aria-hidden className="h-px" />}
 
       {/* Load more from server — button on desktop, infinite scroll on mobile */}
       {effectiveLoaded < total && (

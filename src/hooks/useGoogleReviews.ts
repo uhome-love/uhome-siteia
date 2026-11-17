@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseLazy";
 
 export interface GoogleReview { nome: string; foto: string | null; estrelas: number; texto: string; data: string }
 export interface GoogleReviews { nota: number; total: number; avaliacoes: GoogleReview[]; maps_url: string | null; review_url: string | null }

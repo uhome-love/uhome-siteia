@@ -377,7 +377,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
             sizes="(min-width: 1280px) calc((55vw - 96px) / 3), (min-width: 1024px) calc((55vw - 72px) / 2), (min-width: 640px) calc((100vw - 72px) / 2), calc(100vw - 24px)"
             fallbackSrc={fotos[fotoAtiva]}
             alt={imovel.titulo}
-            loading={index < 6 ? "eager" : "lazy"}
+            loading={index < 4 ? "eager" : "lazy"}
             fetchPriority={index === 0 ? "high" : "auto"}
             decoding="async"
             className="h-full w-full object-cover transition-transform duration-500"

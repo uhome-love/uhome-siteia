@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo, useState, useEffect, useCallback, useRef, ReactNode } from "react";
 import { useLocation } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseLazy";
 import { setCorretorCache } from "@/lib/session";
 
 export interface CorretorData {

@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseLazy";
 import { getSessionId, getTrackingData, classifyOrigemCanal, getCorretorRef, getCorretorRefId, setLeadIdentity } from "@/lib/session";
 import { getVisitorId } from "@/lib/visitor";
 import { postJourney, trackEvent } from "@/lib/trackEvent";

@@ -70,7 +70,7 @@ export function HomeCampanhaBanner() {
               </div>
             </div>
             <img src={NATAL_ART.homi} alt="" loading="lazy" className="uh-float pointer-events-none hidden h-40 w-auto self-end lg:block xl:mr-6" />
-            <img src={NATAL_ART.presentes} alt="" loading="lazy" className="pointer-events-none absolute -bottom-2 -right-4 h-20 w-auto opacity-80 lg:hidden" />
+            <img src={NATAL_ART.presentesMini} alt="" width={109} height={160} loading="lazy" className="pointer-events-none absolute -bottom-2 -right-4 h-20 w-auto opacity-80 lg:hidden" />
           </div>
         </Link>
       )}

@@ -34,10 +34,22 @@ createRoot(rootEl).render(
   </HelmetProvider>
 );
 
-// Fade out the branded splash once React has painted
-requestAnimationFrame(() => requestAnimationFrame(() => {
+/** O CSS principal chega sem bloquear (ver vite.config.ts); o splash só sai depois dele aplicado. */
+function cssPronto(): Promise<void> {
+  const link = document.querySelector<HTMLLinkElement>("link[data-uh-css]");
+  if (!link || (link.rel === "stylesheet" && link.sheet)) return Promise.resolve();
+  return new Promise((ok) => {
+    const fim = () => ok();
+    link.addEventListener("load", fim, { once: true });
+    link.addEventListener("error", fim, { once: true });
+    setTimeout(fim, 4000);
+  });
+}
+
+// Fade out the branded splash once React has painted and the stylesheet applied
+cssPronto().then(() => requestAnimationFrame(() => requestAnimationFrame(() => {
   const splash = document.getElementById("uh-splash");
   if (!splash) return;
   splash.classList.add("uh-out");
   setTimeout(() => splash.remove(), 350);
-}));
+})));

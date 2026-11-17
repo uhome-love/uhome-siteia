@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
 import { Gift, Star, KeyRound, Loader2, MessageCircle, Clock3, CalendarDays } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
@@ -52,7 +52,15 @@ export default function CampanhaPage() {
     document.querySelector('meta[name="description"]')?.setAttribute("content", (c.subtitulo ?? "").slice(0, 158));
   }, [c, black]);
 
+  // Topo pronto vindo da borda (#uh-pre): fica na tela até o topo real montar no mesmo lugar.
+  const [temPre] = useState(() => typeof document !== "undefined" && !!document.getElementById("uh-pre"));
+  useLayoutEffect(() => {
+    if (!isLoading) document.getElementById("uh-pre")?.remove();
+  }, [isLoading]);
+  useEffect(() => () => document.getElementById("uh-pre")?.remove(), []);
+
   if (isLoading) {
+    if (temPre) return <Navbar />;
     return <div className="min-h-screen bg-natal"><Navbar /><div className="flex justify-center pt-40"><Loader2 className="h-6 w-6 animate-spin text-natal-gold" /></div></div>;
   }
   if (!data || !data.vigente || !c) return <Navigate to={prefixLink("/em-foco")} replace />;

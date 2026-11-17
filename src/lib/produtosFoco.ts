@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseLazy";
 
 export interface MidiaFoco { url: string; url_mobile?: string | null; legenda?: string | null; w?: number; h?: number; categoria?: string | null }
 export interface PrecoFoco { tipologia: string; valor: number; texto: string }

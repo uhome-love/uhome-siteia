@@ -10,6 +10,20 @@ const SUPABASE_PUBLISHABLE_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1aWdnbHd2dnp1d3d5cXZwbWVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNTMzNzcsImV4cCI6MjA4OTYyOTM3N30.mi8RveT9gYhxP-sfq0GIN1jog-vU3Sxq511LCq5hhw4";
 
 // https://vitejs.dev/config/
+/** CSS principal não bloqueia a primeira pintura: carrega como preload e vira stylesheet ao chegar.
+ *  O splash (estilo embutido no HTML) cobre a tela até o CSS aplicar — ver main.tsx. */
+const cssAssincrono = {
+  name: "uh-css-assincrono",
+  apply: "build" as const,
+  transformIndexHtml: {
+    order: "post" as const,
+    handler(html: string) {
+      return html.replace(/<link rel="stylesheet"( crossorigin)? href="([^"]+\.css)">/g, (_m, co = "", href) =>
+        `<link rel="preload" as="style" data-uh-css${co} href="${href}" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet"${co} href="${href}"></noscript>`);
+    },
+  },
+};
+
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
@@ -18,7 +32,7 @@ export default defineConfig(({ mode }) => ({
       overlay: false,
     },
   },
-  plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
+  plugins: [react(), cssAssincrono, mode === "development" && componentTagger()].filter(Boolean),
   define: {
     "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(SUPABASE_URL),
     "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(SUPABASE_PUBLISHABLE_KEY),

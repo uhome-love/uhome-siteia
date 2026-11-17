@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseLazy";
 
 export interface Imovel {
   id: string;
@@ -147,7 +147,24 @@ const PUBLIC_REST_HEADERS: HeadersInit = {
 
 const CODIGO_RE = /^\s*\d{2,7}\s*-\s*[a-z]{1,4}\s*$/i;
 
+/** Primeira página da busca padrão, entregue junto do HTML pela borda (window.__UH_BUSCA__). Usada uma vez. */
+export function ehBuscaPadrao(f: BuscaFilters): boolean {
+  const extras = Object.entries(f).filter(([k, v]) => v !== undefined && v !== null && v !== "" && !["finalidade", "cidade", "ordem", "limit", "offset"].includes(k));
+  return extras.length === 0 && (f.finalidade ?? "venda") === "venda" && f.cidade === "Porto Alegre" && (f.ordem ?? "recentes") === "recentes" && !f.offset && f.limit === 40;
+}
+
+function consumirBuscaInicial(f: BuscaFilters): { data: Imovel[]; count: number } | null {
+  if (typeof window === "undefined") return null;
+  const w = window as Window & { __UH_BUSCA__?: { rows?: Record<string, unknown>[]; count?: number } };
+  const b = w.__UH_BUSCA__;
+  if (!b?.rows?.length || !ehBuscaPadrao(f)) return null;
+  delete w.__UH_BUSCA__;
+  return { data: b.rows.map(mapRow), count: b.count ?? b.rows.length };
+}
+
 export async function fetchImoveis(filters: BuscaFilters = {}): Promise<{ data: Imovel[]; count: number }> {
+  const inicial = consumirBuscaInicial(filters);
+  if (inicial) return inicial;
   // Texto digitado que é um código Jetimob (ex: 85149-UH) vira busca por código
   if (filters.q && !filters.codigo && CODIGO_RE.test(filters.q)) {
     filters = { ...filters, codigo: filters.q.replace(/\s+/g, "").toUpperCase(), q: undefined, cidade: undefined, bairro: undefined, bairros: undefined };

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { MapPin, Sparkles, X } from "lucide-react";
 
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseLazy";
 import { getBairrosDisponiveis } from "@/services/bairrosCache";
 import { toast } from "sonner";
 import { getCaptacaoTracking } from "@/lib/leadTracking";

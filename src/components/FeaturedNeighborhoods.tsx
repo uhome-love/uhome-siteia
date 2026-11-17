@@ -82,7 +82,7 @@ export default function FeaturedNeighborhoods() {
               >
                 <div className="aspect-video w-full">
                   <img
-                    src={b.foto}
+                    src={b.foto.startsWith("/images/") ? b.foto.replace(/\.webp$/, "-card.webp") : b.foto}
                     alt={`Imóveis à venda em ${b.nome}, Porto Alegre`}
                     loading="lazy"
                     decoding="async"

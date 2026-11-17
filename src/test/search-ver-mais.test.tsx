@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import type { Imovel } from "@/services/imoveis";
 
@@ -17,6 +17,18 @@ vi.mock("@/components/SearchCTACard", () => ({
 }));
 
 import { ProgressiveGrid } from "@/pages/Search";
+
+// Por padrão a pessoa "já rolou" até o fim dos primeiros cards (o observador avisa na hora).
+const ObservadorPadrao = window.IntersectionObserver;
+class ObservadorVisivel {
+  constructor(private cb: IntersectionObserverCallback) {}
+  observe() { this.cb([{ isIntersecting: true } as IntersectionObserverEntry], this as unknown as IntersectionObserver); }
+  unobserve() {}
+  disconnect() {}
+  takeRecords() { return []; }
+}
+beforeEach(() => { (window as any).IntersectionObserver = ObservadorVisivel; });
+afterEach(() => { (window as any).IntersectionObserver = ObservadorPadrao; });
 
 function makeImoveis(count: number, offset = 0): Imovel[] {
   return Array.from({ length: count }, (_, i) => ({
@@ -241,5 +253,11 @@ describe("ProgressiveGrid — Ver mais regression", () => {
     );
     // Mobile sentinel wrapper present
     expect(container.querySelector(".sm\\:hidden")).toBeInTheDocument();
+  });
+
+  it("mostra só 4 cards na primeira tela enquanto a pessoa não rola", () => {
+    (window as any).IntersectionObserver = ObservadorPadrao;
+    render(<Harness initial={makeImoveis(12)} total={12} fetchMore={() => []} />);
+    expect(screen.getAllByTestId("property-card")).toHaveLength(4);
   });
 });

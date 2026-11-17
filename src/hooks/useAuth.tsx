@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { carregarSupabase } from "@/lib/supabaseLazy";
 import type { User, Session } from "@supabase/supabase-js";
 
 interface AuthContext {
@@ -22,6 +22,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let ativo = true;
+    let sair: (() => void) | null = null;
+    // Quem já tem sessão salva carrega na hora; os demais, depois da primeira pintura.
+    const temSessao = (() => { try { return Object.keys(localStorage).some((k) => /^sb-.*-auth-token$/.test(k)); } catch { return false; } })();
+    const iniciar = async () => {
+    const supabase = await carregarSupabase();
+    if (!ativo) return;
     // Listen first
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, sess) => {
@@ -57,12 +64,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(sess?.user ?? null);
       setLoading(false);
     });
+    sair = () => subscription.unsubscribe();
+    };
+    if (temSessao || document.readyState === "complete") void iniciar();
+    else window.addEventListener("load", () => void iniciar(), { once: true });
 
-    return () => subscription.unsubscribe();
+    return () => { ativo = false; sair?.(); };
   }, []);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    await (await carregarSupabase()).auth.signOut();
   };
 
   return (

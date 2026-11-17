@@ -63,7 +63,7 @@ export function CookieNotice() {
         </div>
       ) : (
         <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 sm:gap-y-1.5">
-          <p className="min-w-0 flex-1 text-xs leading-tight text-foreground sm:text-sm">Usamos cookies para melhorar sua busca.</p>
+          <p className="min-w-0 flex-1 text-xs leading-tight text-foreground sm:basis-full sm:whitespace-nowrap sm:text-sm">Usamos cookies para melhorar sua busca.</p>
           <button type="button" onClick={open} className="order-2 text-xs text-primary underline sm:order-4">Preferências</button>
           <div className="order-3 flex w-full gap-2 sm:w-auto">
             <Button size="sm" variant="outline" className="h-8 flex-1 px-3 text-xs sm:flex-none" onClick={() => save(true, true)}>Aceitar</Button>

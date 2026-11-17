@@ -339,64 +339,115 @@ export type Database = {
           area: number | null
           atribuido_a: string | null
           bairro: string | null
+          cidade: string | null
+          contexto: Json | null
           corretor_ref_id: string | null
           corretor_ref_slug: string | null
           created_at: string | null
           dados_imovel: Json | null
+          device: string | null
+          endereco: string | null
+          fbclid: string | null
+          finalidade: string | null
+          formulario: string | null
+          gbraid: string | null
+          gclid: string | null
           id: string
+          landing_url: string | null
           mensagem: string | null
           nome: string
           origem: string | null
+          origem_componente: string | null
           origem_ref: string | null
+          pagina_url: string | null
           quartos: number | null
+          referrer: string | null
           status: string | null
           telefone: string
           tipo_imovel: string | null
           utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
           utm_source: string | null
+          utm_term: string | null
           valor_pretendido: string | null
+          wbraid: string | null
         }
         Insert: {
           area?: number | null
           atribuido_a?: string | null
           bairro?: string | null
+          cidade?: string | null
+          contexto?: Json | null
           corretor_ref_id?: string | null
           corretor_ref_slug?: string | null
           created_at?: string | null
           dados_imovel?: Json | null
+          device?: string | null
+          endereco?: string | null
+          fbclid?: string | null
+          finalidade?: string | null
+          formulario?: string | null
+          gbraid?: string | null
+          gclid?: string | null
           id?: string
+          landing_url?: string | null
           mensagem?: string | null
           nome: string
           origem?: string | null
+          origem_componente?: string | null
           origem_ref?: string | null
+          pagina_url?: string | null
           quartos?: number | null
+          referrer?: string | null
           status?: string | null
           telefone: string
           tipo_imovel?: string | null
           utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
           utm_source?: string | null
+          utm_term?: string | null
           valor_pretendido?: string | null
+          wbraid?: string | null
         }
         Update: {
           area?: number | null
           atribuido_a?: string | null
           bairro?: string | null
+          cidade?: string | null
+          contexto?: Json | null
           corretor_ref_id?: string | null
           corretor_ref_slug?: string | null
           created_at?: string | null
           dados_imovel?: Json | null
+          device?: string | null
+          endereco?: string | null
+          fbclid?: string | null
+          finalidade?: string | null
+          formulario?: string | null
+          gbraid?: string | null
+          gclid?: string | null
           id?: string
+          landing_url?: string | null
           mensagem?: string | null
           nome?: string
           origem?: string | null
+          origem_componente?: string | null
           origem_ref?: string | null
+          pagina_url?: string | null
           quartos?: number | null
+          referrer?: string | null
           status?: string | null
           telefone?: string
           tipo_imovel?: string | null
           utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
           utm_source?: string | null
+          utm_term?: string | null
           valor_pretendido?: string | null
+          wbraid?: string | null
         }
         Relationships: [
           {

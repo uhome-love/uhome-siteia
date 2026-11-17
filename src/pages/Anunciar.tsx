@@ -4,6 +4,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { getCaptacaoTracking } from "@/lib/leadTracking";
 import { formatPhone } from "@/lib/phoneMask";
 import { motion } from "framer-motion";
 import { UhomeLogo } from "@/components/UhomeLogo";
@@ -102,7 +103,10 @@ const Anunciar = () => {
         corretor_ref_id: refId || null,
         corretor_ref_slug: refSlug || null,
         origem_ref: refSlug ? 'link_corretor' : 'organico',
-      });
+        ...(getCaptacaoTracking("anunciar_form", "Formulário Anunciar imóvel", {
+          tipo_imovel: tipoImovel, bairro: bairro.trim(), valor_pretendido: valorPretendido.trim() || null, mensagem: mensagem.trim() || null,
+        })),
+      } as any);
       if (error) throw error;
       setSubmitted(true);
     } catch {

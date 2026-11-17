@@ -10,6 +10,7 @@ import { formatPhone, rawPhone } from "@/lib/phoneMask";
 import { whatsappLink } from "@/lib/whatsapp";
 import { avaliarImovel, precoM2Fallback, formatPreco } from "@/services/avaliacao";
 import { getCorretorRef, getCorretorRefId } from "@/lib/session";
+import { getCaptacaoTracking } from "@/lib/leadTracking";
 import type { DadosImovel, ResultadoAvaliacao } from "@/services/avaliacao";
 
 const TIPOS = [
@@ -72,10 +73,13 @@ export default function AvaliacaoPage() {
         telefone: rawPhone(telefone),
         bairro: dados.bairro,
         tipo_imovel: dados.tipo,
-        utm_source: "calculadora_avaliacao",
         corretor_ref_id: refId || null,
         corretor_ref_slug: refSlug || null,
         origem_ref: refSlug ? 'link_corretor' : 'organico',
+        ...(getCaptacaoTracking("calculadora_avaliacao", "Calculadora de avaliação", {
+          tipo_imovel: dados.tipo, bairro: dados.bairro, quartos: dados.quartos, area: dados.area,
+          banheiros: dados.banheiros, vagas: dados.vagas, estado: dados.estado, diferenciais: dados.diferenciais,
+        })),
       } as any);
 
       const res = await avaliarImovel(dados);

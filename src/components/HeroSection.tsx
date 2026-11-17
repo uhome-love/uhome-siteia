@@ -5,6 +5,7 @@ import { MapPin, Sparkles, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getBairrosDisponiveis } from "@/services/bairrosCache";
 import { toast } from "sonner";
+import { getCaptacaoTracking } from "@/lib/leadTracking";
 import { formatPhone } from "@/lib/phoneMask";
 import { bairrosData } from "@/data/bairros";
 import { CIDADES_PERMITIDAS } from "@/services/imoveis";
@@ -141,8 +142,8 @@ export function HeroSection() {
         nome: nome.trim(),
         telefone: telefone.trim(),
         bairro: bairroAnuncio.trim() || null,
-        utm_source: "hero_home",
-      });
+        ...(getCaptacaoTracking("hero_anunciar", "Anunciar imóvel (topo da home)", { bairro: bairroAnuncio.trim() || null })),
+      } as any);
       if (error) throw error;
       setEnviado(true);
       toast.success("Cadastro recebido!");

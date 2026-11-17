@@ -128,3 +128,25 @@ export function getLeadTracking(origem_componente: string, formulario?: string) 
   };
   return { colunas, contexto };
 }
+
+export interface CaptacaoInfo {
+  tipo_imovel?: string | null; bairro?: string | null; cidade?: string | null; endereco?: string | null;
+  valor_pretendido?: string | null; quartos?: number | null; area?: number | null; mensagem?: string | null;
+  [k: string]: unknown;
+}
+
+/** Campos extras da captação de imóvel: rastreamento + dados do imóvel (vão ao CRM em dados_site.captacao). */
+export function getCaptacaoTracking(origem_componente: string, formulario: string, info: CaptacaoInfo) {
+  const { colunas, contexto } = getLeadTracking(origem_componente, formulario);
+  const captacao = { finalidade: "venda", ...info };
+  return {
+    ...colunas,
+    finalidade: "venda",
+    cidade: info.cidade ?? null,
+    endereco: info.endereco ?? null,
+    quartos: info.quartos ?? null,
+    area: info.area ?? null,
+    dados_imovel: captacao,
+    contexto: { ...contexto, captacao },
+  };
+}

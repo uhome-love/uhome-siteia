@@ -428,9 +428,10 @@ async function moverParaFilaCEO(
   record: Record<string, unknown>,
   observacoes: string,
   extra: Record<string, unknown> = {},
+  dadosExtra: Record<string, unknown> = {},
 ) {
   if (!pipelineLeadId) return
-  const dadosSite = { site_lead_id: record.id, contexto: record.contexto ?? null, ...rastreioDoRecord(record), fonte: (record.contexto as any)?.rastreamento?.fonte ?? null }
+  const dadosSite = { site_lead_id: record.id, contexto: record.contexto ?? null, ...rastreioDoRecord(record), fonte: (record.contexto as any)?.rastreamento?.fonte ?? null, ...dadosExtra }
   const estados = await buscarEstados(supabaseCRM, pipelineLeadId, record)
 
   // Pessoa já existe no CRM com corretor ativo: só acrescenta dados, o CRM decide o resto.
@@ -472,20 +473,63 @@ async function handleCaptacao(
   record: Record<string, unknown>,
   corretorCRMId: string | null
 ) {
-  const { data: leadCRM, error } = await supabaseCRM
-    .from('leads')
-    .insert({
-      nome: record.nome,
-      telefone: record.telefone,
-      origem: 'site_uhome',
-      origem_detalhe: 'captacao_imovel',
-      status: 'novo',
-      atribuido_para: corretorCRMId,
-      observacoes: `Captação: ${record.tipo_imovel ?? ''} em ${record.bairro ?? ''} - ${record.valor_pretendido ?? ''}`,
-    })
-    .select()
-    .single()
+  const ctx = (record.contexto ?? {}) as any
+  const info = (record.dados_imovel ?? ctx.captacao ?? {}) as Record<string, unknown>
+  const captacao = {
+    ...info,
+    tipo_imovel: record.tipo_imovel ?? info.tipo_imovel ?? null,
+    finalidade: record.finalidade ?? info.finalidade ?? 'venda',
+    bairro: record.bairro ?? info.bairro ?? null,
+    cidade: record.cidade ?? info.cidade ?? null,
+    endereco: record.endereco ?? info.endereco ?? null,
+    valor_pretendido: record.valor_pretendido ?? info.valor_pretendido ?? null,
+    quartos: record.quartos ?? info.quartos ?? null,
+    area: record.area ?? info.area ?? null,
+    mensagem: record.mensagem ?? info.mensagem ?? null,
+  }
+  const l: string[] = ['[Site uhome.com.br] Captação de imóvel']
+  if (captacao.tipo_imovel) l.push(`Tipo: ${captacao.tipo_imovel}`)
+  l.push(`Finalidade: ${captacao.finalidade}`)
+  const local = [captacao.endereco, captacao.bairro, captacao.cidade].filter(Boolean).join(', ')
+  if (local) l.push(`Local: ${local}`)
+  if (captacao.valor_pretendido) l.push(`Valor pretendido: ${captacao.valor_pretendido}`)
+  if (captacao.quartos) l.push(`Quartos: ${captacao.quartos}`)
+  if (captacao.area) l.push(`Área: ${captacao.area} m²`)
+  if (captacao.mensagem) l.push(`Mensagem: ${captacao.mensagem}`)
+  if (record.formulario) l.push(`Formulário: ${record.formulario}`)
+  if (record.pagina_url) l.push(`Página: ${record.pagina_url}`)
+  if (record.device) l.push(`Aparelho: ${record.device}`)
+  if (record.utm_source) l.push(`UTM: ${record.utm_source}${record.utm_campaign ? ` / ${record.utm_campaign}` : ''}`)
+  if (record.utm_term) l.push(`Palavra pesquisada: ${record.utm_term}`)
+  if (record.gclid) l.push(`Google Ads gclid: ${record.gclid}`)
+  else if (record.gbraid || record.wbraid) l.push(`Google Ads: ${record.gbraid ? 'gbraid ' + record.gbraid : 'wbraid ' + record.wbraid}`)
+  if (record.fbclid) l.push(`Meta fbclid: ${record.fbclid}`)
+  if (record.landing_url) l.push(`Primeira página: ${record.landing_url}`)
+  if (record.referrer !== undefined && record.referrer !== null) l.push(`Veio de: ${record.referrer || 'acesso direto'}`)
+  l.push(...contextoLinhas(record.contexto))
+  const observacoes = l.join('\n')
 
+  const payload = {
+    nome: record.nome,
+    telefone: record.telefone,
+    origem: 'site_uhome',
+    origem_detalhe: 'captacao_imovel',
+    bairro_interesse: captacao.bairro,
+    status: 'novo',
+    atribuido_para: corretorCRMId,
+    site_lead_id: record.id,
+    utm_source: record.utm_source ?? null,
+    utm_campaign: record.utm_campaign ?? null,
+    observacoes,
+  }
+  let { data: leadCRM, error } = await supabaseCRM.from('leads').upsert(payload, { onConflict: 'site_lead_id' }).select().single()
+  if (error?.message?.includes('foreign key constraint') && corretorCRMId) {
+    const r = await supabaseCRM.from('leads').upsert({ ...payload, atribuido_para: null }, { onConflict: 'site_lead_id' }).select().single()
+    leadCRM = r.data; error = r.error
+  }
+  if (leadCRM) {
+    await moverParaFilaCEO(supabaseCRM, leadCRM.pipeline_lead_id, corretorCRMId, record, observacoes, {}, { captacao })
+  }
   return { ok: !error, crm_lead_id: leadCRM?.id ?? null, error: error?.message }
 }
 

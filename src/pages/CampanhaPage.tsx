@@ -6,14 +6,17 @@ import { Footer } from "@/components/Footer";
 import { useCanonical } from "@/hooks/useCanonical";
 import { useCorretor } from "@/contexts/CorretorContext";
 import { blackAtiva, useCampanha } from "@/lib/produtosFoco";
-import { InfoLeadFoco } from "@/components/foco/InfoLeadFoco";
+import { DeferredFoco } from "@/components/foco/DeferredFoco";
+import { lazyRetry } from "@/lib/lazyRetry";
 import { ProdutoFocoCard, trackProdutoWhatsApp, useWhatsAppProduto } from "@/components/foco/FocoShared";
-import { ComparadorNatal } from "@/components/foco/ComparadorNatal";
 import { WHATSAPP_NUMBER } from "@/lib/whatsapp";
 import { Reveal } from "@/components/ui/reveal";
 import { Button } from "@/components/ui/button";
 import { FAIXAS_CAMPANHA, filtrarProdutosCampanha } from "@/lib/campanhaFilters";
 import { NATAL_ART, NatalLuzes, Ouro, natalBg } from "@/components/foco/NatalArt";
+
+const InfoLeadFoco = lazyRetry(() => import("@/components/foco/InfoLeadFoco").then((m) => ({ default: m.InfoLeadFoco })));
+const ComparadorNatal = lazyRetry(() => import("@/components/foco/ComparadorNatal").then((m) => ({ default: m.ComparadorNatal })));
 
 function useCountdown(fim?: string | null) {
   const alvo = useMemo(() => (fim ? new Date(`${fim}T23:59:59-03:00`).getTime() : 0), [fim]);
@@ -65,7 +68,7 @@ export default function CampanhaPage() {
       <main className="pt-14">
         <section className={`relative overflow-hidden ${tema}`}>
           <NatalLuzes />
-          <div className="uh-rise relative mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:py-10">
+          <div className="relative mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:py-10">
             <img src={NATAL_ART.selo} alt="Natal Chave de Ouro" className="h-10 w-auto sm:h-12" />
             <p className="mt-4 inline-flex items-center gap-2 rounded-full border border-natal-gold/40 px-4 py-1.5 font-body text-[11px] font-bold uppercase tracking-[0.2em] text-natal-gold sm:text-xs">
               <KeyRound className="h-3.5 w-3.5" /> {black ? "Semana Black · 23 a 29/11" : "Campanha de Natal Uhome"}
@@ -108,7 +111,7 @@ export default function CampanhaPage() {
           {corretor.foto_url && <img src={corretor.foto_url} alt={corretor.nome} loading="lazy" className="h-14 w-14 shrink-0 rounded-full object-cover" />}
           <div className="min-w-0"><p className="font-body text-xs text-muted-foreground">Seu corretor Uhome</p><p className="break-words font-heading font-semibold">{corretor.nome}</p>{corretor.creci && <p className="text-xs text-muted-foreground">CRECI {corretor.creci}</p>}</div>
         </div></section>}
-        <Reveal><section id="empreendimentos" className="mx-auto max-w-7xl scroll-mt-20 px-5 py-8 sm:px-8">
+        <section id="empreendimentos" className="mx-auto max-w-7xl scroll-mt-20 px-5 py-8 sm:px-8">
           <h2 className="text-h2 text-foreground">Empreendimentos participantes</h2>
           <p className="mt-2 font-body text-muted-foreground">{data.produtos.length} produtos selecionados, do primeiro apê ao alto padrão.</p>
           <div className="mt-5 flex flex-wrap gap-4">
@@ -123,17 +126,17 @@ export default function CampanhaPage() {
               <ProdutoFocoCard key={p.id} p={p} selo={black ? "Black Natal" : "Condição de Natal"} campanha={black ? "black" : "natal"} contato />
             ))}
           </div>
-        </section></Reveal>
+        </section>
         {!(isDirectAccess && corretor) && <section id="contato" className="scroll-mt-20 bg-secondary/40">
           <div className="mx-auto grid max-w-5xl gap-6 px-5 py-10 sm:px-8 lg:grid-cols-2 lg:items-center [&>*]:min-w-0">
             <div>
               <h2 className="text-h2 text-foreground">Agende sua visita ou receba as condições de Natal</h2>
               <p className="mt-2 font-body text-muted-foreground">Deixe nome e WhatsApp. Um especialista da Uhome te chama com valores, plantas e unidades disponíveis. Sem compromisso.</p>
             </div>
-            <InfoLeadFoco key={modo} modo={modo} produtos={data.produtos} campanha={c.nome} />
+            <DeferredFoco minHeight={400}><InfoLeadFoco key={modo} modo={modo} produtos={data.produtos} campanha={c.nome} /></DeferredFoco>
           </div>
         </section>}
-        {(data?.produtos?.length ?? 0) > 1 && <Reveal><ComparadorNatal produtos={data!.produtos} linkFor={prefixLink} onContato={isDirectAccess && corretor ? (p) => { trackProdutoWhatsApp(p); window.open(wa(p), "_blank", "noopener"); } : undefined} /></Reveal>}
+        {data.produtos.length > 1 && <DeferredFoco minHeight={480}><ComparadorNatal produtos={data.produtos} linkFor={prefixLink} onContato={isDirectAccess && corretor ? (p) => { trackProdutoWhatsApp(p); window.open(wa(p), "_blank", "noopener"); } : undefined} /></DeferredFoco>}
         <Reveal><section className="mx-auto max-w-3xl px-5 pb-12 sm:px-8">
           <h2 className="text-h2 text-foreground">Perguntas frequentes</h2>
           <div className="mt-5 divide-y divide-border rounded-2xl border border-border">

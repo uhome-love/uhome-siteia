@@ -1,18 +1,19 @@
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { MapPin, Building2, MessageCircle, Gift, Loader2, Navigation, Star, ShieldCheck, CalendarDays, ChevronDown } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { UhomeLogo } from "@/components/UhomeLogo";
-import { InfoLeadFoco } from "@/components/foco/InfoLeadFoco";
-import { AgendaVisitaFoco } from "@/components/foco/AgendaVisitaFoco";
+import { DeferredFoco } from "@/components/foco/DeferredFoco";
+import { lazyRetry } from "@/lib/lazyRetry";
 import { useCanonical } from "@/hooks/useCanonical";
 import { useCorretor } from "@/contexts/CorretorContext";
 import { setJsonLd, removeJsonLd } from "@/lib/jsonld";
 import { absUrl, blackAtiva, formatPreco, useCampanha, useCampanhasAtivas, useProdutoFoco, SITE_URL, type MidiaFoco, type ProdutoFoco } from "@/lib/produtosFoco";
 import { CorretorContatoCard, ProdutoFocoCard, trackProdutoWhatsApp, useWhatsAppProduto } from "@/components/foco/FocoShared";
-import { Reveal } from "@/components/ui/reveal";
 import { Button } from "@/components/ui/button";
-import { MaterialGallery } from "@/components/foco/MaterialGallery";
+const InfoLeadFoco = lazyRetry(() => import("@/components/foco/InfoLeadFoco").then((m) => ({ default: m.InfoLeadFoco })));
+const AgendaVisitaFoco = lazyRetry(() => import("@/components/foco/AgendaVisitaFoco").then((m) => ({ default: m.AgendaVisitaFoco })));
+const MaterialGallery = lazyRetry(() => import("@/components/foco/MaterialGallery").then((m) => ({ default: m.MaterialGallery })));
 
 
 /** Rola até o formulário de contato visível (no celular fica logo após as condições). */
@@ -170,7 +171,7 @@ export default function ProdutoFocoPage() {
             <div ref={trilho} onScroll={(e) => { const el = e.currentTarget; setFotoAtual(Math.round(el.scrollLeft / el.clientWidth)); }} className="flex snap-x snap-mandatory overflow-x-auto [scrollbar-width:none]">
               {(fotos.length ? fotos : p.capa_url ? [{ url: p.capa_url }] : []).map((f, i) => (
                 <button type="button" key={f.url} aria-label={`Abrir foto ${i + 1} de ${p.nome}`} onClick={() => setBox({ fotos, i })} className="w-full shrink-0 snap-center">
-                  <img src={f.url} alt={semProvisoria((f as any).legenda) ?? p.nome} fetchPriority={i === 0 ? "high" : undefined} loading={i === 0 ? "eager" : "lazy"} className="aspect-[4/3] w-full object-cover sm:aspect-[16/7]" />
+                  <img src={i === 0 || Math.abs(i - fotoAtual) <= 1 ? f.url : undefined} alt={semProvisoria((f as MidiaFoco).legenda) ?? p.nome} fetchPriority={i === 0 ? "high" : "low"} loading={i === 0 ? "eager" : "lazy"} decoding="async" width={1600} height={1200} className="aspect-[4/3] w-full object-cover sm:aspect-[16/7]" />
                 </button>
               ))}
             </div>
@@ -323,7 +324,7 @@ export default function ProdutoFocoPage() {
             <section id="informacoes" className="scroll-mt-28">
               <h2 className="text-h2 text-foreground">{natal ? `Receba as condições de Natal do ${p.nome}` : `Receba as condições do ${p.nome}`}</h2>
               <p className="mt-1 font-body text-muted-foreground">Um especialista da Uhome te chama no WhatsApp com valores, plantas e unidades disponíveis.</p>
-              <div className="mt-5 max-w-2xl"><InfoLeadFoco p={p} /></div>
+              <div className="mt-5 max-w-2xl"><DeferredFoco minHeight={288}><InfoLeadFoco p={p} /></DeferredFoco></div>
             </section>
           )}
 
@@ -332,7 +333,7 @@ export default function ProdutoFocoPage() {
             <h2 className="text-h2 text-foreground">Agende sua visita</h2>
             <p className="mt-1 font-body text-muted-foreground">Escolha o dia e o período. Um especialista confirma pelo WhatsApp.</p>
             <div className="mt-5 max-w-2xl">
-              {modoCorretor ? <CorretorContatoCard produto={p} /> : <AgendaVisitaFoco p={p} planta={planta} />}
+              {modoCorretor ? <CorretorContatoCard produto={p} /> : <DeferredFoco minHeight={420}><AgendaVisitaFoco p={p} planta={planta} /></DeferredFoco>}
               {!modoCorretor && (
                 <a href={waUrl} onClick={() => trackProdutoWhatsApp(p)} target="_blank" rel="noopener noreferrer" className="mt-3 flex items-center justify-center gap-2 font-body text-sm font-semibold text-primary"><MessageCircle className="h-4 w-4" />Prefiro conversar no WhatsApp</a>
               )}
@@ -380,7 +381,7 @@ export default function ProdutoFocoPage() {
         <a href={waUrl} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" onClick={() => trackProdutoWhatsApp(p)} className="flex items-center justify-center rounded-xl border border-border px-4 py-3.5 text-foreground"><MessageCircle className="h-5 w-5" /></a>
       </div>
 
-      {box && <MaterialGallery fotos={box.fotos} index={box.i} onClose={() => setBox(null)} />}
+      {box && <Suspense fallback={null}><MaterialGallery fotos={box.fotos} index={box.i} onClose={() => setBox(null)} /></Suspense>}
     </div>
   );
 }

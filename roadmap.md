@@ -1,7 +1,9 @@
 # Roadmap — rodada pós-auditoria 16/11
 - [x] Prévia: função ajustada (produto, Natal, studios, imóvel, home com número do banco)
 - [x] Código do Worker Cloudflare (cloudflare/uhome-previa-worker.js)
-- [ ] Usuário criar o Worker na Cloudflare (bloqueado: precisa do usuário) → depois testar curl e Facebook Debugger
+- [x] Usuário criar o Worker na Cloudflare (confirmado pelo usuário)
+- [x] Correção solicitada: carregamento inicial Open Bosque e campanha Natal; catálogo em 2 requisições, ferramentas diferidas, primeira tela sem animação; 13 testes e navegação 390/1280px
+- [ ] Publicar correções de velocidade e medir novamente (aguarda publicação; mídia não é servida pelo sandbox local)
 - [ ] Sitemap com /em-foco, campanha, studios
 - [ ] 1. Medição (formulario_iniciado por formulário, lia_mensagem, studios celular, PageSpeed antes)
 - [ ] 2. Busca

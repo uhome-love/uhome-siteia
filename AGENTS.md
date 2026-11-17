@@ -16,3 +16,4 @@
 - Product pages `/em-foco/:slug` use their own slim header/footer (ad landing mode) and "Agendar visita" as primary CTA via `AgendaVisitaFoco` (agendamentos + submitLead). Optional `ficha.motivos/faq/frase` and gallery `categoria` override auto-derived content. Why: paid traffic lands on a focused page without site navigation leaks.
 - Google tags load only via `initGA4` in src/lib/gtag.ts (single gtag.js for GA4 + Ads, after window load); no GTM/gtag snippets in index.html. Why: duplicate tags tripled script weight and hurt mobile LCP.
 - Plus Jakarta Sans is self-hosted in public/fonts (400/600/700 woff2, @font-face in index.css, 400/700 preloaded). Why: avoid render-blocking font CSS chains.
+- Foco pages defer below-fold forms/comparison with DeferredFoco and import MaterialGallery only on opening; campaign products use an ordered relationship query. Why: tools and sequential catalog requests must not compete with first-viewport content.

@@ -124,7 +124,7 @@ export function useProdutoFoco(slug?: string) {
       const { data, error } = await supabase
         .from("produtos_foco")
         .select(SELECT)
-        .eq("slug", slug!)
+        .eq("slug", slug ?? "")
         .eq("ativo", true)
         .maybeSingle();
       if (error) throw error;
@@ -169,24 +169,19 @@ export function useCampanha(slug?: string) {
       const { data: c, error } = await supabase
         .from("campanhas")
         .select("id, slug, nome, tema, titulo, subtitulo, descricao, banner_url, inicio, fim, destaque_home, config")
-        .eq("slug", slug!)
+        .eq("slug", slug ?? "")
         .eq("ativo", true)
         .maybeSingle();
       if (error) throw error;
       if (!c) return null;
-      const { data: links } = await supabase
+      const { data: links, error: linksError } = await supabase
         .from("campanha_produtos")
-        .select("ordem, produto_id")
+        .select(`ordem, produto:produtos_foco!inner(${SELECT})`)
         .eq("campanha_id", c.id)
+        .eq("produto.ativo", true)
         .order("ordem");
-      const ids = (links ?? []).map((l) => l.produto_id);
-      const { data: prods } = ids.length
-        ? await supabase.from("produtos_foco").select(SELECT).in("id", ids).eq("ativo", true)
-        : { data: [] };
-      const ordem = new Map(ids.map((id, i) => [id, i]));
-      const produtos = ((prods ?? []) as unknown as ProdutoFoco[]).sort(
-        (a, b) => (ordem.get(a.id) ?? 0) - (ordem.get(b.id) ?? 0)
-      );
+      if (linksError) throw linksError;
+      const produtos = ((links ?? []) as unknown as { produto: ProdutoFoco }[]).map((link) => link.produto);
       return { campanha: c as unknown as Campanha, produtos, vigente: campanhaVigente(c as unknown as Campanha) };
     },
   });

@@ -393,12 +393,13 @@ const Search = () => {
   // Track busca_realizada (debounced — fires once per filter set)
   const buscaTrackRef = useRef<ReturnType<typeof setTimeout>>();
   useEffect(() => {
-    if (loading || total === 0) return;
+    if (loading) return;
     clearTimeout(buscaTrackRef.current);
     buscaTrackRef.current = setTimeout(() => {
+      trackEvent({ tipo: "filtro_aplicado", dados: { filtros: queryFilters as Record<string, unknown>, secao: "Imóveis" } });
       trackEvent({
-        tipo: "busca_realizada",
-        busca_query: filters.q || queryIA || null,
+        tipo: "busca_feita",
+        dados: { secao: "Imóveis", filtros: queryFilters as Record<string, unknown> },
         busca_filtros: queryFilters as Record<string, unknown>,
       });
     }, 2000);

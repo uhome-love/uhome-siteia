@@ -1,3 +1,4 @@
+import { trackEvent } from "@/lib/trackEvent";
 import { useEffect, useRef } from "react";
 import { Helmet } from "react-helmet-async";
 import "@fontsource/montserrat/400.css";
@@ -22,9 +23,9 @@ const HTML = { __html: markup };
 
 function pushDataLayer(event: string, params: Record<string, unknown> = {}) {
   const dados = { landing: "investir_studios", ...params };
-  window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push({ event, ...dados });
+
   gaEvent(event, dados);
+  if (event === "lpi_simulador_cta") void trackEvent({ tipo: "simulacao_feita", dados: { studio: params.studio, noites: params.noites } });
 }
 
 async function registrarLead(l: LeadQualificado) {
@@ -37,7 +38,7 @@ async function registrarLead(l: LeadQualificado) {
       imovel_bairro: l.produto?.bairro,
       imovel_preco: l.produto?.preco,
       origem_componente: ORIGEM_COMPONENTE,
-      contexto: contextoLead(l, montarContextoLia(window.location.pathname, getCorretorRef() || null)),
+      contexto: { ...contextoLead(l, montarContextoLia(window.location.pathname, getCorretorRef() || null)), pedido: { tipo: "visita_pedida", dia: l.dia, periodo: l.periodo, assunto: "simulacao_studio" } },
     });
     return true;
   } catch (err) {
@@ -61,7 +62,7 @@ export default function InvestirStudios() {
     return initLanding(ref.current, {
       data: LP_DATA,
       onLead: registrarLead,
-      onWhatsApp: (local) => trackClickWhatsapp({ origem_componente: `${ORIGEM_COMPONENTE}_${local}` }),
+      onWhatsApp: () => { /* Global click tracker owns WhatsApp conversion. */ },
       track: pushDataLayer,
     });
   }, []);

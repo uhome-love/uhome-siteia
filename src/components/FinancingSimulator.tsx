@@ -1,3 +1,4 @@
+import { trackEvent } from "@/lib/trackEvent";
 import { useState, useMemo } from "react";
 import { Slider } from "@/components/ui/slider";
 import { Calculator, TrendingUp, Calendar, DollarSign } from "lucide-react";
@@ -37,6 +38,8 @@ export function FinancingSimulator({ propertyPrice }: FinancingSimulatorProps) {
     };
   }, [propertyPrice, downPaymentPercent, years, annualRate]);
 
+  const registrar = () => { void trackEvent({ tipo: "simulacao_feita", dados: { entrada_percentual: downPaymentPercent, prazo_anos: years, taxa_anual: annualRate } }); };
+
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }).format(value);
 
@@ -64,6 +67,7 @@ export function FinancingSimulator({ propertyPrice }: FinancingSimulatorProps) {
           <Slider
             value={[downPaymentPercent]}
             onValueChange={([v]) => setDownPaymentPercent(v)}
+            onValueCommit={registrar}
             min={10}
             max={80}
             step={5}
@@ -84,6 +88,7 @@ export function FinancingSimulator({ propertyPrice }: FinancingSimulatorProps) {
           <Slider
             value={[years]}
             onValueChange={([v]) => setYears(v)}
+            onValueCommit={registrar}
             min={5}
             max={35}
             step={5}
@@ -104,6 +109,7 @@ export function FinancingSimulator({ propertyPrice }: FinancingSimulatorProps) {
           <Slider
             value={[annualRate * 10]}
             onValueChange={([v]) => setAnnualRate(v / 10)}
+            onValueCommit={registrar}
             min={60}
             max={150}
             step={5}

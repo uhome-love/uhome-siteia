@@ -5,7 +5,6 @@ import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { useWhatsAppLeadStore } from "@/stores/whatsappLeadStore";
 import { submitLead } from "@/services/leads";
 import { trackWhatsAppClick } from "@/services/whatsappTracker";
-import { trackClickWhatsapp, trackGenerateLead } from "@/lib/gtag";
 import { formatPhone } from "@/lib/phoneMask";
 import { toast } from "sonner";
 
@@ -60,16 +59,7 @@ export function WhatsAppLeadModal() {
         imovel_slug: data.imovel_slug,
         origem_pagina: window.location.pathname,
       });
-      trackClickWhatsapp({
-        origem_componente: data.origem_componente,
-        imovel_titulo: data.imovel_titulo,
-        imovel_slug: data.imovel_slug,
-      });
-      trackGenerateLead({
-        origem_componente: data.origem_componente,
-        imovel_titulo: data.imovel_titulo,
-        imovel_slug: data.imovel_slug,
-      });
+
 
       // Open WhatsApp
       window.open(data.whatsappUrl, "_blank", "noopener");

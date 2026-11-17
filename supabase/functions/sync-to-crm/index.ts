@@ -1,10 +1,7 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient } from 'npm:@supabase/supabase-js@2'
+import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
+import { digest, buildJourney, deliverJourney } from '../_shared/journey.ts'
 import { decidirDistribuicao, temCorretorAtivo, variacoesTelefone } from './distribuicao.ts'
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
-}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -36,10 +33,35 @@ Deno.serve(async (req) => {
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
   )
 
+  const callbackId=req.headers.get('x-callback-id');
+  const bearer=req.headers.get('Authorization')?.replace(/^Bearer /i,'');
+  if(!callbackId || !bearer) return new Response(JSON.stringify({ok:false,error:'Unauthorized callback'}),{status:401,headers:corsHeaders});
+  const {data:callback,error:callbackError}=await supabaseSite.from('site_crm_callbacks').update({consumed_at:new Date().toISOString()}).eq('id',callbackId).eq('token_hash',await digest(bearer)).eq('record_id',record?.id).eq('tipo',tipo).is('consumed_at',null).gt('expires_at',new Date().toISOString()).select('id').maybeSingle();
+  if(callbackError || !callback) return new Response(JSON.stringify({ok:false,error:'Invalid callback'}),{status:401,headers:corsHeaders});
+
   const supabaseCRM = createClient(
     Deno.env.get('UHOMESALES_SUPABASE_URL')!,
     Deno.env.get('UHOMESALES_SERVICE_ROLE_KEY')!
   )
+
+  // Callbacks contain only references: never trust contact/state supplied in a request.
+  const tables: Record<string,string> = { lead:'public_leads', agendamento:'agendamentos', captacao:'captacao_imoveis', whatsapp_click:'whatsapp_clicks', journey:'lead_events' };
+  if (tables[tipo]) {
+    if (!record?.id || !/^[0-9a-f-]{36}$/i.test(String(record.id))) return new Response(JSON.stringify({ok:false,error:'Invalid reference'}),{status:400,headers:corsHeaders});
+    const {data,error}=await supabaseSite.from(tables[tipo]).select('*').eq('id',record.id).maybeSingle();
+    if(error||!data)return new Response(JSON.stringify({ok:false,error:'Record missing'}),{status:404,headers:corsHeaders});
+    record=data;
+  }
+  if (record.is_bot === true) return new Response(JSON.stringify({ok:true,ignored:'bot'}),{headers:{...corsHeaders,'Content-Type':'application/json'}});
+  if (tipo === 'journey') {
+    const result = await deliverJourney(supabaseSite,supabaseCRM,String(record.visitor_id),String(record.id));
+    return new Response(JSON.stringify(result),{headers:{...corsHeaders,'Content-Type':'application/json'}});
+  }
+  if (tipo === 'lead' && record.visitor_id) {
+    await supabaseSite.from('site_visitors').update({lead_id:record.id}).eq('id',record.visitor_id);
+    const jornada=await buildJourney(supabaseSite,String(record.visitor_id),String(record.id));
+    record.contexto={...(record.contexto as Record<string,unknown> || {}),jornada};
+  }
 
   // Resolve corretor CRM ID
   let corretorCRMId: string | null = null
@@ -74,12 +96,13 @@ Deno.serve(async (req) => {
   try {
     if (tipo === 'lead') {
       result = await handleLead(supabaseSite, supabaseCRM, record, corretorCRMId)
+      if(result.ok && record.visitor_id) await deliverJourney(supabaseSite,supabaseCRM,String(record.visitor_id));
     } else if (tipo === 'agendamento') {
-      result = await handleAgendamento(supabaseCRM, record, corretorCRMId)
+      result = record.origem_componente === 'agendamento_visita_foco' || record.origem_componente === 'agendamento_visita' ? {ok:true,crm_lead_id:null} : await handleAgendamento(supabaseCRM, record, corretorCRMId)
     } else if (tipo === 'captacao') {
       result = await handleCaptacao(supabaseCRM, record, corretorCRMId)
     } else if (tipo === 'whatsapp_click') {
-      result = await handleWhatsAppClick(supabaseCRM, record, corretorCRMId)
+      result = record.nome && record.telefone ? await handleWhatsAppClick(supabaseCRM, record, corretorCRMId) : {ok:true,crm_lead_id:null}
     } else if (tipo === 'favorito') {
       // Favoritos não são sincronizados ao CRM (apenas tracking interno).
       // Tratamos como sucesso silencioso para não poluir sync_log com erros.
@@ -431,7 +454,7 @@ async function moverParaFilaCEO(
   dadosExtra: Record<string, unknown> = {},
 ) {
   if (!pipelineLeadId) return
-  const dadosSite = { site_lead_id: record.id, contexto: record.contexto ?? null, ...rastreioDoRecord(record), fonte: (record.contexto as any)?.rastreamento?.fonte ?? null, ...dadosExtra }
+  const dadosSite = { site_lead_id: record.id, visitor_id:record.visitor_id??null, jornada:(record.contexto as any)?.jornada??null, site_events:(record.contexto as any)?.jornada?.site_events??[], contexto: record.contexto ?? null, ...rastreioDoRecord(record), fonte: (record.contexto as any)?.rastreamento?.fonte ?? null, ...dadosExtra }
   const estados = await buscarEstados(supabaseCRM, pipelineLeadId, record)
 
   // Pessoa já existe no CRM com corretor ativo: só acrescenta dados, o CRM decide o resto.

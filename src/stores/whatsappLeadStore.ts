@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { submitLead } from "@/services/leads";
 import { trackWhatsAppClick } from "@/services/whatsappTracker";
-import { trackClickWhatsapp, trackGenerateLead } from "@/lib/gtag";
 
 export interface WhatsAppLeadData {
   whatsappUrl: string;
@@ -52,16 +51,7 @@ export const useWhatsAppLeadStore = create<WhatsAppLeadStore>((set) => ({
         imovel_slug: data.imovel_slug,
         origem_pagina: window.location.href,
       });
-      trackClickWhatsapp({
-        origem_componente: data.origem_componente,
-        imovel_titulo: data.imovel_titulo,
-        imovel_slug: data.imovel_slug,
-      });
-      trackGenerateLead({
-        origem_componente: data.origem_componente,
-        imovel_titulo: data.imovel_titulo,
-        imovel_slug: data.imovel_slug,
-      });
+
 
       window.open(data.whatsappUrl, "_blank", "noopener");
       return;

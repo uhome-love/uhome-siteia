@@ -3,6 +3,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { generateResponse, GatewayError } from "npm:@lovable.dev/ai-gateway";
+import { tokenValid } from "../_shared/journey.ts";
 import { z } from "npm:zod@3";
 import { montarPromptLia } from "./prompt.ts";
 import { dividirBolhas, normalizarTelefone, normalizarTurno, TURNO_LABEL, validarDataVisita } from "./regras.ts";
@@ -330,9 +331,8 @@ async function registrarInteresse(a: any, ctx: Ctx) {
     if (igual && (qualificacao as any)[igual]) continue;
     (qualificacao as any)[k] = v;
   }
-  const { data, error } = await sb
-    .from("public_leads")
-    .insert({
+  const { data: leadId, error } = await sb.rpc("journey_upsert_lead", { p_payload: {
+      visitor_id: c.visitor_id || null,
       nome: String(a.nome).slice(0, 120),
       telefone: tel,
       tipo_interesse: a.tipo === "captacao" ? "captacao" : "compra",
@@ -350,14 +350,12 @@ async function registrarInteresse(a: any, ctx: Ctx) {
       corretor_ref_id: ctx.corretor?.id ?? null,
       corretor_ref_slug: ctx.corretor?.slug_ref ?? null,
       contexto: contextoCRM(ctx, { resumo: a.resumo, qualificacao, produto: a.produto ?? c.produto ?? null }),
-    })
-    .select("id")
-    .single();
+    } });
   if (error) {
     console.error("[lia-chat] lead:", error.message);
     return { erro: "não consegui registrar agora" };
   }
-  ctx.conversa = { ...(ctx.conversa ?? {}), lead_id: data.id, etapa: "qualificado" };
+  ctx.conversa = { ...(ctx.conversa ?? {}), lead_id: leadId, etapa: "qualificado" };
   return { ok: true };
 }
 
@@ -447,6 +445,7 @@ Deno.serve(async (req) => {
   }
 
   const contexto = (body.contexto ?? {}) as Record<string, any>;
+  if (contexto.visitor_id && (!contexto.token || !(await tokenValid(String(contexto.visitor_id), String(contexto.token))))) return json({error:"Invalid visitor capability"},401);
   const { iso, dia } = hojeSP();
 
   let corretor: Ctx["corretor"] = null;

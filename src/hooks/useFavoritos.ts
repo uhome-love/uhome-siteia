@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
-import { syncToCRM } from "@/services/syncCRM";
+import { trackEvent } from "@/lib/trackEvent";
 
 export function useFavoritos() {
   const { user } = useAuth();
@@ -40,10 +40,9 @@ export function useFavoritos() {
           .eq("user_id", user.id)
           .eq("imovel_id", imovelId);
       } else {
-        await supabase
-          .from("favoritos")
-          .insert({ user_id: user.id, imovel_id: imovelId });
-        syncToCRM("favorito", { user_id: user.id, imovel_id: imovelId, created_at: new Date().toISOString() });
+        const { error } = await supabase.from("favoritos").insert({ user_id: user.id, imovel_id: imovelId });
+        if (error) throw error;
+        void trackEvent({ tipo: "favorito_salvo", dados: { imovel_id: imovelId } });
       }
 
       setFavoritos((prev) => {

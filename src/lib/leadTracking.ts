@@ -1,5 +1,8 @@
 // Rastreamento enviado em todo lead ao CRM: primeira visita (UTM, cliques de anúncio, referrer),
 // página/formulário da conversão, aparelho e um resumo do comportamento do visitante.
+import { canTrack } from "./consent";
+import { getSessionId } from "./session";
+import { safePage } from "./journeyIdentity";
 import { getTrackingData, classifyOrigemCanal, getCorretorRef } from "@/lib/session";
 
 export const FORMULARIO_LABELS: Record<string, string> = {
@@ -59,15 +62,16 @@ export function fonteLegivel(t: Record<string, any>, corretor?: string | null): 
 
 const VISITAS_KEY = "uhome_visitas";
 /** Conta visitas (uma por sessão do navegador). Chamar uma vez na abertura do site. */
-export function registrarVisita(): void {
+export function registrarVisita(): void { void canTrack("analytics").then(allowed => {
+  if (!allowed) return;
   try {
-    if (sessionStorage.getItem("uhome_visita_contada")) return;
-    sessionStorage.setItem("uhome_visita_contada", "1");
+    if (sessionStorage.getItem("uhome_visita_contada") === getSessionId()) return;
+    sessionStorage.setItem("uhome_visita_contada", getSessionId());
     sessionStorage.setItem("uhome_sessao_inicio", String(Date.now()));
     const n = Number(localStorage.getItem(VISITAS_KEY) || "0") + 1;
     localStorage.setItem(VISITAS_KEY, String(n));
   } catch { /* silencioso */ }
-}
+}); }
 
 function lerJSON<T>(s: Storage, k: string, f: T): T {
   try { const v = s.getItem(k); return v ? (JSON.parse(v) as T) : f; } catch { return f; }
@@ -102,7 +106,7 @@ export function getLeadTracking(origem_componente: string, formulario?: string) 
   const device = classificarDevice(ua, largura);
   const corretor = getCorretorRef();
   const colunas = {
-    pagina_url: window.location.href,
+    pagina_url: safePage(),
     origem_componente,
     formulario: nomeFormulario(origem_componente, formulario),
     device,

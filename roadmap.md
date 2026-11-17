@@ -1,4 +1,8 @@
 # Roadmap — rodada pós-auditoria 16/11
+- [x] Jornada do site: identidade e atribuição, eventos sem dados pessoais, consentimento e robôs
+- [x] Jornada do site: deduplicação WhatsApp, vínculo de lead e envio completo/contínuo ao CRM existente
+- [x] Jornada do site: testes em 3 sessões, consultas de duplicação/robôs e contrato de entrega
+- [ ] Jornada: Pixel Meta aguarda conexão/ID; prioridades Ads preservadas; entrega sem retentativa automática em falha externa (pendências registradas)
 - [x] Prévia: função ajustada (produto, Natal, studios, imóvel, home com número do banco)
 - [x] Código do Worker Cloudflare (cloudflare/uhome-previa-worker.js)
 - [x] Usuário criar o Worker na Cloudflare (confirmado pelo usuário)

@@ -1,3 +1,4 @@
+import { CookieNotice } from "@/components/privacy/CookieNotice";
 import { Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
@@ -41,6 +42,7 @@ const App = () => (
         <AuthProvider>
           <CorretorProvider>
             <TooltipProvider>
+              <CookieNotice />
               <Toaster />
               <Sonner />
               <BannerCorretor />

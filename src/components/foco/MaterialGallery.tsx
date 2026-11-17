@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { trackEvent } from "@/lib/trackEvent";
 import { funilEvento } from "@/lib/funilAnuncio";
 import * as Dialog from "@radix-ui/react-dialog";
 import { ChevronLeft, ChevronRight, X, ZoomIn, ZoomOut } from "lucide-react";
@@ -10,7 +11,8 @@ export function MaterialGallery({ fotos, index, onClose }: { fotos: MidiaFoco[];
   const [zoom, setZoom] = useState(false);
   const [failed, setFailed] = useState(false);
   const touch = useRef<number | null>(null);
-  useEffect(() => { funilEvento("galeria_aberta"); }, []);
+
+  useEffect(() => { void trackEvent({ tipo: "foto_aberta", dados: { foto_index: i } }); }, [i]);
   const f = fotos[i];
   const move = (delta: number) => { setI(x => (x + delta + fotos.length) % fotos.length); setZoom(false); setFailed(false); };
   if (!f) return null;

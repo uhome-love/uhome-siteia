@@ -35,6 +35,7 @@ export function InfoLeadFoco({ p, produtos, modo = "info", campanha }: { p?: Pro
         nome: r.data.nome, telefone: v.telefone.trim(),
         mensagem: tipo === "visita" ? `Quero agendar uma visita: ${alvo}` : `Quero receber informações: ${alvo}`,
         imovel_slug: escolhido ? `em-foco/${escolhido.slug}` : undefined, imovel_titulo: escolhido?.nome ?? campanha, imovel_bairro: escolhido?.bairro ?? undefined, imovel_preco: escolhido?.preco_a_partir ?? undefined,
+        contexto: { pedido: { tipo: tipo === "visita" ? "visita_pedida" : "informacoes_pedidas", assunto: "valores_plantas_unidades", planta: null } },
         origem_componente: p ? "foco_mais_informacoes" : tipo === "visita" ? "campanha_agendar_visita" : "campanha_receber_informacoes",
       } as any);
       setOk(true);

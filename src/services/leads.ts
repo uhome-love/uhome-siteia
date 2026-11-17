@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { getSessionId, getTrackingData, classifyOrigemCanal, getCorretorRef, getCorretorRefId, setLeadIdentity } from "@/lib/session";
-import { trackEvent } from "@/lib/trackEvent";
+import { getVisitorId } from "@/lib/visitor";
+import { postJourney, trackEvent } from "@/lib/trackEvent";
 import { trackGenerateLead } from "@/lib/gtag";
 import { getLeadTracking } from "@/lib/leadTracking";
 
@@ -41,30 +42,6 @@ export async function submitLead(data: LeadData) {
   }
 
   const rastreio = getLeadTracking(data.origem_componente, data.formulario);
-  setLeadIdentity({ telefone: data.telefone, email: data.email, nome: data.nome }, data.origem_componente);
-
-  // Deduplicate: skip if same phone submitted in last 24h
-  const digitsOnly = data.telefone.replace(/\D/g, "");
-  if (digitsOnly.length >= 10) {
-    try {
-      const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-      const { count } = await supabase
-        .from("public_leads")
-        .select("id", { count: "exact", head: true })
-        .ilike("telefone", `%${digitsOnly.slice(-8)}%`)
-        .gte("created_at", since);
-      if (count && count > 0) {
-        console.log("[submitLead] Dedup: lead recente encontrado para este telefone");
-        trackEvent({
-          tipo: "formulario_enviado",
-          imovel_slug: data.imovel_slug,
-          imovel_titulo: data.imovel_titulo,
-        });
-        return true;
-      }
-    } catch { /* if check fails, proceed with insert */ }
-  }
-
   const origem_canal = classifyOrigemCanal(tracking);
 
   const payload = {
@@ -102,17 +79,12 @@ export async function submitLead(data: LeadData) {
     contexto: { ...(data.contexto ?? {}), ...rastreio.contexto },
   };
 
-  const { error } = await supabase
-    .from("public_leads")
-    .insert(payload as any);
-
-  if (error) throw error;
-
-  trackEvent({
-    tipo: "formulario_enviado",
-    imovel_slug: data.imovel_slug,
-    imovel_titulo: data.imovel_titulo,
-  });
+  const pedido = (data.contexto?.pedido as Record<string, unknown> | undefined) || {};
+  const tipo = typeof pedido.tipo === "string" ? pedido.tipo : /agendamento|agendar_visita/.test(data.origem_componente) ? "visita_pedida" : /informac/.test(data.origem_componente) ? "informacoes_pedidas" : "pedido_corretor";
+  const result = await postJourney({ action: "lead", lead: { ...payload, visitor_id: getVisitorId(), email: data.email || undefined } });
+  if (!result.ok) throw new Error("Contato não registrado");
+  setLeadIdentity({ telefone: data.telefone, email: data.email, nome: data.nome }, data.origem_componente);
+  await trackEvent({ tipo: tipo as import("@/lib/trackEvent").JourneyTipo, imovel_slug: data.imovel_slug, imovel_titulo: data.imovel_titulo, dados: { ...pedido, formulario: data.origem_componente } });
 
   // GA4 dataLayer event
   trackGenerateLead({

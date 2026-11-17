@@ -1,3 +1,4 @@
+import { trackEvent } from "@/lib/trackEvent";
 import { useState } from "react";
 import { Check, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -42,17 +43,19 @@ export function AgendaVisitaFoco({ p, planta }: { p: ProdutoFoco; planta?: strin
     try {
       const ref = getCorretorRef();
       const tr = getLeadTracking("agendamento_visita_foco");
-      await supabase.from("agendamentos" as any).insert({
+      const { error: agendamentoError } = await supabase.from("agendamentos" as any).insert({
         nome: nome.trim(), telefone: tel.trim(), imovel_slug: `em-foco/${p.slug}`, imovel_titulo: p.nome,
         data_visita: dia.toISOString().split("T")[0], turno: turno.toLowerCase(), horario: turno,
         status: "confirmado", corretor_ref_id: getCorretorRefId() || null, corretor_ref_slug: ref || null,
         origem_ref: ref ? "link_corretor" : "organico", origem_componente: "agendamento_visita_foco",
         contexto: planta ? { planta } : null, ...tr.colunas,
       });
+      if (agendamentoError) throw agendamentoError;
       await submitLead({
         nome: nome.trim(), telefone: tel.trim(), imovel_slug: `em-foco/${p.slug}`, imovel_titulo: p.nome,
         imovel_bairro: p.bairro ?? undefined, imovel_preco: p.preco_a_partir ?? undefined,
         origem_componente: "agendamento_visita_foco",
+        contexto: { pedido: { tipo: "visita_pedida", dia: dia.toISOString().split("T")[0], periodo: turno.toLowerCase(), planta: planta || null } },
       } as any);
       setOk(true);
     } catch {
@@ -80,7 +83,7 @@ export function AgendaVisitaFoco({ p, planta }: { p: ProdutoFoco; planta?: strin
         {dias.map((d) => {
           const sel = dia?.toDateString() === d.toDateString();
           return (
-            <button type="button" key={d.toISOString()} onClick={() => setDia(d)} aria-pressed={sel}
+            <button type="button" key={d.toISOString()} onClick={() => { setDia(d); void trackEvent({ tipo: "dia_escolhido", imovel_slug: `em-foco/${p.slug}`, dados: { dia: d.toISOString().split("T")[0] } }); }} aria-pressed={sel}
               className={`flex min-w-[64px] shrink-0 flex-col items-center rounded-xl border px-3 py-2 font-body transition-colors ${sel ? "border-primary bg-primary text-primary-foreground" : "border-border text-foreground hover:bg-secondary"}`}>
               <span className="text-xs capitalize">{d.toLocaleDateString("pt-BR", { weekday: "short" }).replace(".", "")}</span>
               <span className="text-lg font-bold">{d.getDate()}</span>

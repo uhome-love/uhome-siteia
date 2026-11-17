@@ -15,10 +15,10 @@ describe("funil das páginas de anúncio", () => {
     expect(primeiraVez("rolagem_50", "/busca", s)).toBe(false);
     expect(primeiraVez("rolagem_50", "/em-foco/a", s)).toBe(true);
   });
-  it("WhatsApp: no máximo 1 registro por sessão a cada 5s", () => {
+  it("WhatsApp: no máximo 1 registro por sessão por botão a cada 2s", () => {
     const s = mem();
     expect(podeRegistrar(100000, s)).toBe(true);
-    expect(podeRegistrar(104000, s)).toBe(false);
-    expect(podeRegistrar(105001, s)).toBe(true);
+    expect(podeRegistrar(101999, s)).toBe(false);
+    expect(podeRegistrar(102000, s)).toBe(true);
   });
 });

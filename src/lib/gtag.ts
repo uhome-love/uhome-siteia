@@ -1,3 +1,4 @@
+import { canTrack, onConsentChange } from "./consent";
 /**
  * Centralized GA4 event tracking via GTM dataLayer.
  * Events: generate_lead (form submissions) and click_whatsapp (WhatsApp clicks).
@@ -10,9 +11,7 @@ declare global {
 }
 
 function push(event: string, params: Record<string, unknown> = {}) {
-  window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push({ event, ...params });
-  window.gtag?.("event", event, params);
+  void canTrack("analytics").then(allowed => { if (allowed) window.gtag?.("event", event, params); });
   reportAdsConversion(event, params);
 }
 
@@ -32,7 +31,7 @@ export function reportAdsConversion(event: string, params: Record<string, unknow
     const tipo = String(params.lead_tipo ?? params.lead_source ?? "");
     send_to = /visita|agend/i.test(tipo) ? ADS.visita : ADS.lead;
   } else if (event === "click_whatsapp") send_to = ADS.whatsapp;
-  if (send_to) window.gtag?.("event", "conversion", { send_to });
+  if (send_to) { const target = send_to; void canTrack("advertising").then(allowed => { if (allowed) window.gtag?.("event", "conversion", { send_to: target }); }); }
 }
 
 /** Track form lead submissions */
@@ -76,13 +75,13 @@ declare global {
 
 /** Envia evento ao GA4 (se carregado). */
 export function gaEvent(name: string, params: Record<string, unknown> = {}) {
-  window.gtag?.("event", name, params);
+  void canTrack("analytics").then(allowed => { if (allowed) window.gtag?.("event", name, params); });
 }
 
 /** Carrega GA4 com o ID conectado e registra page_view em navegações SPA. */
 export function initGA4() {
   const id = (import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_ANALYTICS_API_KEY as string | undefined) || GA4_ID;
-  if (typeof window === "undefined" || window.gtag) return;
+  if (typeof window === "undefined" || document.querySelector("script[data-uhome-google]")) return;
   if (/lovableproject\.com|localhost/.test(location.hostname)) return;
   window.dataLayer = window.dataLayer || [];
   window.gtag = function () {
@@ -93,9 +92,12 @@ export function initGA4() {
   window.gtag("js", new Date());
   window.gtag("config", id, { send_page_view: false });
   window.gtag("config", ADS_ID);
-  const load = () => {
+  const load = async () => {
+    if (!(await canTrack("analytics")) && !(await canTrack("advertising"))) return;
+    if (document.querySelector("script[data-uhome-google]")) return;
     const s = document.createElement("script");
     s.async = true;
+    s.dataset.uhomeGoogle = "true";
     s.src = `https://www.googletagmanager.com/gtag/js?id=${id}`;
     document.head.appendChild(s);
   };
@@ -103,12 +105,13 @@ export function initGA4() {
   const later = () => setTimeout(load, 1500);
   if (document.readyState === "complete") later();
   else addEventListener("load", later, { once: true });
+  onConsentChange(() => { void load(); });
   let last = "";
   const pv = () => {
     const path = location.pathname + location.search;
     if (path === last) return;
     last = path;
-    window.gtag?.("event", "page_view", { page_path: path, page_location: location.href, page_title: document.title });
+    void canTrack("analytics").then(allowed => { if (allowed) window.gtag?.("event", "page_view", { page_path: location.pathname, page_location: location.origin + location.pathname, page_title: document.title }); });
   };
   for (const m of ["pushState", "replaceState"] as const) {
     const orig = history[m];
@@ -120,4 +123,15 @@ export function initGA4() {
   }
   addEventListener("popstate", () => setTimeout(pv, 300));
   setTimeout(pv, 300);
+}
+
+/** Canonical outcome labels; existing Ads conversion action IDs and priorities remain unchanged. */
+export function journeyMediaEvent(name: string, params: Record<string, unknown> = {}) {
+  gaEvent(name, params);
+  void canTrack("advertising").then(allowed => {
+    if (!allowed) return;
+    const fbq = (window as Window & { fbq?: (...args: unknown[]) => void }).fbq;
+    fbq?.("trackCustom", name, params);
+    window.gtag?.("event", name, { ...params, send_to: ADS_ID });
+  });
 }

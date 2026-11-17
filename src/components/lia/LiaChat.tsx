@@ -1,4 +1,8 @@
 import { reportAdsConversion } from "@/lib/gtag";
+import { trackEvent } from "@/lib/trackEvent";
+import { getSessionId } from "@/lib/session";
+import { gaEvent } from "@/lib/gtag";
+import { journeyEnvelope } from "@/lib/journeyIdentity";
 import { setLeadIdentity } from "@/lib/session";
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
@@ -15,19 +19,14 @@ type Msg = { role: "user" | "assistant"; content: string; cartoes?: Cartao[] };
 const KEY = "uhome_lia_conversa";
 const SID_KEY = "uhome_lia_sid";
 
-function sessionId() {
-  let id = sessionStorage.getItem(SID_KEY);
-  if (!id) { id = crypto.randomUUID(); sessionStorage.setItem(SID_KEY, id); }
-  return id;
-}
+function sessionId() { return getSessionId(); }
 
 function lerConversa(): Msg[] {
   try { return JSON.parse(sessionStorage.getItem(KEY) || "[]"); } catch { return []; }
 }
 
 function track(event: string, data: Record<string, unknown> = {}) {
-  (window as any).dataLayer?.push({ event, ...data });
-  window.gtag?.("event", event, data);
+  gaEvent(event, data);
   reportAdsConversion(event, data);
 }
 
@@ -68,6 +67,7 @@ export function LiaChat() {
       if (m) pendenteRef.current = m;
       setVisible(true);
       setAberto(true);
+      void trackEvent({ tipo: "lia_aberta" });
     };
     window.addEventListener("uhome:abrir-lia", abrir);
     return () => window.removeEventListener("uhome:abrir-lia", abrir);
@@ -97,15 +97,15 @@ export function LiaChat() {
     if (msgs.length === 0) track("lia_conversa_iniciada", { pagina: location.pathname });
     try {
       const { data, error } = await supabase.functions.invoke("lia-chat", {
-        body: { session_id: sessionId(), mensagens: novas.slice(-30), contexto: montarContextoLia(location.pathname, corretor?.slug ?? null) },
+        body: { session_id: sessionId(), mensagens: novas.slice(-30), contexto: { ...montarContextoLia(location.pathname, corretor?.slug ?? null), ...(await journeyEnvelope()) } },
       });
       if (error) throw error;
       const bolhas: string[] = data?.bolhas ?? [];
       const cartoes: Cartao[] = Array.isArray(data?.cartoes) ? data.cartoes.slice(0, 3) : [];
       setMsgs((m) => [...m, ...bolhas.map((b, i) => ({ role: "assistant" as const, content: b, ...(i === bolhas.length - 1 && cartoes.length ? { cartoes } : {}) }))]);
       if (data?.identidade) setLeadIdentity({ telefone: data.identidade }, "lia");
-      if (data?.acao === "visita") { track("generate_lead", { lead_tipo: "visita_lia", pagina: location.pathname }); }
-      if (data?.acao === "lead") { track("generate_lead", { lead_tipo: "lead_lia", pagina: location.pathname }); }
+      if (data?.acao === "visita") { void trackEvent({ tipo: "visita_pedida" }); track("generate_lead", { lead_tipo: "visita_lia", pagina: location.pathname }); }
+      if (data?.acao === "lead") { void trackEvent({ tipo: "lia_lead" }); track("generate_lead", { lead_tipo: "lead_lia", pagina: location.pathname }); }
     } catch {
       setMsgs((m) => [...m, { role: "assistant", content: "Ops, a conexão falhou por um instante. Pode mandar de novo? Se preferir, continue comigo pelo WhatsApp logo abaixo." }]);
     } finally {
@@ -209,7 +209,7 @@ export function LiaChat() {
 
       {!aberto && (
         <button
-          onClick={() => { setAberto(true); track("lia_aberta", { pagina: location.pathname }); }}
+          onClick={() => { setAberto(true); track("lia_aberta", { pagina: location.pathname }); void trackEvent({ tipo: "lia_aberta" }); }}
           aria-label="Fale com a LIA, atendente virtual da Uhome"
           className={`fixed right-4 z-50 flex items-center gap-2 rounded-full border border-border bg-background p-1 shadow-xl transition-transform hover:scale-[1.03] active:scale-95 sm:right-6 sm:pr-4 ${
             hasBottomBar ? "bottom-24 sm:bottom-6" : "bottom-5 sm:bottom-6"

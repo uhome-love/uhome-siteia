@@ -122,6 +122,7 @@ export default function AdminCorretores() {
       supabase
         .from("whatsapp_clicks")
         .select("corretor_ref_id, created_at")
+        .eq("is_bot", false)
         .in("corretor_ref_id", ids)
         .gte("created_at", since),
     ]);

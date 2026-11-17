@@ -51,6 +51,7 @@ const PropertyDetail = () => {
   const openLeadModal = useWhatsAppLeadStore((s) => s.openModal);
   const [showAuth, setShowAuth] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
+
   const [imovel, setImovel] = useState<Imovel | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -58,6 +59,8 @@ const PropertyDetail = () => {
   const [showFullDesc, setShowFullDesc] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, dragFree: false });
+
+  useEffect(() => { if (galleryOpen) void trackEvent({ tipo: "foto_aberta", imovel_slug: slug, dados: { foto_index: currentImage } }); }, [galleryOpen, currentImage, slug]);
 
   // Sync embla with currentImage state
   useEffect(() => {

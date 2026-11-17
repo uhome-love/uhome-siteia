@@ -1,3 +1,4 @@
+import { trackEvent } from "@/lib/trackEvent";
 import { useState } from "react";
 import { CalendarDays, Check, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -57,7 +58,8 @@ export function AgendamentoVisita({ imovelId, imovelSlug, imovelTitulo, imovelBa
         origem_ref: refSlug ? 'link_corretor' : 'organico',
         ...getLeadTracking("agendamento_visita").colunas,
       };
-      await supabase.from("agendamentos" as any).insert(agendamentoPayload);
+      const { error } = await supabase.from("agendamentos" as any).insert(agendamentoPayload);
+      if (error) throw error;
       await submitLead({
         nome: nome.trim(),
         telefone: telefone.trim(),
@@ -67,6 +69,7 @@ export function AgendamentoVisita({ imovelId, imovelSlug, imovelTitulo, imovelBa
         imovel_bairro: imovelBairro,
         imovel_preco: imovelPreco,
         origem_componente: "agendamento_visita",
+        contexto: { pedido: { tipo: "visita_pedida", dia: dataEscolhida.toISOString().split("T")[0], horario, periodo: Number(horario.slice(0, 2)) < 12 ? "manhã" : "tarde" } },
       });
       setEtapa("confirmado");
       toast.success("Visita agendada com sucesso!");
@@ -141,7 +144,7 @@ export function AgendamentoVisita({ imovelId, imovelSlug, imovelTitulo, imovelBa
                 return (
                   <button
                     key={dia.toISOString()}
-                    onClick={() => setDataEscolhida(dia)}
+                    onClick={() => { setDataEscolhida(dia); void trackEvent({ tipo: "dia_escolhido", imovel_slug: imovelSlug, dados: { dia: dia.toISOString().split("T")[0] } }); }}
                     className={`rounded-lg border-[1.5px] px-3 py-2 font-body text-xs font-medium transition-colors active:scale-[0.97] ${
                       selected
                         ? "border-primary bg-primary/10 text-primary"

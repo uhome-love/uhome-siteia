@@ -829,15 +829,20 @@ export type Database = {
       }
       lead_events: {
         Row: {
+          bot_reason: string | null
           busca_filtros: Json | null
           busca_query: string | null
+          canonical_tipo: string | null
           corretor_id: string | null
           corretor_slug: string | null
           created_at: string
+          dados: Json
+          event_key: string | null
           id: string
           identidade: Json | null
           imovel_slug: string | null
           imovel_titulo: string | null
+          is_bot: boolean | null
           origem: Json | null
           pagina: string | null
           session_id: string | null
@@ -845,15 +850,20 @@ export type Database = {
           visitor_id: string
         }
         Insert: {
+          bot_reason?: string | null
           busca_filtros?: Json | null
           busca_query?: string | null
+          canonical_tipo?: string | null
           corretor_id?: string | null
           corretor_slug?: string | null
           created_at?: string
+          dados?: Json
+          event_key?: string | null
           id?: string
           identidade?: Json | null
           imovel_slug?: string | null
           imovel_titulo?: string | null
+          is_bot?: boolean | null
           origem?: Json | null
           pagina?: string | null
           session_id?: string | null
@@ -861,15 +871,20 @@ export type Database = {
           visitor_id: string
         }
         Update: {
+          bot_reason?: string | null
           busca_filtros?: Json | null
           busca_query?: string | null
+          canonical_tipo?: string | null
           corretor_id?: string | null
           corretor_slug?: string | null
           created_at?: string
+          dados?: Json
+          event_key?: string | null
           id?: string
           identidade?: Json | null
           imovel_slug?: string | null
           imovel_titulo?: string | null
+          is_bot?: boolean | null
           origem?: Json | null
           pagina?: string | null
           session_id?: string | null
@@ -1124,6 +1139,7 @@ export type Database = {
           imovel_preco: number | null
           imovel_slug: string | null
           imovel_titulo: string | null
+          is_bot: boolean
           landing_page: string | null
           landing_url: string | null
           nome: string
@@ -1144,6 +1160,7 @@ export type Database = {
           utm_medium: string | null
           utm_source: string | null
           utm_term: string | null
+          visitor_id: string | null
           wbraid: string | null
         }
         Insert: {
@@ -1163,6 +1180,7 @@ export type Database = {
           imovel_preco?: number | null
           imovel_slug?: string | null
           imovel_titulo?: string | null
+          is_bot?: boolean
           landing_page?: string | null
           landing_url?: string | null
           nome: string
@@ -1183,6 +1201,7 @@ export type Database = {
           utm_medium?: string | null
           utm_source?: string | null
           utm_term?: string | null
+          visitor_id?: string | null
           wbraid?: string | null
         }
         Update: {
@@ -1202,6 +1221,7 @@ export type Database = {
           imovel_preco?: number | null
           imovel_slug?: string | null
           imovel_titulo?: string | null
+          is_bot?: boolean
           landing_page?: string | null
           landing_url?: string | null
           nome?: string
@@ -1222,6 +1242,7 @@ export type Database = {
           utm_medium?: string | null
           utm_source?: string | null
           utm_term?: string | null
+          visitor_id?: string | null
           wbraid?: string | null
         }
         Relationships: [
@@ -1249,6 +1270,200 @@ export type Database = {
           key?: string
           updated_at?: string | null
           value?: string | null
+        }
+        Relationships: []
+      }
+      site_crm_callbacks: {
+        Row: {
+          consumed_at: string | null
+          expires_at: string
+          id: string
+          record_id: string
+          tipo: string
+          token_hash: string
+        }
+        Insert: {
+          consumed_at?: string | null
+          expires_at?: string
+          id?: string
+          record_id: string
+          tipo: string
+          token_hash: string
+        }
+        Update: {
+          consumed_at?: string | null
+          expires_at?: string
+          id?: string
+          record_id?: string
+          tipo?: string
+          token_hash?: string
+        }
+        Relationships: []
+      }
+      site_journey_deliveries: {
+        Row: {
+          attempts: number
+          created_at: string
+          crm_lead_id: string | null
+          error: string | null
+          event_count: number | null
+          event_id: string | null
+          http_status: number | null
+          id: string
+          lead_id: string | null
+          sent_at: string | null
+          status: string
+          visitor_id: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          crm_lead_id?: string | null
+          error?: string | null
+          event_count?: number | null
+          event_id?: string | null
+          http_status?: number | null
+          id?: string
+          lead_id?: string | null
+          sent_at?: string | null
+          status?: string
+          visitor_id: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          crm_lead_id?: string | null
+          error?: string | null
+          event_count?: number | null
+          event_id?: string | null
+          http_status?: number | null
+          id?: string
+          lead_id?: string | null
+          sent_at?: string | null
+          status?: string
+          visitor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_journey_deliveries_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "lead_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_journey_deliveries_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "public_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_journey_deliveries_visitor_id_fkey"
+            columns: ["visitor_id"]
+            isOneToOne: false
+            referencedRelation: "site_visitors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      site_sessions: {
+        Row: {
+          bot_reason: string | null
+          id: string
+          interacted_at: string | null
+          is_bot: boolean
+          last_active_at: string
+          started_at: string
+          user_agent: string | null
+          visitor_id: string
+        }
+        Insert: {
+          bot_reason?: string | null
+          id: string
+          interacted_at?: string | null
+          is_bot?: boolean
+          last_active_at?: string
+          started_at?: string
+          user_agent?: string | null
+          visitor_id: string
+        }
+        Update: {
+          bot_reason?: string | null
+          id?: string
+          interacted_at?: string | null
+          is_bot?: boolean
+          last_active_at?: string
+          started_at?: string
+          user_agent?: string | null
+          visitor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_sessions_visitor_id_fkey"
+            columns: ["visitor_id"]
+            isOneToOne: false
+            referencedRelation: "site_visitors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      site_visitors: {
+        Row: {
+          analytics_allowed: boolean
+          capability_hash: string
+          id: string
+          lead_id: string | null
+          primeira_origem: Json
+          primeira_visita: string
+          ultima_origem: Json
+          updated_at: string
+        }
+        Insert: {
+          analytics_allowed?: boolean
+          capability_hash: string
+          id: string
+          lead_id?: string | null
+          primeira_origem?: Json
+          primeira_visita?: string
+          ultima_origem?: Json
+          updated_at?: string
+        }
+        Update: {
+          analytics_allowed?: boolean
+          capability_hash?: string
+          id?: string
+          lead_id?: string | null
+          primeira_origem?: Json
+          primeira_visita?: string
+          ultima_origem?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_visitors_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "public_leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      site_whatsapp_dedup: {
+        Row: {
+          accepted_at: string
+          button_key: string
+          session_id: string
+        }
+        Insert: {
+          accepted_at?: string
+          button_key: string
+          session_id: string
+        }
+        Update: {
+          accepted_at?: string
+          button_key?: string
+          session_id?: string
         }
         Relationships: []
       }
@@ -1465,6 +1680,8 @@ export type Database = {
       }
       whatsapp_clicks: {
         Row: {
+          bot_reason: string | null
+          button_key: string | null
           contexto: Json | null
           corretor_ref_id: string | null
           corretor_ref_slug: string | null
@@ -1481,6 +1698,7 @@ export type Database = {
           imovel_id: string | null
           imovel_slug: string | null
           imovel_titulo: string | null
+          is_bot: boolean | null
           landing_url: string | null
           mensagem: string | null
           nome: string | null
@@ -1500,6 +1718,8 @@ export type Database = {
           wbraid: string | null
         }
         Insert: {
+          bot_reason?: string | null
+          button_key?: string | null
           contexto?: Json | null
           corretor_ref_id?: string | null
           corretor_ref_slug?: string | null
@@ -1516,6 +1736,7 @@ export type Database = {
           imovel_id?: string | null
           imovel_slug?: string | null
           imovel_titulo?: string | null
+          is_bot?: boolean | null
           landing_url?: string | null
           mensagem?: string | null
           nome?: string | null
@@ -1535,6 +1756,8 @@ export type Database = {
           wbraid?: string | null
         }
         Update: {
+          bot_reason?: string | null
+          button_key?: string | null
           contexto?: Json | null
           corretor_ref_id?: string | null
           corretor_ref_slug?: string | null
@@ -1551,6 +1774,7 @@ export type Database = {
           imovel_id?: string | null
           imovel_slug?: string | null
           imovel_titulo?: string | null
+          is_bot?: boolean | null
           landing_url?: string | null
           mensagem?: string | null
           nome?: string | null
@@ -1710,6 +1934,11 @@ export type Database = {
         Args: { _tipo: string; _vitrine_id: string }
         Returns: undefined
       }
+      journey_accept_whatsapp: {
+        Args: { p_button: string; p_session: string }
+        Returns: boolean
+      }
+      journey_upsert_lead: { Args: { p_payload: Json }; Returns: string }
       upsert_corretor_from_crm: {
         Args: {
           _crm_user_id: string

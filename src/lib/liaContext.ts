@@ -1,4 +1,6 @@
 // Contexto do visitante enviado à LIA e ao CRM: páginas vistas, imóveis, busca, origem do anúncio.
+import { getJourneyVisitorId } from "./journeyIdentity";
+import { canTrack } from "./consent";
 import { getTrackingData } from "@/lib/session";
 import { getLeadTracking } from "@/lib/leadTracking";
 
@@ -6,15 +8,10 @@ const TRAIL_KEY = "uhome_lia_paginas";
 const GCLID_KEY = "uhome_gclid";
 
 /** Guarda o gclid (clique do Google Ads) da primeira visita com anúncio. */
-export function captureGclid(search = window.location.search) {
-  const g = new URLSearchParams(search).get("gclid");
-  if (g) {
-    try { localStorage.setItem(GCLID_KEY, g); } catch { /* silencioso */ }
-  }
-}
+export function captureGclid() { /* Click IDs are captured by the single consent-gated attribution module. */ }
 
 export function getGclid(): string | null {
-  try { return localStorage.getItem(GCLID_KEY); } catch { return null; }
+  try { return getTrackingData().gclid || null; } catch { return null; }
 }
 
 /** Registra a página na trilha da sessão (sem repetir a última, máximo 20). */
@@ -34,6 +31,7 @@ export function montarContextoLia(pathname: string, corretorSlug: string | null)
   const t = getTrackingData();
   const ctx: Record<string, unknown> = {
     pagina: pathname,
+    visitor_id: getJourneyVisitorId(),
     paginas: lerJSON<string[]>(sessionStorage, TRAIL_KEY, []),
     corretor_slug: corretorSlug,
     gclid: getGclid(),

@@ -1,16 +1,9 @@
-const SESSION_KEY = 'uhome_session_id';
+import { getJourneySession, getJourneyVisitorId, captureJourneyOrigin, origins } from "./journeyIdentity";
 const UTM_KEY = 'uhome_utm_data';
 const LEAD_TELEFONE_KEY = 'uhome_lead_telefone';
 const LEAD_EMAIL_KEY = 'uhome_lead_email';
 
-export function getSessionId(): string {
-  let id = sessionStorage.getItem(SESSION_KEY);
-  if (!id) {
-    id = crypto.randomUUID();
-    sessionStorage.setItem(SESSION_KEY, id);
-  }
-  return id;
-}
+export function getSessionId(): string { return getJourneySession().id; }
 
 // --- UTM first-touch persistence ---
 
@@ -66,66 +59,17 @@ export function setLeadIdentity(id: { telefone?: string; email?: string; nome?: 
     const atual = getLeadIdentity();
     if (telOk) localStorage.setItem(LEAD_TELEFONE_KEY, telOk);
     if (email) localStorage.setItem(LEAD_EMAIL_KEY, email);
-    if (atual.telefone?.replace(/\D/g, '') === telOk && (!email || atual.email === email)) return; // já vinculado
-    let visitor_id = localStorage.getItem('uhome_visitor_id');
-    if (!visitor_id) { visitor_id = crypto.randomUUID(); localStorage.setItem('uhome_visitor_id', visitor_id); }
-    const url = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/site-identidade`;
-    const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-    fetch(url, {
-      method: 'POST',
-      keepalive: true,
-      headers: { 'Content-Type': 'application/json', apikey: key, Authorization: `Bearer ${key}` },
-      body: JSON.stringify({ visitor_id, telefone: telOk, email, origem }),
-    }).catch(() => { /* silent */ });
+    // Contact data stays in the lead pipeline, never in behavioral events.
+    void getJourneyVisitorId();
   } catch { /* silent */ }
 }
 
 /** Capture UTMs from URL + referrer + device on first visit (first-touch attribution) */
-export function captureUtmParams(): void {
-  const params = new URLSearchParams(window.location.search);
-
-  const incoming: UtmData = {};
-  const keys: (keyof UtmData)[] = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'gbraid', 'wbraid', 'fbclid'];
-  for (const k of keys) {
-    const v = params.get(k);
-    if (v) incoming[k] = v;
-  }
-
-  // Always capture referrer / landing_page / device on first visit
-  const existing = getPersistedUtm();
-  if (!existing) {
-    // First visit — save everything
-    const data: UtmData = {
-      ...incoming,
-      referrer: document.referrer || '',
-      landing_page: window.location.pathname + window.location.search,
-      landing_url: window.location.href,
-      first_visit_at: new Date().toISOString(),
-      device: /Mobi|Android/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
-    };
-    try { localStorage.setItem(UTM_KEY, JSON.stringify(data)); } catch { /* silent */ }
-  } else if (Object.keys(incoming).length > 0) {
-    // Visita anterior: só completa o que faltava (nunca sobrescreve a primeira origem)
-    const merged: UtmData = { ...existing };
-    let mudou = false;
-    const clickKeys: (keyof UtmData)[] = ['gclid', 'gbraid', 'wbraid', 'fbclid'];
-    const temClique = clickKeys.some((k) => existing[k]);
-    for (const k of keys) {
-      const isClick = clickKeys.includes(k);
-      const pode = isClick ? !temClique : !existing.utm_source;
-      if (pode && incoming[k] && !existing[k]) { (merged as any)[k] = incoming[k]; mudou = true; }
-    }
-    if (mudou) try { localStorage.setItem(UTM_KEY, JSON.stringify(merged)); } catch { /* silent */ }
-  }
-}
+export function captureUtmParams(): void { void captureJourneyOrigin(); }
 
 function getPersistedUtm(): UtmData | null {
-  try {
-    const raw = localStorage.getItem(UTM_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
+  const first = origins().primeira_origem;
+  return Object.keys(first).length ? { ...first, first_visit_at: first.at } : null;
 }
 
 /** Get all persisted UTM + tracking data for lead submission */

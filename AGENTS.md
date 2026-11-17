@@ -19,3 +19,6 @@
 - Foco pages defer below-fold forms/comparison with DeferredFoco and import MaterialGallery only on opening; campaign products use an ordered relationship query. Why: tools and sequential catalog requests must not compete with first-viewport content.
 - Search cards use responsive WebP thumbnails with an original-image fallback, never rewriting stored/gallery URLs; mount only the visible photo layout. Why: avoid oversized and duplicate hidden image downloads.
 - Search map mounting uses the same 1024px breakpoint as its layout, synchronously on first render; below that it loads only when opened. Why: CSS-hidden maps must not download Mapbox or request pins.
+- Site journey identity and attribution use journeyIdentity plus the shared consent module; behavioral events use site-journey with a visitor capability. Why: one consent gate, no personal contact data in events, and protected visitor linkage.
+- CRM journey delivery runs server-side through existing sync-to-crm triggers and dados_site; canonical events have time-bounded aliases and stable IDs. Why: preserve funnel compatibility and keep identity out of the browser-to-CRM transport.
+- WhatsApp URL generation is pure; only trusted activation emits a click and enrichment-only calls never send. Why: render cycles previously generated one click per product per countdown tick.

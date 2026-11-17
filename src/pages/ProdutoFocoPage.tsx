@@ -1,3 +1,4 @@
+import { trackEvent } from "@/lib/trackEvent";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { MapPin, Building2, MessageCircle, Gift, Loader2, Navigation, Star, ShieldCheck, CalendarDays, ChevronDown } from "lucide-react";
@@ -52,6 +53,7 @@ export default function ProdutoFocoPage() {
 
   useEffect(() => {
     if (!p) return;
+    void trackEvent({ tipo: "imovel_visto", imovel_slug: `em-foco/${p.slug}`, imovel_titulo: p.nome, imovel_bairro: p.bairro, imovel_preco: p.preco_a_partir });
     const desc = `${p.nome} em ${p.bairro}, ${p.cidade}${p.preco_a_partir ? `, a partir de ${formatPreco(p.preco_a_partir)}` : ""}. ${p.resumo ?? ""}`.slice(0, 158);
     document.title = `${p.nome} | ${p.bairro}, ${p.cidade} | Uhome em Foco`;
     setMeta("name", "description", desc);
@@ -240,7 +242,7 @@ export default function ProdutoFocoPage() {
               {abas.length > 1 && (
                 <div role="tablist" className="mt-4 flex gap-2 overflow-x-auto [scrollbar-width:none]">
                   {abas.map((a) => (
-                    <button key={a.nome} role="tab" aria-selected={abaAtiva === a.nome} type="button" onClick={() => setAbaAtiva(a.nome)} className={`shrink-0 rounded-full border px-4 py-1.5 font-body text-sm font-semibold ${abaAtiva === a.nome ? "border-primary bg-primary text-primary-foreground" : "border-border text-foreground hover:bg-secondary"}`}>{a.nome}</button>
+                    <button key={a.nome} role="tab" aria-selected={abaAtiva === a.nome} type="button" onClick={() => { setAbaAtiva(a.nome); void trackEvent({ tipo: "categoria_tocada", imovel_slug: `em-foco/${p.slug}`, dados: { categoria: a.nome } }); }} className={`shrink-0 rounded-full border px-4 py-1.5 font-body text-sm font-semibold ${abaAtiva === a.nome ? "border-primary bg-primary text-primary-foreground" : "border-border text-foreground hover:bg-secondary"}`}>{a.nome}</button>
                   ))}
                 </div>
               )}

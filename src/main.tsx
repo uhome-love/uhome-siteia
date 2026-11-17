@@ -6,6 +6,7 @@ import { registrarVisita } from "./lib/leadTracking";
 import { instalarFunilAnuncio } from "./lib/funilAnuncio";
 import { instalarRastreioWhatsApp } from "./services/whatsappTracker";
 import App from "./App.tsx";
+import { instalarJornada } from "./lib/journeyBrowser";
 import { initGA4 } from "./lib/gtag";
 initGA4();
 
@@ -16,6 +17,7 @@ captureLeadIdentity();
 registrarVisita();
 instalarRastreioWhatsApp();
 instalarFunilAnuncio();
+instalarJornada();
 // Plus Jakarta (400/600/700) is self-hosted in index.css; only secondary fonts load lazily
 import "./index.css";
 
@@ -42,7 +44,8 @@ if (import.meta.env.DEV) {
   import("./utils/testCorretorFlow").then(m => m.setupCorretorFlowTest());
 }
 
-const rootEl = document.getElementById("root")!;
+const rootEl = document.getElementById("root");
+if (!rootEl) throw new Error("Root missing");
 rootEl.innerHTML = ""; // Remove static SEO fallback before React mounts
 createRoot(rootEl).render(
   <HelmetProvider>

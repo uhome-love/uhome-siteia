@@ -70,7 +70,6 @@ export function StickyPropertyCTA({ imovelId, imovelSlug, imovelTitulo, imovelBa
         origem_componente: "sticky_cta",
         origem_pagina: window.location.href,
       });
-      trackGenerateLead({ origem_componente: "sticky_cta", imovel_titulo: imovelTitulo, imovel_slug: imovelSlug });
       setSuccess(true);
       toast.success("Recebemos seu contato!");
       setTimeout(() => { setSuccess(false); setFormOpen(false); setNome(""); setTelefone(""); }, 2500);

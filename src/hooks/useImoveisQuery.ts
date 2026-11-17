@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetchImoveis, type BuscaFilters, type Imovel } from "@/services/imoveis";
+import { fetchImoveis, consumirBuscaInicial, type BuscaFilters, type Imovel } from "@/services/imoveis";
 
 interface UseImoveisQueryOptions {
   filters: BuscaFilters;
@@ -22,6 +22,8 @@ export function useImoveisQuery({ filters, enabled = true }: UseImoveisQueryOpti
   const query = useQuery<ImoveisResult>({
     queryKey: ["imoveis", "list", filters],
     queryFn: () => fetchImoveis(filters),
+    // Primeira página que veio com o HTML: já monta com cards e total (troca da primeira tela sem piscar).
+    initialData: () => (enabled ? consumirBuscaInicial(filters) ?? undefined : undefined),
     enabled,
     staleTime: 3 * 60 * 1000, // 3 min — listing-specific (overrides global 5 min)
     gcTime: 10 * 60 * 1000,

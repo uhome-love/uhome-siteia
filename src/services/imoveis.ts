@@ -153,7 +153,7 @@ export function ehBuscaPadrao(f: BuscaFilters): boolean {
   return extras.length === 0 && (f.finalidade ?? "venda") === "venda" && f.cidade === "Porto Alegre" && (f.ordem ?? "recentes") === "recentes" && !f.offset && f.limit === 40;
 }
 
-function consumirBuscaInicial(f: BuscaFilters): { data: Imovel[]; count: number } | null {
+export function consumirBuscaInicial(f: BuscaFilters): { data: Imovel[]; count: number } | null {
   if (typeof window === "undefined") return null;
   const w = window as Window & { __UH_BUSCA__?: { rows?: Record<string, unknown>[]; count?: number } };
   const b = w.__UH_BUSCA__;

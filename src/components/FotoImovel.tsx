@@ -1,4 +1,4 @@
-import { useState, useEffect, forwardRef, useCallback, useRef } from "react";
+import { useState, useEffect, useLayoutEffect, forwardRef, useCallback, useRef } from "react";
 import { Home } from "lucide-react";
 
 interface FotoImovelProps {
@@ -25,10 +25,18 @@ export const FotoImovel = forwardRef<HTMLImageElement, FotoImovelProps>(function
   const [loaded, setLoaded] = useState(false);
   const [useOriginal, setUseOriginal] = useState(false);
 
-  useEffect(() => {
+  // Foto já no cache (ex.: veio pronta da borda): aparece na hora, sem esmaecer.
+  const imgRef = useRef<HTMLImageElement | null>(null);
+  const setImg = useCallback((el: HTMLImageElement | null) => {
+    imgRef.current = el;
+    if (typeof ref === "function") ref(el);
+    else if (ref) ref.current = el;
+  }, [ref]);
+  useLayoutEffect(() => {
     setErro(false);
-    setLoaded(false);
     setUseOriginal(false);
+    const el = imgRef.current;
+    setLoaded(!!el && el.complete && el.naturalWidth > 0);
   }, [src]);
 
   const handleLoad = useCallback(() => setLoaded(true), []);
@@ -83,7 +91,7 @@ export const FotoImovel = forwardRef<HTMLImageElement, FotoImovelProps>(function
         />
       )}
       <img
-        ref={ref}
+        ref={setImg}
         src={useOriginal ? fallbackSrc : src}
         srcSet={useOriginal ? undefined : srcSet}
         alt={alt}

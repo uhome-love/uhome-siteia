@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect, forwardRef } from "react";
+import { preAtivo } from "@/lib/dobra";
 import { useNavigate } from "react-router-dom";
 import { AuthModal } from "@/components/AuthModal";
 import { Heart, TrendingDown, Sparkles, Clock } from "lucide-react";
@@ -159,6 +160,8 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
     if (typeof ref === "function") ref(node);
     else if (ref) (ref as React.MutableRefObject<HTMLAnchorElement | null>).current = node;
   }, [ref]);
+  // Primeiros cards já vieram prontos da borda: aparecem sem animação de entrada.
+  const [semEntrada] = useState(preAtivo);
   const price = formatPreco(imovel.preco);
   const area = imovel.area_util ?? imovel.area_total ?? 0;
 
@@ -237,7 +240,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
       ref={mergedRef}
       href={detailHref}
       onClick={handleCardClick}
-      initial={index < 6 ? { opacity: 0, y: 8 } : false}
+      initial={index < 6 && !semEntrada ? { opacity: 0, y: 8 } : false}
       animate={index < 6 ? { opacity: 1, y: 0 } : undefined}
       transition={index < 6 ? { duration: 0.3, delay: Math.min(index * 0.03, 0.15) } : undefined}
       className={`relative block w-full min-w-0 cursor-pointer select-none outline-none [&_*]:outline-none [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] no-underline text-inherit ${highlighted ? "sm:rounded-xl sm:ring-2 sm:ring-primary" : ""}`}

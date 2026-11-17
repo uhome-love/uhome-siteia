@@ -168,7 +168,7 @@ export default function ProdutoFocoPage() {
 
       <main>
         {/* Abertura com galeria */}
-        <section className="mx-auto max-w-6xl sm:px-8 sm:pt-6">
+        <section data-uh-capa className="mx-auto max-w-6xl sm:px-8 sm:pt-6">
           <div className="relative overflow-hidden bg-muted sm:rounded-2xl">
             <div ref={trilho} onScroll={(e) => { const el = e.currentTarget; setFotoAtual(Math.round(el.scrollLeft / el.clientWidth)); }} className="flex snap-x snap-mandatory overflow-x-auto [scrollbar-width:none]">
               {(fotos.length ? fotos : p.capa_url ? [{ url: p.capa_url }] : []).map((f, i) => (

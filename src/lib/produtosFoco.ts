@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { dadosDobra } from "@/lib/dobra";
 import { supabase } from "@/lib/supabaseLazy";
 
 export interface MidiaFoco { url: string; url_mobile?: string | null; legenda?: string | null; w?: number; h?: number; categoria?: string | null }
@@ -138,6 +139,10 @@ export function useCampanhasAtivas() {
   return useQuery({
     queryKey: ["campanhas-ativas"],
     staleTime: 5 * 60_000,
+    initialData: () => {
+      const c = dadosDobra("campanhas");
+      return c ? (c as Campanha[]).filter((x) => campanhaVigente(x)) : undefined;
+    },
     queryFn: async () => {
       const { data, error } = await supabase
         .from("campanhas")

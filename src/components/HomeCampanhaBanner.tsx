@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { FotoPerto } from "@/components/FotoPerto";
 import { Link } from "react-router-dom";
 import { ArrowRight, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import { useCorretor } from "@/contexts/CorretorContext";
@@ -99,7 +100,7 @@ export function HomeCampanhaBanner() {
             {lista.map((p) => (
               <Link key={p.id} to={prefixLink(`/em-foco/${p.slug}`)} className="group w-[72vw] max-w-[260px] flex-shrink-0 snap-start overflow-hidden rounded-2xl border border-border/60 bg-card sm:w-64">
                 <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-                  {p.capa_url && <img src={p.capa_url} alt={p.nome} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />}
+                  {p.capa_url && <FotoPerto src={p.capa_url} alt={p.nome} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />}
                   {c && <span className="absolute left-2 top-2 rounded-full bg-natal px-2.5 py-1 font-body text-[10px] font-bold uppercase tracking-wide text-natal-gold">{black ? "Black Natal" : "Natal"}</span>}
                 </div>
                 <div className="p-4">

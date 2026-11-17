@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabaseLazy";
+import { dadosDobra } from "@/lib/dobra";
 
 /** Contagem única de imóveis disponíveis, compartilhada por toda a página (mesmo número em todo lugar). */
 export function useTotalImoveis() {
@@ -12,6 +13,7 @@ export function useTotalImoveis() {
         .eq("status", "disponivel");
       return count && count > 0 ? count : null;
     },
+    initialData: () => dadosDobra("total") || undefined,
     staleTime: 10 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
   });

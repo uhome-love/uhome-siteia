@@ -131,6 +131,32 @@ gtag("consent", "default", {
         <p><a href="https://uhome.com.br/busca">Buscar imóveis</a> · <a href="https://uhome.com.br/bairros">Ver bairros</a> · <a href="https://uhome.com.br/blog">Blog</a></p>
       </div>
     </div>
+    <style>#uh-pre[data-uh-alvo]~#root{visibility:hidden;position:absolute;top:0;left:0;right:0}</style>
+    <script>
+      /* Primeira tela pronta da borda (#uh-pre): fica até o app montar o mesmo trecho (data-uh-alvo) e sai no mesmo quadro. */
+      (function () {
+        var p = document.getElementById("uh-pre"), r = document.getElementById("root");
+        if (!p || !r || !p.getAttribute("data-uh-alvo")) return;
+        var max = p.getAttribute("data-uh-max");
+        if (max && !matchMedia("(max-width: " + max + "px)").matches) { p.remove(); return; }
+        var alvo = p.getAttribute("data-uh-alvo"), caminho = location.pathname, o, t;
+        function sair() { if (o) o.disconnect(); clearTimeout(t); if (p.parentNode) p.remove(); }
+        /* Espera a foto principal do app estar pronta (vem do cache) para a troca não mostrar um quadro vazio. */
+        function quandoPronto(a) {
+          o.disconnect();
+          var im = a.matches("img") ? a : a.querySelector("img[fetchpriority=high]");
+          if (!im || (im.complete && im.naturalWidth)) return sair();
+          var feito = false, fim = function () { if (feito) return; feito = true; requestAnimationFrame(function () { requestAnimationFrame(sair); }); };
+          im.addEventListener("load", fim); im.addEventListener("error", fim); setTimeout(fim, 1500);
+        }
+        o = new MutationObserver(function () {
+          if (location.pathname !== caminho) return sair();
+          var a = r.querySelector(alvo); if (a) quandoPronto(a);
+        });
+        o.observe(r, { childList: true, subtree: true });
+        t = setTimeout(sair, 10000);
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

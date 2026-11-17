@@ -4,7 +4,7 @@
 // 1) ROBÔS (comportamento da versão de 16/11, sem mudança): user-agent em BOT_UA e caminho em SSR_PATH
 //    recebem o HTML do ssr-render, chamado com Accept: text/html e user-agent "WhatsApp/2.0",
 //    respondido com Cache-Control public, s-maxage=3600.
-// 2) PESSOAS: HTML com cache curto na borda; /busca (padrão), /em-foco/x e /campanha/x recebem
+// 2) PESSOAS: HTML com cache curto na borda; / (home), /busca (padrão), /em-foco/x e /campanha/x recebem
 //    a primeira dobra do site-dobra, esperando no máximo 300 ms.
 // 3) Arquivos (/assets, /fonts, /images) NÃO passam por aqui: cache longo é regra de cache da Cloudflare.
 // Qualquer erro ou demora: a página normal passa direto (fail open).
@@ -13,8 +13,10 @@
 
 const FN = "https://huigglwvvzuwwyqvpmec.supabase.co/functions/v1/";
 
-// ATENÇÃO: conferir com a lista BOT_UA da versão de 16/11 no ar e colar a mesma, se diferir.
-const BOT_UA = /googlebot|bingbot|whatsapp|facebookexternalhit|facebot|meta-externalagent|instagram|twitterbot|linkedinbot|slackbot|telegrambot|discordbot|pinterest|skypeuripreview/i;
+// ATENÇÃO: a lista que vale é a que está no ar (definida pela central). Ao atualizar o Worker, mantenha
+// a BOT_UA do ar. Nunca incluir "instagram" solto: o navegador do app do Instagram traz essa palavra
+// e quem abre anúncio receberia a página de robô.
+const BOT_UA = /googlebot|bingbot|whatsapp|facebookexternalhit|facebot|meta-externalagent|twitterbot|linkedinbot|slackbot|telegrambot|discordbot|pinterest|skypeuripreview/i;
 // Mesmos caminhos de SSR da versão de 16/11: /, /imovel/, /em-foco/x, /campanha/x, /investir-studios, /c/...
 const SSR_PATH = /^\/(?:$|imovel\/|em-foco\/[^/]+|campanha\/[^/]+|investir-studios|c\/)/;
 
@@ -77,6 +79,7 @@ async function dobra(p, ctx) {
 
 function caminhoDobra(url) {
   const p = url.pathname;
+  if (p === "/") return p; // capa da home (igual para qualquer parâmetro de anúncio)
   if (p === "/busca") return url.search ? null : p; // só a busca padrão, sem filtros
   return /^(\/c\/[^/]+)?\/(em-foco|campanha)\/[^/]+\/?$/.test(p) ? p : null;
 }

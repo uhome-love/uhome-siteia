@@ -12,6 +12,7 @@ import { CIDADES_PERMITIDAS } from "@/services/imoveis";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { prefetchBusca } from "@/lib/prefetch";
 import { useCampanhaDestaque } from "@/lib/produtosFoco";
+import { preAtivo } from "@/lib/dobra";
 import { NATAL_ART } from "@/components/foco/NatalArt";
 import gasometroDesktop from "@/assets/gasometro-desktop.webp.asset.json";
 import gasometroTablet from "@/assets/gasometro-tablet.webp.asset.json";
@@ -58,6 +59,15 @@ export function HeroSection() {
   const queryClient = useQueryClient();
   const { prefixLink } = useCorretor();
   const [modo, setModo] = useState<"comprar" | "ia" | "anunciar">("comprar");
+  // Veio com a capa pronta da borda: sem animação de entrada, para a troca não piscar.
+  const [semEntrada] = useState(preAtivo);
+  // O zoom lento da foto continua de onde a capa pronta estava (sem "pulo" na troca).
+  const [atrasoZoom] = useState(() => {
+    if (typeof document === "undefined") return 0;
+    const el = document.querySelector("#uh-pre .uh-kenburns") as HTMLElement | null;
+    const t = el?.getAnimations?.()[0]?.currentTime;
+    return typeof t === "number" ? -Math.round(t) : 0;
+  });
   const [aiQuery, setAiQuery] = useState("");
 
   // Search state
@@ -157,7 +167,7 @@ export function HeroSection() {
   const quartosOptions = ["Qualquer", "1+", "2+", "3+", "4+"];
 
   return (
-    <section className="relative flex min-h-[auto] items-center overflow-hidden pt-16 lg:min-h-[92vh]">
+    <section data-uh-capa className="relative flex min-h-[auto] items-center overflow-hidden pt-16 lg:min-h-[92vh]">
       {/* Responsive cover sourced from the supplied Gasômetro image. */}
       <div className="absolute inset-0 bg-muted">
         <picture>
@@ -172,6 +182,7 @@ export function HeroSection() {
             width={1612}
             height={768}
             className="uh-kenburns absolute inset-0 h-full w-full object-cover object-[35%_center] lg:object-center"
+            style={atrasoZoom ? { animationDelay: `${atrasoZoom}ms` } : undefined}
           />
         </picture>
         <div
@@ -187,7 +198,7 @@ export function HeroSection() {
         <div className="flex flex-col items-start gap-6 lg:flex-row lg:items-center lg:gap-16">
           {/* Left — headline (CSS animation for instant LCP) */}
           <div
-            className="max-w-lg animate-[heroSlideIn_0.7s_cubic-bezier(0.16,1,0.3,1)_both]"
+            className={`max-w-lg ${semEntrada ? "" : "animate-[heroSlideIn_0.7s_cubic-bezier(0.16,1,0.3,1)_both]"}`}
           >
             <p className="mb-3 font-body text-xs font-semibold uppercase tracking-[0.2em] text-white/70 sm:mb-4">
               Porto Alegre & Região
@@ -212,7 +223,7 @@ export function HeroSection() {
 
           {/* Right — card (CSS animation for instant LCP) */}
           <div
-            className="w-full max-w-md rounded-2xl bg-card p-5 shadow-2xl sm:p-7 md:max-w-lg lg:ml-auto animate-[heroCardIn_0.6s_0.2s_cubic-bezier(0.16,1,0.3,1)_both]"
+            className={`w-full max-w-md rounded-2xl bg-card p-5 shadow-2xl sm:p-7 md:max-w-lg lg:ml-auto ${semEntrada ? "" : "animate-[heroCardIn_0.6s_0.2s_cubic-bezier(0.16,1,0.3,1)_both]"}`}
           >
             {/* Toggle */}
             <div className="mb-4 flex gap-2 sm:mb-6">

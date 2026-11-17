@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { FotoPerto } from "@/components/FotoPerto";
 import { Link } from "react-router-dom";
 import { Star, ChevronLeft, ChevronRight, MessageCircle } from "lucide-react";
 import { useGoogleReviews } from "@/hooks/useGoogleReviews";
@@ -94,7 +95,7 @@ export function HomeConfianca() {
                 return (
                   <div key={c.id} className="w-44 flex-shrink-0 snap-start overflow-hidden rounded-2xl border border-border bg-card sm:w-52">
                     <Link to={`/c/${c.slug_ref}`} className="block aspect-[4/5] overflow-hidden bg-muted">
-                      <img src={c.foto_url} alt={c.nome} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 hover:scale-105" />
+                      <FotoPerto src={c.foto_url} alt={c.nome} className="h-full w-full object-cover transition-transform duration-500 hover:scale-105" />
                     </Link>
                     <div className="p-3">
                       <p className="truncate font-body text-sm font-bold text-foreground">{c.nome}</p>

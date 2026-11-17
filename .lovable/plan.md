@@ -5,10 +5,24 @@ Ordem: 1 Medição, 4 Prévia do link (urgente), 2 Busca, 3 Página de produto +
 ## Diagnóstico confirmado da prévia (item 4)
 - Já existe uma função que monta a prévia certa: pedida direto, ela devolve "Open Bosque | Passo d'Areia, Porto Alegre | Uhome em Foco".
 - O problema é que o uhome.com.br nunca chama essa função: o WhatsApp recebe o HTML genérico (og-default.jpg). Falta o "desvio" dos robôs de prévia para ela.
-- A hospedagem do Lovable só entrega o mesmo HTML para todos os endereços, e não há como pré-renderizar por rota neste tipo de projeto. A solução simples e estável é um **Worker da Cloudflare** (o DNS já está lá):
-  - se o visitante for robô (WhatsApp, facebookexternalhit, Instagram, Twitterbot, LinkedInBot, Slackbot, TelegramBot, Googlebot, Bingbot) e o endereço for /em-foco/*, /campanha/*, /investir-studios, /imovel/*, / → serve o HTML da função;
-  - qualquer outro visitante passa direto, sem mudança. Pessoas não sentem diferença de velocidade.
-- **O que você vai precisar fazer** (eu te entrego o código pronto e o passo a passo com prints): Cloudflare > Workers e Pages > Criar Worker > colar o código > Implantar > em "Rotas" adicionar `uhome.com.br/*` e `www.uhome.com.br/*`. Cerca de 5 minutos.
+- A hospedagem do Lovable entrega o mesmo HTML para todos os endereços. Solução: um **Worker da Cloudflare** que desvia só os robôs de prévia para a função.
+- Robôs no desvio: WhatsApp, facebookexternalhit/Facebot, Instagram, Twitterbot, LinkedInBot, Slackbot, TelegramBot. **Googlebot e Bingbot ficam fora**: conferi que o HTML da função tem só título, descrição e 1 imagem, não o conteúdo visível da página. O Google continua lendo a página normal (ele executa JavaScript).
+- Rotas só das páginas (nada de `uhome.com.br/*`): `uhome.com.br/`, `uhome.com.br/em-foco*`, `uhome.com.br/campanha/*`, `uhome.com.br/investir-studios*`, `uhome.com.br/imovel/*`, e as mesmas com `www.`. Imagens e scripts não passam pelo Worker.
+- Deixar passar (fail open): no código, qualquer erro ou demora acima de 3 s devolve a página normal; e no painel, em Worker > Configurações > Rotas, cada rota fica com **"Falha em caso de erro: Abrir (Fail open)"** para que, se passar das 100 mil requisições/dia, a Cloudflare sirva o site direto em vez de erro.
+
+### Proxy (nuvem laranja) — já conferido
+- O uhome.com.br já está com proxy ligado: o endereço responde por IPs da Cloudflare e o cabeçalho diz "server: cloudflare". Então a rota funciona sem mudar nada no DNS, e o domínio e o certificado do Lovable continuam como estão hoje.
+- Onde conferir: Cloudflare > uhome.com.br > DNS > Registros; nas linhas `uhome.com.br` e `www`, a coluna "Status do proxy" deve mostrar a nuvem laranja "Com proxy". Não altere esses registros.
+- Observação: o www.uhome.com.br aparece no Lovable como "drifted" (registro diferente do esperado); vou checar isso à parte e te dizer o ajuste.
+
+### Passo a passo do Worker (você faz, ~5 min; eu entrego o código)
+1. Cloudflare > Workers e Pages > Criar > Criar Worker > nome `uhome-previa` > Implantar.
+2. Editar código > colar o código que vou te mandar > Implantar.
+3. No Worker: Configurações > Domínios e rotas > Adicionar > Rota > zona uhome.com.br > colar cada rota acima > modo de falha "Abrir" > Adicionar.
+4. Me avisar; eu rodo os testes com curl e passo os links para o Depurador do Facebook.
+
+### Alerta de texto
+- A descrição do Open Bosque no banco fala "Minha Casa Minha Vida" e aparece na prévia. Pela regra "sem MCMV", vou tirar esse trecho da prévia (sem mudar o dado do produto) — me diga se prefere manter.
 
 ## 1. Medição
 - formulario_iniciado passa a gravar qual formulário: agendar_visita, receber_informacoes, natal, busca, captacao. Campo da LIA deixa de contar; LIA ganha evento próprio lia_mensagem.
@@ -48,7 +62,7 @@ Ordem: 1 Medição, 4 Prévia do link (urgente), 2 Busca, 3 Página de produto +
 - Regras mantidas: sem "tabela"/"simulação", sem MCMV/FGTS/"barato", nenhum dado de produto inventado, anúncios intocados.
 
 ## Detalhes técnicos
-- Worker: checa User-Agent por regex de bots e o caminho; faz fetch para `/functions/v1/ssr-render?path=...` com cache de 10 min; em erro, cai no `fetch(request)` original.
+- Worker: regex de User-Agent só de robôs de prévia; demais passam com `fetch(request)`; bots chamam `/functions/v1/ssr-render?path=...` com timeout 3 s e cache 10 min; qualquer erro cai no `fetch(request)`; rotas configuradas com fail open.
 - funilAnuncio.ts: `formulario` no payload via `data-form` no form mais próximo; ignora inputs dentro do widget LIA.
 - Novos campos do agendamento vão em `contexto` (jsonb existente), repassados pelo sync-to-crm em dados_site.
 - Imagens: WebP 2400 e 800 via lovable-assets, `srcset/sizes`.

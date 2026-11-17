@@ -332,6 +332,8 @@ html { scroll-behavior: smooth; }
  .uhs-mobile-tabs{display:flex;justify-content:space-between;gap:2px}.uhs-mobile-tabs .uhs-tab{font-size:12px;gap:6px;height:64px;padding:0 8px}.uhs-tab svg{height:22px;width:22px}
  .uhs-bottom-nav{display:flex;position:fixed;inset:auto 0 0;z-index:var(--camada-barra-celular);height:64px;padding-bottom:env(safe-area-inset-bottom);border-top:1px solid var(--line);background:var(--surface)}
  .uhs-lia-float{right:16px;bottom:calc(var(--uh-bottom-height) + 16px + var(--uh-cookie,0px));width:60px;height:60px;padding:4px}.uhs-lia-float .uhs-lia-label{display:none}
+ /* A barra de ação e a navegação inferior já oferecem conversa; não sobrepor o rosto. */
+ body:has([data-barra-baixo]:not(nav)) .uhs-lia-float{display:none}
  .uhs-contact-bar{bottom:var(--uh-bottom-height)!important}.uhs-search-tools{bottom:var(--uh-bottom-height)!important}
  .uhs-site-footer{padding-bottom:var(--uh-bottom-height)}
 }

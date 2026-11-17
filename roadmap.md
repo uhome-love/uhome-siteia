@@ -1,7 +1,10 @@
 # Roadmap — rodada pós-auditoria 16/11
 - [x] A / rodada 4: capa 44,9 KB ativada, preconnect como alternativa autorizada, foto da tela pronta conservada; trace local antes da execução do app
 - [x] B / parte 1: tokens, cabeçalho/barras, rodapé, Lia e modelos versionados; 390/1440 px e fluxos conferidos
-- [ ] Rodada 4: publicar app e central medir no Brasil; mediana oficial ≤2,5 s ainda não verificada
+- [x] Rodada 4 publicada: central confirmou LCP 1,0/2,4/1,5/1,0 s e CLS zero nas quatro páginas
+- [x] Corrigir CLS: reprodução com CSS tardio 1,000 → 0,000; regras da troca inline, mesma foto conservada
+- [ ] PageSpeed oficial antes/depois home/busca: bloqueado por cota diária da API (429); depois depende de publicação
+- [x] Corrigir Lia sobre barra de ação: rosto oculto no celular e conversa do Open Bosque abre Lia; fluxo conferido
 - [x] Jornada do site: identidade e atribuição, eventos sem dados pessoais, consentimento e robôs
 - [x] Jornada do site: deduplicação WhatsApp, vínculo de lead e envio completo/contínuo ao CRM existente
 - [x] Jornada do site: testes em 3 sessões, consultas de duplicação/robôs e contrato de entrega

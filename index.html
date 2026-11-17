@@ -133,7 +133,17 @@ gtag("consent", "default", {
         <p><a href="https://uhome.com.br/busca">Buscar imóveis</a> · <a href="https://uhome.com.br/bairros">Ver bairros</a> · <a href="https://uhome.com.br/blog">Blog</a></p>
       </div>
     </div>
-    <style>#uh-pre[data-uh-alvo]~#root{visibility:hidden;position:absolute;top:0;left:0;right:0}</style>
+    <style>
+      /* A troca não pode depender do CSS assíncrono: remover data-uh-alvo e
+         revelar o app mantém a foto pronta fora do fluxo no mesmo quadro. */
+      #uh-pre[data-uh-alvo]~#root{visibility:hidden;position:absolute;top:0;left:0;right:0}
+      .uh-foto-retida{position:absolute;inset:0;pointer-events:none;z-index:0}
+      .uh-foto-retida *{visibility:hidden!important}
+      .uh-foto-retida .uh-foto-original{visibility:visible!important}
+      .uh-app-com-foto{position:relative;z-index:1}
+      .uh-app-com-foto>.min-h-screen,.uh-app-com-foto [data-uh-capa]>div:first-child{background:transparent!important}
+      .uh-app-com-foto .uh-foto-espelho{opacity:0!important}
+    </style>
     <script>
       /* Primeira tela pronta da borda (#uh-pre): fica até o app montar o mesmo trecho (data-uh-alvo) e sai no mesmo quadro. */
       (function () {

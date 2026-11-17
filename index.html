@@ -2,6 +2,16 @@
 <html lang="pt-BR">
   <head>
     <script>
+// Se um arquivo da versão anterior sumir (HTML em cache logo após publicar), recarrega uma vez pedindo HTML novo.
+window.addEventListener("error", function (e) {
+  var t = e.target, u = t && (t.src || t.href) || "";
+  if (!/\/assets\//.test(u)) return;
+  try { if (sessionStorage.getItem("uh_rec")) return; sessionStorage.setItem("uh_rec", "1"); } catch (x) { return; }
+  var q = new URLSearchParams(location.search); q.set("__uh_novo", Date.now());
+  location.replace(location.pathname + "?" + q.toString() + location.hash);
+}, true);
+    </script>
+    <script>
 window.dataLayer = window.dataLayer || [];
 function gtag() {
   dataLayer.push(arguments);

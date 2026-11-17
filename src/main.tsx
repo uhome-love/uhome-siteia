@@ -21,6 +21,13 @@ instalarJornada();
 // Montserrat (400–800) is self-hosted in index.css; no other font families load
 import "./index.css";
 
+// Recuperação de arquivo ausente concluída: limpa a marca e o parâmetro técnico da URL.
+try {
+  sessionStorage.removeItem("uh_rec");
+  const u = new URL(location.href);
+  if (u.searchParams.has("__uh_novo")) { u.searchParams.delete("__uh_novo"); history.replaceState(history.state, "", u.toString()); }
+} catch { /* ignore */ }
+
 if (import.meta.env.DEV) {
   import("./utils/testCorretorFlow").then(m => m.setupCorretorFlowTest());
 }

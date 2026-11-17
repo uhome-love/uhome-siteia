@@ -22,7 +22,7 @@ function searchImageUrl(src: string, width: number): string {
   } catch { return src; }
 }
 
-async function busca() {
+async function calcularBusca() {
   const [{ data }, { data: count }] = await Promise.all([
     supabase.from("imoveis").select(LISTING_COLUMNS)
       .eq("status", "disponivel").eq("finalidade", "venda").not("fotos", "is", null).neq("fotos", "[]")
@@ -40,6 +40,26 @@ async function busca() {
       : `<link rel="preload" as="image" fetchpriority="high" href="${esc(foto)}">`;
   }
   return { head, pre: "", script: rows.length ? `window.__UH_BUSCA__=${json({ rows, count: count ?? rows.length })};` : "" };
+}
+
+/** Busca padrão pré-calculada: lê uma linha pronta (rápido); renova em segundo plano se passou de 4 min. */
+async function busca() {
+  const { data } = await supabase.from("site_dobra_cache").select("corpo, atualizado_em").eq("chave", "busca").maybeSingle();
+  const idade = data ? Date.now() - new Date(data.atualizado_em).getTime() : Infinity;
+  if (idade > 4 * 60_000) {
+    // @ts-ignore EdgeRuntime existe no ambiente das funções
+    const tarefa = renovarBusca().catch((e) => console.error("renovar busca", e));
+    // @ts-ignore
+    if (globalThis.EdgeRuntime?.waitUntil) globalThis.EdgeRuntime.waitUntil(tarefa);
+  }
+  // Mais velho que 15 min (ou inexistente): não entrega, a página busca sozinha.
+  return data && idade <= 15 * 60_000 ? data.corpo as { head: string; pre: string; script: string } : { head: "", pre: "", script: "" };
+}
+
+async function renovarBusca() {
+  const corpo = await calcularBusca();
+  if (corpo.script) await supabase.from("site_dobra_cache").upsert({ chave: "busca", corpo, atualizado_em: new Date().toISOString() });
+  return corpo;
 }
 
 async function produto(slug: string) {
@@ -79,10 +99,13 @@ Deno.serve(async (req) => {
   const vazio = { head: "", pre: "", script: "" };
   let corpo = vazio, ttl = 120;
   try {
-    const bruto = new URL(req.url).searchParams.get("path") ?? "";
+    const q = new URL(req.url).searchParams;
+    const corpoPost = req.method === "POST" ? await req.json().catch(() => ({})) : {};
+    const bruto = String(corpoPost.path ?? q.get("path") ?? "");
+    const renovar = corpoPost.renovar === true || q.get("renovar") === "1";
     const corretor = /^\/c\/[^/]+/.test(bruto);
     const path = bruto.replace(/^\/c\/[^/]+/, "").replace(/\/$/, "") || "/";
-    if (path === "/busca") corpo = await busca();
+    if (path === "/busca") corpo = renovar ? await renovarBusca() : await busca();
     else if (path.startsWith("/em-foco/")) { corpo = await produto(decodeURIComponent(path.slice(9))); ttl = 600; }
     else if (path.startsWith("/campanha/") && !corretor) { corpo = await campanha(decodeURIComponent(path.slice(10))); ttl = 60; }
   } catch (e) {

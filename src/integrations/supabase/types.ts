@@ -1300,6 +1300,24 @@ export type Database = {
         }
         Relationships: []
       }
+      site_dobra_cache: {
+        Row: {
+          atualizado_em: string
+          chave: string
+          corpo: Json
+        }
+        Insert: {
+          atualizado_em?: string
+          chave: string
+          corpo: Json
+        }
+        Update: {
+          atualizado_em?: string
+          chave?: string
+          corpo?: Json
+        }
+        Relationships: []
+      }
       site_journey_deliveries: {
         Row: {
           attempts: number

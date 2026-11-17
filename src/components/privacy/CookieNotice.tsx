@@ -11,7 +11,7 @@ function alturaBarraBaixo(): number {
   let h = 0;
   document.querySelectorAll<HTMLElement>('[data-barra-baixo]').forEach((el) => {
     const r = el.getBoundingClientRect();
-    if (r.height > 0 && r.bottom >= window.innerHeight - 2) h = Math.max(h, r.height);
+    if (r.height > 0 && r.bottom >= window.innerHeight - 150) h = Math.max(h, window.innerHeight - r.top);
   });
   return Math.round(h);
 }

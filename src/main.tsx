@@ -8,6 +8,7 @@ import { instalarRastreioWhatsApp } from "./services/whatsappTracker";
 import App from "./App.tsx";
 import { instalarJornada } from "./lib/journeyBrowser";
 import { initGA4 } from "./lib/gtag";
+performance.mark("uh-app-evaluation");
 initGA4();
 
 // Capture UTMs + referrer on first page load (first-touch attribution)

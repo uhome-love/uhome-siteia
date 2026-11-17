@@ -16,7 +16,7 @@ import { preAtivo } from "@/lib/dobra";
 import { NATAL_ART } from "@/components/foco/NatalArt";
 import gasometroDesktop from "@/assets/gasometro-desktop.webp.asset.json";
 import gasometroTablet from "@/assets/gasometro-tablet.webp.asset.json";
-import gasometroMobile from "@/assets/gasometro-mobile.webp.asset.json";
+import gasometroMobile from "@/assets/gasometro-mobile-45.webp.asset.json";
 
 function HeroFocoButtons() {
   const { prefixLink } = useCorretor();
@@ -167,7 +167,7 @@ export function HeroSection() {
   const quartosOptions = ["Qualquer", "1+", "2+", "3+", "4+"];
 
   return (
-    <section data-uh-capa className="relative flex min-h-[auto] items-center overflow-hidden pt-16 lg:min-h-[92vh]">
+    <section data-uh-capa className="relative flex min-h-[auto] items-center overflow-hidden pt-[var(--uh-header-height)] lg:min-h-[92vh]">
       {/* Responsive cover sourced from the supplied Gasômetro image. */}
       <div className="absolute inset-0 bg-muted">
         <picture>

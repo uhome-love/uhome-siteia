@@ -1,6 +1,7 @@
 # Roadmap — rodada pós-auditoria 16/11
-- [ ] A / rodada 4: capa 44.858 bytes preparada e preconnect no início do head; preservar LCP e gerar fotos locais ainda pendentes; Lighthouse 13 publicado bloqueado por HTTP 403 regional (docs/rodada4-status.md)
-- [ ] B / parte 1: não iniciado; aguarda conclusão e conferência do A conforme ordem do dono
+- [x] A / rodada 4: capa 44,9 KB ativada, preconnect como alternativa autorizada, foto da tela pronta conservada; trace local antes da execução do app
+- [x] B / parte 1: tokens, cabeçalho/barras, rodapé, Lia e modelos versionados; 390/1440 px e fluxos conferidos
+- [ ] Rodada 4: publicar app e central medir no Brasil; mediana oficial ≤2,5 s ainda não verificada
 - [x] Jornada do site: identidade e atribuição, eventos sem dados pessoais, consentimento e robôs
 - [x] Jornada do site: deduplicação WhatsApp, vínculo de lead e envio completo/contínuo ao CRM existente
 - [x] Jornada do site: testes em 3 sessões, consultas de duplicação/robôs e contrato de entrega

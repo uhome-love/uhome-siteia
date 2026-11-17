@@ -304,7 +304,7 @@ const Search = () => {
       parts.push(`em ${city}`);
     }
     if (filters.quartos) parts.push(`com ${filters.quartos}+ quartos`);
-    document.title = `${parts.join(" ")} | Uhome Imóveis`;
+    document.title = `${parts.join(" ")} | Uhome · Você e seu novo lar | Imóveis em Porto Alegre e Canoas`;
     return () => { document.title = "Uhome Imóveis | Apartamentos e Casas à Venda em Porto Alegre"; };
   }, [filters.tipo, filters.bairro, filters.cidade, filters.quartos]);
 
@@ -717,17 +717,18 @@ const Search = () => {
   };
 
   const filterDesc = describeFilters(filters);
+  useEffect(() => { const abrir = () => setMobileFilters(true); window.addEventListener("uhome:abrir-filtros", abrir); return () => window.removeEventListener("uhome:abrir-filtros", abrir); }, []);
   const animatedTotal = useCountUp(total);
 
   return (
     <div className="flex flex-col bg-background overflow-x-hidden min-h-screen lg:h-screen lg:max-h-screen lg:overflow-hidden">
       <Navbar />
       {/* Spacer to push content below the fixed navbar */}
-      <div className="shrink-0" style={{ height: 56 }} />
+      <div className="uh-header-spacer" />
 
       {/* Filter bar — switches between normal and AI */}
       {modoIA ? (
-        <div className="sticky top-14 z-10 border-b border-border bg-background px-4 py-3 sm:px-6">
+        <div className="sticky uh-header-top z-10 border-b border-border bg-background px-4 py-3 sm:px-6">
           <div className="flex items-center gap-2 sm:gap-3">
             <div
               className="flex flex-1 items-center gap-2.5 rounded-xl border-[1.5px] border-primary bg-primary/[0.03] px-3 py-2.5 sm:px-4 sm:py-3"
@@ -1023,7 +1024,7 @@ const Search = () => {
       </div>
 
       {/* Mobile: floating bottom bar — QuintoAndar style */}
-      <div className="fixed bottom-0 left-0 right-0 z-30 flex items-center justify-center gap-3 border-t border-border bg-background/95 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-sm lg:hidden">
+      <div className="uhs-search-tools fixed bottom-0 left-0 right-0 z-30 flex items-center justify-center gap-3 border-t border-border bg-background/95 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-sm lg:hidden">
         <button
           onClick={() => setMobileMap(true)}
           className="flex items-center gap-2 rounded-full border border-border bg-card px-5 py-2.5 font-body text-[13px] font-semibold text-foreground shadow-sm transition-all active:scale-95"

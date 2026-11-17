@@ -48,7 +48,7 @@ export default function CampanhaPage() {
 
   useEffect(() => {
     if (!c) return;
-    document.title = `${black ? "Black Natal Uhome" : c.titulo} | Imóveis com condição especial | Uhome`;
+    document.title = `${black ? "Black Natal Uhome" : c.titulo} | Uhome · Você e seu novo lar | Imóveis em Porto Alegre e Canoas`;
     document.querySelector('meta[name="description"]')?.setAttribute("content", (c.subtitulo ?? "").slice(0, 158));
   }, [c, black]);
 
@@ -73,7 +73,7 @@ export default function CampanhaPage() {
   return (
     <div className="min-h-screen bg-background pb-20 lg:pb-0">
       <Navbar />
-      <main className="pt-14">
+      <main className="pt-[var(--uh-header-height)]">
         <section className={`relative overflow-hidden ${tema}`}>
           <NatalLuzes />
           <div className="relative mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:py-10">
@@ -162,7 +162,7 @@ export default function CampanhaPage() {
           </div>
         </section></Reveal>
       </main>
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-natal-gold/30 bg-natal-deep/95 p-3 backdrop-blur lg:hidden" style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}>
+      <div data-barra-baixo className="uhs-contact-bar fixed inset-x-0 bottom-0 z-40 border-t border-natal-gold/30 bg-natal-deep/95 p-3 backdrop-blur lg:hidden" style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}>
         {isDirectAccess && corretor ? (
           <Button asChild size="lg" className="w-full bg-natal-gold text-natal-deep hover:bg-natal-gold/90"><a href={`https://wa.me/${numero}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer"><MessageCircle /> Falar com {corretor.nome.split(" ")[0]}</a></Button>
         ) : (

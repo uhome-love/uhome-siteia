@@ -12,7 +12,7 @@ export function Footer() {
   const total = useTotalImoveis();
 
   return (
-    <footer className="border-t border-border bg-background">
+    <footer className="uhs-site-footer border-t border-border">
       {/* SEO Content Block — rich text for search engines */}
       <div className="border-b border-border bg-secondary/20 py-10">
         <div className="mx-auto max-w-7xl px-6">
@@ -66,7 +66,7 @@ export function Footer() {
           <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
             {/* Brand */}
             <div>
-              <UhomeLogo variant="full" height={28} />
+              <div className="uhs-footer-brand"><UhomeLogo variant="full" height={28} /><p className="font-body text-sm font-semibold">Você e seu novo lar.</p></div>
               <p className="mt-4 max-w-xs font-body text-sm leading-relaxed text-muted-foreground">
                 Imóveis em Porto Alegre com curadoria especializada e tecnologia de ponta.
               </p>

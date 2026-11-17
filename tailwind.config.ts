@@ -14,12 +14,18 @@ export default {
     },
     extend: {
       fontFamily: {
+        sans: ["Montserrat", "system-ui", "sans-serif"],
         display: ['"Montserrat"', "system-ui", "sans-serif"],
         body: ['"Montserrat"', "system-ui", "sans-serif"],
         mono: ["ui-monospace", "monospace"],
         natal: ['"Montserrat"', "system-ui", "sans-serif"],
       },
       colors: {
+        brand: { DEFAULT: "var(--brand)", acao: "var(--brand-acao)", strong: "var(--brand-strong)", soft: "var(--brand-soft)", light: "var(--brand-light)", text: "var(--brand-text)" },
+        ink: { DEFAULT: "var(--ink)", muted: "var(--ink-muted)" },
+        line: { DEFAULT: "var(--line)", strong: "var(--line-strong)" },
+        surface: { DEFAULT: "var(--surface)", alt: "var(--surface-alt)" },
+        whatsapp: "var(--whatsapp)", navy: "var(--navy-800)", gold: "var(--gold)",
         natal: {
           DEFAULT: "hsl(var(--natal))",
           deep: "hsl(var(--natal-deep))",
@@ -77,10 +83,10 @@ export default {
         },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        sm: "var(--radius-sm)", md: "var(--radius-md)", lg: "var(--radius-lg)", xl: "var(--radius-xl)", "2xl": "var(--radius-2xl)", pill: "var(--radius-pill)",
       },
+      boxShadow: { busca: "var(--shadow-busca)", flutuante: "var(--shadow-flutuante)", popover: "var(--shadow-popover)", pin: "var(--shadow-pin)" },
+      zIndex: { cabecalho: "var(--camada-cabecalho)", barra: "var(--camada-barra-celular)", lia: "var(--camada-lia)", modal: "var(--camada-modal)", mapa: "var(--camada-mapa-botao)" },
       keyframes: {
         "accordion-down": {
           from: { height: "0" },

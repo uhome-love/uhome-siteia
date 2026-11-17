@@ -3,7 +3,8 @@
 // "pre" com data-uh-alvo: o index.html troca pelo app quando o mesmo trecho monta (sem piscar nem duplicar).
 // Qualquer erro devolve campos vazios: a página segue normal (fail open).
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
-import { NAV, NAV_BUSCA, HERO, BUSCA_TOPO, BUSCA_GRADE, CABECALHO_FOCO, BOTOES_FOCO } from "./moldes.ts";
+import * as NOVO from "./moldes.ts";
+import { NAV, NAV_BUSCA, HERO, BUSCA_TOPO, BUSCA_GRADE, CABECALHO_FOCO, BOTOES_FOCO } from "./moldes-legado.ts";
 
 const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 const LISTING_COLUMNS = "id,slug,tipo,finalidade,status,destaque,preco,preco_condominio,area_total,area_util,quartos,banheiros,vagas,bairro,cidade,uf,publicado_em,foto_principal,fase";
@@ -12,6 +13,31 @@ const SELO = "/__l5e/assets-v1/f588f789-17e9-4ae1-b6c7-fcb6b4fb0e8c/selo_natal_c
 
 const esc = (s: unknown) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const json = (o: unknown) => JSON.stringify(o).replace(/</g, "\\u003c").replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029");
+
+/** O Worker não precisa mudar: o HTML publicado decide, antes de pintar, qual molde usar. */
+function compativel(corpo: Corpo): Corpo {
+  let novo = corpo.pre;
+  const pares = [[NAV_BUSCA, NOVO.NAV_BUSCA], [NAV, NOVO.NAV], [HERO, NOVO.HERO], [BUSCA_TOPO, NOVO.BUSCA_TOPO], [BUSCA_GRADE, NOVO.BUSCA_GRADE], [CABECALHO_FOCO, NOVO.CABECALHO_FOCO], [BOTOES_FOCO, NOVO.BOTOES_FOCO]];
+  // Valores dinâmicos são conservados; apenas os fragmentos de estrutura mudam.
+  const camps = corpo.script.match(/window\.__UH_DOBRA__=(.*?);/);
+  let campanhas: Camp[] = [];
+  try { campanhas = camps ? JSON.parse(camps[1]).campanhas ?? [] : []; } catch { /* sem seed */ }
+  for (const [velho, atual] of pares) {
+    let v = velho, n = atual;
+    if (v.includes('{{DESTAQUE}}')) { v = v.replace('{{DESTAQUE}}', linkDestaque(campanhas)); n = n.replace('{{DESTAQUE}}', linkDestaque(campanhas)); }
+    if (v.includes('{{COUNT}}')) { const count = corpo.script.match(/"count":(\d+)/)?.[1]; if (count) { v=v.replace('{{COUNT}}', Number(count).toLocaleString('pt-BR')); n=n.replace('{{COUNT}}', Number(count).toLocaleString('pt-BR')); } }
+    if (!v.includes('{{TOTAL}}')) novo = novo.replace(v,n);
+  }
+  // Capa home: conserva o botão e o total vindos do cálculo atual.
+  if (corpo.pre.includes('gasometro-mobile.webp')) {
+    const total = corpo.pre.match(/([\d.]+\+) imóveis com curadoria/)?.[1] ?? 'milhares de';
+    const botao = corpo.pre.match(/<div class="hidden sm:block">([\s\S]*?)<\/div><\/div><a href="#corretor-busca"/)?.[1] ?? '';
+    const inicio = novo.indexOf('<section class="relative flex'), fim = novo.indexOf('</section>',inicio);
+    if (inicio >= 0 && fim >= 0) novo = novo.slice(0,inicio) + NOVO.HERO.replace('{{TOTAL}}',total).replace('{{BOTAO}}',botao) + novo.slice(fim+10);
+  }
+  novo = novo.replace('<main class="pt-14">','<main class="pt-[var(--uh-header-height)]">');
+  return { ...corpo, pre: corpo.pre ? `<script>document.write(document.querySelector('meta[name="uh-dobra-versao"]')?.content === 'site-v1' ? ${json(novo)} : ${json(corpo.pre)});</script>` : "" };
+}
 
 /** Igual a src/lib/searchImages.ts */
 function searchImageUrl(src: string, width: number): string {
@@ -253,7 +279,7 @@ Deno.serve(async (req) => {
     console.error("site-dobra", e);
     corpo = vazio; ttl = 30;
   }
-  return new Response(JSON.stringify(corpo), {
+  return new Response(JSON.stringify(compativel(corpo)), {
     headers: { "content-type": "application/json; charset=utf-8", "cache-control": `public, max-age=${ttl}`, "access-control-allow-origin": "*" },
   });
 });

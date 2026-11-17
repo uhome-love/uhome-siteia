@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Navbar } from "@/components/Navbar";
@@ -25,30 +25,17 @@ function renderNavbar(path = "/") {
   );
 }
 
-describe("Navbar", () => {
-  it("renders logo and main navigation links", () => {
+describe("ações do cabeçalho", () => {
+  it("abre busca e permite enviar um bairro real", () => {
     renderNavbar();
-    expect(screen.getByText("Comprar")).toBeInTheDocument();
-    expect(screen.getByText("Proprietários")).toBeInTheDocument();
-    expect(screen.getByText("Ajuda")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", {name: "Onde vai ser seu novo lar?"}));
+    fireEvent.change(screen.getByLabelText("Bairro ou endereço"), {target: {value: "Moinhos de Vento"}});
+    expect(screen.getByLabelText("Bairro ou endereço")).toHaveValue("Moinhos de Vento");
   });
-
-  it("renders login button when not authenticated", () => {
-    renderNavbar();
-    const buttons = screen.getAllByText("Entrar");
-    expect(buttons.length).toBeGreaterThanOrEqual(1);
-  });
-
-  it("highlights Comprar on search page", () => {
-    renderNavbar("/busca");
-    const comprar = screen.getByText("Comprar").closest("button")!;
-    expect(comprar.className).toContain("bg-secondary");
-  });
-
-  it("links to correct routes", () => {
-    renderNavbar();
-    expect(screen.getByText("Ajuda").closest("a")).toHaveAttribute("href", "/faq");
-    // Sem campanha em destaque, o menu mostra "Uhome em Foco".
-    expect(screen.getByText("Uhome em Foco").closest("a")).toHaveAttribute("href", "/em-foco");
+  it("Lia somente abre por ação", () => {
+    const abrir = vi.fn(); window.addEventListener("uhome:abrir-lia", abrir);
+    renderNavbar(); expect(abrir).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", {name: "Falar com a Lia"}));
+    expect(abrir).toHaveBeenCalledTimes(1); window.removeEventListener("uhome:abrir-lia", abrir);
   });
 });

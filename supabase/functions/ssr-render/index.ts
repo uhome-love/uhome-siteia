@@ -175,6 +175,8 @@ function localBusinessJsonLd() {
 }
 
 function html(title: string, description: string, rawOgImage: string, canonical: string, jsonLdBlocks: string[], bodyHtml: string) {
+  const marca = "Uhome · Você e seu novo lar | Imóveis em Porto Alegre e Canoas";
+  title = canonical.replace(/\/$/, "") === "https://uhome.com.br".replace(/\/$/, "") ? marca : `${title.split(" | ")[0]} | ${marca}`;
   const ogImage = ogImageUrl(rawOgImage);
   const isJpeg = ogImage.includes(".jpg") || ogImage.includes(".jpeg") || ogImage.includes("unsplash.com") || ogImage.includes("output=jpg");
   const own = isOwnAsset(rawOgImage || "");

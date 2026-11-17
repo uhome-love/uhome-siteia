@@ -12,6 +12,7 @@ import { useCorretor } from "@/contexts/CorretorContext";
 import { buildWhatsAppUrl, buildCorretorWhatsAppUrl } from "@/lib/whatsapp";
 import { captureGclid, montarContextoLia, registrarPagina } from "@/lib/liaContext";
 import liaAvatar from "@/assets/lia-avatar.webp.asset.json";
+import { Button } from "@/components/ui/button";
 import { isLandingCampanha } from "@/lib/landingPages";
 
 type Cartao = { slug: string; titulo: string; bairro?: string; preco?: number; quartos?: number; area?: number; foto: string };
@@ -132,11 +133,11 @@ export function LiaChat() {
           aria-label="Conversa com a LIA"
           className="fixed inset-x-0 bottom-0 z-[60] flex h-[85dvh] flex-col overflow-hidden rounded-t-3xl border border-border bg-background shadow-2xl sm:inset-x-auto sm:bottom-6 sm:right-6 sm:h-[600px] sm:max-h-[calc(100dvh-3rem)] sm:w-[380px] sm:rounded-3xl animate-in fade-in slide-in-from-bottom-4 duration-300"
         >
-          <header className="flex items-center gap-3 bg-primary px-4 py-3 text-primary-foreground">
+          <header className="flex items-center gap-3 bg-navy px-4 py-3 text-primary-foreground">
             <img src={liaAvatar.url} alt="" width={40} height={40} className="h-10 w-10 rounded-full object-cover ring-2 ring-primary-foreground/40" />
             <div className="min-w-0 flex-1">
               <p className="font-body text-sm font-bold leading-tight">LIA · Uhome</p>
-              <p className="font-body text-xs opacity-80">Atendente virtual · responde na hora</p>
+              <p className="font-body text-xs opacity-80">Assistente virtual · um corretor assume quando você quiser</p>
             </div>
             <button onClick={() => setAberto(false)} aria-label="Fechar conversa" className="rounded-full p-1.5 hover:bg-primary-foreground/15">
               <X className="h-5 w-5" />
@@ -208,23 +209,11 @@ export function LiaChat() {
       )}
 
       {!aberto && (
-        <button
+        <Button
           onClick={() => { setAberto(true); track("lia_aberta", { pagina: location.pathname }); void trackEvent({ tipo: "lia_aberta" }); }}
           aria-label="Fale com a LIA, atendente virtual da Uhome"
-          style={{ marginBottom: "var(--uh-cookie, 0px)" }}
-          className={`fixed right-4 z-50 flex items-center gap-2 rounded-full border border-border bg-background p-1 shadow-xl transition-transform hover:scale-[1.03] active:scale-95 sm:right-6 sm:pr-4 ${
-            hasBottomBar ? "bottom-24 sm:bottom-6" : "bottom-5 sm:bottom-6"
-          } ${isLanding ? "hidden min-[1081px]:flex" : isProdutoPage ? "hidden sm:flex" : "flex"}`}
-        >
-          <span className="relative">
-            <img src={liaAvatar.url} alt="" width={52} height={52} className="h-[52px] w-[52px] rounded-full object-cover" />
-            <span className="absolute bottom-0.5 right-0.5 h-3 w-3 rounded-full border-2 border-background bg-primary" aria-hidden />
-          </span>
-          <span className="hidden text-left sm:block">
-            <span className="block font-body text-sm font-bold leading-tight text-foreground">Fale com a LIA</span>
-            <span className="block font-body text-xs text-muted-foreground">Responde na hora</span>
-          </span>
-        </button>
+          className="uhs-lia-float"
+        ><img src={liaAvatar.url} alt="" width={52} height={52} className="h-[52px] w-[52px] rounded-full object-cover" /><span className="uhs-lia-label">Falar com a Lia</span></Button>
       )}
     </>
   );

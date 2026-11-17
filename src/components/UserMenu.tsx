@@ -3,6 +3,7 @@ import { User, Heart, Search, LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
 const AuthModal = lazy(() => import("./AuthModal.tsx").then(m => ({ default: m.AuthModal })));
 
 export function UserMenu() {
@@ -10,6 +11,11 @@ export function UserMenu() {
   const [showModal, setShowModal] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const abrir = () => user ? setMenuOpen(true) : setShowModal(true);
+    window.addEventListener('uhome:entrar', abrir);
+    return () => window.removeEventListener('uhome:entrar', abrir);
+  }, [user]);
 
   // Close on outside click
   useEffect(() => {
@@ -26,14 +32,14 @@ export function UserMenu() {
   if (!user) {
     return (
       <>
-        <button
+        <Button variant="outline"
           onClick={() => setShowModal(true)}
           aria-label="Entrar na conta"
-          className="flex h-9 items-center gap-1.5 rounded-full bg-primary px-4 font-body text-[13px] font-semibold text-primary-foreground transition-colors hover:bg-primary/90 active:scale-[0.97]"
+          className="gap-1.5 px-3 font-body text-[13px]"
         >
           <User className="h-4 w-4" />
           <span>Entrar</span>
-        </button>
+        </Button>
         {showModal && <Suspense fallback={null}><AuthModal open={showModal} onClose={() => setShowModal(false)} /></Suspense>}
       </>
     );

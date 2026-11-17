@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { SITE_TITLE } from "@/lib/siteTitle";
 import { useLocation } from "react-router-dom";
 
 const SITE = "https://uhome.com.br";
@@ -15,6 +16,7 @@ export function useCanonical(overridePath?: string) {
 
   useEffect(() => {
     let path = overridePath ?? pathname;
+    if (path === "/") { document.title = SITE_TITLE; document.querySelector('meta[property="og:title"]')?.setAttribute("content", SITE_TITLE); }
 
     // Strip /c/:corretorSlug prefix so corretor pages point to the canonical URL
     const corretorMatch = path.match(/^\/c\/[^/]+(\/.*)?$/);

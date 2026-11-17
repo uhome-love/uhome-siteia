@@ -2,6 +2,8 @@ import { trackEvent } from "@/lib/trackEvent";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { MapPin, Building2, MessageCircle, Gift, Loader2, Navigation, Star, ShieldCheck, CalendarDays, ChevronDown } from "lucide-react";
+import { SiteBottomBar } from "@/components/SiteBottomBar";
+import { siteTitle } from "@/lib/siteTitle";
 import { Navbar } from "@/components/Navbar";
 import { UhomeLogo } from "@/components/UhomeLogo";
 import { DeferredFoco } from "@/components/foco/DeferredFoco";
@@ -55,9 +57,9 @@ export default function ProdutoFocoPage() {
     if (!p) return;
     void trackEvent({ tipo: "imovel_visto", imovel_slug: `em-foco/${p.slug}`, imovel_titulo: p.nome, imovel_bairro: p.bairro, imovel_preco: p.preco_a_partir });
     const desc = `${p.nome} em ${p.bairro}, ${p.cidade}${p.preco_a_partir ? `, a partir de ${formatPreco(p.preco_a_partir)}` : ""}. ${p.resumo ?? ""}`.slice(0, 158);
-    document.title = `${p.nome} | ${p.bairro}, ${p.cidade} | Uhome em Foco`;
+    document.title = siteTitle(p.nome);
     setMeta("name", "description", desc);
-    setMeta("property", "og:title", modoCorretor ? `${p.nome} · enviado por ${corretor?.nome ?? "Uhome"}` : `${p.nome} | Uhome`);
+    setMeta("property", "og:title", siteTitle(modoCorretor ? `${p.nome} · enviado por ${corretor?.nome ?? "Uhome"}` : p.nome));
     setMeta("property", "og:description", desc);
     if (p.capa_url) setMeta("property", "og:image", absUrl(p.capa_url) ?? p.capa_url);
     setJsonLd("produto-foco", {
@@ -369,13 +371,14 @@ export default function ProdutoFocoPage() {
         </div>
       </main>
 
+      <SiteBottomBar />
       {/* Rodapé curto */}
       <footer className="border-t border-border/60 py-8 text-center font-body text-xs text-muted-foreground">
         Uhome Imóveis · CRECI-RS 25682J · <Link to="/politica-de-privacidade" className="underline">Política de privacidade</Link> · <Link to={prefixLink("/em-foco")} className="underline">Ver outros produtos</Link>
       </footer>
 
       {/* Barra fixa no celular */}
-      <div data-barra-baixo className="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-border bg-background/95 p-3 backdrop-blur lg:hidden" style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}>
+      <div data-barra-baixo className="uhs-contact-bar fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-border bg-background/95 p-3 backdrop-blur lg:hidden" style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}>
         <button type="button" onClick={() => agendar()} className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3.5 font-body text-sm font-bold ${corBotao}`}>
           <CalendarDays className="h-4 w-4" />{modoCorretor ? `Falar com ${corretor?.nome.split(" ")[0]}` : "Agendar visita"}
         </button>

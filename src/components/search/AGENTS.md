@@ -1,0 +1,1 @@
+- Amenities: `imoveis.comodidades` (trigger from Jetimob raw) drives busca_site filter, counts and price histogram. Why: one source, no client parsing.

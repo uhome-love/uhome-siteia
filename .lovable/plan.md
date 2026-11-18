@@ -23,8 +23,11 @@
 ## 4. Calendário de visita
 - Trocar os botões de dia por um calendário mensal bonito (dois meses no computador, um no celular), dias passados desativados, dia escolhido em azul Uhome com transição suave, depois horários em chips e resumo da visita. Mesmo envio de agendamento de hoje (nada muda no CRM).
 
-## 5. Validação antes de entregar
-Teste no navegador (computador e celular): buscar Capão e Canoas e ver o mapa ir até lá; dar zoom e arrastar sem pins sumirem; "Buscar nessa região" mudando lista e total; mini card, etiqueta cinza e gaveta; tempo de abertura do imóvel; título; escolher dia e horário no calendário. Sem enviar lead de teste. Só aviso como pronto com tudo isso conferido.
+## 5. Botão Filtros da Home
+- Na Home, o botão "Filtros" abre o painel completo de filtros em vez da busca; ao aplicar, leva aos resultados já filtrados.
+
+## 6. Validação antes de entregar
+Teste no navegador (computador e celular): Filtros da Home abrindo o painel; buscar Capão e Canoas e ver o mapa ir até lá; dar zoom e arrastar sem pins sumirem; "Buscar nessa região" mudando lista e total; mini card, etiqueta cinza e gaveta; tempo de abertura do imóvel; título; escolher dia e horário no calendário. Sem enviar lead de teste. Só aviso como pronto com tudo isso conferido.
 
 ## Detalhes técnicos
 - `SearchExperience.tsx`: `placeholderData: keepPreviousData` nos pins; `bounds` de busca separado do `bounds` de visualização e aplicado em `buscarSite` da lista/contagem; `fitToPins` quando houver cidade/bairro/q; ligar `onBoundsSearch` no celular.

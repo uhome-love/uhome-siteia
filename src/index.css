@@ -362,7 +362,7 @@ html { scroll-behavior: smooth; }
 .search-show-map{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--uh-bottom-height) + var(--uh-cookie,0px) + 16px);z-index:30}
 .search-filter-dialog{max-width:600px;max-height:90dvh;grid-template-rows:auto auto minmax(0,1fr) auto}
 .catalog-card{display:flex;flex-direction:column;gap:10px;min-width:0;border-radius:8px}
-.catalog-card-active{outline:2px solid var(--brand-acao);outline-offset:6px}
+.catalog-card-active{box-shadow:0 0 0 6px hsl(var(--background)),0 0 0 8px var(--brand-acao);border-radius:14px}
 .catalog-photo{position:relative;aspect-ratio:10/9;border-radius:18px;overflow:hidden;background:var(--foto-vazia)}
 .catalog-photo>a{position:absolute;inset:0}.catalog-photo img{display:block;width:100%;height:100%;object-fit:cover}
 .uh-app-com-foto .catalog-photo:has(.uh-foto-espelho){background:transparent}
@@ -662,3 +662,6 @@ body:has(.search-filter-dialog[data-state=open]) [aria-label="Preferências de p
 
 /* Aviso de cookies não cobre janelas abertas (agendamento, filtros). */
 body:has([role="dialog"][data-state="open"]) .aviso-cookies{display:none}
+
+/* Mapa no celular: aviso de cookies acima da gaveta recolhida. */
+body:has(.gaveta-mapa) .aviso-cookies{display:none}

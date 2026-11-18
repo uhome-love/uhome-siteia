@@ -24,6 +24,25 @@ export function tituloFoco(p: Produto): string {
 export function tituloPreviaFoco(p: Produto): string {
   return `${p.nome} · ${tituloFoco(p)} | Uhome`;
 }
+export function numerosFoco(p: { entrega?: string | null; ficha?: { tipologias?: { area?: string; dorm?: number | null; suites?: number | null; vagas?: string }[] } | null }) {
+  const tip = p.ficha?.tipologias ?? [];
+  const positivos = (valores: (number | null | undefined)[]) => [...new Set(valores.filter((n): n is number => typeof n === "number" && Number.isFinite(n) && n > 0))].sort((a, b) => a - b);
+  const areas = tip.flatMap(t => {
+    const privativa = t.area?.match(/([\d.,]+)\s*m² privativa/);
+    return (privativa ? [privativa[1]] : t.area?.split("(")[0].match(/\d+(?:,\d+)?/g) ?? []).map(n => Number(n.replace(",", ".")));
+  }).filter(n => n > 15);
+  const quartos = positivos(tip.map(t => t.dorm));
+  const suites = positivos(tip.map(t => t.suites));
+  const vagas = tip.map(t => t.vagas?.trim()).find(v => v && !/^(?:0(?:[,.]0+)?)(?:\s*vagas?)?$/.test(v) && !/^sem vagas?$/i.test(v));
+  const entrega = p.entrega?.trim();
+  return [
+    areas.length ? { label: "Área", valor: `${Math.min(...areas).toLocaleString("pt-BR")} a ${Math.max(...areas).toLocaleString("pt-BR")} m²` } : null,
+    quartos.length ? { label: "Quartos", valor: quartos.join(" e ") } : null,
+    suites.length ? { label: "Suíte", valor: suites.join(" a ") } : null,
+    vagas ? { label: "Vaga", valor: vagas } : null,
+    entrega && !/^0(?:[,.]0+)?$/.test(entrega) ? { label: "Entrega prevista", valor: entrega } : null,
+  ].filter((item): item is { label: string; valor: string } => item !== null);
+}
 export function destaquesFoco(p: Produto) {
   if (p.ficha?.motivos?.length) return p.ficha.motivos.slice(0, 3);
   return [

@@ -5,7 +5,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import * as NOVO from "./moldes.ts";
 import { HERO_FOCO_V2, HEADER_FOCO_V2 } from "./moldes-foco-v2.ts";
-import { tituloFoco } from "../_shared/focoPresentation.ts";
+import { tituloFoco, numerosFoco } from "../_shared/focoPresentation.ts";
 import { NAV, NAV_BUSCA, HERO, BUSCA_TOPO, BUSCA_GRADE, CABECALHO_FOCO, BOTOES_FOCO } from "./moldes-legado.ts";
 
 const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
@@ -241,7 +241,9 @@ async function produto(slug: string, corretor: boolean) {
   let heroV2 = HERO_FOCO_V2.replace("{{FOTOS}}", fotosV2).replaceAll("{{NOME}}", esc(p.nome)).replaceAll("{{N}}", String(galeria.length));
   if (!natal) heroV2 = heroV2.replace(/<span[^>]*>Condição de Natal até 18\/12<\/span>/g, "");
   const headingV2 = `<div data-foco-title="true" class="foco-heading"><p class="text-sm font-semibold text-muted-foreground">${esc(p.nome)} · ${esc(p.incorporadora)}</p><div class="mt-3 flex flex-wrap gap-2"><span class="rounded-md bg-secondary px-3 py-1 text-xs font-semibold">${esc(p.status_obra ?? "Empreendimento")}</span>${natal ? '<span class="rounded-md bg-natal-red px-3 py-1 text-xs font-semibold text-natal-foreground">Condição de Natal até 18/12</span>' : ''}</div><h1 class="mt-3 text-3xl font-extrabold leading-tight lg:text-4xl">${esc(tituloFoco(p))}</h1><p class="mt-3 flex items-center gap-2 text-sm text-muted-foreground">${PIN}${esc(p.bairro)}, ${esc(p.cidade)}</p></div>`;
-  const preV2 = `<div id="uh-pre" data-uh-alvo="[data-uh-capa]"><div class="foco-page min-h-screen bg-background">${HEADER_FOCO_V2}<main class="foco-container">${headingV2}${heroV2}<div class="foco-columns"><div class="foco-content"></div></div></main></div></div>`;
+  const numerosV2 = numerosFoco(p);
+  const gradeV2 = numerosV2.length ? `<section class="border-b border-border pb-6"><dl class="grid grid-cols-2 gap-5 sm:grid-cols-3">${numerosV2.map(n => `<div><dt class="text-xs text-muted-foreground">${esc(n.label)}</dt><dd class="mt-1 text-sm font-bold">${esc(n.valor)}</dd></div>`).join("")}</dl></section>` : "";
+  const preV2 = `<div id="uh-pre" data-uh-alvo="[data-uh-capa]"><div class="foco-page min-h-screen bg-background">${HEADER_FOCO_V2}<main class="foco-container">${headingV2}${heroV2}<div class="foco-columns"><div class="foco-content">${gradeV2}</div></div></main></div></div>`;
   return { head, pre, preV2, script: `window.__UH_DOBRA__=${json({ campanhas: camps, produto: p })};` };
 }
 

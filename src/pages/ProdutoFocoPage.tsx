@@ -14,7 +14,7 @@ import { lazyRetry } from "@/lib/lazyRetry";
 import { useCanonical } from "@/hooks/useCanonical";
 import { useCorretor } from "@/contexts/CorretorContext";
 import { useProdutoFoco, useProdutosFoco, useCampanhasAtivas, formatPreco, SITE_URL, absUrl, type MidiaFoco } from "@/lib/produtosFoco";
-import { tituloFoco, tituloPreviaFoco, destaquesFoco, faqFoco } from "../../supabase/functions/_shared/focoPresentation";
+import { tituloFoco, tituloPreviaFoco, numerosFoco, destaquesFoco, faqFoco } from "../../supabase/functions/_shared/focoPresentation";
 import { proximosDiasFoco, diaInicialFoco } from "@/lib/focoVisit";
 import { setJsonLd, removeJsonLd } from "@/lib/jsonld";
 import { trackEvent } from "@/lib/trackEvent";
@@ -48,13 +48,7 @@ export default function ProdutoFocoPage() {
   if (isLoading) return <div className="min-h-screen bg-background"><Navbar /><div className="mx-auto h-96 max-w-6xl animate-pulse bg-muted" /></div>;
   if (!p) return <div className="min-h-screen bg-background"><Navbar /><h1 className="pt-40 text-center text-2xl">Produto não encontrado</h1><Link to={prefixLink("/em-foco")}>Ver empreendimentos</Link></div>;
   const fi = p.ficha ?? {}; const waUrl = wa(p); const destaques = destaquesFoco(p);
-  const tipologias = fi.tipologias ?? []; const dorms = [...new Set(tipologias.map(t => t.dorm).filter(Boolean))].sort();
-  const suites = [...new Set(tipologias.map(t => t.suites).filter(n => n !== null && n !== undefined))];
-  const areas = tipologias.flatMap(t => {
-    const privativa = t.area?.match(/([\d.,]+)\s*m² privativa/);
-    return (privativa ? [privativa[1]] : t.area?.split("(")[0].match(/\d+(?:,\d+)?/g) ?? []).map(n => Number(n.replace(",", ".")));
-  }).filter(n => n > 15);
-  const area = areas.length ? `${Math.min(...areas).toLocaleString("pt-BR")} a ${Math.max(...areas).toLocaleString("pt-BR")} m²` : "Consulte áreas";
+  const tipologias = fi.tipologias ?? []; const numeros = numerosFoco(p);
   const similares = catalogo.filter(x => x.slug !== p.slug && (/casa|sobrado/i.test(x.tipo ?? "") === /casa|sobrado/i.test(p.tipo ?? "")) && x.preco_a_partir && p.preco_a_partir && x.preco_a_partir >= p.preco_a_partir * 0.65 && x.preco_a_partir <= p.preco_a_partir * 1.5).slice(0, 3);
   const abrir = (fotos: MidiaFoco[], i: number) => { opener.current = document.activeElement instanceof HTMLElement ? document.activeElement : null; setBox({ fotos, i }); };
   const pedir = (modo: PedidoFoco, escolhida?: string) => { if (modoCorretor) { window.open(waUrl, "_blank", "noopener"); trackProdutoWhatsApp(p); return; } setPlanta(escolhida ?? null); setPedido(modo); };
@@ -66,7 +60,7 @@ export default function ProdutoFocoPage() {
       <FocoHero p={p} natal={!!natal} abrir={abrir} prefixLink={prefixLink} />
       <div className="foco-columns">
         <div className="foco-content">
-          <section className="border-b border-border pb-6"><dl className="grid grid-cols-2 gap-5 sm:grid-cols-3"><div><dt className="text-xs text-muted-foreground">Área</dt><dd className="mt-1 text-sm font-bold">{area}</dd></div><div><dt className="text-xs text-muted-foreground">Quartos</dt><dd className="mt-1 font-bold">{dorms.join(" e ") || "Consulte"}</dd></div><div><dt className="text-xs text-muted-foreground">Suíte</dt><dd className="mt-1 font-bold">{suites.length ? [...suites].sort((a,b) => Number(a)-Number(b)).join(" a ") : "Conforme planta"}</dd></div><div><dt className="text-xs text-muted-foreground">Vaga</dt><dd className="mt-1 text-sm font-bold">{tipologias.find(t => t.vagas)?.vagas ?? "Conforme unidade"}</dd></div><div><dt className="text-xs text-muted-foreground">Entrega prevista</dt><dd className="mt-1 text-sm font-bold">{p.entrega ?? "Consulte"}</dd></div></dl></section>
+          {numeros.length > 0 && <section className="border-b border-border pb-6"><dl className="grid grid-cols-2 gap-5 sm:grid-cols-3">{numeros.map(n => <div key={n.label}><dt className="text-xs text-muted-foreground">{n.label}</dt><dd className="mt-1 text-sm font-bold">{n.valor}</dd></div>)}</dl></section>}
           <section><h2 className="text-2xl font-bold">Por que o {p.nome}</h2><div className="mt-6 space-y-5">{destaques.map(d => <div key={d.titulo} className="flex gap-3"><Check className="mt-1 h-5 w-5 shrink-0 text-primary" /><div><h3 className="font-bold">{d.titulo}</h3><p className="mt-1 text-sm leading-relaxed text-muted-foreground">{d.texto}</p></div></div>)}</div></section>
           {!modoCorretor && <section className="lg:hidden"><h2 className="text-xl font-bold">Quer saber mais antes de visitar?</h2><p className="mt-2 text-sm text-muted-foreground">Valores, plantas e condições do {p.nome}.</p><Button variant="outline" onClick={() => pedir("informacoes")} className="mt-4 w-full">Receber informações</Button></section>}
           <section><h2 className="text-2xl font-bold">Conheça o {p.nome}</h2>{[p.resumo, fi.unidade?.join(". "), fi.lazer?.join(", ")].filter(Boolean).slice(0, 3).map((t, i) => <p className="mt-4 text-sm leading-relaxed text-muted-foreground" key={i}>{t}</p>)}</section>

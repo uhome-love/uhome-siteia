@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { tipoFoco, tituloFoco, tituloPreviaFoco } from "../../supabase/functions/_shared/focoPresentation";
+import { tipoFoco, tituloFoco, numerosFoco } from "../../supabase/functions/_shared/focoPresentation";
 
 describe("classificação da oferta principal", () => {
   it.each([
@@ -18,5 +18,20 @@ describe("classificação da oferta principal", () => {
   });
   it("respeita o título manual por produto", () => {
     expect(tituloFoco({ nome: "Essence", tipo: "Lotes", ficha: { titulo_manual: "Oferta definida pela central" } })).toBe("Oferta definida pela central");
+  });
+});
+
+describe("números visíveis", () => {
+  it("omite suíte 0 e mantém os outros números preenchidos", () => {
+    expect(numerosFoco({ entrega: "Março de 2029", ficha: { tipologias: [{ area: "31,4 a 52 m²", dorm: 2, suites: 0, vagas: "1" }] } }).map(n => n.label)).toEqual(["Área", "Quartos", "Vaga", "Entrega prevista"]);
+  });
+  it("omite todos os números zerados", () => {
+    expect(numerosFoco({ entrega: "0", ficha: { tipologias: [{ area: "0 m²", dorm: 0, suites: 0, vagas: "0" }] } })).toEqual([]);
+  });
+  it("omite campos vazios", () => {
+    expect(numerosFoco({ entrega: "  ", ficha: { tipologias: [{ vagas: " " }] } })).toEqual([]);
+  });
+  it("conserva suíte positiva sem incluir zero no intervalo", () => {
+    expect(numerosFoco({ ficha: { tipologias: [{ suites: 0 }, { suites: 1 }] } })).toEqual([{ label: "Suíte", valor: "1" }]);
   });
 });

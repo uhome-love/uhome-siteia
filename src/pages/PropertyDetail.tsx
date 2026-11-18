@@ -281,7 +281,7 @@ const PropertyDetail = () => {
         </div>
       )}
       <div className="mt-16 hidden sm:block">
-        <div className="mx-auto flex max-w-[1120px] items-end justify-between gap-6 px-6 pb-4 pt-6">
+        <div className="mx-auto flex max-w-[1120px] items-end justify-between gap-6 px-6 pb-6 pt-8">
           <div className="min-w-0">
             <p aria-hidden="true" className="truncate font-body text-[26px] font-bold leading-tight text-foreground">{imovel.titulo}</p>
             <p className="mt-1 font-body text-sm text-muted-foreground">{imovel.bairro}, {imovel.cidade}</p>
@@ -427,8 +427,8 @@ const PropertyDetail = () => {
             <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
               <nav aria-label="Navegação do imóvel" className="min-w-0 break-words font-body text-xs leading-relaxed text-muted-foreground">
                 <Link to={prefixLink("/busca")} className="hover:text-foreground">Imóveis</Link>
-                {" › "}
-                <Link to={prefixLink(`/busca?bairro=${encodeURIComponent(imovel.bairro)}`)} className="hover:text-foreground">{imovel.bairro}</Link>
+                <span className="hidden sm:inline">{" › "}</span>
+                <Link to={prefixLink(`/busca?bairro=${encodeURIComponent(imovel.bairro)}`)} className="hidden hover:text-foreground sm:inline">{imovel.bairro}</Link>
                 {imovel.condominio_nome && (
                   <>
                     {" › "}
@@ -467,10 +467,10 @@ const PropertyDetail = () => {
                   </span>
                 )}
               </div>
-              <h1 className="mt-3 sm:sr-only break-words font-body text-2xl font-extrabold leading-tight tracking-normal text-foreground sm:text-3xl">
+              <h1 className="mt-3 sm:sr-only break-words font-body text-[22px] font-bold leading-tight tracking-normal text-foreground sm:text-3xl">
                 {imovel.titulo}
               </h1>
-              <div className="mt-2 font-body text-base text-muted-foreground">
+              <div className="mt-2 font-body text-base text-muted-foreground sm:hidden">
                 <span className="flex items-start gap-1.5">
                   <MapPin className="mt-1 h-4 w-4 shrink-0" aria-hidden="true" />
                   <span className="min-w-0 break-words">{imovel.bairro}, {imovel.cidade}</span>

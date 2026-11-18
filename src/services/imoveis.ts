@@ -61,12 +61,22 @@ export function tituloLimpo(imovel: { tipo: string; finalidade: string; quartos:
   return `${tipo} para Venda — ${imovel.bairro}`;
 }
 
+/** Junta comodidades normalizadas e diferenciais do anúncio, sem repetir. */
+export function comodidadesDoAnuncio(comodidades?: string[] | null, diferenciais?: string[] | null): string[] {
+  const vistos = new Set<string>(); const out: string[] = [];
+  for (const v of [...(comodidades ?? []), ...(diferenciais ?? [])]) {
+    const t = String(v ?? "").trim(); const k = t.toLocaleLowerCase("pt-BR").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    if (t && !vistos.has(k)) { vistos.add(k); out.push(t); }
+  }
+  return out;
+}
+
 function mapRow(row: any): Imovel {
   const mapped = {
     ...row,
     fotos: parseFotos(row.fotos),
     foto_principal: row.foto_principal || null,
-    diferenciais: row.diferenciais || [],
+    diferenciais: comodidadesDoAnuncio(row.comodidades, row.diferenciais),
     destaque: row.destaque ?? false,
     cidade: row.cidade ?? "Porto Alegre",
     uf: row.uf ?? "RS",
@@ -137,7 +147,7 @@ export const CIDADES_PERMITIDAS = ["Porto Alegre", "Canoas", "Cachoeirinha", "Gr
 const LISTING_COLUMNS = "id,slug,tipo,finalidade,status,destaque,preco,preco_condominio,area_total,area_util,quartos,banheiros,vagas,bairro,cidade,uf,publicado_em,foto_principal,fase";
 
 // Focused detail payload — excludes large sync/debug fields that can slow or stall property pages
-const DETAIL_COLUMNS = "id,slug,tipo,finalidade,status,destaque,preco,preco_condominio,preco_iptu,iptu_periodicidade,area_total,area_util,quartos,banheiros,vagas,andar,latitude,longitude,titulo,descricao,diferenciais,fotos,foto_principal,video_url,condominio_nome,publicado_em,bairro,cidade,uf";
+const DETAIL_COLUMNS = "id,slug,tipo,finalidade,status,destaque,preco,preco_condominio,preco_iptu,iptu_periodicidade,area_total,area_util,quartos,banheiros,vagas,andar,latitude,longitude,titulo,descricao,diferenciais,comodidades,fotos,foto_principal,video_url,condominio_nome,publicado_em,bairro,cidade,uf";
 
 const PUBLIC_REST_URL = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/imoveis`;
 const PUBLIC_REST_HEADERS: HeadersInit = {
@@ -571,8 +581,23 @@ export function normalizarCodigo(codigo: string): string {
  * Fetch a single imóvel by slug via public read endpoint, without relying
  * on any authenticated browser session.
  */
-export async function fetchImovelBySlug(slug: string): Promise<Imovel | null> {
-  const normalizedSlug = decodeURIComponent(slug).trim().replace(/^\/+|\/+$/g, "");
+const cacheDetalhe = new Map<string, { t: number; p: Promise<Imovel | null> }>();
+/** Pré-carrega o imóvel (hover/toque no card) para a página abrir sem espera. */
+export function prefetchImovel(slug: string): void {
+  void fetchImovelBySlug(slug).catch(() => null);
+}
+
+export function fetchImovelBySlug(slug: string): Promise<Imovel | null> {
+  const k = decodeURIComponent(slug).trim().replace(/^\/+|\/+$/g, "");
+  const hit = cacheDetalhe.get(k);
+  if (hit && Date.now() - hit.t < 120000) return hit.p;
+  const p = fetchImovelBySlugRede(k);
+  cacheDetalhe.set(k, { t: Date.now(), p });
+  p.then(d => { if (!d) cacheDetalhe.delete(k); }, () => cacheDetalhe.delete(k));
+  return p;
+}
+
+async function fetchImovelBySlugRede(normalizedSlug: string): Promise<Imovel | null> {
   
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 12000);

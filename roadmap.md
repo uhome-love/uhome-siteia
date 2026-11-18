@@ -1,54 +1,8 @@
-# Roadmap — rodada pós-auditoria 16/11
-- [x] Busca celular compacta: foto 248/308 px, uma busca e filtros nas URLs prontas; site-v3 protegido por compacta-1, paridade sem salto; prints 390×844 e 3 traces locais, computador/Worker preservados; aguarda publicação do app e medição oficial da central
-- [x] Site-dobra simplificada: apenas site-v3 direto, sem document.write; /busca 195.618 → 53.456 bytes
-- [x] Ajuste Lucas: faixa Home e nota agregada/equipe removidas; imagem padrão sem números; junção sem espaço e 12 avaliações individuais conferidas em 390/1440; modelos publicados preservados
-- [x] Parte 3: seções/categorias com contagens reais, modal, chips, vazio e paginação manual
-- [x] Parte 3: favoritos locais e pedido de aviso de preço UUID, jornada/CRM sem enviar leads de teste
-- [x] Parte 3: cinco URLs Google; sitemap dinâmico/estático regenerados sem datas artificiais
-- [x] Ajuste Lucas: remover vitrine do total na Home, busca, SEO e site-v3; preservar contagens práticas e modelos publicados
-- [ ] Parte 3: saída automática em /sitemap.xml aguarda central encaminhar ao dynamic-sitemap sem alterar Worker
-- [x] Parte 3: 22 fotos WebP próprias (768 px, ≤50 KB), modelo site-v3, prints e trace local LCP anterior ao main
-- [ ] Parte 3: renovar Assets de novas fotos a cada mudança aguarda uploader da central; função não dispõe de credencial CDN
-- [ ] Parte 3: publicar app; central mede e testa pedido normal após publicação
-- [x] Pedidos UUID acumulados, último pedido/origem, atribuição das visitas; validação local sem leads reais
-- [ ] Jornada sem funil: código preparado; CRM precisa criar leads.dados_site (campo ausente). Retentativa no tick mantém pendência até disponível
-- [ ] Publicar app de pedidos; central repete teste autorizado. Limpeza de testes fica com CRM
-- [x] Parte 2: página em-foco, galeria, visita fixa, conteúdo real e formulários compartilhados; todos os produtos abrem
-- [x] Parte 2: modelos site-v2 e seed produto implantados; site-v1 mantém o modelo anterior; prévias com capa/título e FAQ; Worker intacto
-- [x] Parte 2: 23 testes com envios simulados, prints 390/1440 de Arvoredo/Bosque/Orygem e foco/troca conferidos
-- [x] Ajustes pré-publicação: Essence lotes, tipos do catálogo, título manual e nome nas prévias; dez páginas/prévias verificadas, site-v1 preservado
-- [x] Números 0/vazios ocultos por regra compartilhada app/site-v2; Open Bosque conferido, site-v1 preservado e Worker intacto; 20 testes passaram
-- [x] Parte 2 publicada e encerrada pela central; 10 páginas e preços conferidos, LCP 1,5/1,5/2,1 s; testes apagados
-- [x] A / rodada 4: capa 44,9 KB ativada, preconnect como alternativa autorizada, foto da tela pronta conservada; trace local antes da execução do app
-- [x] B / parte 1: tokens, cabeçalho/barras, rodapé, Lia e modelos versionados; 390/1440 px e fluxos conferidos
-- [x] Rodada 4 publicada: central confirmou LCP 1,0/2,4/1,5/1,0 s e CLS zero nas quatro páginas
-- [x] Corrigir CLS: reprodução com CSS tardio 1,000 → 0,000; regras da troca inline, mesma foto conservada
-- [x] CLS publicado e conferido pela central: PageSpeed home LCP 1,4 s, CLS 0,000; Partes 0/1 encerradas
-- [x] WhatsApp original restaurado na barra em-foco; rosto Lia oculto e Lia na navegação inferior conferidos; CLS, site-dobra e Worker intactos
-- [x] Jornada do site: identidade e atribuição, eventos sem dados pessoais, consentimento e robôs
-- [x] Jornada do site: deduplicação WhatsApp, vínculo de lead e envio completo/contínuo ao CRM existente
-- [x] Jornada do site: testes em 3 sessões, consultas de duplicação/robôs e contrato de entrega
-- [ ] Jornada: Pixel Meta aguarda conexão/ID; prioridades Ads preservadas; entrega sem retentativa automática em falha externa (pendências registradas)
-- [x] Prévia: função ajustada (produto, Natal, studios, imóvel, home com número do banco)
-- [x] Código do Worker Cloudflare (cloudflare/uhome-previa-worker.js)
-- [x] Usuário criar o Worker na Cloudflare (confirmado pelo usuário)
-- [x] Correção solicitada: carregamento inicial Open Bosque e campanha Natal; catálogo em 2 requisições, ferramentas diferidas, primeira tela sem animação; 13 testes e navegação 390/1280px
-- [ ] Publicar correções de velocidade e medir novamente (aguarda publicação; mídia não é servida pelo sandbox local)
-- [ ] Sitemap com /em-foco, campanha, studios
-- [ ] 1. Medição (formulario_iniciado por formulário, lia_mensagem, studios celular, PageSpeed antes)
-- [ ] 2. Busca
-- [x] Correção solicitada: fotos responsivas WebP da busca, fallback original e mapa apenas quando visível; carrossel e mapa conferidos em 390px, tablet 820px e desktop 1280px
-- [ ] 3. Página de produto + mídias
-- [ ] 5. Velocidade
-- [ ] Entrega (prints, testes de formulário até CRM)
-- [x] Publicar app (busca compacta + foto de card 480x432): publicação registrada em 18/11 17:00:39 UTC; UH_FOTO_CARD=1 ativada e cache renovado; paridade foto conservada/app/preload nas três páginas; fotos 20.280/50.772/32.082 bytes. Worker intacto; medição oficial com central no Brasil.
-- [x] Área nos cards da busca com vírgula (75,45 m²); tela pronta segue a mesma chave UH_FOTO_CARD
-- [ ] /apartamentos-petropolis com 0 imóveis (acento): conferir e corrigir
-- [ ] Próximas partes do design: Imóvel, Favoritos em pastas, Home nova, Lia celular, Movimento
-- [x] Continuação 18/11: imóvel com visita principal (dia → horário → dados), informações secundárias, análise de preço retirada, galeria acessível compartilhada, corretor real em links personalizados sem disponibilidade inventada e aviso 28238-UH. 7 testes com envios simulados; fluxo celular/computador conferido; aguarda publicação, sem Worker. Medição Brasil fica com o dono depois.
-- [ ] Imóvel: atribuição de corretor nas páginas gerais e frase pessoal aguardam dados oficiais; páginas gerais não inventam profissional. Favoritos, Home e Lia/Movimento seguem como próximas etapas após conferir/publicar esta parte.
-- [x] Favoritos em pastas: pastas, nota, compartilhar por link (só leitura + WhatsApp), visitas em lote pelo fluxo existente, pastas levadas para a conta; 6 testes; aguarda publicação
-- [ ] Entrar com WhatsApp aguarda serviço de envio de código por WhatsApp
-- [x] Busca estilo Airbnb: cada campo da pílula abre o seu painel, Buscar busca direto, Filtros abre tudo; preço digitável; rua sem acento/prefixo; pet = Pet friendly ou Pet care; 33/33 filtros conferidos
-- [x] Mapa: gaveta de arrastar no celular e pílula que encolhe ao rolar
-- [x] Rodada Airbnb 360: chips rápidos, pílula compacta, setas, gaveta do mapa, faixa de preço, 6 bairros 3D, 120 combinações validadas
+# Roadmap
+- [x] Mapa: ir até a cidade buscada, pins sem sumir, buscar na região/ao mover filtrando lista e total
+- [x] Abrir imóvel sem atraso (pré-carregamento)
+- [x] Título do imóvel com respiro; local sem repetir
+- [x] Comodidades reais do anúncio
+- [x] Calendário de visita mensal
+- [x] Filtros da Home abre o painel de filtros
+- [ ] Conferir gaveta do mapa e mini card no celular em aparelho real

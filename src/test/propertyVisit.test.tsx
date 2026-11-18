@@ -15,7 +15,7 @@ describe('visita do imóvel com envio somente simulado', () => {
     vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(new Date(2026, 10, 18, 12));
     mocks.insert.mockResolvedValue({ error: null }); mocks.lead.mockResolvedValue(true);
     render(<AgendamentoVisita imovelId="imovel-id" imovelSlug="apartamento-28238-UH" imovelTitulo="Apartamento Menino Deus" imovelBairro="Menino Deus" imovelPreco={795000} />);
-    fireEvent.click(screen.getByRole('button', { name: /19\/11/ }));
+    fireEvent.click(screen.getByRole('gridcell', { name: '19' }));
     fireEvent.click(screen.getByRole('button', { name: '14:00' }));
     fireEvent.click(screen.getByRole('button', { name: 'Continuar' }));
     expect(mocks.insert).not.toHaveBeenCalled();

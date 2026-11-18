@@ -5,6 +5,8 @@ import { CalendarDays, Check, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { submitLead } from "@/services/leads";
 import { toast } from "sonner";
+import { Calendar } from "@/components/ui/calendar";
+import { ptBR } from "date-fns/locale";
 import { getCorretorRef, getCorretorRefId } from "@/lib/session";
 import { formatPhone } from "@/lib/phoneMask";
 import { getLeadTracking } from "@/lib/leadTracking";
@@ -141,24 +143,30 @@ export function AgendamentoVisita({ imovelId, imovelSlug, imovelTitulo, imovelBa
             <p className="mb-2 font-body text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Escolha o dia
             </p>
-            <div className="flex flex-wrap gap-2">
-              {proximosDias.map((dia) => {
-                const selected = dataEscolhida?.toDateString() === dia.toDateString();
-                return (
-                  <Button
-                    key={dia.toISOString()}
-                    onClick={() => { setDataEscolhida(dia); void trackEvent({ tipo: "dia_escolhido", imovel_slug: imovelSlug, dados: { dia: dia.toISOString().split("T")[0] } }); }}
-                    variant="outline" aria-pressed={selected} className={`rounded-lg border-[1.5px] px-3 py-2 font-body text-xs font-medium transition-colors active:scale-[0.97] ${
-                      selected
-                        ? "border-foreground bg-foreground text-background"
-                        : "border-border text-foreground hover:border-primary/30"
-                    }`}
-                  >
-                    {dia.toLocaleDateString("pt-BR", { weekday: "short", day: "2-digit", month: "2-digit" })}
-                  </Button>
-                );
-              })}
-            </div>
+            <Calendar
+              mode="single"
+              locale={ptBR}
+              selected={dataEscolhida ?? undefined}
+              defaultMonth={proximosDias[0]}
+              fromDate={proximosDias[0]}
+              toDate={new Date(Date.now() + 60 * 864e5)}
+              disabled={[{ before: proximosDias[0] }, { dayOfWeek: [0] }]}
+              showOutsideDays={false}
+              onSelect={(dia) => { if (!dia) return; setDataEscolhida(dia); setHorario(""); void trackEvent({ tipo: "dia_escolhido", imovel_slug: imovelSlug, dados: { dia: dia.toISOString().split("T")[0] } }); }}
+              className="visita-calendario pointer-events-auto rounded-xl border border-border p-3"
+              classNames={{
+                caption_label: "font-body text-[15px] font-bold capitalize",
+                nav_button: "grid h-8 w-8 place-items-center rounded-full border border-border bg-background transition hover:bg-secondary disabled:opacity-30",
+                head_cell: "w-full font-body text-[11px] font-semibold uppercase text-muted-foreground",
+                row: "mt-1 flex w-full",
+                cell: "relative flex-1 p-0.5 text-center",
+                day: "mx-auto grid h-10 w-10 place-items-center rounded-full font-body text-sm font-semibold transition-all duration-200 hover:border hover:border-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                day_selected: "!bg-primary !text-primary-foreground scale-105 shadow-md",
+                day_today: "underline underline-offset-4",
+                day_disabled: "!cursor-not-allowed text-muted-foreground/50 line-through hover:border-0",
+              }}
+            />
+            {dataEscolhida && <p className="mt-2 font-body text-sm text-foreground animate-in fade-in">{dataEscolhida.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })}</p>}
           </div>
 
           {dataEscolhida && (
@@ -173,10 +181,10 @@ export function AgendamentoVisita({ imovelId, imovelSlug, imovelTitulo, imovelBa
                     <Button
                       key={h}
                       onClick={() => setHorario(h)}
-                      variant="outline" aria-pressed={selected} className={`rounded-lg border-[1.5px] px-3.5 py-2 font-body text-xs font-medium transition-colors active:scale-[0.97] ${
+                      variant="outline" aria-pressed={selected} className={`min-h-11 rounded-full border-[1.5px] px-4 py-2 animate-in fade-in font-body text-xs font-medium transition-colors active:scale-[0.97] ${
                         selected
-                          ? "border-foreground bg-foreground text-background"
-                          : "border-border text-foreground hover:border-primary/30"
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border text-foreground hover:border-foreground"
                       }`}
                     >
                       {h}

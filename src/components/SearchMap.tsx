@@ -144,13 +144,14 @@ interface SearchMapProps {
   onDrawFilter?: (filteredPins: MapPinData[]) => void;
   onPertoDeVoce?: () => void;
   fitToPins?: boolean;
+  autoSearchPadrao?: boolean;
 }
 
 function vistosSet(): Set<string> {
   try { return new Set((JSON.parse(localStorage.getItem("imoveis_vistos") || "[]") as unknown[]).filter((v): v is string => typeof v === "string")); } catch { return new Set(); }
 }
 
-export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, onBoundsChange, onDrawFilter, onPertoDeVoce, fitToPins = false }: SearchMapProps) {
+export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, onBoundsChange, onDrawFilter, onPertoDeVoce, fitToPins = false, autoSearchPadrao = false }: SearchMapProps) {
   const navigate = useNavigate();
   const { prefixLink } = useCorretor();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -160,8 +161,9 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
   const boundsRef = useRef<mapboxgl.LngLatBounds | null>(null);
   const pinsRef = useRef(pins);
   const [mapMoved, setMapMoved] = useState(false);
-  const [autoSearch, setAutoSearch] = useState(false);
-  const autoSearchRef = useRef(false);
+  const [mapaPronto, setMapaPronto] = useState(false);
+  const [autoSearch, setAutoSearch] = useState(autoSearchPadrao);
+  const autoSearchRef = useRef(autoSearchPadrao);
   const autoSearchTimerRef = useRef<number | null>(null);
   const boundsChangeTimerRef = useRef<number | null>(null);
   const userMarkerRef = useRef<mapboxgl.Marker | null>(null);
@@ -488,6 +490,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       });
 
       mapReadyRef.current = true;
+      setMapaPronto(true);
 
       // FIX 3 — Report initial bounds once, flag it
       const initialBounds = map.getBounds();
@@ -718,10 +721,12 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         const idsKey = pins.map(p => p.id).sort().join(",");
         if (idsKey !== lastFitIdsRef.current) {
           lastFitIdsRef.current = idsKey;
-          const lngs = pins.map(p => Number(p.longitude));
-          const lats = pins.map(p => Number(p.latitude));
-          const sw: [number, number] = [Math.min(...lngs), Math.min(...lats)];
-          const ne: [number, number] = [Math.max(...lngs), Math.max(...lats)];
+          // Ignora coordenadas isoladas (geocodificação errada) para enquadrar a região real
+          const corte = (v: number[]) => { const o = [...v].sort((x, y) => x - y); const n = o.length; const k = n > 20 ? Math.floor(n * 0.03) : 0; return [o[k], o[n - 1 - k]]; };
+          const [lngMin, lngMax] = corte(pins.map(p => Number(p.longitude)));
+          const [latMin, latMax] = corte(pins.map(p => Number(p.latitude)));
+          const sw: [number, number] = [lngMin, latMin];
+          const ne: [number, number] = [lngMax, latMax];
           programmaticMoveRef.current = true;
           map.fitBounds([sw, ne], { padding: 60, maxZoom: 15, duration: 800 });
         }
@@ -742,7 +747,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         doFit();
       });
     }
-  }, [pins, fitToPins]);
+  }, [pins, fitToPins, mapaPronto]);
 
   // Hover from card OR selected pin (popup aberto) → destaque escuro no topo
   useEffect(() => {

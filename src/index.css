@@ -672,3 +672,4 @@ body:has(.gaveta-mapa) .aviso-cookies{display:none}
 .mapboxgl-ctrl-group:not(:empty){border-radius:12px;box-shadow:0 2px 6px rgb(0 0 0/.18);border:0;overflow:hidden;background:hsl(var(--card))}
 .mapboxgl-ctrl-group button{width:40px;height:40px}
 .mapboxgl-ctrl-group button+button{border-top:1px solid hsl(var(--border))}
+@media(min-width:1024px){body.mapa-cheio .search-list{display:none}body.mapa-cheio .search-map{width:100%;padding-left:32px}.search-map .mapboxgl-ctrl-top-right{top:52px}}

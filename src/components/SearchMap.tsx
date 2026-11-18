@@ -2,7 +2,7 @@ import { selosDoCard } from "@/lib/novidade";
 import { FotosCard } from "@/components/search/FotosCard";
 import { useRef, useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, X, Bed, Maximize, ToggleLeft, ToggleRight, PenTool, Navigation, Check, Eye } from "lucide-react";
+import { Search, X, Bed, Maximize, ToggleLeft, ToggleRight, PenTool, Navigation, Check, Eye, Maximize2, Minimize2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type mapboxgl from "mapbox-gl";
 
@@ -60,13 +60,14 @@ function toGeoJSON(pins: MapPinData[]): GeoJSON.FeatureCollection {
           lng > -55 && lng < -48
         );
       })
-      .map((i) => ({
+      .map((i, ordem) => ({
         type: "Feature" as const,
         geometry: {
           type: "Point" as const,
           coordinates: [Number(i.longitude), Number(i.latitude)],
         },
         properties: {
+          ordem,
           id: i.id,
           slug: i.slug,
           preco: Number(i.preco),
@@ -182,8 +183,9 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
   const pinsRef = useRef(pins);
   const [mapMoved, setMapMoved] = useState(false);
   const [mapaPronto, setMapaPronto] = useState(false);
-  const [autoSearch, setAutoSearch] = useState(autoSearchPadrao);
-  const autoSearchRef = useRef(autoSearchPadrao);
+  const [autoSearch, setAutoSearch] = useState(true);
+  const autoSearchRef = useRef(true);
+  const [cheio, setCheio] = useState(false);
   const autoSearchTimerRef = useRef<number | null>(null);
   const boundsChangeTimerRef = useRef<number | null>(null);
   const userMarkerRef = useRef<mapboxgl.Marker | null>(null);
@@ -244,7 +246,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
 
   // Cleanup user marker on unmount
   useEffect(() => {
-    return () => { userMarkerRef.current?.remove(); };
+    return () => { userMarkerRef.current?.remove(); document.body.classList.remove("mapa-cheio"); };
   }, []);
 
   // Handle "Perto de você" — center map + add marker
@@ -296,7 +298,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
 
       const map = new mb.default.Map({
         container: containerRef.current,
-        style: "mapbox://styles/mapbox/streets-v12",
+        style: "mapbox://styles/mapbox/light-v11",
         center: [-51.2177, -30.0346],
         zoom: 11,
         minZoom: 7,
@@ -312,6 +314,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       });
 
       map.addControl(new mb.default.NavigationControl({ showCompass: false }), "top-right");
+      map.on("style.load", () => { for (const l of map.getStyle().layers ?? []) { if (/poi|transit/.test(l.id) && l.type === "symbol") map.setLayoutProperty(l.id, "visibility", "none"); if (l.type === "fill" && /^water/.test(l.id)) map.setPaintProperty(l.id, "fill-color", "#CDE6F2"); if (l.type === "fill" && /landuse|park|national-park/.test(l.id)) map.setPaintProperty(l.id, "fill-color", "#E3EFD9"); if (l.type === "background") map.setPaintProperty(l.id, "background-color", "#F5F3EF"); } });
 
     map.on("load", () => {
       // Cluster settings — lower maxZoom/radius to show price pins earlier
@@ -340,9 +343,9 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         source: "imoveis",
         paint: {
           "circle-color": ["case", ["boolean", ["get", "visto"], false], "#EBEBEB", "#FFFFFF"],
-          "circle-radius": ["interpolate", ["linear"], ["zoom"], 9, 2.5, 12, 3.5, 15, 5],
+          "circle-radius": 5,
           "circle-stroke-width": 1,
-          "circle-stroke-color": "rgba(0,0,0,0.28)",
+          "circle-stroke-color": "rgba(0,0,0,0.18)",
         },
       });
 
@@ -366,17 +369,17 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         layout: {
           "icon-image": ["case", ["boolean", ["get", "visto"], false], "pin-bg-visto", "pin-bg"],
           "icon-text-fit": "both",
-          "icon-text-fit-padding": [6, 11, 6, 11],
+          "icon-text-fit-padding": [7, 13, 7, 13],
           "icon-allow-overlap": false,
           "icon-ignore-placement": false,
-          "icon-padding": 3,
+          "icon-padding": 8,
           "text-field": ["get", "preco_label"],
           "text-font": ["DIN Pro Bold", "Arial Unicode MS Bold"],
-          "text-size": 12.5,
+          "text-size": 14,
           "text-allow-overlap": false,
           "text-optional": false,
           "text-anchor": "center",
-          "symbol-sort-key": ["-", 0, ["get", "preco"]],
+          "symbol-sort-key": ["get", "ordem"],
         },
         paint: {
           "text-color": ["case", ["boolean", ["get", "visto"], false], "#6A6A6A", "#222222"],
@@ -399,7 +402,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
           "icon-ignore-placement": true,
           "text-field": ["get", "preco_label"],
           "text-font": ["DIN Pro Bold", "Arial Unicode MS Bold"],
-          "text-size": 13.5,
+          "text-size": 14.5,
           "text-allow-overlap": true,
           "text-ignore-placement": true,
           "text-anchor": "center",
@@ -870,9 +873,16 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         })()}
       </AnimatePresence>
 
-      {/* Map toolbar — draw, nearby, auto-search */}
+      {onBoundsSearch && (
+        <button type="button" aria-label={cheio ? "Mostrar lista" : "Ampliar mapa"} aria-pressed={cheio}
+          onClick={() => { const n = !cheio; setCheio(n); document.body.classList.toggle("mapa-cheio", n); setTimeout(() => mapRef.current?.resize(), 50); }}
+          className="mapa-ampliar absolute right-3 top-3 z-20 hidden h-10 w-10 place-items-center rounded-xl bg-card text-foreground shadow-lg lg:grid">
+          {cheio ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+        </button>
+      )}
+      {/* Map toolbar — draw, nearby */}
       {onBoundsSearch && !drawMode && !hasDrawn && (
-        <div role="toolbar" aria-label="Ferramentas do mapa" className="absolute left-1/2 z-20 flex -translate-x-1/2 items-center gap-0.5 rounded-full border border-border bg-card/95 p-1 shadow-xl backdrop-blur-md sm:bottom-5" style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 3rem)" }}>
+        <div role="toolbar" aria-label="Ferramentas do mapa" className="absolute left-3 top-3 z-20 flex items-center gap-0.5 rounded-full bg-card p-1 shadow-lg">
           <button
             onClick={() => window.dispatchEvent(new CustomEvent("uhome:draw-area"))}
             className="flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 font-body text-[12px] font-semibold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.97]"
@@ -889,22 +899,6 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
               Perto de você
             </button>
           )}
-          <button
-            onClick={() => setAutoSearch(prev => !prev)}
-            aria-pressed={autoSearch}
-            className={`flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 font-body text-[12px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.97] ${
-              autoSearch
-                ? "bg-primary/10 text-primary"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground"
-            }`}
-          >
-            {autoSearch ? (
-              <ToggleRight className="h-4 w-4 text-primary" />
-            ) : (
-              <ToggleLeft className="h-4 w-4" />
-            )}
-            Buscar ao mover
-          </button>
         </div>
       )}
 

@@ -20,6 +20,7 @@ export function categoriasVisiveis(contagens: Record<string, number>) { return C
 export function tituloBusca(cidade?: string) { return `Imóveis à venda em ${cidade || 'Porto Alegre'}`; }
 /** Faixa de categorias com ícones 3D (Home e busca). Ícones em /public/categorias. */
 export const CATEGORIAS_3D = [
+  { id: 'novidades', nome: 'Novidades', icone: '/categorias/novidades.webp', filtros: { novidades: 30 } },
   { id: 'garden', nome: 'Apartamentos garden', icone: '/categorias/garden.webp', filtros: { tipo: 'garden' } },
   { id: 'studios', nome: 'Studios', icone: '/categorias/studio.webp', filtros: { tipo: 'studio,loft' } },
   { id: 'casas_condominio', nome: 'Casas em condomínio', icone: '/categorias/condominio.webp', filtros: { tipo: 'casa_condominio' } },

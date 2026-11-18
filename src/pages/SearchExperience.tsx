@@ -27,13 +27,14 @@ const mobileIcons: Record<string, typeof House> = { apartamento: Building, casa:
 export function urlFiltros(params: URLSearchParams, preset: Record<string, unknown> = {}) {
   const f: Record<string, any> = { secao: 'imoveis', cidade: '', ordem: 'recentes', ...preset };
   const keys: Record<string, string> = { preco_max: 'precoMax', preco_min: 'precoMin', area_min: 'areaMin', area_max: 'areaMax', area_util_min: 'areaUtilMin', area_util_max: 'areaUtilMax', andar_min: 'andarMin', condominio_max: 'condominioMax', iptu_max: 'iptuMax' };
-  params.forEach((v,k) => { const key = keys[k] ?? k; if (['precoMax','precoMin','quartos','vagas','banheiros','areaMin','areaMax','areaUtilMin','areaUtilMax','andarMin','condominioMax','iptuMax'].includes(key)) f[key]=Number(v); else if (['secao','cidade','tipo','fase','bairro','ordem','q','codigo','condominio','comodidades'].includes(key)) f[key]=v; });
+  params.forEach((v,k) => { const key = keys[k] ?? k; if (['precoMax','precoMin','quartos','vagas','banheiros','areaMin','areaMax','areaUtilMin','areaUtilMax','andarMin','condominioMax','iptuMax','novidades'].includes(key)) f[key]=Number(v); else if (['secao','cidade','tipo','fase','bairro','ordem','q','codigo','condominio','comodidades'].includes(key)) f[key]=v; });
   return f;
 }
 const brl=(v:unknown)=>reais(Number(v));
 const AREAS:Record<string,string>={areaUtilMin:'Área priv. a partir de',areaUtilMax:'Área priv. até',areaMin:'Área total a partir de',areaMax:'Área total até'};
 /** Texto legível de cada filtro aplicado. */
 export function rotuloChip(k:string,v:unknown):string{
+  if(k==='novidades')return 'Novidades';
   if(k==='tipo')return String(v).split(',').map(x=>TIPOS[x]??x).join(', ');
   if(k==='precoMax')return `Até ${brl(v)}`; if(k==='precoMin')return `A partir de ${brl(v)}`; if(k==='condominioMax')return `Condomínio até ${brl(v)}`;
   if(k==='quartos'||k==='banheiros'||k==='vagas')return `${v}+ ${k}`;

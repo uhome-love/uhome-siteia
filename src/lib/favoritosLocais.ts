@@ -1,0 +1,5 @@
+export const FAVORITOS_KEY = 'uh-imoveis-favoritos';
+export function lerFavoritos(): string[] { try { const a = JSON.parse(localStorage.getItem(FAVORITOS_KEY) ?? '[]'); return Array.isArray(a) ? a.filter(x => typeof x === 'string') : []; } catch { return []; } }
+export function salvarFavoritos(ids: string[]) { localStorage.setItem(FAVORITOS_KEY, JSON.stringify([...new Set(ids)])); window.dispatchEvent(new Event('uhome:favoritos')); }
+export function devePedirAviso(antes: number, depois: number, pedido: boolean) { return antes < 3 && depois >= 3 && !pedido; }
+export function pedidoAviso(id: string, imoveis: string[], pagina: string, horario: string) { return { id, tipo: 'aviso_preco', dia: null, periodo: null, planta: null, assunto: 'Avisar quando o preço baixar', empreendimento: null, pagina, horario, financiamento: null, imoveis: [...new Set(imoveis)] }; }

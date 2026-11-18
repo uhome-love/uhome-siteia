@@ -11,6 +11,7 @@ import { Heart, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useProdutosFoco } from "@/lib/produtosFoco";
 import { ProdutoFocoCard } from "@/components/foco/FocoShared";
+import { PriceNotice } from '@/components/search/PriceNotice';
 
 function parseFotos(fotos: any) {
   if (!fotos) return [];
@@ -21,7 +22,9 @@ function parseFotos(fotos: any) {
 
 const Favoritos = () => {
   const { user } = useAuth();
-  const { favoritos, loading: favsLoading } = useFavoritos();
+  const { favoritos, loading: favsLoading, isFavorito, toggleFavorito } = useFavoritos();
+  const [notice,setNotice]=useState(false);
+  useEffect(()=>{const on=()=>setNotice(true);window.addEventListener('uhome:aviso-preco',on);return()=>window.removeEventListener('uhome:aviso-preco',on);},[]);
   const [imoveis, setImoveis] = useState<Imovel[]>([]);
   const [loading, setLoading] = useState(true);
   const { data: produtosFoco = [] } = useProdutosFoco();
@@ -61,11 +64,11 @@ const Favoritos = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="mx-auto max-w-5xl px-6 pb-20 pt-28">
-        <h1 className="font-body text-[clamp(1.5rem,4vw,2rem)] font-extrabold text-foreground">
+        <h1 className="font-body text-3xl font-extrabold text-foreground">
           Meus favoritos
         </h1>
         <p className="mt-1 font-body text-sm text-muted-foreground">
-          {user ? `${favoritos.size} imóveis salvos` : "Faça login para sincronizar seus favoritos"}
+          {`${favoritos.size} imóveis salvos`}{!user && ' · Sua lista está só neste aparelho'}
         </p>
 
         {loading || favsLoading ? (
@@ -95,13 +98,14 @@ const Favoritos = () => {
         ) : (
           <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {imoveis.map((imovel, i) => (
-              <SearchPropertyCard key={imovel.id} imovel={imovel} index={i} />
+              <SearchPropertyCard key={imovel.id} imovel={imovel} index={i} isFavorito={isFavorito} toggleFavorito={toggleFavorito} />
             ))}
           </div>
         )}
         {empreendimentos.length > 0 && <section className="mt-8"><h2 className="text-xl font-bold">Empreendimentos salvos</h2><div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{empreendimentos.map(p => <ProdutoFocoCard key={p.id} p={p} />)}</div></section>}
       </div>
       <Footer />
+      <PriceNotice open={notice} onClose={()=>setNotice(false)}/>
     </div>
   );
 };

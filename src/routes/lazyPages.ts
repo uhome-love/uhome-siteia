@@ -6,7 +6,8 @@ export { default as Index } from "../pages/Index.tsx";
 // Secondary pages – lazy loaded
 
 // Public pages
-export const Search = lazyRetry(() => import("../pages/Search.tsx"));
+export const Search = lazyRetry(() => import("../pages/SearchExperience.tsx"));
+export const SearchAI = lazyRetry(() => import("../pages/Search.tsx"));
 export const PropertyDetail = lazyRetry(() => import("../pages/PropertyDetail.tsx"));
 export const Anunciar = lazyRetry(() => import("../pages/Anunciar.tsx"));
 export const Carreiras = lazyRetry(() => import("../pages/Carreiras.tsx"));

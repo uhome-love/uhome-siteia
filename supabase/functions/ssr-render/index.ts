@@ -1,5 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { tituloFoco, tituloPreviaFoco, faqFoco } from "../_shared/focoPresentation.ts";
+import { BUSCA_URLS } from '../_shared/buscaConfig.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -1255,6 +1256,13 @@ async function renderPillarPage() {
 }
 
 /* ── main handler ────────────────────────────────────── */
+async function renderBuscaPronta(path: keyof typeof BUSCA_URLS) {
+ const config=BUSCA_URLS[path];const {data,error}=await supabase.rpc('busca_site',{p:{...config.filtros,limit:4}});if(error)throw error;
+ const rows=data?.rows??[];const title=`${config.titulo} | Uhome`,desc=config.texto;
+ const image=rows[0]?.foto_principal??OG_DEFAULT;
+ const body=`<h1>${esc(config.titulo)}</h1><p>${esc(desc)}</p><p>${data?.count??0} imóveis disponíveis</p>${rows.map((r:any)=>`<article><a href="${SITE}/${r.fonte==='produto'?'em-foco':'imovel'}/${esc(r.slug)}"><img src="${esc(r.foto_principal)}" alt="${esc(r.titulo)}"><h2>${esc(r.titulo)}</h2></a><p>${esc(r.bairro)}, ${esc(r.cidade)}</p><p>${Number(r.preco).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</p></article>`).join('')}`;
+ return html(title,desc,image,SITE+path,[orgJsonLd(),{'@context':'https://schema.org','@type':'ItemList',name:config.titulo,numberOfItems:data?.count}],body);
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -1268,7 +1276,9 @@ Deno.serve(async (req) => {
 
     let rendered: string | null = null;
 
-    if (path === "/" || path === "") {
+    if (path in BUSCA_URLS) {
+      rendered = await renderBuscaPronta(path as keyof typeof BUSCA_URLS);
+    } else if (path === "/" || path === "") {
       rendered = await renderHome();
     } else if (path === "/imoveis-porto-alegre") {
       rendered = await renderPillarPage();

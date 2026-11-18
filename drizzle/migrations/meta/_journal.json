@@ -162,6 +162,13 @@
       "when": 1794964099136,
       "tag": "0022_simplificar_merge_pedidos_json",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1794970088095,
+      "tag": "0023_busca_site_catalogo_e_aviso_preco",
+      "breakpoints": true
     }
   ]
 }

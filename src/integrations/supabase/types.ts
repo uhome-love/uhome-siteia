@@ -1826,6 +1826,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      busca_site: { Args: { p?: Json }; Returns: Json }
       count_imoveis: {
         Args: {
           lat_max?: number

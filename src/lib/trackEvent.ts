@@ -3,7 +3,7 @@ import { canTrack } from './consent';
 import { journeyEnvelope, safePage } from './journeyIdentity';
 import { getCorretorRef, getTrackingData } from './session';
 import { fonteLegivel, classificarDevice } from './leadTracking';
-export type JourneyTipo = 'pagina_vista'|'busca_feita'|'categoria_tocada'|'filtro_aplicado'|'imovel_visto'|'foto_aberta'|'favorito_salvo'|'dia_escolhido'|'formulario_iniciado'|'visita_pedida'|'informacoes_pedidas'|'lia_aberta'|'lia_lead'|'whatsapp_tocado'|'simulacao_feita'|'pedido_corretor'|'rolagem_50'|'pagina_anuncio_vista';
+export type JourneyTipo = 'pagina_vista'|'busca_feita'|'categoria_tocada'|'filtro_aplicado'|'imovel_visto'|'foto_aberta'|'favorito_salvo'|'aviso_preco_pedido'|'dia_escolhido'|'formulario_iniciado'|'visita_pedida'|'informacoes_pedidas'|'lia_aberta'|'lia_lead'|'whatsapp_tocado'|'simulacao_feita'|'pedido_corretor'|'rolagem_50'|'pagina_anuncio_vista';
 export type FunilTipo = 'pagina_anuncio_vista'|'rolagem_50'|'galeria_aberta'|'formulario_iniciado';
 export interface TrackEventParams {tipo:JourneyTipo|FunilTipo|'imovel_visualizado'|'busca_realizada'|'whatsapp_click'|'formulario_enviado';imovel_slug?:string|null;imovel_titulo?:string|null;imovel_bairro?:string|null;imovel_preco?:number|null;busca_query?:string|null;busca_filtros?:Record<string,unknown>|null;dados?:Record<string,unknown>}
 export function origemResumo(){const t=getTrackingData();return {fonte:fonteLegivel(t,getCorretorRef()),utm_source:t.utm_source||null,utm_campaign:t.utm_campaign||null,tem_gclid:!!(t.gclid||t.gbraid||t.wbraid),device:classificarDevice(navigator.userAgent,window.innerWidth)};}

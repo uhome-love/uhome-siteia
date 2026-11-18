@@ -14,7 +14,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC = path.join(__dirname, "..", "public");
 
 const SITE = "https://uhome.com.br";
-const TODAY = new Date().toISOString().split("T")[0];
+const TODAY = null;
 const MAX_URLS = 50000;
 
 // ── Supabase client ──
@@ -30,7 +30,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 // ── Helpers ──
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const entry = (loc, lastmod, changefreq, priority) =>
-  `  <url>\n    <loc>${esc(loc)}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`;
+  `  <url>\n    <loc>${esc(loc)}</loc>\n    ${lastmod ? `<lastmod>${lastmod}</lastmod>` : ''}\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`;
 const slugify = (name) =>
   name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
@@ -91,6 +91,12 @@ async function main() {
   add("/", TODAY, "daily", "1.0");
   add("/imoveis-porto-alegre", TODAY, "daily", "0.95");
   add("/busca", TODAY, "daily", "0.9");
+  add('/em-foco', null, 'weekly', '0.85');
+  for(const p of ['/apartamentos-ate-400-mil-porto-alegre','/casas-em-condominio-porto-alegre','/studios-para-investir-porto-alegre','/imoveis-canoas'])add(p,null,'daily','0.8');
+  const [{data:products},{data:campaigns}]=await Promise.all([supabase.from('produtos_foco').select('slug,ficha').eq('ativo',true).range(0,1999),supabase.from('campanhas').select('slug,inicio,fim,config').eq('ativo',true).range(0,1999)]);
+  for(const p of products??[])add('/em-foco/'+p.slug,p.ficha?.conteudo_atualizado_em??null,'weekly','0.85');
+  const day=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+  for(const c of campaigns??[])if((!c.inicio||day>=c.inicio)&&(!c.fim||day<=c.fim))add('/campanha/'+c.slug,c.config?.conteudo_atualizado_em??null,'daily','0.9');
   add("/bairros", TODAY, "weekly", "0.85");
   add("/condominios", TODAY, "weekly", "0.85");
   add("/guia-bairros", TODAY, "weekly", "0.85");
@@ -117,7 +123,7 @@ async function main() {
   while (urls.size < MAX_URLS) {
     const { data, error } = await supabase
       .from("imoveis")
-      .select("slug, updated_at")
+      .select("slug, publicado_em")
       .eq("status", "disponivel")
       .not("slug", "is", null)
       .order("publicado_em", { ascending: false })
@@ -125,7 +131,7 @@ async function main() {
     if (error) { console.error("  Imoveis error:", error.message); break; }
     if (!data || data.length === 0) break;
     for (const row of data) {
-      const lm = row.updated_at ? new Date(row.updated_at).toISOString().split("T")[0] : TODAY;
+      const lm = row.publicado_em ? new Date(row.publicado_em).toISOString().split("T")[0] : null;
       add(`/imovel/${row.slug}`, lm, "daily", "0.9");
       imoveisCount++;
     }

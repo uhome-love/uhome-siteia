@@ -80,7 +80,7 @@ export async function submitLead(data: LeadData) {
   };
 
   const pedido = (data.contexto?.pedido as Record<string, unknown> | undefined) || {};
-  const tipo = typeof pedido.tipo === "string" ? pedido.tipo : /agendamento|agendar_visita/.test(data.origem_componente) ? "visita_pedida" : /informac/.test(data.origem_componente) ? "informacoes_pedidas" : "pedido_corretor";
+  const tipo = pedido.tipo === 'aviso_preco' ? 'aviso_preco_pedido' : typeof pedido.tipo === "string" ? pedido.tipo : /agendamento|agendar_visita/.test(data.origem_componente) ? "visita_pedida" : /informac/.test(data.origem_componente) ? "informacoes_pedidas" : "pedido_corretor";
   const result = await postJourney({ action: "lead", lead: { ...payload, visitor_id: getVisitorId(), email: data.email || undefined } });
   if (!result.ok) throw new Error("Contato não registrado");
   setLeadIdentity({ telefone: data.telefone, email: data.email, nome: data.nome }, data.origem_componente);

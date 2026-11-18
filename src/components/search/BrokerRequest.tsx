@@ -1,0 +1,8 @@
+import {useState} from 'react';
+import {Button} from '@/components/ui/button';
+import {formatPhone,rawPhone} from '@/lib/phoneMask';
+import {submitLead} from '@/services/leads';
+export function BrokerRequest({filtros}:{filtros:Record<string,unknown>}) {
+ const [phone,setPhone]=useState(''),[error,setError]=useState(''),[ok,setOk]=useState(false),[loading,setLoading]=useState(false);
+ return <section className="broker-request"><h2>Um corretor busca para você</h2><p>Deixe seu WhatsApp e receba opções que combinam com esta busca, inclusive imóveis que ainda não estão no site.</p>{ok?<p>Pedido recebido. Um corretor vai falar com você.</p>:<form onSubmit={async e=>{e.preventDefault();const falta=11-rawPhone(phone).length;if(falta>0){setError(`Confira o número: faltam ${falta} dígitos.`);return;}setLoading(true);try{await submitLead({nome:'Pedido de busca',telefone:phone,origem_componente:'busca_corretor',formulario:'pedido_corretor',contexto:{filtros}});setOk(true);}catch{setError('Não foi possível salvar. Tente novamente.');}finally{setLoading(false);}}}><label>WhatsApp<input aria-label="WhatsApp do pedido ao corretor" required type="tel" value={phone} onChange={e=>setPhone(formatPhone(e.target.value))} placeholder="(51) 90000-0000"/></label><Button type="submit" disabled={loading}>{loading?'Salvando…':'Quero receber opções'}</Button>{error&&<p role="alert">{error}</p>}</form>}<small>Sem custo. Seus dados ficam só com a Uhome.</small></section>;
+}

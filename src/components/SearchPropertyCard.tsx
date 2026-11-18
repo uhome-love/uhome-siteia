@@ -88,7 +88,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
   const cardRef = useRef<HTMLElement>(null);
   const { prefixLink } = useCorretor();
   const navigate = useNavigate();
-  const detailHref = prefixLink(`/imovel/${imovel.slug}`);
+  const detailHref = prefixLink(`${(imovel as Imovel & {fonte?:string}).fonte === 'produto' ? '/em-foco/' : '/imovel/'}${imovel.slug}`);
   const handleCardClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
     // Allow opening in new tab via cmd/ctrl/middle click — let the browser handle it
     if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
@@ -114,6 +114,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
 
   // Load full photo set lazily
   const loadFullFotos = useCallback(() => {
+    if ((imovel as Imovel & {fonte?:string}).fonte === 'produto') return;
     if (fotosLoadedRef.current || baseFotos.length > 1) return;
     fotosLoadedRef.current = true;
     setLoadingFotos(true);
@@ -342,13 +343,14 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
 
         {/* Text content — QuintoAndar style */}
         <div className="px-1 pt-2.5 pb-1">
+          <p className="mb-1 text-base font-bold leading-snug">{imovel.titulo}</p>
           {/* Price */}
           <p className="font-body text-[17px] font-extrabold leading-tight text-foreground">{price}</p>
 
           {/* Monthly costs inline */}
           {((imovel.preco_condominio ?? 0) > 0 || (imovel.preco_iptu ?? 0) > 0) && (
             <p className="mt-0.5 font-body text-[12px] text-muted-foreground">
-              {(imovel.preco_condominio ?? 0) > 0 && `Cond. R$ ${imovel.preco_condominio!.toLocaleString("pt-BR")}`}
+              {(imovel.preco_condominio ?? 0) > 0 && `Cond. R$ ${imovel.preco_condominio?.toLocaleString("pt-BR")}`}
               {(imovel.preco_condominio ?? 0) > 0 && iptuMensal(imovel) > 0 && " · "}
               {iptuMensal(imovel) > 0 && formatIptuCurto(imovel)}
             </p>
@@ -465,6 +467,7 @@ export const SearchPropertyCard = forwardRef<HTMLAnchorElement, Props>(function 
 
         {/* Text — QuintoAndar style: price first */}
         <div className="min-h-[5.75rem] px-0.5 pt-2.5">
+          <p className="mb-1 text-sm font-bold leading-snug">{imovel.titulo}</p>
           <p className="font-body text-[15px] font-bold text-foreground">{price}</p>
 
           <p className="mt-0.5 min-h-[1rem] font-body text-[11px] text-muted-foreground">

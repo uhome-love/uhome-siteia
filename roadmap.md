@@ -1,4 +1,11 @@
 # Roadmap — rodada pós-auditoria 16/11
+- [x] Parte 3: seções/categorias com contagens reais, modal, chips, vazio e paginação manual
+- [x] Parte 3: favoritos locais e pedido de aviso de preço UUID, jornada/CRM sem enviar leads de teste
+- [x] Parte 3: cinco URLs Google e contagem única; sitemap dinâmico/estático regenerados sem datas artificiais
+- [ ] Parte 3: saída automática em /sitemap.xml aguarda central encaminhar ao dynamic-sitemap sem alterar Worker
+- [x] Parte 3: 22 fotos WebP próprias (768 px, ≤50 KB), modelo site-v3, prints e trace local LCP anterior ao main
+- [ ] Parte 3: renovar Assets de novas fotos a cada mudança aguarda uploader da central; função não dispõe de credencial CDN
+- [ ] Parte 3: publicar app; central mede e testa pedido normal após publicação
 - [x] Pedidos UUID acumulados, último pedido/origem, atribuição das visitas; validação local sem leads reais
 - [ ] Jornada sem funil: código preparado; CRM precisa criar leads.dados_site (campo ausente). Retentativa no tick mantém pendência até disponível
 - [ ] Publicar app de pedidos; central repete teste autorizado. Limpeza de testes fica com CRM
@@ -7,7 +14,7 @@
 - [x] Parte 2: 23 testes com envios simulados, prints 390/1440 de Arvoredo/Bosque/Orygem e foco/troca conferidos
 - [x] Ajustes pré-publicação: Essence lotes, tipos do catálogo, título manual e nome nas prévias; dez páginas/prévias verificadas, site-v1 preservado
 - [x] Números 0/vazios ocultos por regra compartilhada app/site-v2; Open Bosque conferido, site-v1 preservado e Worker intacto; 20 testes passaram
-- [ ] Parte 2: publicar app e central conferir pedidos reais/LCP oficial; sem envio de teste ao CRM nesta rodada
+- [x] Parte 2 publicada e encerrada pela central; 10 páginas e preços conferidos, LCP 1,5/1,5/2,1 s; testes apagados
 - [x] A / rodada 4: capa 44,9 KB ativada, preconnect como alternativa autorizada, foto da tela pronta conservada; trace local antes da execução do app
 - [x] B / parte 1: tokens, cabeçalho/barras, rodapé, Lia e modelos versionados; 390/1440 px e fluxos conferidos
 - [x] Rodada 4 publicada: central confirmou LCP 1,0/2,4/1,5/1,0 s e CLS zero nas quatro páginas

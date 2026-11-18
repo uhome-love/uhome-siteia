@@ -1,4 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { BUSCA_URLS } from '../_shared/buscaConfig.ts';
+import { xmlUrl } from '../_shared/sitemapPolicy.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -80,8 +82,8 @@ function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-function urlEntry(loc: string, lastmod: string, changefreq: string, priority: string) {
-  return `  <url>\n    <loc>${esc(loc)}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`;
+function urlEntry(loc: string, lastmod: string | null, changefreq: string, priority: string) {
+  return `  <url>\n    <loc>${esc(loc)}</loc>\n    ${lastmod ? `<lastmod>${lastmod}</lastmod>` : ''}\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`;
 }
 
 function wrapUrlset(entries: string[]) {
@@ -118,7 +120,7 @@ function buildSitemapIndex(today: string) {
   ];
 
   const entries = sitemaps
-    .map((s) => `  <sitemap>\n    <loc>${esc(s.loc)}</loc>\n    <lastmod>${s.lastmod}</lastmod>\n  </sitemap>`)
+    .map((s) => `  <sitemap>\n    <loc>${esc(s.loc)}</loc>\n  </sitemap>`)
     .join("\n");
 
   return `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries}\n</sitemapindex>`;
@@ -174,7 +176,7 @@ async function buildImoveisSitemap(today: string, pageNum = 0) {
   while (entries.length < maxEntries) {
     const { data, error } = await supabase
       .from("imoveis")
-      .select("slug, updated_at")
+      .select("slug, publicado_em")
       .eq("status", "disponivel")
       .not("slug", "is", null)
       .order("publicado_em", { ascending: false })
@@ -184,8 +186,8 @@ async function buildImoveisSitemap(today: string, pageNum = 0) {
     if (!data || data.length === 0) break;
 
     for (const row of data) {
-      const lastmod = row.updated_at
-        ? new Date(row.updated_at).toISOString().split("T")[0]
+      const lastmod = row.publicado_em
+        ? new Date(row.publicado_em).toISOString().split("T")[0]
         : today;
       entries.push(urlEntry(`${SITE}/imovel/${row.slug}`, lastmod, "daily", "0.9"));
     }
@@ -418,9 +420,22 @@ Deno.serve(async (req) => {
     const url = new URL(req.url);
     const type = url.searchParams.get("type");
     const page = parseInt(url.searchParams.get("page") || "0", 10);
-    const today = new Date().toISOString().split("T")[0];
+    // Unknown page-specific content dates must not become generation dates.
+    const today = null as unknown as string;
 
     switch (type) {
+      case 'catalogo': {
+        const entries=[xmlUrl(`${SITE}/`),xmlUrl(`${SITE}/busca`),...Object.keys(BUSCA_URLS).map(p=>xmlUrl(SITE+p))];
+        const [{data:products,error:pe},{data:campaigns,error:ce}]=await Promise.all([
+          supabase.from('produtos_foco').select('slug,ficha').eq('ativo',true).range(0,1999),
+          supabase.from('campanhas').select('slug,inicio,fim,config').eq('ativo',true).range(0,1999)
+        ]);if(pe||ce)throw pe||ce;
+        for(const p of products??[])entries.push(xmlUrl(`${SITE}/em-foco/${p.slug}`,p.ficha?.conteudo_atualizado_em));
+        const day=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+        for(const c of campaigns??[])if((!c.inicio||day>=c.inicio)&&(!c.fim||day<=c.fim))entries.push(xmlUrl(`${SITE}/campanha/${c.slug}`,c.config?.conteudo_atualizado_em));
+        for(let offset=0;;offset+=1000){const {data,error}=await supabase.from('imoveis').select('slug,publicado_em').eq('status','disponivel').eq('finalidade','venda').not('foto_principal','is',null).neq('foto_principal','').not('fotos','is',null).neq('fotos','[]').order('id').range(offset,offset+999);if(error)throw error;for(const r of data??[])entries.push(xmlUrl(`${SITE}/imovel/${r.slug}`,r.publicado_em));if(!data||data.length<1000)break;}
+        return xmlResponse(wrapUrlset(entries));
+      }
       case "pages":
         return xmlResponse(await buildPagesSitemap(today));
 
@@ -429,7 +444,7 @@ Deno.serve(async (req) => {
         if (totalImoveis > MAX_URLS_PER_SITEMAP && page === -1) {
           const numPages = Math.ceil(totalImoveis / MAX_URLS_PER_SITEMAP);
           const sitemapEntries = Array.from({ length: numPages }, (_, i) =>
-            `  <sitemap>\n    <loc>${SITE}/sitemap-imoveis-${i + 1}.xml</loc>\n    <lastmod>${today}</lastmod>\n  </sitemap>`
+            `  <sitemap>\n    <loc>${SITE}/sitemap-imoveis-${i + 1}.xml</loc>\n  </sitemap>`
           ).join("\n");
           return xmlResponse(
             `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapEntries}\n</sitemapindex>`

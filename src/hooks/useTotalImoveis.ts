@@ -1,16 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabaseLazy";
 import { dadosDobra } from "@/lib/dobra";
+import { totalHome } from '../../supabase/functions/_shared/buscaConfig';
 
 /** Contagem única de imóveis disponíveis, compartilhada por toda a página (mesmo número em todo lugar). */
 export function useTotalImoveis() {
   const { data } = useQuery({
     queryKey: ["imoveis", "total-count"],
     queryFn: async () => {
-      const { count } = await supabase
-        .from("imoveis")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "disponivel");
+      const { data } = await supabase.rpc('busca_site', {p:{limit:0}});
+      const count = (data as any)?.count;
       return count && count > 0 ? count : null;
     },
     initialData: () => dadosDobra("total") || undefined,
@@ -22,6 +21,5 @@ export function useTotalImoveis() {
 
 /** "21.400+" arredondado para baixo na centena; texto neutro enquanto carrega. */
 export function formatTotal(n: number | null) {
-  if (!n) return "milhares de";
-  return `${(Math.floor(n / 100) * 100).toLocaleString("pt-BR")}+`;
+  return totalHome(n);
 }

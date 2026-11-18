@@ -16,8 +16,8 @@ export function Navbar() {
   const [params] = useSearchParams(); const { campanha, black } = useCampanhaDestaque();
   useEffect(() => { const on = () => setRolou(window.scrollY > 120); window.addEventListener('scroll', on, { passive: true }); return () => window.removeEventListener('scroll', on); }, []);
   useEffect(() => { setMenu(false); setBusca(false); }, [location.pathname]);
-  const tabs = [{ label: 'Imóveis', to: '/busca', icon: House }, { label: 'Lançamentos', to: '/em-foco', icon: Building2 }, { label: 'Investir', to: '/investir-studios', icon: ChartNoAxesCombined }];
-  const ativo = location.pathname.includes('investir') ? 'Investir' : /em-foco|campanha/.test(location.pathname) ? 'Lançamentos' : 'Imóveis';
+  const tabs = [{ label: 'Imóveis', to: '/busca', icon: House }, { label: 'Lançamentos', to: '/busca?secao=lancamentos', icon: Building2 }, { label: 'Investir', to: '/busca?secao=investir', icon: ChartNoAxesCombined }];
+  const ativo = params.get('secao') === 'investir' || location.pathname.includes('investir') ? 'Investir' : params.get('secao') === 'lancamentos' || /em-foco|campanha|lancamentos/.test(location.pathname) ? 'Lançamentos' : 'Imóveis';
   const abrirLia = () => window.dispatchEvent(new CustomEvent('uhome:abrir-lia'));
   const pesquisar = () => { const q = new URLSearchParams({ finalidade: 'venda', cidade }); if (local.trim()) q.set('q', local.trim()); navigate(prefixLink('/busca?' + q)); setBusca(false); };
   return <>

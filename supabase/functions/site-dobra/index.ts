@@ -6,6 +6,9 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import * as NOVO from "./moldes.ts";
 import { HERO_FOCO_V2, HEADER_FOCO_V2 } from "./moldes-foco-v2.ts";
 import { tituloFoco, numerosFoco } from "../_shared/focoPresentation.ts";
+import { NAV_BUSCA_V3, TOOLBAR_V3, CARD_V3 } from './moldes-busca-v3.ts';
+import { BUSCA_URLS, categoriasVisiveis, totalHome } from '../_shared/buscaConfig.ts';
+import miniaturas from '../_shared/buscaMiniaturas.json' with { type: 'json' };
 import { NAV, NAV_BUSCA, HERO, BUSCA_TOPO, BUSCA_GRADE, CABECALHO_FOCO, BOTOES_FOCO } from "./moldes-legado.ts";
 
 const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
@@ -39,7 +42,7 @@ function compativel(corpo: Corpo): Corpo {
   }
   novo = novo.replace('<main class="pt-14">','<main class="pt-[var(--uh-header-height)]">');
   const v2 = corpo.preV2 ?? novo;
-  return { ...corpo, pre: corpo.pre ? `<script>var v=document.querySelector('meta[name="uh-dobra-versao"]')?.content;document.write(v === 'site-v2' ? ${json(v2)} : v === 'site-v1' ? ${json(novo)} : ${json(corpo.pre)});</script>` : "" };
+  return { ...corpo, pre: corpo.pre || corpo.preV3 ? `<script>var v=document.querySelector('meta[name="uh-dobra-versao"]')?.content;document.write(v === 'site-v3' ? ${json(corpo.preV3 ?? v2)} : v === 'site-v2' ? ${json(v2)} : v === 'site-v1' ? ${json(novo)} : ${json(corpo.pre)});</script>` : "" };
 }
 
 /** Igual a src/lib/searchImages.ts */
@@ -152,7 +155,7 @@ function cardBusca(r: any, i: number) {
   return `<a class="relative block w-full min-w-0 cursor-pointer select-none outline-none [&amp;_*]:outline-none [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] no-underline text-inherit" href="/imovel/${esc(r.slug)}"><div class="sm:hidden"><div class="relative overflow-hidden rounded-xl"><div class="flex snap-x snap-mandatory overflow-x-auto scrollbar-hide" style="aspect-ratio: 4 / 3;"><div class="w-full shrink-0 snap-center"><div class="relative h-full w-full overflow-hidden" style="aspect-ratio: 4 / 3;"><img src="${esc(searchImageUrl(foto, 768))}" srcset="${esc(set)}" sizes="(max-width: 639px) calc(100vw - 24px), 400px" alt="${esc(alt)}" loading="eager" decoding="async" fetchpriority="${i === 0 ? "high" : "auto"}" class="h-full w-full object-cover transition-opacity duration-300 opacity-100" style="aspect-ratio: 4 / 3;" width="400" height="300"></div></div></div><div class="pointer-events-none absolute left-3 top-3 z-10 flex flex-wrap gap-1.5">${selos.slice(0, 2).map((b) => `<span class="inline-flex items-center gap-1 rounded-md px-2.5 py-1 font-body text-[11px] ${SELO_CLS[b.s]}">${b.s === "novo" ? CLOCK : ""}${b.l}</span>`).join("")}</div>${HEART}</div><div class="px-1 pt-2.5 pb-1"><p class="font-body text-[17px] font-extrabold leading-tight text-foreground">${preco}</p>${(r.preco_condominio ?? 0) > 0 ? `<p class="mt-0.5 font-body text-[12px] text-muted-foreground">Cond. R$ ${Number(r.preco_condominio).toLocaleString("pt-BR")}</p>` : ""}${stats.length ? `<p class="mt-1.5 font-body text-[13px] text-foreground">${esc(stats.join(" · "))}</p>` : ""}<p class="mt-0.5 font-body text-[12px] text-muted-foreground truncate">${esc(`${r.bairro}, ${r.cidade || "Porto Alegre"}`)}</p></div></div></a>`;
 }
 
-type Corpo = { head: string; pre: string; script: string; preV2?: string };
+type Corpo = { head: string; pre: string; script: string; preV2?: string; preV3?: string };
 const CALCULAR: Record<string, () => Promise<Corpo>> = { busca: calcularBusca, home: calcularHome };
 
 /** Primeira dobra pré-calculada: lê uma linha pronta (rápido); renova em segundo plano se passou de 4 min. */
@@ -171,8 +174,25 @@ async function preCalculado(chave: "busca" | "home") {
 
 async function renovar(chave: "busca" | "home") {
   const corpo = await CALCULAR[chave]();
+  if(chave==='busca') {
+    const v3=await calcularBuscaV3('/busca');
+    Object.assign(corpo,{preV3:v3.preV3,script:corpo.script+v3.script,head:corpo.head+v3.head});
+    for(const path of Object.keys(BUSCA_URLS)){const b=await calcularBuscaV3(path);await supabase.from('site_dobra_cache').upsert({chave:'busca-v3:'+path,corpo:b,atualizado_em:new Date().toISOString()});}
+  }
   if (corpo.script) await supabase.from("site_dobra_cache").upsert({ chave, corpo, atualizado_em: new Date().toISOString() });
   return corpo;
+}
+
+async function calcularBuscaV3(path:string):Promise<Corpo> {
+ const config=BUSCA_URLS[path as keyof typeof BUSCA_URLS];
+ const {data,error}=await supabase.rpc('busca_site',{p:{...config?.filtros,limit:40}});if(error)throw error;
+ const rows=data?.rows??[];if(!rows.length)return {head:'',pre:'',script:''};
+ const escHtml=(s:unknown)=>esc(s);const first=(miniaturas as Record<string,string>)[rows[0].foto_principal]??searchImageUrl(rows[0].foto_principal,768);
+ const cats=categoriasVisiveis(data.categorias??{}).map(c=>`<button class="inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold hover:bg-secondary hover:text-foreground h-12 px-6 py-2 search-category"><span aria-hidden="true" style="width:32px;height:32px;display:block"></span><span>${esc(c.nome)}</span></button>`).join('');
+ const card=(r:any,i:number)=>{const tipo=({'casa_condominio':'Casa em Condomínio','garden':'Apartamento Garden'} as Record<string,string>)[r.tipo]??r.tipo.charAt(0).toUpperCase()+r.tipo.slice(1);const title=r.fonte==='produto'?r.titulo:`${tipo}${r.quartos>0?` ${r.quartos} quarto${r.quartos>1?'s':''}`:' para Venda'} — ${r.bairro}`;let h=CARD_V3;const values={HREF:`/${r.fonte==='produto'?'em-foco':'imovel'}/${r.slug}`,FOTO:(miniaturas as Record<string,string>)[r.foto_principal]??searchImageUrl(r.foto_principal,768),ALT:`${title} - foto 1`,PRIORIDADE:i===0?'high':'auto',TITULO:title,STATS:[r.area_util??r.area_total,r.quartos,r.vagas].map((v:number,j:number)=>v?`${v} ${j===0?'m²':j===1?`quarto${v>1?'s':''}`:`vaga${v>1?'s':''}`}`:null).filter(Boolean).join(' · '),LOCAL:`${r.bairro}, ${r.cidade}`,PRECO:(r.fonte==='produto'?'A partir de ':'')+BRL.format(r.preco)};for(const [k,v] of Object.entries(values))h=h.replaceAll('{{'+k+'}}',escHtml(v));return h;};
+ const title=`${Number(data.count).toLocaleString('pt-BR')} imóveis${config?.filtros.cidade?` em ${config.filtros.cidade}`:' à venda'}`;
+ const preV3=`<div id="uh-pre" data-uh-alvo=".catalog-photo img" data-uh-max="1023"><div class="search-page bg-background text-foreground">${NAV_BUSCA_V3}<div class="uh-header-spacer"></div><div class="search-categories border-b border-border">${cats}</div>${TOOLBAR_V3}<div class="search-main"><main class="search-list"><header class="mb-6"><h1 class="text-xl font-extrabold sm:text-2xl">${esc(title)}</h1>${config?`<p class="mt-2 text-sm leading-relaxed text-muted-foreground">${esc(config.texto)}</p>`:''}</header><div class="search-grid">${rows.slice(0,4).map(card).join('')}</div></main></div></div></div>`;
+ return {head:`<script>if(document.querySelector('meta[name="uh-dobra-versao"]')?.content==='site-v3'){var l=document.createElement('link');l.rel='preload';l.as='image';l.href=${json(first)};l.fetchPriority='high';document.head.appendChild(l);}</script>`,pre:'',preV3,script:`window.__UH_BUSCA_V3__=${json({...data,path})};`};
 }
 
 // ---------- Em foco: capa pronta (ProdutoFocoPage, mesmas regras) ----------
@@ -283,6 +303,7 @@ Deno.serve(async (req) => {
     if (renovarJa) { const [b] = await Promise.all([renovar("busca"), renovar("home")]); corpo = b; }
     else if (path === "/" && !corretor) corpo = await preCalculado("home");
     else if (path === "/busca") corpo = await preCalculado("busca");
+    else if(path in BUSCA_URLS){const {data}=await supabase.from('site_dobra_cache').select('corpo').eq('chave','busca-v3:'+path).maybeSingle();corpo=data?.corpo??vazio;}
     else if (path.startsWith("/em-foco/")) { corpo = await produto(decodeURIComponent(path.slice(9)), corretor); ttl = 600; }
     else if (path.startsWith("/campanha/") && !corretor) { corpo = await campanha(decodeURIComponent(path.slice(10))); ttl = 60; }
   } catch (e) {

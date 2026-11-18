@@ -1,7 +1,7 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { saveDadosLead, mergeDadosSite, dadosSiteRecord } from './pedidos.ts';
 export const BOT_UA = /bot|crawler|spider|headless|slurp|facebookexternalhit|whatsapp|telegrambot|preview|lighthouse/i;
-export const EVENT_NAMES = ['pagina_vista','busca_feita','categoria_tocada','filtro_aplicado','imovel_visto','foto_aberta','favorito_salvo','dia_escolhido','formulario_iniciado','visita_pedida','informacoes_pedidas','lia_aberta','lia_lead','whatsapp_tocado','simulacao_feita','pedido_corretor','rolagem_50','pagina_anuncio_vista'] as const;
+export const EVENT_NAMES = ['pagina_vista','busca_feita','categoria_tocada','filtro_aplicado','imovel_visto','foto_aberta','favorito_salvo','aviso_preco_pedido','dia_escolhido','formulario_iniciado','visita_pedida','informacoes_pedidas','lia_aberta','lia_lead','whatsapp_tocado','simulacao_feita','pedido_corretor','rolagem_50','pagina_anuncio_vista'] as const;
 export const LEGACY: Record<string,string> = { imovel_visualizado:'imovel_visto',busca_realizada:'busca_feita',whatsapp_click:'whatsapp_tocado',galeria_aberta:'foto_aberta',formulario_enviado:'pedido_corretor' };
 export const ALIAS_UNTIL = '2026-12-17T05:06:00.000Z';
 export function siteClient() {
@@ -20,7 +20,7 @@ export async function tokenValid(id:string,token:string) {
   let diff=0; for(let i=0;i<expected.length;i++)diff|=expected.charCodeAt(i)^token.charCodeAt(i); return diff===0;
 }
 // Positive list: no contact fields, search prose, arbitrary URLs or nested text can enter events.
-const SAFE_FIELDS=new Set(['secao','bairros','bairro','tipo','quartos','preco_min','preco_max','faixa_valor','tipos','filtros','categoria','foto_index','formulario','dia','periodo','horario','assunto','planta','button_key','imovel_id','imovel_slug','imovel_bairro','imovel_preco','entrada_percentual','prazo_anos','taxa_anual','studio','noites','event_source','pedido_tipo']);
+const SAFE_FIELDS=new Set(['secao','cidade','fase','precoMin','precoMax','areaMin','areaMax','areaUtilMin','areaUtilMax','vagas','banheiros','bairros','bairro','tipo','quartos','preco_min','preco_max','faixa_valor','tipos','filtros','categoria','foto_index','formulario','dia','periodo','horario','assunto','planta','button_key','imovel_id','imovel_slug','imovel_bairro','imovel_preco','entrada_percentual','prazo_anos','taxa_anual','studio','noites','event_source','pedido_tipo']);
 export function safeDetails(input:unknown):Record<string,unknown> {
   if(!input||typeof input!=='object'||Array.isArray(input))return {};
   const out:Record<string,unknown>={};

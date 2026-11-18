@@ -167,7 +167,7 @@ const Search = () => {
   useCanonical();
   const { prefixLink } = useCorretor();
   const [searchParams, setSearchParams] = useSearchParams();
-  const modoIA = searchParams.get("modo") === "ia";
+  const modoIA = searchParams.get("modo") === "ia" || window.location.pathname.endsWith('/ia-search');
   const { filters, setFilter, setFilters, resetFilters, page, setPage, scrollY, setScrollY } = useSearchStore();
   const [sortOpen, setSortOpen] = useState(false);
   const sortRef = React.useRef<HTMLDivElement>(null);

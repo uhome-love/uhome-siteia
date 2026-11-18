@@ -1,5 +1,8 @@
+import miniaturas from '../../supabase/functions/_shared/buscaMiniaturas.json';
 /** Listing thumbnails only: keep original URLs for detail galleries and fallback. */
 export function searchImageUrl(src: string, width: number): string {
+  const local = (miniaturas as Record<string,string>)[src];
+  if (local) return local;
   try {
     const original = new URL(src);
     if (original.protocol !== "https:" || original.hostname === "uhome.com.br" || original.hostname.endsWith(".uhome.com.br") || original.pathname.startsWith("/__l5e/")) return src;

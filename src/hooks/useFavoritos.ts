@@ -2,55 +2,59 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { trackEvent } from "@/lib/trackEvent";
+import { lerFavoritos, salvarFavoritos, devePedirAviso } from '@/lib/favoritosLocais';
 
 export function useFavoritos() {
   const { user } = useAuth();
-  const [favoritos, setFavoritos] = useState<Set<string>>(new Set());
+  const [favoritos, setFavoritos] = useState<Set<string>>(() => new Set(lerFavoritos()));
   const [loading, setLoading] = useState(false);
 
   // Load favorites
   useEffect(() => {
+    const atualizar = () => setFavoritos(new Set(lerFavoritos()));
+    window.addEventListener('uhome:favoritos', atualizar);
+    window.addEventListener('storage', atualizar);
     if (user) {
       setLoading(true);
-      supabase
+      const locais = lerFavoritos();
+      const migrar = locais.length ? supabase.from('favoritos').upsert(locais.map(imovel_id => ({user_id:user.id,imovel_id})), {onConflict:'user_id,imovel_id'}) : Promise.resolve();
+      Promise.resolve(migrar).then(() => supabase
         .from("favoritos")
         .select("imovel_id")
         .eq("user_id", user.id)
         .then(({ data }) => {
-          setFavoritos(new Set((data ?? []).map((r) => r.imovel_id)));
+          const ids = [...new Set([...locais, ...(data ?? []).map(r => r.imovel_id)])];
+          salvarFavoritos(ids);
           setLoading(false);
-        });
+        }));
     } else {
-      setFavoritos(new Set());
+      setFavoritos(new Set(lerFavoritos()));
     }
+    return () => { window.removeEventListener('uhome:favoritos', atualizar); window.removeEventListener('storage', atualizar); };
   }, [user]);
 
   const toggleFavorito = useCallback(
     async (imovelId: string): Promise<"needs_auth" | void> => {
-      if (!user) {
-        return "needs_auth";
-      }
-
       const isFav = favoritos.has(imovelId);
 
-      if (isFav) {
+      if (user && isFav) {
         await supabase
           .from("favoritos")
           .delete()
           .eq("user_id", user.id)
           .eq("imovel_id", imovelId);
-      } else {
+      } else if (user) {
         const { error } = await supabase.from("favoritos").insert({ user_id: user.id, imovel_id: imovelId });
         if (error) throw error;
         void trackEvent({ tipo: "favorito_salvo", dados: { imovel_id: imovelId } });
       }
 
-      setFavoritos((prev) => {
-        const next = new Set(prev);
+      const next = new Set(lerFavoritos());
         if (isFav) next.delete(imovelId);
         else next.add(imovelId);
-        return next;
-      });
+      salvarFavoritos([...next]);
+      if (!isFav && !user) void trackEvent({tipo:'favorito_salvo',dados:{imovel_id:imovelId}});
+      if (devePedirAviso(favoritos.size,next.size,localStorage.getItem('uh-aviso-preco-pedido')==='1')) window.dispatchEvent(new Event('uhome:aviso-preco'));
     },
     [user, favoritos]
   );

@@ -37,6 +37,7 @@ import {
   PropertyDetail,
   ResetPassword,
   Search,
+  SearchAI,
   SeoOrNotFound,
   Sobre,
   TipoImovel,
@@ -49,7 +50,8 @@ export function AppRoutes() {
       <Route path="/" element={<Index />} />
       <Route path="/busca" element={<Search />} />
       <Route path="/imovel/:slug" element={<PropertyDetail />} />
-      <Route path="/ia-search" element={<Navigate to="/busca?modo=ia" replace />} />
+      <Route path="/ia-search" element={<SearchAI />} />
+      {['/lancamentos-porto-alegre','/apartamentos-ate-400-mil-porto-alegre','/casas-em-condominio-porto-alegre','/studios-para-investir-porto-alegre','/imoveis-canoas'].map(path => <Route key={path} path={path} element={<Search />} />)}
       <Route path="/anunciar" element={<Anunciar />} />
       <Route path="/carreiras" element={<Carreiras />} />
       <Route path="/bairros" element={<Bairros />} />

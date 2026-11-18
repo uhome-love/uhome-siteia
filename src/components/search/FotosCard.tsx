@@ -1,4 +1,8 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+
+const prontas = new Set<string>();
+/** Baixa e decodifica a foto antes de ela ser mostrada, para a troca ser instantânea. */
+function preparar(url?: string) { if (!url) return; const u = cardFotoUrl(url); if (prontas.has(u)) return; prontas.add(u); const im = new Image(); im.decoding = 'async'; im.src = u; im.decode?.().catch(() => {}); }
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/lib/supabaseLazy';
@@ -25,6 +29,7 @@ export function FotosCard({ id, produto, titulo, children }: { id: string; produ
   const carregar = () => { void fotosDoCard(id, produto).then((f) => setFotos(f)); };
   const total = Math.max(fotos.length, 1);
   const ir = (d: number) => { carregar(); setI((v) => { const n = fotos.length || 1; return (v + d + n) % n; }); };
+  useEffect(() => { if (fotos.length > 1) { preparar(fotos[(i + 1) % fotos.length]); preparar(fotos[(i + 2) % fotos.length]); if (i > 0) preparar(fotos[i - 1]); } }, [fotos, i]);
   const atual = i > 0 ? fotos[i] : null;
   return (
     <div className="fotos-card" onPointerEnter={carregar}
@@ -32,8 +37,7 @@ export function FotosCard({ id, produto, titulo, children }: { id: string; produ
       onPointerUp={(e) => { const a = arrasto.current; arrasto.current = null; if (a && Math.abs(e.clientX - a.x) > 40 && fotos.length > 1) { bloqueia.current = true; ir(e.clientX < a.x ? 1 : -1); } }}
       onClickCapture={(e) => { if (bloqueia.current) { bloqueia.current = false; e.preventDefault(); e.stopPropagation(); } }}>
       {children}
-      {atual && <img className="fotos-card-extra" src={cardFotoUrl(atual)} alt={`${titulo} - foto ${i + 1}`} decoding="async" onError={(e) => { e.currentTarget.src = atual; }} />}
-      {fotos[i + 1] && <link rel="prefetch" as="image" href={cardFotoUrl(fotos[i + 1])} />}
+      {atual && <img key={atual} className="fotos-card-extra" src={cardFotoUrl(atual)} alt={`${titulo} - foto ${i + 1}`} decoding="async" onError={(e) => { e.currentTarget.src = atual; }} />}
       {fotos.length > 1 && <>
         {i > 0 && <Button type="button" variant="secondary" size="icon" className="fotos-card-seta fotos-card-ant" aria-label="Foto anterior" onClick={(e) => { e.preventDefault(); e.stopPropagation(); ir(-1); }}><ChevronLeft /></Button>}
         <Button type="button" variant="secondary" size="icon" className="fotos-card-seta fotos-card-prox" aria-label="Próxima foto" onClick={(e) => { e.preventDefault(); e.stopPropagation(); ir(1); }}><ChevronRight /></Button>

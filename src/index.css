@@ -617,3 +617,14 @@ body:has(.search-filter-dialog[data-state=open]) [aria-label="Preferências de p
 .search-cat-filtros{flex-shrink:0;border-radius:12px}
 @media(min-width:1024px){.search-pilula-linha{display:none}}
 @media(max-width:1023px){.search-cat-filtros{display:none}.search-cat-linha{padding-right:0}}
+/* Faixa de preço azul Uhome, barras iguais e movimento */
+.filtro-histograma span{flex:1 1 0!important;background:hsl(var(--muted-foreground)/.22)!important;transition:background-color .2s ease,height .25s cubic-bezier(.2,.8,.2,1)!important}
+.filtro-histograma span[data-dentro]{background:hsl(var(--primary))!important}
+.filtro-slider-faixa{background:hsl(var(--primary))!important}
+.filtro-slider-ponta{transition:transform .15s ease,box-shadow .15s ease!important}
+.filtro-slider-ponta:hover,.filtro-slider-ponta:active,.filtro-slider-ponta:focus-visible{transform:scale(1.12);box-shadow:0 0 0 6px hsl(var(--primary)/.15),var(--sombra-2)!important}
+/* Topo compacto na busca */
+@media(min-width:1024px){.search-categories{min-height:76px!important;padding-top:8px!important;padding-bottom:8px!important}.search-category img.search-category-3d{width:28px!important;height:28px!important}.search-category{font-size:12px!important}}
+@media(min-width:1280px){.search-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:28px 18px}}
+.fotos-card-extra{animation:fotoEntra .18s ease-out}@keyframes fotoEntra{from{opacity:.4}to{opacity:1}}
+/* Reserva a faixa de categorias antes dos dados chegarem (evita a tela pular) */.home-categorias-trilho{min-height:76px}@media(max-width:1023px){.home-categorias-trilho{min-height:74px}}

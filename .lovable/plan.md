@@ -1,5 +1,14 @@
 # Busca e mapa no padrão Airbnb: validação final e acabamento
 
+## 0. O que o Airbnb faz e vamos adaptar (estudado no site agora, computador e celular)
+- **Topo ao rolar:** a pílula grande vira uma pílula curta de uma linha no centro do cabeçalho ("Qualquer lugar · Qualquer dia · Hóspedes?", com ícone 3D à esquerda e botão redondo de busca). Na Uhome: "Qualquer lugar · Qualquer tipo · Qualquer valor".
+- **Busca com resultados:** fileira de **chips rápidos** logo abaixo do topo (Filtros + Estacionamento, Wi-Fi, Permite animais, Piscina…). Na Uhome: Filtros, Aceita pet, Piscina, Com pátio, Vista panorâmica, Churrasqueira, 2+ vagas, Pronto pra morar, tocando para ligar ou desligar direto.
+- **Título curto** ("Mais de mil acomodações em Porto Alegre") acima de uma grade de 2 colunas à esquerda, com o mapa à direita com cantos arredondados, botão de tela cheia e zoom no canto.
+- **Card:** foto com pontinhos e coração, selo branco no canto ("Superhost", "Novo"), uma linha "Tipo · Bairro" em negrito, descrição curta em cinza, detalhes e preço sublinhado. Na Uhome: selos "Novo", "Lançamento", "Baixou o preço".
+- **Celular:** cabeçalho com voltar, pílula com resumo da busca e botão de filtros. Chips rápidos abaixo, mapa ocupando o fundo e a lista numa gaveta branca com alça, que sobe por cima do mapa. Navegação de baixo com Explorar, Favoritos e Entrar (já temos).
+- **Etiquetas do mapa:** cápsula branca com sombra e preço em negrito. Fica escura no hover ou quando selecionada.
+- **Acabamento:** só um cinza de borda, sombras suaves em camadas, cantos de 12 a 16 px nas fotos, tipografia com no máximo 3 pesos e movimentos curtos (150 a 250 ms).
+
 ## 1. Validação dos filtros com combinações reais (antes de publicar)
 - Rodar cerca de 60 combinações reais (cidade + bairro + tipo + preço + quartos + vagas + área + etapa + comodidades, rua + filtros, garden + pátio, pet + piscina etc.).
 - Para cada uma, comparar três números: o botão "Mostrar N" do painel, o total no título da página de resultados e a contagem direta no banco. Conferir também, um por um, se cada imóvel listado cumpre a regra.

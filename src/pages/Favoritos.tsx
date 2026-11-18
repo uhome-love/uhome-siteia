@@ -11,6 +11,7 @@ import { CalendarDays, FolderPlus, Heart, Loader2, Pencil, Share2, Trash2 } from
 import { useProdutosFoco } from "@/lib/produtosFoco";
 import { ProdutoFocoCard } from "@/components/foco/FocoShared";
 import { PriceNotice } from '@/components/search/PriceNotice';
+import { CriarPastaInline } from "@/components/favoritos/CriarPastaInline";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AgendamentoVisita } from "@/components/AgendamentoVisita";
 import { toast } from "sonner";
@@ -101,7 +102,8 @@ function MeusFavoritos() {
   const pastaAtiva = estado.pastas.find(p => p.id === ativa);
   const lista = useMemo(() => pastaAtiva ? imoveis.filter(m => pastaAtiva.itens.includes(m.id)) : imoveis, [imoveis, pastaAtiva]);
 
-  const novaPasta = () => { const n = window.prompt("Nome da pasta", "Para visitar"); if (n) { const e = criarPasta(estado, n); atualizar(e); setAtiva(e.pastas[e.pastas.length - 1]?.id ?? "todos"); } };
+  const [criando, setCriando] = useState(false);
+  const novaPasta = (n: string) => { setCriando(false); if (n) { const e = criarPasta(estado, n); atualizar(e); setAtiva(e.pastas[e.pastas.length - 1]?.id ?? "todos"); } };
   const renomear = () => { if (!pastaAtiva) return; const n = window.prompt("Novo nome", pastaAtiva.nome); if (n) atualizar(renomearPasta(estado, pastaAtiva.id, n)); };
   const apagar = () => { if (pastaAtiva && window.confirm(`Apagar a pasta "${pastaAtiva.nome}"? Os imóveis continuam nos favoritos.`)) { atualizar(apagarPasta(estado, pastaAtiva.id)); setAtiva("todos"); } };
   const compartilhar = async () => {
@@ -125,7 +127,7 @@ function MeusFavoritos() {
         <div className="-mx-4 mt-5 flex gap-2 overflow-x-auto px-4 pb-1" role="tablist" aria-label="Pastas">
           <button role="tab" aria-selected={ativa === "todos"} className={chip(ativa === "todos")} onClick={() => setAtiva("todos")}>Todos</button>
           {estado.pastas.map(p => <button key={p.id} role="tab" aria-selected={ativa === p.id} className={chip(ativa === p.id)} onClick={() => setAtiva(p.id)}>{p.nome} <span className="opacity-60">{p.itens.filter(id => favoritos.has(id)).length}</span></button>)}
-          <button className={chip(false)} onClick={novaPasta}><FolderPlus className="h-5 w-5" /> Nova pasta</button>
+          {criando ? <div className="w-full max-w-sm"><CriarPastaInline abertoInicial onCriar={novaPasta} /></div> : <button className={chip(false)} onClick={() => setCriando(true)}><FolderPlus className="h-5 w-5" /> Nova pasta</button>}
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2">
@@ -166,7 +168,7 @@ function MeusFavoritos() {
         <DialogContent className="max-w-sm"><DialogHeader><DialogTitle>Escolher pasta</DialogTitle></DialogHeader>
           <div className="flex flex-col gap-2">
             {estado.pastas.map(p => <label key={p.id} className="flex min-h-[44px] items-center gap-3 rounded-xl border border-border px-3 text-sm font-semibold"><input type="checkbox" className="h-4 w-4 accent-primary" checked={!!escolher && p.itens.includes(escolher)} onChange={() => escolher && atualizar(alternarNaPasta(estado, p.id, escolher))} /> {p.nome}</label>)}
-            <button className={chip(false)} onClick={() => { const n = window.prompt("Nome da pasta", "Para visitar"); if (n && escolher) { const e = criarPasta(estado, n); atualizar(alternarNaPasta(e, e.pastas[e.pastas.length - 1].id, escolher)); } }}><FolderPlus className="h-5 w-5" /> Nova pasta</button>
+            <CriarPastaInline onCriar={(n) => { if (escolher) { const e = criarPasta(estado, n); atualizar(alternarNaPasta(e, e.pastas[e.pastas.length - 1].id, escolher)); } }} />
           </div>
         </DialogContent>
       </Dialog>

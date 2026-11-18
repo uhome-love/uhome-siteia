@@ -628,3 +628,26 @@ body:has(.search-filter-dialog[data-state=open]) [aria-label="Preferências de p
 @media(min-width:1280px){.search-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:28px 18px}}
 .fotos-card-extra{animation:fotoEntra .18s ease-out}@keyframes fotoEntra{from{opacity:.4}to{opacity:1}}
 /* Reserva a faixa de categorias antes dos dados chegarem (evita a tela pular) */.home-categorias-trilho{min-height:76px}@media(max-width:1023px){.home-categorias-trilho{min-height:74px}}
+/* Logo "U" no topo do celular */
+.uhs-mobile-logo{display:grid;place-items:center;flex-shrink:0;width:44px;height:44px;border-radius:999px}.uhs-mobile-logo img{width:36px;height:36px;border-radius:999px}
+/* Salvar em pasta */
+.salvar-pasta{display:flex;flex-direction:column;gap:14px;padding-top:8px}
+.salvar-pasta-topo{display:flex;align-items:center;gap:12px}.salvar-pasta-topo img,.salvar-pasta-foto-vazia{width:56px;height:56px;border-radius:12px;object-fit:cover;background:hsl(var(--muted));flex-shrink:0}
+.salvar-pasta-topo strong{display:block;font-size:16px}.salvar-pasta-topo small{color:hsl(var(--muted-foreground));font-size:13px}
+.salvar-pasta-lista{display:flex;flex-direction:column;gap:6px;max-height:40vh;overflow:auto}
+.salvar-pasta-lista button{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:8px 10px;border-radius:14px;border:1px solid hsl(var(--border));background:hsl(var(--card));text-align:left;transition:border-color .15s,background .15s,transform .1s}
+.salvar-pasta-lista button:active{transform:scale(.98)}.salvar-pasta-lista button[aria-pressed=true]{border-color:hsl(var(--foreground));background:hsl(var(--muted)/.5)}
+.salvar-pasta-icone{display:grid;place-items:center;width:40px;height:40px;border-radius:10px;background:hsl(var(--primary)/.1);color:hsl(var(--primary))}.salvar-pasta-icone svg{width:20px;height:20px}
+.salvar-pasta-nome{flex:1;font-weight:600;font-size:15px;display:flex;flex-direction:column}.salvar-pasta-nome small{font-weight:400;color:hsl(var(--muted-foreground));font-size:12px}
+.salvar-pasta-check{display:grid;place-items:center;width:26px;height:26px;border-radius:999px;border:1.5px solid hsl(var(--border));transition:background .2s,border-color .2s}.salvar-pasta-check svg{width:15px;height:15px;opacity:0;transform:scale(.4);transition:transform .25s cubic-bezier(.3,1.6,.5,1),opacity .15s;color:hsl(var(--primary-foreground))}
+.salvar-pasta-check[data-on]{background:hsl(var(--primary));border-color:hsl(var(--primary))}.salvar-pasta-check[data-on] svg{opacity:1;transform:scale(1)}
+.pasta-criar-botao{display:flex;align-items:center;gap:12px;min-height:52px;padding:6px 10px;border-radius:14px;border:1.5px dashed hsl(var(--border));font-weight:600;font-size:15px;width:100%;transition:border-color .15s}.pasta-criar-botao:hover{border-color:hsl(var(--primary))}
+.pasta-criar-botao span{display:grid;place-items:center;width:40px;height:40px;border-radius:10px;background:hsl(var(--muted))}.pasta-criar-botao svg{width:20px;height:20px}
+.pasta-criar{display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:16px;border:1px solid hsl(var(--border));background:hsl(var(--card));animation:pastaEntra .22s ease-out}
+.pasta-criar input{height:48px;border-radius:12px;border:1.5px solid hsl(var(--foreground));padding:0 14px;font-size:16px;background:hsl(var(--background));outline:none}
+.pasta-sugestoes{display:flex;flex-wrap:wrap;gap:6px}.pasta-sugestoes button{min-height:36px;padding:0 12px;border-radius:999px;border:1px solid hsl(var(--border));font-size:13px;font-weight:500;transition:background .15s}.pasta-sugestoes button:hover{background:hsl(var(--muted))}
+.pasta-criar-acoes{display:flex;justify-content:flex-end;gap:8px}
+.salvar-pasta-rodape{display:flex;justify-content:space-between;align-items:center;padding-top:4px}.salvar-pasta-rodape a{font-weight:600;text-decoration:underline;font-size:14px}.salvar-pasta-rodape button{min-height:44px;padding:0 20px;border-radius:12px;background:hsl(var(--foreground));color:hsl(var(--background));font-weight:600}
+@keyframes pastaEntra{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.pasta-criar,.salvar-pasta-check svg{animation:none;transition:none}}
+.salvar-pasta-gaveta{z-index:400!important}[data-vaul-overlay]{z-index:399}

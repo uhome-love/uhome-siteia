@@ -513,8 +513,9 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
     });
 
     // FIX 5 & 9 — Debounce 800ms, smart popup close
-    map.on("moveend", () => {
+    map.on("moveend", (ev: any) => {
       if (!mapReadyRef.current) return;
+      const peloUsuario = !!ev?.originalEvent;
       boundsRef.current = map.getBounds();
 
       // Skip side-effects when fitBounds was triggered programmatically by us (prevents zoom loop)
@@ -547,6 +548,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       }, 350);
 
       // FIX 5 — Auto-search with 800ms debounce
+      if (!peloUsuario) return;
       if (autoSearchRef.current && onBoundsSearchRef.current) {
         if (autoSearchTimerRef.current) clearTimeout(autoSearchTimerRef.current);
         autoSearchTimerRef.current = window.setTimeout(() => {
@@ -726,7 +728,8 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
           lastFitIdsRef.current = idsKey;
           map.resize();
           // Ignora coordenadas isoladas (geocodificação errada) para enquadrar a região real
-          const corte = (v: number[]) => { const o = [...v].sort((x, y) => x - y); const n = o.length; const k = n > 20 ? Math.floor(n * 0.03) : 0; return [o[k], o[n - 1 - k]]; };
+          // Faixa central (10%–90%) ampliada em 40%: endereços mal geocodificados não afastam o mapa da cidade
+          const corte = (v: number[]) => { const o = [...v].sort((x, y) => x - y); const n = o.length; if (n < 8) return [o[0], o[n - 1]]; const a = o[Math.floor(n * 0.1)], b = o[Math.ceil(n * 0.9) - 1], m = Math.max((b - a) * 0.4, 0.01); return [Math.max(o[0], a - m), Math.min(o[n - 1], b + m)]; };
           const [lngMin, lngMax] = corte(pins.map(p => Number(p.longitude)));
           const [latMin, latMax] = corte(pins.map(p => Number(p.latitude)));
           const sw: [number, number] = [lngMin, latMin];
@@ -795,14 +798,14 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       <AnimatePresence>
         {previewPin && previewPos && (
           <motion.div
-            initial={{ opacity: 0, y: "calc(-100% + 8px)", scale: 0.95 }}
-            animate={{ opacity: 1, y: "-100%", scale: 1 }}
-            exit={{ opacity: 0, y: "calc(-100% + 4px)", scale: 0.97 }}
+            initial={{ opacity: 0, y: previewPos.y < 270 ? 8 : "calc(-100% + 8px)", scale: 0.95 }}
+            animate={{ opacity: 1, y: previewPos.y < 270 ? 0 : "-100%", scale: 1 }}
+            exit={{ opacity: 0, y: previewPos.y < 270 ? 4 : "calc(-100% + 4px)", scale: 0.97 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="absolute z-30 w-[260px] cursor-pointer"
             style={{
               left: Math.min(Math.max(previewPos.x - 130, 8), (containerRef.current?.offsetWidth ?? 400) - 268),
-              top: Math.max(previewPos.y - 10, 250),
+              top: previewPos.y < 270 ? previewPos.y + 22 : previewPos.y - 10,
             }}
             onClick={() => navigate(prefixLink(`/imovel/${previewPin.slug}`))}
           >

@@ -46,7 +46,14 @@ function compativel(corpo: Corpo): Corpo {
   const v3 = (corpo.preV3 ?? v2)
     .replace(/(?:[\d.]+\+|milhares de) imóveis com curadoria/g, 'Imóveis com curadoria')
     .replace(/(<h1[^>]*>)[\d.]+ imóveis(?: em ([^<]+)| à venda)(<\/h1>)/g, (_m, a, cidade, b) => a + esc(tituloBusca(cidade)) + b);
-  return { ...corpo, pre: corpo.pre || corpo.preV3 ? `<script>var v=document.querySelector('meta[name="uh-dobra-versao"]')?.content;document.write(v === 'site-v3' ? ${json(v3)} : v === 'site-v2' ? ${json(v2)} : v === 'site-v1' ? ${json(novo)} : ${json(corpo.pre)});</script>` : "" };
+  // O Worker não transmite o HTML nem sua versão à função. A proteção roda
+  // no parser, antes de #root: HTML diferente de v3 descarta a dobra inteira.
+  const proteger = `<script>if(document.querySelector('meta[name="uh-dobra-versao"]')?.content!=='site-v3')document.getElementById('uh-pre')?.remove();</script>`;
+  const buscaV3 = !!corpo.preV3 && corpo.script.includes('window.__UH_BUSCA_V3__=');
+  const script = buscaV3 ? corpo.script.replace(/window\.__UH_BUSCA__=.*?;(?=window\.__UH_DOBRA__=)/s, '') : corpo.script;
+  const head = buscaV3 ? corpo.head.replace(/<link[^>]*rel="preload"[^>]*as="image"[^>]*>/g, '') : corpo.head;
+  // Nunca serializar preV2/preV3 ou os demais moldes no contrato público.
+  return { head, pre: v3 ? v3 + proteger : '', script };
 }
 
 /** Igual a src/lib/searchImages.ts */

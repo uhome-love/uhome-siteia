@@ -422,7 +422,7 @@ body:has(.search-filter-dialog[data-state=open]) [aria-label="Preferências de p
 .home-categorias{display:flex;align-items:center;gap:16px;border-bottom:1px solid hsl(var(--border));padding:12px 40px 0;margin-top:20px}
 .home-categorias-trilho{display:flex;gap:28px;overflow-x:auto;scrollbar-width:none;flex:1}
 .home-categoria{display:flex;flex-direction:column;align-items:center;gap:6px;min-height:44px;padding:4px 2px 12px;font-size:13px;font-weight:600;color:hsl(var(--muted-foreground));white-space:nowrap;border-bottom:2px solid transparent;text-decoration:none}
-.home-categoria svg{width:24px;height:24px;color:hsl(var(--foreground))}
+.home-categoria img{width:32px;height:32px;object-fit:contain;transition:transform .25s}.home-categoria:hover img{transform:translateY(-2px) scale(1.06)}
 .home-categoria:hover{color:hsl(var(--foreground));border-bottom-color:hsl(var(--border))}
 .home-filtros{border-radius:12px!important;margin-bottom:10px}
 .home-conteudo{max-width:1440px;margin:0 auto;padding:8px 40px 24px}
@@ -443,7 +443,7 @@ body:has(.search-filter-dialog[data-state=open]) [aria-label="Preferências de p
   .home-capa{display:none}
   .home-categorias{margin-top:0;padding:calc(var(--uh-header-height) + 4px) 0 0}
   .home-categorias-trilho{gap:22px;padding:0 16px}
-  .home-categoria{font-size:12px}
+  .home-categoria{font-size:12px}.home-categoria img{width:28px;height:28px}
   .home-filtros{display:none!important}
   .home-conteudo{padding:0 0 16px}
   .home-fileira{margin-top:22px}
@@ -454,3 +454,30 @@ body:has(.search-filter-dialog[data-state=open]) [aria-label="Preferências de p
   .home-trilho>:nth-child(n+4){display:flex}
   .home-trilho-vistos>*{flex-basis:78%}
 }
+
+/* Busca: pílula Airbnb no topo (computador), ícones 3D, total */
+.search-pilula-linha{display:flex;align-items:center;justify-content:center;gap:12px;padding:14px 32px;border-bottom:1px solid hsl(var(--border))}
+.search-pilula-linha .home-pilula{max-width:820px}
+.search-pilula-filtros{border-radius:999px!important;height:48px}
+.search-category img.search-category-3d{width:32px;height:32px;object-fit:contain}
+.search-category[aria-pressed=true]{box-shadow:inset 0 -2px 0 hsl(var(--foreground))}
+.search-titulo-linha{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.search-ordem{min-height:44px;border:1px solid hsl(var(--border));border-radius:999px;background:hsl(var(--background));padding:0 14px;font-size:14px}
+.search-total{margin-top:4px;font-size:14px;font-weight:600;color:hsl(var(--muted-foreground))}
+@media(min-width:1024px){.search-toolbar{display:none!important}}
+@media(max-width:1023px){.search-pilula-linha{display:none}.search-ordem{display:none}.search-category img.search-category-3d{width:24px;height:24px}}
+
+/* Fotos que passam no card (padrão Airbnb) */
+.fotos-card{position:absolute;inset:0;touch-action:pan-y}
+.fotos-card-extra{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;animation:fotoEntra .18s ease-out}
+@keyframes fotoEntra{from{opacity:.4}to{opacity:1}}
+.fotos-card-seta{position:absolute;top:50%;transform:translateY(-50%);width:32px!important;height:32px!important;border-radius:999px!important;background:hsl(var(--background)/.92)!important;box-shadow:0 2px 8px hsl(var(--foreground)/.18);opacity:0;transition:opacity .15s,transform .15s;z-index:2}
+.fotos-card-seta svg{width:16px;height:16px}
+.fotos-card-ant{left:10px}.fotos-card-prox{right:10px}
+.catalog-photo:hover .fotos-card-seta,.fotos-card-seta:focus-visible{opacity:1}
+.fotos-card-seta:hover{transform:translateY(-50%) scale(1.06)}
+.fotos-card-pontos{position:absolute;bottom:10px;left:0;right:0;display:flex;justify-content:center;gap:5px;pointer-events:none;z-index:2}
+.fotos-card-pontos span{width:6px;height:6px;border-radius:999px;background:hsl(var(--background)/.6)}
+.fotos-card-pontos span[data-ativo]{background:hsl(var(--background))}
+@media(hover:none){.fotos-card-seta{display:none}}
+.fotos-card>a{position:absolute;inset:0}

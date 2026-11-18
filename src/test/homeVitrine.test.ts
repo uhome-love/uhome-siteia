@@ -22,3 +22,17 @@ describe('Home: novo desde a última visita', () => {
     expect(registrarVisitaHome(1_000 + 70 * 60_000, s)).toBe(1_000);
   });
 });
+
+import { tituloBuscaComTotal, categorias3dVisiveis } from '../../supabase/functions/_shared/buscaConfig';
+describe('Busca: título com total', () => {
+  it('0, 1, 999 e acima de 1.000', () => {
+    expect(tituloBuscaComTotal(0)).toBe('Nenhum imóvel à venda em Porto Alegre');
+    expect(tituloBuscaComTotal(1, 'Canoas')).toBe('1 imóvel à venda em Canoas');
+    expect(tituloBuscaComTotal(999)).toBe('999 imóveis à venda em Porto Alegre');
+    expect(tituloBuscaComTotal(1284)).toBe('Mais de 1.000 imóveis à venda em Porto Alegre');
+  });
+  it('categoria com menos de 8 imóveis não aparece', () => {
+    const ids = categorias3dVisiveis({ studios: 8, terrenos: 7 }, { garden: 20, cobertura: 3 }).map((c) => c.id);
+    expect(ids).toEqual(['garden', 'studios']);
+  });
+});

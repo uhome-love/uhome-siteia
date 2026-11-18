@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabaseLazy';
 import { tituloLimpo, type Imovel } from '@/services/imoveis';
-export { BUSCA_URLS, CATEGORIAS, SECOES, categoriasVisiveis } from '../../supabase/functions/_shared/buscaConfig';
+export { BUSCA_URLS, CATEGORIAS, SECOES, categoriasVisiveis, CATEGORIAS_3D, categorias3dVisiveis, tituloBuscaComTotal } from '../../supabase/functions/_shared/buscaConfig';
 export type { BuscaSecao } from '../../supabase/functions/_shared/buscaConfig';
 export interface BuscaSiteResult { rows: Imovel[]; count: number; tipos: Record<string, number>; categorias: Record<string, number> }
 export function normalizarBusca(data: any): BuscaSiteResult {

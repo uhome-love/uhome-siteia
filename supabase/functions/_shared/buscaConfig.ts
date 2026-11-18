@@ -18,3 +18,27 @@ export const CATEGORIAS = [
 ] as const;
 export function categoriasVisiveis(contagens: Record<string, number>) { return CATEGORIAS.filter(c => (contagens[c.id] ?? 0) >= 8); }
 export function tituloBusca(cidade?: string) { return `Imóveis à venda em ${cidade || 'Porto Alegre'}`; }
+/** Faixa de categorias com ícones 3D (Home e busca). Ícones em /public/categorias. */
+export const CATEGORIAS_3D = [
+  { id: 'garden', nome: 'Apartamentos garden', icone: '/categorias/garden.webp', filtros: { tipo: 'garden' } },
+  { id: 'studios', nome: 'Studios', icone: '/categorias/studio.webp', filtros: { tipo: 'studio,loft' } },
+  { id: 'casas_condominio', nome: 'Casas em condomínio', icone: '/categorias/condominio.webp', filtros: { tipo: 'casa_condominio' } },
+  { id: 'terrenos', nome: 'Terrenos', icone: '/categorias/terreno.webp', filtros: { tipo: 'terreno' } },
+  { id: 'ate400', nome: 'Até R$ 400 mil', icone: '/categorias/ate400.webp', filtros: { precoMax: 400000 } },
+  { id: 'canoas', nome: 'Em Canoas', icone: '/categorias/canoas.webp', filtros: { cidade: 'Canoas' } },
+  { id: 'coberturas', nome: 'Coberturas', icone: '/categorias/cobertura.webp', filtros: { tipo: 'cobertura' } },
+] as const;
+/** Contagem por categoria: usa `categorias` e, para garden/coberturas, `tipos` da busca_site. */
+export function categorias3dVisiveis(categorias: Record<string, number>, tipos: Record<string, number>) {
+  const n: Record<string, number> = { ...categorias, garden: tipos.garden ?? 0, coberturas: tipos.cobertura ?? 0 };
+  return CATEGORIAS_3D.filter((c) => (n[c.id] ?? 0) >= 8);
+}
+/** Título dos resultados com total (exceção à regra de não mostrar totais). */
+export function tituloBuscaComTotal(count: number | null | undefined, cidade?: string) {
+  const lugar = `à venda em ${cidade || 'Porto Alegre'}`;
+  if (count == null) return `Imóveis ${lugar}`;
+  if (count === 0) return `Nenhum imóvel ${lugar}`;
+  if (count === 1) return `1 imóvel ${lugar}`;
+  if (count > 1000) return `Mais de 1.000 imóveis ${lugar}`;
+  return `${count.toLocaleString('pt-BR')} imóveis ${lugar}`;
+}

@@ -318,9 +318,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       map.addSource("imoveis", {
         type: "geojson",
         data: { type: "FeatureCollection", features: [] },
-        cluster: true,
-        clusterMaxZoom: 12,
-        clusterRadius: 40,
+        cluster: false,
         buffer: 64,
         tolerance: 0.4,
       });
@@ -335,55 +333,17 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         data: { type: "FeatureCollection", features: [] },
       });
 
-      // Cluster halo (soft outer ring — Airbnb-like depth)
-      map.addLayer({
-        id: "clusters-halo",
-        type: "circle",
-        source: "imoveis",
-        filter: ["has", "point_count"],
-        paint: {
-          "circle-color": "#222222",
-          "circle-opacity": 0.06,
-          "circle-radius": [
-            "interpolate", ["linear"], ["get", "point_count"],
-            1, 26, 25, 32, 100, 39, 500, 47,
-          ],
-          "circle-radius-transition": { duration: 260, delay: 0 },
-        },
-      });
-
-      // Cluster circles
+      // Pontinhos (padrão Airbnb): todo imóvel tem um ponto; o preço aparece por cima quando cabe
       map.addLayer({
         id: "clusters",
         type: "circle",
         source: "imoveis",
-        filter: ["has", "point_count"],
         paint: {
-          "circle-color": "#FFFFFF",
-          "circle-radius": [
-            "interpolate", ["linear"], ["get", "point_count"],
-            1, 16, 25, 20, 100, 25, 500, 31,
-          ],
+          "circle-color": ["case", ["boolean", ["get", "visto"], false], "#EBEBEB", "#FFFFFF"],
+          "circle-radius": ["interpolate", ["linear"], ["zoom"], 9, 2.5, 12, 3.5, 15, 5],
           "circle-stroke-width": 1,
-          "circle-stroke-color": "rgba(0,0,0,0.12)",
-          "circle-opacity": 1,
-          "circle-radius-transition": { duration: 260, delay: 0 },
+          "circle-stroke-color": "rgba(0,0,0,0.28)",
         },
-      });
-
-      map.addLayer({
-        id: "cluster-count",
-        type: "symbol",
-        source: "imoveis",
-        filter: ["has", "point_count"],
-        layout: {
-          "text-field": "{point_count_abbreviated}",
-          "text-font": ["DIN Pro Bold", "Arial Unicode MS Bold"],
-          "text-size": ["interpolate", ["linear"], ["get", "point_count"], 1, 12, 100, 14, 500, 15],
-          "text-allow-overlap": true,
-          "text-ignore-placement": true,
-        },
-        paint: { "text-color": "#222222" },
       });
 
       // Pill images — high-DPI with 9-slice stretch so corners never distort
@@ -473,16 +433,11 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       });
 
       // Events
+      // Toque no pontinho aproxima o mapa até o preço aparecer
       map.on("click", "clusters", (e) => {
-        const features = map.queryRenderedFeatures(e.point, { layers: ["clusters"] });
-        const clusterId = features[0].properties!.cluster_id;
-        (map.getSource("imoveis") as mapboxgl.GeoJSONSource).getClusterExpansionZoom(clusterId, (err, zoom) => {
-          if (err) return;
-          map.easeTo({
-            center: (features[0].geometry as GeoJSON.Point).coordinates as [number, number],
-            zoom: zoom!,
-          });
-        });
+        if (map.queryRenderedFeatures(e.point, { layers: ["imoveis-pins"] }).length) return;
+        const f = e.features?.[0]; if (!f) return;
+        map.easeTo({ center: (f.geometry as GeoJSON.Point).coordinates as [number, number], zoom: Math.min(map.getZoom() + 2, 17) });
       });
 
       // Pin click → show preview popup

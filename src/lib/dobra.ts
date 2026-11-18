@@ -3,7 +3,7 @@
  * - `#uh-pre`: HTML da primeira tela, trocado pelo app quando o conteúdo real monta (ver index.html).
  * - `window.__UH_DOBRA__`: os mesmos dados usados no "pre", para o app montar igual na primeira vez.
  */
-type Dobra = { campanhas?: unknown[]; total?: number | null };
+type Dobra = { campanhas?: unknown[]; total?: number | null; produto?: unknown };
 
 export function dadosDobra<K extends keyof Dobra>(k: K): Dobra[K] | undefined {
   if (typeof window === "undefined") return undefined;

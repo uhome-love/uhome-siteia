@@ -9,6 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { type Imovel } from "@/services/imoveis";
 import { Heart, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
+import { useProdutosFoco } from "@/lib/produtosFoco";
+import { ProdutoFocoCard } from "@/components/foco/FocoShared";
 
 function parseFotos(fotos: any) {
   if (!fotos) return [];
@@ -22,6 +24,9 @@ const Favoritos = () => {
   const { favoritos, loading: favsLoading } = useFavoritos();
   const [imoveis, setImoveis] = useState<Imovel[]>([]);
   const [loading, setLoading] = useState(true);
+  const { data: produtosFoco = [] } = useProdutosFoco();
+  const [focoSalvos] = useState<string[]>(() => { try { return JSON.parse(localStorage.getItem("uh-foco-favoritos") ?? "[]"); } catch { return []; } });
+  const empreendimentos = produtosFoco.filter(p => focoSalvos.includes(p.slug));
 
   useEffect(() => {
     if (favsLoading) return;
@@ -67,7 +72,7 @@ const Favoritos = () => {
           <div className="flex items-center justify-center py-20">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
-        ) : imoveis.length === 0 ? (
+        ) : imoveis.length === 0 && empreendimentos.length === 0 ? (
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -94,6 +99,7 @@ const Favoritos = () => {
             ))}
           </div>
         )}
+        {empreendimentos.length > 0 && <section className="mt-8"><h2 className="text-xl font-bold">Empreendimentos salvos</h2><div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{empreendimentos.map(p => <ProdutoFocoCard key={p.id} p={p} />)}</div></section>}
       </div>
       <Footer />
     </div>

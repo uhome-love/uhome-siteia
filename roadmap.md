@@ -1,9 +1,13 @@
 # Roadmap — rodada pós-auditoria 16/11
+- [x] Parte 2: página em-foco, galeria, visita fixa, conteúdo real e formulários compartilhados; todos os produtos abrem
+- [x] Parte 2: modelos site-v2 e seed produto implantados; site-v1 mantém o modelo anterior; prévias com capa/título e FAQ; Worker intacto
+- [x] Parte 2: 23 testes com envios simulados, prints 390/1440 de Arvoredo/Bosque/Orygem e foco/troca conferidos
+- [ ] Parte 2: publicar app e central conferir pedidos reais/LCP oficial; sem envio de teste ao CRM nesta rodada
 - [x] A / rodada 4: capa 44,9 KB ativada, preconnect como alternativa autorizada, foto da tela pronta conservada; trace local antes da execução do app
 - [x] B / parte 1: tokens, cabeçalho/barras, rodapé, Lia e modelos versionados; 390/1440 px e fluxos conferidos
 - [x] Rodada 4 publicada: central confirmou LCP 1,0/2,4/1,5/1,0 s e CLS zero nas quatro páginas
 - [x] Corrigir CLS: reprodução com CSS tardio 1,000 → 0,000; regras da troca inline, mesma foto conservada
-- [ ] PageSpeed oficial antes/depois home/busca: bloqueado por cota diária da API (429); depois depende de publicação
+- [x] CLS publicado e conferido pela central: PageSpeed home LCP 1,4 s, CLS 0,000; Partes 0/1 encerradas
 - [x] WhatsApp original restaurado na barra em-foco; rosto Lia oculto e Lia na navegação inferior conferidos; CLS, site-dobra e Worker intactos
 - [x] Jornada do site: identidade e atribuição, eventos sem dados pessoais, consentimento e robôs
 - [x] Jornada do site: deduplicação WhatsApp, vínculo de lead e envio completo/contínuo ao CRM existente

@@ -4,6 +4,8 @@
 // Qualquer erro devolve campos vazios: a página segue normal (fail open).
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import * as NOVO from "./moldes.ts";
+import { HERO_FOCO_V2, HEADER_FOCO_V2 } from "./moldes-foco-v2.ts";
+import { tituloFoco } from "../_shared/focoPresentation.ts";
 import { NAV, NAV_BUSCA, HERO, BUSCA_TOPO, BUSCA_GRADE, CABECALHO_FOCO, BOTOES_FOCO } from "./moldes-legado.ts";
 
 const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
@@ -36,7 +38,8 @@ function compativel(corpo: Corpo): Corpo {
     if (inicio >= 0 && fim >= 0) novo = novo.slice(0,inicio) + NOVO.HERO.replace('{{TOTAL}}',total).replace('{{BOTAO}}',botao) + novo.slice(fim+10);
   }
   novo = novo.replace('<main class="pt-14">','<main class="pt-[var(--uh-header-height)]">');
-  return { ...corpo, pre: corpo.pre ? `<script>document.write(document.querySelector('meta[name="uh-dobra-versao"]')?.content === 'site-v1' ? ${json(novo)} : ${json(corpo.pre)});</script>` : "" };
+  const v2 = corpo.preV2 ?? novo;
+  return { ...corpo, pre: corpo.pre ? `<script>var v=document.querySelector('meta[name="uh-dobra-versao"]')?.content;document.write(v === 'site-v2' ? ${json(v2)} : v === 'site-v1' ? ${json(novo)} : ${json(corpo.pre)});</script>` : "" };
 }
 
 /** Igual a src/lib/searchImages.ts */
@@ -149,7 +152,7 @@ function cardBusca(r: any, i: number) {
   return `<a class="relative block w-full min-w-0 cursor-pointer select-none outline-none [&amp;_*]:outline-none [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] no-underline text-inherit" href="/imovel/${esc(r.slug)}"><div class="sm:hidden"><div class="relative overflow-hidden rounded-xl"><div class="flex snap-x snap-mandatory overflow-x-auto scrollbar-hide" style="aspect-ratio: 4 / 3;"><div class="w-full shrink-0 snap-center"><div class="relative h-full w-full overflow-hidden" style="aspect-ratio: 4 / 3;"><img src="${esc(searchImageUrl(foto, 768))}" srcset="${esc(set)}" sizes="(max-width: 639px) calc(100vw - 24px), 400px" alt="${esc(alt)}" loading="eager" decoding="async" fetchpriority="${i === 0 ? "high" : "auto"}" class="h-full w-full object-cover transition-opacity duration-300 opacity-100" style="aspect-ratio: 4 / 3;" width="400" height="300"></div></div></div><div class="pointer-events-none absolute left-3 top-3 z-10 flex flex-wrap gap-1.5">${selos.slice(0, 2).map((b) => `<span class="inline-flex items-center gap-1 rounded-md px-2.5 py-1 font-body text-[11px] ${SELO_CLS[b.s]}">${b.s === "novo" ? CLOCK : ""}${b.l}</span>`).join("")}</div>${HEART}</div><div class="px-1 pt-2.5 pb-1"><p class="font-body text-[17px] font-extrabold leading-tight text-foreground">${preco}</p>${(r.preco_condominio ?? 0) > 0 ? `<p class="mt-0.5 font-body text-[12px] text-muted-foreground">Cond. R$ ${Number(r.preco_condominio).toLocaleString("pt-BR")}</p>` : ""}${stats.length ? `<p class="mt-1.5 font-body text-[13px] text-foreground">${esc(stats.join(" · "))}</p>` : ""}<p class="mt-0.5 font-body text-[12px] text-muted-foreground truncate">${esc(`${r.bairro}, ${r.cidade || "Porto Alegre"}`)}</p></div></div></a>`;
 }
 
-type Corpo = { head: string; pre: string; script: string };
+type Corpo = { head: string; pre: string; script: string; preV2?: string };
 const CALCULAR: Record<string, () => Promise<Corpo>> = { busca: calcularBusca, home: calcularHome };
 
 /** Primeira dobra pré-calculada: lê uma linha pronta (rápido); renova em segundo plano se passou de 4 min. */
@@ -173,7 +176,7 @@ async function renovar(chave: "busca" | "home") {
 }
 
 // ---------- Em foco: capa pronta (ProdutoFocoPage, mesmas regras) ----------
-const PROD_SELECT = "slug, nome, incorporadora, bairro, cidade, tipo, status_obra, entrega, preco_a_partir, capa_url, galeria, plantas, mapas, ficha";
+const PROD_SELECT = "id, slug, nome, incorporadora, bairro, cidade, endereco, segmento, tipo, status_obra, entrega, preco_a_partir, resumo, capa_url, logo_url, galeria, plantas, mapas, ficha, ordem";
 const PIN = `<svg ${'xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"'} class="lucide lucide-map-pin mt-1 h-4 w-4 shrink-0"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg>`;
 const BTN_FOTO = "rounded-full bg-background/90 px-3 py-1.5 font-body text-xs font-semibold text-foreground shadow";
 
@@ -234,7 +237,12 @@ async function produto(slug: string, corretor: boolean) {
     + (chips.length ? `<ul class="mt-4 flex flex-wrap gap-2">${chips.map((c) => `<li class="rounded-full border border-border px-3 py-1 font-body text-sm text-foreground">${esc(c)}</li>`).join("")}</ul>` : "")
     + `<div class="mt-5 flex flex-wrap items-end justify-between gap-4"><div>${preco ? `<p class="font-heading text-3xl font-bold text-foreground sm:text-4xl"><span class="block font-body text-xs font-normal uppercase tracking-wider text-muted-foreground">a partir de</span>${esc(preco)}</p>` : ""}${natal && condGerais[0] ? `<p class="mt-1 font-body text-sm font-semibold text-primary">${esc(condGerais[0])}</p>` : ""}</div>${botoes}</div></div>`;
   const pre = `<div id="uh-pre" data-uh-alvo="[data-uh-capa]"><div class="min-h-screen bg-background pb-24 lg:pb-0">${cab}<main><section class="mx-auto max-w-6xl sm:px-8 sm:pt-6">${capa}${info}</section></main></div></div>`;
-  return { head, pre, script: `window.__UH_DOBRA__=${json({ campanhas: camps })};` };
+  const fotosV2 = galeria.slice(0, 5).map((g: any, i: number) => `<button type="button" aria-label="Abrir foto ${i + 1} de ${esc(p.nome)}" class="inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold foco-photo ${i === 0 ? "foco-photo-main" : ""}"><img src="${esc(g.url)}"${g.url_mobile ? ` srcset="${esc(g.url_mobile)} 800w, ${esc(g.url)} 1600w" sizes="${i === 0 ? "(min-width:1024px) 640px, 100vw" : "(min-width:1024px) 320px, 100vw"}"` : ""} alt="${esc(g.legenda ?? p.nome)}" width="1600" height="1200" loading="${i === 0 ? "eager" : "lazy"}" fetchpriority="${i === 0 ? "high" : "low"}" decoding="async"></button>`).join("");
+  let heroV2 = HERO_FOCO_V2.replace("{{FOTOS}}", fotosV2).replaceAll("{{NOME}}", esc(p.nome)).replaceAll("{{N}}", String(galeria.length));
+  if (!natal) heroV2 = heroV2.replace(/<span[^>]*>Condição de Natal até 18\/12<\/span>/g, "");
+  const headingV2 = `<div data-foco-title="true" class="foco-heading"><p class="text-sm font-semibold text-muted-foreground">${esc(p.nome)} · ${esc(p.incorporadora)}</p><div class="mt-3 flex flex-wrap gap-2"><span class="rounded-md bg-secondary px-3 py-1 text-xs font-semibold">${esc(p.status_obra ?? "Empreendimento")}</span>${natal ? '<span class="rounded-md bg-natal-red px-3 py-1 text-xs font-semibold text-natal-foreground">Condição de Natal até 18/12</span>' : ''}</div><h1 class="mt-3 text-3xl font-extrabold leading-tight lg:text-4xl">${esc(tituloFoco(p))}</h1><p class="mt-3 flex items-center gap-2 text-sm text-muted-foreground">${PIN}${esc(p.bairro)}, ${esc(p.cidade)}</p></div>`;
+  const preV2 = `<div id="uh-pre" data-uh-alvo="[data-uh-capa]"><div class="foco-page min-h-screen bg-background">${HEADER_FOCO_V2}<main class="foco-container">${headingV2}${heroV2}<div class="foco-columns"><div class="foco-content"></div></div></main></div></div>`;
+  return { head, pre, preV2, script: `window.__UH_DOBRA__=${json({ campanhas: camps, produto: p })};` };
 }
 
 function hojeSP(now = new Date()) {

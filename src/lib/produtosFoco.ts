@@ -121,6 +121,10 @@ export function useProdutoFoco(slug?: string) {
     queryKey: ["produto-foco", slug],
     enabled: !!slug,
     staleTime: 5 * 60_000,
+    initialData: () => {
+      const p = dadosDobra("produto") as ProdutoFoco | undefined;
+      return p?.slug === slug ? p : undefined;
+    },
     queryFn: async () => {
       const { data, error } = await supabase
         .from("produtos_foco")

@@ -337,3 +337,23 @@ html { scroll-behavior: smooth; }
  .uhs-contact-bar{bottom:var(--uh-bottom-height)!important}.uhs-search-tools{bottom:var(--uh-bottom-height)!important}
  .uhs-site-footer{padding-bottom:var(--uh-bottom-height)}
 }
+
+/* Parte 2: páginas de empreendimento, escala fixa do design Site Uhome. */
+.foco-header{height:72px;display:flex;align-items:center;justify-content:space-between;gap:16px;max-width:1280px;margin:auto;padding:0 40px}
+.foco-container{max-width:1280px;margin:auto;padding:0 40px;display:flex;flex-direction:column}
+.foco-heading{padding:24px 0}
+.foco-hero{position:relative;overflow:hidden;border-radius:8px}
+.foco-photo-grid{display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-rows:1fr 1fr;gap:8px;height:460px}
+.foco-photo-grid .foco-photo{height:100%;min-height:0;width:100%;padding:0;border-radius:0;overflow:hidden}
+.foco-photo-main{grid-row:span 2}
+.foco-photo img{width:100%;height:100%;object-fit:cover}
+.foco-columns{display:grid;grid-template-columns:minmax(0,1fr) 372px;gap:64px;padding:40px 0 64px;align-items:start}
+.foco-columns>div:last-child{height:100%;min-width:0}
+.foco-content{display:flex;flex-direction:column;gap:40px;min-width:0}
+@media(max-width:1023px){
+ .foco-header{display:none}.foco-container{padding:0}.foco-heading{padding:24px 20px;order:1}.foco-hero{border-radius:0}
+ .foco-photo-grid{display:flex;gap:0;overflow-x:auto;scroll-snap-type:x mandatory;height:auto;aspect-ratio:4/3;scrollbar-width:none}
+ .foco-photo-grid .foco-photo{width:100%;height:100%;flex:0 0 100%;scroll-snap-align:center}
+ .foco-columns{display:block;padding:0 20px 40px;order:2}.foco-content{gap:32px}
+ .foco-footer{padding-bottom:160px}.foco-page{padding-bottom:64px}
+}

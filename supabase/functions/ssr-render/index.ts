@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { tituloFoco, faqFoco } from "../_shared/focoPresentation.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -872,8 +873,8 @@ async function renderProdutoFoco(slug: string, corretorSlug?: string) {
   const nomeCorretor = await corretorNome(corretorSlug);
   const preco = precoCurto(p.preco_a_partir);
   const title = nomeCorretor
-    ? `${p.nome} · enviado por ${nomeCorretor} | Uhome`
-    : `${p.nome} · ${p.bairro}, ${p.cidade} | Uhome`;
+    ? `${tituloFoco(p)} · enviado por ${nomeCorretor} | Uhome`
+    : `${tituloFoco(p)} | Uhome`;
   const ficha = (p.ficha ?? {}) as Record<string, unknown>;
   const tip = typeof ficha.tipologias === "string" ? ficha.tipologias : Array.isArray(ficha.tipologias) ? (() => { const ds = [...new Set((ficha.tipologias as { dorm?: number | string }[]).map((t) => Number(t?.dorm)).filter((n) => n > 0))].sort(); return ds.length ? `${ds.join(ds.length > 2 ? ", " : " e ")} dormitório${ds.length > 1 || ds[0] > 1 ? "s" : ""}` : ""; })() : (p.tipo ?? "");
   const partes = [tip ? `${p.nome}: ${tip}` : p.nome, preco ? `a partir de ${preco}` : "", p.entrega ? `entrega ${p.entrega}` : ""].filter(Boolean);
@@ -889,9 +890,10 @@ async function renderProdutoFoco(slug: string, corretorSlug?: string) {
     url: canonical,
     address: { "@type": "PostalAddress", addressLocality: p.cidade, addressRegion: "RS", addressCountry: "BR" },
   });
-  const og = natalVigente() && PREVIA_NATAL[slug] ? PREVIA_NATAL[slug] : p.capa_url;
-  return html(title, desc, absAsset(og), canonical, [orgJsonLd(), ld],
-    `<h1>${esc(p.nome)}</h1><p>${esc(desc)}</p>${imgs.map((u) => `<img src="${esc(u)}" alt="${esc(p.nome)}" />`).join("")}`);
+  const faq = faqFoco(p);
+  const faqLd = JSON.stringify({ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map(q => ({ "@type": "Question", name: q.p, acceptedAnswer: { "@type": "Answer", text: q.r } })) });
+  return html(title, desc, absAsset(p.capa_url), canonical, [orgJsonLd(), ld, faqLd],
+    `<h1>${esc(tituloFoco(p))}</h1><p>${esc(desc)}</p>${imgs.map((u) => `<img src="${esc(u)}" alt="${esc(p.nome)}" />`).join("")}`);
 }
 
 async function renderEmFoco() {

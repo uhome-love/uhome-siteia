@@ -2,7 +2,6 @@ import { useEffect, lazy, Suspense } from "react";
 import { Navbar } from "@/components/Navbar";
 import { HeroSection } from "@/components/HeroSection";
 import { HomeCampanhaBanner } from "@/components/HomeCampanhaBanner";
-import { HomeFaixaConfianca } from "@/components/home/HomeFaixaConfianca";
 import { Reveal } from "@/components/ui/reveal";
 
 
@@ -55,7 +54,6 @@ const Index = () => {
       <Navbar />
       <main>
         <HeroSection />
-        <HomeFaixaConfianca />
         <HomeCampanhaBanner />
         <Suspense fallback={null}>
           <Reveal><EmpreendimentosDestaque /></Reveal>

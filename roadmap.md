@@ -1,4 +1,5 @@
 # Roadmap — rodada pós-auditoria 16/11
+- [x] Ajuste Lucas: faixa Home e nota agregada/equipe removidas; imagem padrão sem números; junção sem espaço e 12 avaliações individuais conferidas em 390/1440; modelos publicados preservados
 - [x] Parte 3: seções/categorias com contagens reais, modal, chips, vazio e paginação manual
 - [x] Parte 3: favoritos locais e pedido de aviso de preço UUID, jornada/CRM sem enviar leads de teste
 - [x] Parte 3: cinco URLs Google; sitemap dinâmico/estático regenerados sem datas artificiais

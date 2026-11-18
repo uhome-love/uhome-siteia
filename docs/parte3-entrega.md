@@ -1,5 +1,8 @@
 # Parte 3 — busca com mapa
 
+## Ajuste de vitrine aprovado por Lucas
+Faixa numérica abaixo da capa removida por completo, sem espaço residual. Nota agregada Google e quantidade de corretores não são argumentos de vitrine nem da Lia; avaliações individuais e perfis permanecem. Imagem `og-default.jpg` mantém a arte, agora sem o antigo total de imóveis. Não havia `aggregateRating` no código ativo. Esta rodada não modifica site-dobra nem Worker; os modelos antigos continuam intactos. Conferência em 390/1440: junção da capa com a próxima seção sem intervalo e 12 avaliações individuais preservadas.
+
 ## Pedido de aviso de preço
 Transportado pelo pipeline existente, via `submitLead`, `contexto.pedidos` e `dados_site.pedidos`. O CRM deve gerar uma nota por ID novo, sem duplicar no reenvio.
 

@@ -45,13 +45,12 @@ export function HomeConfianca() {
               <div>
                 <p className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-primary">Quem comprou com a Uhome</p>
                 <h2 className="mt-3 text-h2 text-foreground">
-                  Nota {g.nota.toLocaleString("pt-BR")} no Google
+                  Avaliações de quem comprou com a Uhome
                 </h2>
                 <div className="mt-2 flex items-center gap-2">
-                  <Estrelas n={g.nota} className="h-5 w-5" />
                   {g.maps_url && (
                     <a href={g.maps_url} target="_blank" rel="noopener noreferrer" className="font-body text-sm text-muted-foreground underline-offset-2 hover:underline">
-                      {g.total} avaliações reais
+                      Avaliações no Google
                     </a>
                   )}
                 </div>

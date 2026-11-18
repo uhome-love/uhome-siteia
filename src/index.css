@@ -353,10 +353,12 @@ html { scroll-behavior: smooth; }
 .search-category .search-category-mobile-icon,.search-mobile-chips{display:none}
 .search-toolbar{display:flex;gap:16px;align-items:center;padding:12px 32px}
 .search-chips{display:flex;flex-wrap:wrap;gap:8px;padding:12px 32px}
+.search-desktop-chips .search-chips{padding:0 0 16px}
 .search-chips button:not(:last-child){background:var(--ink);color:var(--surface);border-radius:999px}
 .search-main{display:flex;flex:1;min-height:0}
 .search-list{width:60%;min-width:0;padding:28px 32px 96px;overflow-y:auto}
 .search-map{width:40%;min-width:0;position:relative;overflow:hidden}
+@media(min-width:1024px){.search-map{border-left:0!important;padding:24px 32px 24px 0}.search-map>*{border-radius:20px;overflow:hidden;height:100%;position:relative}}
 .search-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px 24px}
 .search-empty{display:flex;flex-direction:column;align-items:center;gap:20px;padding:40px 0;text-align:center}
 .search-show-map{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--uh-bottom-height) + var(--uh-cookie,0px) + 16px);z-index:30}

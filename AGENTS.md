@@ -33,4 +33,4 @@
 - Home lar-1 (uh-home-layout) = HomeVitrine, no mold yet; site-dobra drops legacy home pre. Why: no cover swap.
 - Retained-pre transition rules stay inline in index.html, not only in async CSS. Why: late CSS caused CLS 1.
 - Foco uses shared type/title/FAQ/numbers helpers, ficha.titulo_manual overrides, site-v2 molds and one deferred form. Preserve CRM/journey; mock test writes. Why: page/pre/social parity and safe verification.
-- Search amenities come from `imoveis.comodidades` (text[] filled by trigger from Jetimob `imovel_comodidades`/`condominio_comodidades`); busca_site filters with `@>` and returns per-amenity counts and a price histogram. Why: one source for filter, counts and panel; no client-side parsing of raw sync data.
+- Amenities: `imoveis.comodidades` (trigger from Jetimob raw) drives busca_site filter, counts and price histogram. Why: one source, no client parsing.

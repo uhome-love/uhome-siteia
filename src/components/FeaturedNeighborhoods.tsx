@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getBairrosDisponiveis } from "@/services/bairrosCache";
 import { bairrosData } from "@/data/bairros";
@@ -78,26 +77,14 @@ export default function FeaturedNeighborhoods() {
             >
               <Link
                 to={prefixLink(`/bairros/${b.slug}`)}
-                className="group relative block overflow-hidden rounded-2xl hover-lift"
+                className="group flex items-center gap-4 rounded-2xl border border-border bg-card p-4 shadow-sm transition-shadow hover:shadow-md"
               >
-                <div className="aspect-video w-full">
-                  <img
-                    src={b.foto.startsWith("/images/") ? b.foto.replace(/\.webp$/, "-card.webp") : b.foto}
-                    alt={`Imóveis à venda em ${b.nome}, Porto Alegre`}
-                    loading="lazy"
-                    decoding="async"
-                    width={600}
-                    height={338}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-4">
-                  <p className="font-body text-base font-semibold text-white">{b.nome}</p>
-                  <p className="mt-0.5 flex items-center gap-1 font-body text-sm text-white/70">
-                    <MapPin className="h-3.5 w-3.5" />
+                <img src="/categorias/canoas.webp" alt="" aria-hidden="true" loading="lazy" decoding="async" width={56} height={56} className="h-14 w-14 shrink-0 object-contain transition-transform duration-300 group-hover:scale-110" />
+                <div className="min-w-0">
+                  <p className="font-body text-base font-bold text-foreground">{b.nome}</p>
+                  <p className="mt-0.5 font-body text-sm text-muted-foreground">
                     {contagens[i]} imóveis
-                    {aPartir[b.nome] > 0 && <span className="ml-1">· a partir de <strong className="font-semibold text-white">{fmt(aPartir[b.nome])}</strong></span>}
+                    {aPartir[b.nome] > 0 && <span className="ml-1">· a partir de <strong className="font-semibold text-foreground">{fmt(aPartir[b.nome])}</strong></span>}
                   </p>
                 </div>
               </Link>

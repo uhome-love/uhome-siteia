@@ -1,0 +1,24 @@
+import { describe, it, expect } from 'vitest';
+import { urlBuscaHome, novoDesdeVisita, registrarVisitaHome } from '@/lib/homeVitrine';
+
+describe('Home: busca da pílula', () => {
+  it('leva Onde/Tipo/Quartos/Valor para /busca', () => {
+    expect(urlBuscaHome({ onde: ' Petrópolis ', tipo: 'apartamento', quartos: '3', valor: '700000' })).toBe('/busca?q=Petr%C3%B3polis&tipo=apartamento&quartos=3&preco_max=700000');
+  });
+  it('sem nada escolhido vai para /busca', () => { expect(urlBuscaHome({ quartos: '0', valor: '' })).toBe('/busca'); });
+});
+
+describe('Home: novo desde a última visita', () => {
+  const ultima = new Date('2026-11-10T12:00:00Z').getTime();
+  it('marca só o que foi publicado depois', () => {
+    expect(novoDesdeVisita('2026-11-11T00:00:00Z', ultima)).toBe(true);
+    expect(novoDesdeVisita('2026-11-09T00:00:00Z', ultima)).toBe(false);
+  });
+  it('primeira visita não marca nada', () => { expect(novoDesdeVisita('2026-11-11T00:00:00Z', null)).toBe(false); });
+  it('a visita anterior é a de antes, não a atual', () => {
+    const m = new Map<string, string>(); const s = { getItem: (k: string) => m.get(k) ?? null, setItem: (k: string, v: string) => void m.set(k, v) };
+    expect(registrarVisitaHome(1_000, s)).toBe(null);
+    expect(registrarVisitaHome(1_000 + 60 * 60_000, s)).toBe(1_000);
+    expect(registrarVisitaHome(1_000 + 70 * 60_000, s)).toBe(1_000);
+  });
+});

@@ -406,3 +406,51 @@ body:has(.search-filter-dialog[data-state=open]) [aria-label="Preferências de p
  .foco-columns{display:block;padding:0 20px 40px;order:2}.foco-content{gap:32px}
  .foco-footer{padding-bottom:160px}.foco-page{padding-bottom:64px}
 }
+
+/* ---------- Home vitrine (design "Home", referência airbnb.com) ---------- */
+.home-capa{padding:calc(var(--uh-header-height) + 28px) 16px 8px;display:flex;flex-direction:column;align-items:center;gap:24px}
+.home-titulo{font-size:clamp(1.75rem,4vw,3rem);font-weight:800;letter-spacing:-.02em;color:hsl(var(--foreground));text-align:center}
+.home-titulo span{color:hsl(var(--primary))}
+.home-pilula{display:flex;align-items:center;width:100%;max-width:860px;border:1px solid hsl(var(--border));border-radius:999px;background:hsl(var(--card));box-shadow:0 6px 20px -8px hsl(var(--foreground)/.18);padding:6px 6px 6px 8px}
+.home-campo{display:flex;flex-direction:column;flex:1;min-width:0;padding:6px 18px;border-right:1px solid hsl(var(--border));cursor:pointer}
+.home-campo:nth-last-child(2){border-right:0}
+.home-campo-onde{flex:1.6}
+.home-campo>span{font-size:12px;font-weight:700;color:hsl(var(--foreground))}
+.home-campo input,.home-campo select{border:0;background:transparent;font-size:14px;color:hsl(var(--muted-foreground));outline:none;min-height:24px;width:100%;text-overflow:ellipsis}
+.home-campo:focus-within{background:hsl(var(--secondary));border-radius:999px}
+.home-buscar{border-radius:999px!important;height:48px;padding:0 22px}
+.home-categorias{display:flex;align-items:center;gap:16px;border-bottom:1px solid hsl(var(--border));padding:12px 40px 0;margin-top:20px}
+.home-categorias-trilho{display:flex;gap:28px;overflow-x:auto;scrollbar-width:none;flex:1}
+.home-categoria{display:flex;flex-direction:column;align-items:center;gap:6px;min-height:44px;padding:4px 2px 12px;font-size:13px;font-weight:600;color:hsl(var(--muted-foreground));white-space:nowrap;border-bottom:2px solid transparent;text-decoration:none}
+.home-categoria svg{width:24px;height:24px;color:hsl(var(--foreground))}
+.home-categoria:hover{color:hsl(var(--foreground));border-bottom-color:hsl(var(--border))}
+.home-filtros{border-radius:12px!important;margin-bottom:10px}
+.home-conteudo{max-width:1440px;margin:0 auto;padding:8px 40px 24px}
+.home-fileira{margin-top:32px}
+.home-fileira-topo{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:14px}
+.home-fileira-topo h2{font-size:22px;font-weight:700;color:hsl(var(--foreground))}
+.home-fileira-topo a{font-size:14px;font-weight:700;color:hsl(var(--foreground));text-decoration:underline;text-underline-offset:3px;white-space:nowrap;min-height:44px;display:inline-flex;align-items:center}
+.home-trilho{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:24px}
+.home-trilho-vistos{grid-template-columns:repeat(3,minmax(0,1fr))}
+.home-visto{display:flex;align-items:center;gap:12px;padding:10px;border:1px solid hsl(var(--border));border-radius:14px;color:hsl(var(--foreground));text-decoration:none;min-width:0}
+.home-visto img{width:80px;height:72px;border-radius:10px;object-fit:cover;flex-shrink:0;background:hsl(var(--muted))}
+.home-visto-texto{display:flex;flex-direction:column;min-width:0;flex:1;font-size:13px;color:hsl(var(--muted-foreground))}
+.home-visto-texto strong{font-size:14px;color:hsl(var(--foreground));overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.home-visto-texto b{color:hsl(var(--foreground))}
+.home-visto-seta{width:18px;height:18px;flex-shrink:0}
+@media (max-width:1100px){.home-trilho{grid-template-columns:repeat(3,minmax(0,1fr))}.home-trilho>:nth-child(n+4){display:none}}
+@media (max-width:639px){
+  .home-capa{display:none}
+  .home-categorias{margin-top:0;padding:calc(var(--uh-header-height) + 4px) 0 0}
+  .home-categorias-trilho{gap:22px;padding:0 16px}
+  .home-categoria{font-size:12px}
+  .home-filtros{display:none!important}
+  .home-conteudo{padding:0 0 16px}
+  .home-fileira{margin-top:22px}
+  .home-fileira-topo{padding:0 16px;margin-bottom:10px}
+  .home-fileira-topo h2{font-size:20px}
+  .home-trilho{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:16px;scrollbar-width:none;gap:14px;padding:0 16px}
+  .home-trilho>*{flex:0 0 86%;scroll-snap-align:start}
+  .home-trilho>:nth-child(n+4){display:flex}
+  .home-trilho-vistos>*{flex-basis:78%}
+}

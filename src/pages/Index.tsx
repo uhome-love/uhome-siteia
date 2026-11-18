@@ -1,6 +1,6 @@
 import { useEffect, lazy, Suspense } from "react";
 import { Navbar } from "@/components/Navbar";
-import { HeroSection } from "@/components/HeroSection";
+import { HomeVitrine } from "@/components/home/HomeVitrine";
 import { HomeCampanhaBanner } from "@/components/HomeCampanhaBanner";
 import { Reveal } from "@/components/ui/reveal";
 
@@ -53,8 +53,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <main>
-        <HeroSection />
-        <HomeCampanhaBanner />
+        <HomeVitrine entreFileiras={<HomeCampanhaBanner />} />
         <Suspense fallback={null}>
           <Reveal><EmpreendimentosDestaque /></Reveal>
           <Reveal><FeaturedNeighborhoods /></Reveal>

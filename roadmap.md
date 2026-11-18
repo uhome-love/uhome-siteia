@@ -49,3 +49,5 @@
 - [ ] Imóvel: atribuição de corretor nas páginas gerais e frase pessoal aguardam dados oficiais; páginas gerais não inventam profissional. Favoritos, Home e Lia/Movimento seguem como próximas etapas após conferir/publicar esta parte.
 - [x] Favoritos em pastas: pastas, nota, compartilhar por link (só leitura + WhatsApp), visitas em lote pelo fluxo existente, pastas levadas para a conta; 6 testes; aguarda publicação
 - [ ] Entrar com WhatsApp aguarda serviço de envio de código por WhatsApp
+- [x] Busca estilo Airbnb: cada campo da pílula abre o seu painel, Buscar busca direto, Filtros abre tudo; preço digitável; rua sem acento/prefixo; pet = Pet friendly ou Pet care; 33/33 filtros conferidos
+- [ ] Mapa: gaveta de arrastar no celular e pílula que encolhe ao rolar (próxima rodada)

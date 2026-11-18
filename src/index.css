@@ -541,3 +541,16 @@ body:has(.search-filter-dialog[data-state=open]) [aria-label="Preferências de p
 .search-category:hover img.search-category-3d,.home-categoria:hover img,.search-category[aria-pressed=true] img.search-category-3d{opacity:1;filter:none}
 .search-category{transition:color .2s}
 .filtro-precos label{min-width:0}.filtro-precos input{width:100%}
+/* Pílula estilo Airbnb: painel por campo */
+.pilula-raiz{position:relative;width:100%;max-width:860px}
+.search-pilula-linha .pilula-raiz{max-width:820px}
+.home-pilula[data-ativa]{background:hsl(var(--secondary))}
+.home-pilula[data-ativa] button.home-campo{border-right-color:transparent}
+.home-pilula button.home-campo[aria-expanded=true]{background:hsl(var(--card));border-radius:999px;box-shadow:var(--sombra-2)}
+.pilula-painel{position:absolute;left:0;right:0;top:calc(100% + 12px);z-index:60;background:hsl(var(--card));border-radius:32px;box-shadow:var(--sombra-3);padding:8px 32px 24px;max-height:min(70vh,640px);overflow:auto;animation:pilula-entra .18s ease-out;text-align:left}
+.pilula-painel[data-campo=onde]{right:auto;width:min(520px,100%)}
+.pilula-painel[data-campo=quartos]{left:auto;width:min(480px,100%)}
+.pilula-painel .filtro-secao:last-child{border-bottom:0}
+.pilula-painel-carregando{height:160px}
+@keyframes pilula-entra{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.pilula-painel{animation:none}}

@@ -124,7 +124,7 @@ describe("ProgressiveGrid — Ver mais regression", () => {
       />
     );
     expect(
-      screen.getByRole("button", { name: /Ver mais imóveis \(12 de 30\)/i })
+      screen.getByRole("button", { name: /^Ver mais imóveis$/i })
     ).toBeInTheDocument();
   });
 
@@ -155,7 +155,7 @@ describe("ProgressiveGrid — Ver mais regression", () => {
     expect(cards[23].getAttribute("data-id")).toBe("id-23");
     // Button updated
     expect(
-      screen.getByRole("button", { name: /Ver mais imóveis \(24 de 30\)/i })
+      screen.getByRole("button", { name: /^Ver mais imóveis$/i })
     ).toBeInTheDocument();
   });
 

@@ -1,3 +1,4 @@
+import { FotosCard } from "@/components/search/FotosCard";
 import { useRef, useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, X, Bed, Maximize, ToggleLeft, ToggleRight, PenTool, Navigation, Check } from "lucide-react";
@@ -75,6 +76,7 @@ function toGeoJSON(pins: MapPinData[]): GeoJSON.FeatureCollection {
           quartos: i.quartos ?? 0,
           area: i.area_total ?? 0,
           foto: i.foto ?? "",
+          visto: vistosSet().has(String(i.id)),
         },
       })),
   };
@@ -142,6 +144,10 @@ interface SearchMapProps {
   onDrawFilter?: (filteredPins: MapPinData[]) => void;
   onPertoDeVoce?: () => void;
   fitToPins?: boolean;
+}
+
+function vistosSet(): Set<string> {
+  try { return new Set((JSON.parse(localStorage.getItem("imoveis_vistos") || "[]") as unknown[]).filter((v): v is string => typeof v === "string")); } catch { return new Set(); }
 }
 
 export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, onBoundsChange, onDrawFilter, onPertoDeVoce, fitToPins = false }: SearchMapProps) {
@@ -357,6 +363,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         content: [18, 18, 234, 108] as [number, number, number, number],
       };
       map.addImage("pin-bg", createPillImage("#FFFFFF", "rgba(0,0,0,0.10)"), pillOptions);
+      map.addImage("pin-bg-visto", createPillImage("#EBEBEB", "rgba(0,0,0,0.10)"), pillOptions);
       map.addImage("pin-bg-dark", createPillImage("#1A1A1A", "rgba(0,0,0,0.25)"), pillOptions);
 
       // Individual pins with collision management
@@ -366,7 +373,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         source: "imoveis",
         filter: ["!", ["has", "point_count"]],
         layout: {
-          "icon-image": "pin-bg",
+          "icon-image": ["case", ["boolean", ["get", "visto"], false], "pin-bg-visto", "pin-bg"],
           "icon-text-fit": "both",
           "icon-text-fit-padding": [6, 11, 6, 11],
           "icon-allow-overlap": false,
@@ -381,7 +388,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
           "symbol-sort-key": ["-", 0, ["get", "preco"]],
         },
         paint: {
-          "text-color": "#222222",
+          "text-color": ["case", ["boolean", ["get", "visto"], false], "#6A6A6A", "#222222"],
           "icon-opacity": 1,
           "icon-opacity-transition": { duration: 180, delay: 0 },
         },
@@ -782,12 +789,12 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
           >
             <div className="overflow-hidden rounded-xl border border-border bg-card shadow-xl">
               {previewPin.foto ? (
-                <img
+                <FotosCard id={String(previewPin.id)} produto={false} titulo={previewPin.titulo ?? ""}><img
                   src={previewPin.foto}
                   alt={previewPin.titulo}
                   className="h-[130px] w-full object-cover"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                />
+                /></FotosCard>
               ) : (
                 <div className="flex h-[80px] w-full items-center justify-center bg-muted">
                   <span className="text-2xl opacity-30">🏠</span>

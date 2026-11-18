@@ -7,7 +7,7 @@ import { lazyRetry } from '@/lib/lazyRetry';
 import { SkeletonCard } from '@/components/SkeletonCard';
 import { CatalogCard } from '@/components/search/CatalogCard';
 import { BrokerRequest } from '@/components/search/BrokerRequest';
-import { SearchFilterDialog, TIPOS } from '@/components/search/SearchFilterDialog';
+import { SearchFilterDialog, TIPOS, reais } from '@/components/search/SearchFilterDialog';
 import { PriceNotice } from '@/components/search/PriceNotice';
 import { useFavoritos } from '@/hooks/useFavoritos';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -27,6 +27,19 @@ export function urlFiltros(params: URLSearchParams, preset: Record<string, unkno
   const keys: Record<string, string> = { preco_max: 'precoMax', preco_min: 'precoMin', area_min: 'areaMin', area_max: 'areaMax', area_util_min: 'areaUtilMin', area_util_max: 'areaUtilMax', andar_min: 'andarMin', condominio_max: 'condominioMax', iptu_max: 'iptuMax' };
   params.forEach((v,k) => { const key = keys[k] ?? k; if (['precoMax','precoMin','quartos','vagas','banheiros','areaMin','areaMax','areaUtilMin','areaUtilMax','andarMin','condominioMax','iptuMax'].includes(key)) f[key]=Number(v); else if (['secao','cidade','tipo','fase','bairro','ordem','q','codigo','condominio','comodidades'].includes(key)) f[key]=v; });
   return f;
+}
+const brl=(v:unknown)=>reais(Number(v));
+const AREAS:Record<string,string>={areaUtilMin:'Área priv. a partir de',areaUtilMax:'Área priv. até',areaMin:'Área total a partir de',areaMax:'Área total até'};
+/** Texto legível de cada filtro aplicado. */
+export function rotuloChip(k:string,v:unknown):string{
+  if(k==='tipo')return String(v).split(',').map(x=>TIPOS[x]??x).join(', ');
+  if(k==='precoMax')return `Até ${brl(v)}`; if(k==='precoMin')return `A partir de ${brl(v)}`; if(k==='condominioMax')return `Condomínio até ${brl(v)}`;
+  if(k==='quartos'||k==='banheiros'||k==='vagas')return `${v}+ ${k}`;
+  if(k in AREAS)return `${AREAS[k]} ${v} m²`;
+  if(k==='fase')return String(v).replace('novo,usado','Pronto pra morar').replace('na_planta','Na planta').replace('em_construcao','Em obras');
+  if(k==='comodidades')return String(v).split(',').map(c=>c==='Pet friendly'?'Aceita pet':c).join(', ');
+  if(k==='bounds')return 'Área do mapa';
+  return String(v);
 }
 export default function SearchEntry() { const [params]=useSearchParams(); return params.get('modo')==='ia' ? <Suspense fallback={<Loader2 className="animate-spin"/>}><LegacyAI/></Suspense> : <SearchExperience/>; }
 function SearchExperience() {
@@ -48,7 +61,7 @@ function SearchExperience() {
   useEffect(() => { document.title=preset ? `${preset.titulo} | Uhome` : `Imóveis${filtros.cidade ? ` em ${filtros.cidade}` : ' à venda'} | Uhome`; },[path,filtros.cidade]);
   const apply = (next: Record<string, any>) => { const p=new URLSearchParams(); const keys:Record<string,string>={precoMax:'preco_max',precoMin:'preco_min',areaMin:'area_min',areaMax:'area_max',areaUtilMin:'area_util_min',areaUtilMax:'area_util_max'};Object.entries(next).forEach(([k,v])=>{if(v && k!=='bounds')p.set(keys[k]??k,String(v));});setParams(p);void trackEvent({tipo:'filtro_aplicado',dados:{secao:next.secao,filtros:next}}); };
   const remove = (k:string) => { const next={...filtros};next[k]=typeof next[k]==='number'?0:'';apply(next); };
-  const chips=Object.entries(filtros).filter(([k,v])=>v && !['ordem','secao'].includes(k)).map(([k,v])=>({k,label:k==='tipo'?String(v).split(',').map(x=>TIPOS[x]??x).join(', '):k==='precoMax'?`Até ${Number(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0})}`:k==='quartos'?`${v}+ quartos`:k==='fase'?String(v).replace('novo,usado','Pronto pra morar').replace('na_planta','Na planta').replace('em_construcao','Em obras'):String(v)}));
+  const chips=Object.entries(filtros).filter(([k,v])=>v && !['ordem','secao'].includes(k)).map(([k,v])=>({k,label:rotuloChip(k,v)}));
   const [restriction,setRestriction]=useState<{k:string;label:string;count:number}|null>(null);
   useEffect(()=>{let ativo=true;if(data?.count!==0){setRestriction(null);return;}Promise.all(chips.map(async c=>({ ...c,count:(await buscarSite({...filtros,[c.k]:typeof filtros[c.k]==='number'?0:'',limit:0})).count }))).then(all=>{if(ativo)setRestriction(all.sort((a,b)=>b.count-a.count)[0]??null);});return()=>{ativo=false;};},[key,data?.count]);
   const mapPins=(pins?.rows ?? []).filter(r=>r.latitude!==null&&r.longitude!==null).map(r=>({...r,latitude:Number(r.latitude),longitude:Number(r.longitude)}));

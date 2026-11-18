@@ -183,6 +183,20 @@
       "when": 1795026435593,
       "tag": "0025_busca_comodidades_garden",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1795028946754,
+      "tag": "0026_busca_rua_e_pet",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1795029038881,
+      "tag": "0027_busca_rua_palavra_inteira",
+      "breakpoints": true
     }
   ]
 }

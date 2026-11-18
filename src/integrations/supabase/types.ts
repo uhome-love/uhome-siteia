@@ -1880,6 +1880,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      busca_normalizar: { Args: { t: string }; Returns: string }
       busca_site: { Args: { p?: Json }; Returns: Json }
       compartilhar_pasta: {
         Args: { p_imoveis: string[]; p_nome: string }

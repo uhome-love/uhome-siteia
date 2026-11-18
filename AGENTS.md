@@ -30,5 +30,6 @@
 - Below-fold home photos use `FotoPerto` (loads near the viewport) with WebP card versions mapped in `src/data/miniaturas.json`; originals stay untouched. Why: keep first load light without altering source assets.
 - Search uses busca_site for catalog/counts, four initial cards and manual pages; site-v3 gates molds. Why: parity and safe rollout.
 - Compact search molds require uh-busca-layout=compacta-1; older published apps must fail open to avoid mismatched photos.
+- Home layout lar-1 (meta uh-home-layout) has no first-fold mold yet; site-dobra drops the legacy home pre for it. Why: avoid swapping the old cover for the new home.
 - Retained-pre transition rules must be inline in index.html, not only in async CSS; late CSS otherwise moves root by a viewport and produces CLS 1. Why: the pre leaving flow and app becoming visible must be atomic even under delayed styles.
 - Foco uses shared type/title/FAQ/numbers helpers, ficha.titulo_manual overrides, site-v2 molds and one deferred form. Preserve CRM/journey; mock test writes. Why: page/pre/social parity and safe verification.

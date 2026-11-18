@@ -34,9 +34,9 @@ export function HomeCampanhaBanner() {
   // Reserva o espaço enquanto carrega, para o conteúdo abaixo não "pular".
   if (carregandoCampanha || carregandoProdutos) {
     return (
-      <section aria-hidden className="mx-auto max-w-7xl px-4 pt-8 sm:px-8">
-        <div className="h-[282px] animate-pulse rounded-3xl bg-muted lg:h-[238px]" />
-        <div className="mt-8 h-[436px] lg:h-[413px]" />
+      <section aria-hidden className="mx-auto max-w-7xl px-4 pt-4 sm:px-8 sm:pt-8">
+        <div className="h-[186px] animate-pulse sm:h-[282px] rounded-3xl bg-muted lg:h-[238px]" />
+        <div className="mt-5 h-[436px] sm:mt-8 lg:h-[413px]" />
       </section>
     );
   }
@@ -44,14 +44,14 @@ export function HomeCampanhaBanner() {
   const linkTodos = c ? `/campanha/${c.slug}` : "/em-foco";
 
   return (
-    <section className="mx-auto max-w-7xl px-4 pt-8 sm:px-8">
+    <section className="mx-auto max-w-7xl px-4 pt-4 sm:px-8 sm:pt-8">
       {c && (
         <Link
           to={prefixLink(`/campanha/${c.slug}`)}
           className={`group relative block overflow-hidden rounded-3xl ${black ? "bg-noir text-noir-foreground" : `${natalBg} text-natal-foreground`}`}
         >
           <NatalLuzes />
-          <div className="relative grid items-center gap-4 px-6 pb-6 pt-5 sm:px-10 sm:pb-7 lg:grid-cols-[1fr_auto]">
+          <div className="relative grid items-center gap-4 px-5 pb-5 pt-4 sm:px-10 sm:pb-7 lg:grid-cols-[1fr_auto]">
             <div className="relative z-10">
               <div className="flex items-center gap-4">
                 <img src={NATAL_ART.selo} alt="Natal Chave de Ouro" width={48} height={48} className="h-12 w-auto flex-shrink-0 sm:h-14" />
@@ -59,12 +59,12 @@ export function HomeCampanhaBanner() {
                   {black ? <>Black Natal <Ouro>Uhome</Ouro></> : <>Natal <Ouro>Chave de Ouro</Ouro></>}
                 </h2>
               </div>
-              <p className="mt-2 max-w-xl font-body text-sm text-natal-foreground/85">{c.subtitulo}</p>
+              <p className="mt-2 hidden max-w-xl font-body text-sm text-natal-foreground/85 sm:block">{c.subtitulo}</p>
               <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
                 <span className="inline-flex h-11 items-center gap-2 rounded-full px-5 font-body text-sm font-bold text-natal-deep transition-transform group-hover:scale-[1.02]" style={{ backgroundImage: "var(--natal-gold-grad)" }}>
                   Ver os {produtos.length || ""} empreendimentos <ArrowRight className="h-4 w-4" />
                 </span>
-                <p className="font-body text-xs text-natal-foreground/70">
+                <p className="hidden font-body text-xs text-natal-foreground/70 sm:block">
                   {alvo > agora && <><strong className="text-natal-gold">Faltam {dias} dias</strong> · </>}
                   {black ? "condições Black só até 29/11" : "contratos até 18/12 · comprou, ganhou presente da urna"}
                 </p>
@@ -77,7 +77,7 @@ export function HomeCampanhaBanner() {
       )}
 
       {produtos.length > 0 && (
-        <div className="mt-8">
+        <div className="mt-5 sm:mt-8">
           <div className="flex items-end justify-between gap-4">
             <h2 className="flex items-center gap-2 font-heading text-xl font-bold text-foreground sm:text-2xl">
               {c ? <img src={NATAL_ART.chave} alt="" className="h-5 w-auto" /> : <Sparkles className="h-5 w-5 text-primary" />}

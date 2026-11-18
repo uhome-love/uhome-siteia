@@ -53,7 +53,9 @@ function compativel(corpo: Corpo): Corpo {
   const script = buscaV3 ? corpo.script.replace(/window\.__UH_BUSCA__=.*?;(?=window\.__UH_DOBRA__=)/s, '') : corpo.script;
   const head = buscaV3 ? corpo.head.replace(/<link(?![^>]*data-uh-v3)[^>]*rel="preload"[^>]*as="image"[^>]*>/g, '') : corpo.head;
   // Nunca serializar preV2/preV3 ou os demais moldes no contrato público.
-  return { head, pre: v3 ? v3 + proteger : '', script };
+  // Home nova ("Você e seu novo lar.") ainda sem molde: o app novo descarta a capa antiga em vez de trocar de tela.
+  const lar = String(corpo.pre ?? '').includes('gasometro-') ? `<script>if(document.querySelector('meta[name="uh-home-layout"]')?.content==='lar-1')document.getElementById('uh-pre')?.remove();</script>` : '';
+  return { head, pre: v3 ? v3 + proteger + lar : '', script };
 }
 
 /** Igual a src/lib/searchImages.ts */

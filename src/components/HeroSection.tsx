@@ -165,9 +165,9 @@ export function HeroSection() {
   const quartosOptions = ["Qualquer", "1+", "2+", "3+", "4+"];
 
   return (
-    <section data-uh-capa className="relative flex min-h-[auto] items-center overflow-hidden pt-[var(--uh-header-height)] lg:min-h-[92vh]">
+    <section data-uh-capa className="uh-home-capa relative flex min-h-[auto] items-center overflow-hidden pt-[var(--uh-header-height)] lg:min-h-[68vh]">
       {/* Responsive cover sourced from the supplied Gasômetro image. */}
-      <div className="absolute inset-0 bg-muted">
+      <div className="absolute inset-0 hidden bg-muted sm:block">
         <picture>
           <source media="(max-width: 640px)" srcSet={gasometroMobile.url} type="image/webp" />
           <source media="(max-width: 1024px)" srcSet={gasometroTablet.url} type="image/webp" />
@@ -192,22 +192,22 @@ export function HeroSection() {
         />
       </div>
 
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 sm:py-16 lg:px-8">
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-2 pt-5 sm:px-6 sm:py-16 lg:px-8">
         <div className="flex flex-col items-start gap-6 lg:flex-row lg:items-center lg:gap-16">
           {/* Left — headline (CSS animation for instant LCP) */}
           <div
             className={`max-w-lg ${semEntrada ? "" : "animate-[heroSlideIn_0.7s_cubic-bezier(0.16,1,0.3,1)_both]"}`}
           >
-            <p className="mb-3 font-body text-xs font-semibold uppercase tracking-[0.2em] text-white/70 sm:mb-4">
+            <p className="mb-3 hidden font-body text-xs font-semibold uppercase tracking-[0.2em] text-white/70 sm:mb-4 sm:block">
               Porto Alegre & Região
             </p>
             <h1
-              className="font-body text-[clamp(2rem,5vw,3.25rem)] font-extrabold leading-[1.08] tracking-tight text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.4)]"
+              className="font-body text-[1.75rem] sm:text-[clamp(2rem,5vw,3.25rem)] font-extrabold leading-[1.08] tracking-tight text-foreground sm:text-white sm:drop-shadow-[0_2px_12px_rgba(0,0,0,0.4)]"
               style={{ textWrap: "balance" }}
             >
-              Encontre o imóvel perfeito para você
+              Você e seu novo lar.
             </h1>
-            <p className="mt-3 max-w-md font-body text-sm leading-relaxed text-white/75 sm:mt-4 sm:text-base">
+            <p className="mt-2 max-w-md font-body text-sm leading-relaxed text-muted-foreground sm:mt-4 sm:text-base sm:text-white/75">
               Imóveis com curadoria Uhome, busca inteligente e atendimento humano.
             </p>
             <div className="hidden sm:block"><HeroFocoButtons /></div>
@@ -221,7 +221,7 @@ export function HeroSection() {
 
           {/* Right — card (CSS animation for instant LCP) */}
           <div
-            className={`w-full max-w-md rounded-2xl bg-card p-5 shadow-2xl sm:p-7 md:max-w-lg lg:ml-auto ${semEntrada ? "" : "animate-[heroCardIn_0.6s_0.2s_cubic-bezier(0.16,1,0.3,1)_both]"}`}
+            className={`hidden w-full max-w-md rounded-2xl bg-card sm:block p-5 shadow-2xl sm:p-7 md:max-w-lg lg:ml-auto ${semEntrada ? "" : "animate-[heroCardIn_0.6s_0.2s_cubic-bezier(0.16,1,0.3,1)_both]"}`}
           >
             {/* Toggle */}
             <div className="mb-4 flex gap-2 sm:mb-6">

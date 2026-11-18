@@ -169,6 +169,13 @@
       "when": 1794970088095,
       "tag": "0023_busca_site_catalogo_e_aviso_preco",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1795022729738,
+      "tag": "0024_favoritos_pastas",
+      "breakpoints": true
     }
   ]
 }

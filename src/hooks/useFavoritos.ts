@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { trackEvent } from "@/lib/trackEvent";
+import { toast } from 'sonner';
+import { lerPastas, salvarPastas, removerImovel } from '@/lib/favoritosPastas';
 import { lerFavoritos, salvarFavoritos, devePedirAviso } from '@/lib/favoritosLocais';
 
 export function useFavoritos() {
@@ -53,6 +55,8 @@ export function useFavoritos() {
         if (isFav) next.delete(imovelId);
         else next.add(imovelId);
       salvarFavoritos([...next]);
+      if (isFav) salvarPastas(removerImovel(lerPastas(), imovelId));
+      else toast('Salvo nos favoritos', { action: { label: 'Escolher pasta', onClick: () => { window.location.href = `/favoritos?escolher=${encodeURIComponent(imovelId)}`; } } });
       if (!isFav && !user) void trackEvent({tipo:'favorito_salvo',dados:{imovel_id:imovelId}});
       if (devePedirAviso(favoritos.size,next.size,localStorage.getItem('uh-aviso-preco-pedido')==='1')) window.dispatchEvent(new Event('uhome:aviso-preco'));
     },

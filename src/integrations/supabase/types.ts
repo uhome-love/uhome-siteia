@@ -629,6 +629,57 @@ export type Database = {
         }
         Relationships: []
       }
+      favorito_pastas: {
+        Row: {
+          id: string
+          itens: Json
+          local_id: string
+          nome: string
+          ordem: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          itens?: Json
+          local_id: string
+          nome: string
+          ordem?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          itens?: Json
+          local_id?: string
+          nome?: string
+          ordem?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      favorito_pastas_compartilhadas: {
+        Row: {
+          created_at: string
+          imoveis: string[]
+          nome: string
+          token: string
+        }
+        Insert: {
+          created_at?: string
+          imoveis: string[]
+          nome: string
+          token: string
+        }
+        Update: {
+          created_at?: string
+          imoveis?: string[]
+          nome?: string
+          token?: string
+        }
+        Relationships: []
+      }
       favoritos: {
         Row: {
           created_at: string
@@ -1827,6 +1878,10 @@ export type Database = {
     }
     Functions: {
       busca_site: { Args: { p?: Json }; Returns: Json }
+      compartilhar_pasta: {
+        Args: { p_imoveis: string[]; p_nome: string }
+        Returns: string
+      }
       count_imoveis: {
         Args: {
           lat_max?: number
@@ -1958,6 +2013,7 @@ export type Database = {
         Returns: boolean
       }
       journey_upsert_lead: { Args: { p_payload: Json }; Returns: string }
+      pasta_compartilhada: { Args: { p_token: string }; Returns: Json }
       site_merge_pedidos: {
         Args: { incoming: Json; old_context: Json }
         Returns: Json

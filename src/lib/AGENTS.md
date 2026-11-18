@@ -1,0 +1,1 @@
+- Favorite folders/notes: localStorage first (favoritosPastas.ts), mirrored to favorito_pastas when signed in; shares are read-only snapshots via RPC. Why: works signed-out, never exposes the owner.

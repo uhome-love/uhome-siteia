@@ -47,3 +47,5 @@
 - [ ] Próximas partes do design: Imóvel, Favoritos em pastas, Home nova, Lia celular, Movimento
 - [x] Continuação 18/11: imóvel com visita principal (dia → horário → dados), informações secundárias, análise de preço retirada, galeria acessível compartilhada, corretor real em links personalizados sem disponibilidade inventada e aviso 28238-UH. 7 testes com envios simulados; fluxo celular/computador conferido; aguarda publicação, sem Worker. Medição Brasil fica com o dono depois.
 - [ ] Imóvel: atribuição de corretor nas páginas gerais e frase pessoal aguardam dados oficiais; páginas gerais não inventam profissional. Favoritos, Home e Lia/Movimento seguem como próximas etapas após conferir/publicar esta parte.
+- [x] Favoritos em pastas: pastas, nota, compartilhar por link (só leitura + WhatsApp), visitas em lote pelo fluxo existente, pastas levadas para a conta; 6 testes; aguarda publicação
+- [ ] Entrar com WhatsApp aguarda serviço de envio de código por WhatsApp

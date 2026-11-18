@@ -61,6 +61,7 @@ export function AppRoutes() {
       <Route path="/blog" element={<Blog />} />
       <Route path="/blog/:slug" element={<BlogPostPage />} />
       <Route path="/favoritos" element={<Favoritos />} />
+      <Route path="/favoritos/p/:token" element={<Favoritos />} />
       <Route path="/apartamentos-porto-alegre" element={<TipoImovel />} />
       <Route path="/condominios" element={<Condominios />} />
       <Route path="/condominios/:slug" element={<CondominioDetail />} />

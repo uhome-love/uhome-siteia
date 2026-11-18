@@ -858,7 +858,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
           >
             {/* Pontinha apontando para o preço quando o card abre para baixo */}
             {abreBaixo && (
-              <div className="relative h-[6px]">
+              <div className="relative z-10 h-[6px]">
                 <div data-testid="seta-mini-card" data-direcao="cima" className="absolute top-[1px] h-2.5 w-2.5 -translate-x-1/2 rotate-45 border-l border-t border-border bg-card" style={{ left: setaX }} />
               </div>
             )}
@@ -906,7 +906,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
             </div>
             {/* Pontinha apontando para o preço quando o card abre para cima */}
             {!abreBaixo && (
-              <div className="relative h-[6px]">
+              <div className="relative z-10 h-[6px]">
                 <div data-testid="seta-mini-card" data-direcao="baixo" className="absolute -top-[6px] h-2.5 w-2.5 -translate-x-1/2 rotate-45 border-b border-r border-border bg-card" style={{ left: setaX }} />
               </div>
             )}

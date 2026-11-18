@@ -42,7 +42,7 @@ function Contador({ rotulo, valor, onChange }: { rotulo: string; valor: number; 
 }
 
 let bairrosCache: Promise<string[]> | null = null;
-const bairros = () => (bairrosCache ??= supabase.rpc('get_bairros_disponiveis').then(({ data }) => ((data as any[]) ?? []).map((b) => b.bairro).filter(Boolean)));
+const bairros = () => (bairrosCache ??= Promise.resolve(supabase.rpc('get_bairros_disponiveis')).then(({ data }) => ((data as any[]) ?? []).map((b) => String(b.bairro)).filter(Boolean)));
 
 export function SearchFilterDialog({ open, onClose, filtros, onApply, opener }: { open: boolean; onClose: () => void; filtros: Record<string, any>; onApply: (f: Record<string, any>) => void; opener?: React.RefObject<HTMLElement> }) {
   const [draft, setDraft] = useState(filtros), [result, setResult] = useState<(BuscaSiteResult & { precos?: number[]; comodidades?: Record<string, number> }) | null>(null), [loading, setLoading] = useState(false);

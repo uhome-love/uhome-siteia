@@ -13,7 +13,7 @@ const valor = (v: number) => (v >= 1_000_000 ? `R$ ${(v / 1_000_000).toLocaleStr
 export function PilulaBusca({ inicial = {}, onApply }: { inicial?: Record<string, any>; onApply?: (f: Record<string, any>) => void }) {
   const navigate = useNavigate(); const { prefixLink } = useCorretor();
   const [aberto, setAberto] = useState(false);
-  const f = { secao: 'imoveis', ordem: 'recentes', ...inicial };
+  const f: Record<string, any> = { secao: 'imoveis', ordem: 'recentes', ...inicial };
   const aplicar = (n: Record<string, any>) => (onApply ? onApply(n) : navigate(prefixLink(urlDeFiltros(n))));
   const partes: [string, string, string][] = [
     ['Onde', f.bairro || f.q || f.cidade || '', 'Bairro, cidade ou código'],

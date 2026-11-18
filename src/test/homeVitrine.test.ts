@@ -36,3 +36,16 @@ describe('Busca: título com total', () => {
     expect(ids).toEqual(['garden', 'studios']);
   });
 });
+
+import { urlDeFiltros } from '@/lib/homeVitrine';
+import { alternarComodidade } from '@/components/search/SearchFilterDialog';
+describe('Painel de filtros', () => {
+  it('leva comodidades, banheiros, vagas e faixa de preço para a busca', () => {
+    expect(urlDeFiltros({ secao: 'imoveis', ordem: 'recentes', tipo: 'garden', precoMin: 300000, precoMax: 700000, banheiros: 2, vagas: 1, comodidades: 'Piscina,Sacada', quartos: 0 }))
+      .toBe('/busca?tipo=garden&preco_min=300000&preco_max=700000&banheiros=2&vagas=1&comodidades=Piscina%2CSacada');
+  });
+  it('liga e desliga uma comodidade sem perder as outras', () => {
+    expect(alternarComodidade('Piscina', 'Sacada')).toBe('Piscina,Sacada');
+    expect(alternarComodidade('Piscina,Sacada', 'Piscina')).toBe('Sacada');
+  });
+});

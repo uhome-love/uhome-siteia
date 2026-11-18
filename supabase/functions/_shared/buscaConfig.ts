@@ -30,7 +30,7 @@ export const CATEGORIAS_3D = [
 ] as const;
 /** Contagem por categoria: usa `categorias` e, para garden/coberturas, `tipos` da busca_site. */
 export function categorias3dVisiveis(categorias: Record<string, number>, tipos: Record<string, number>) {
-  const n: Record<string, number> = { ...categorias, garden: tipos.garden ?? 0, coberturas: tipos.cobertura ?? 0 };
+  const n: Record<string, number> = { ...categorias, garden: categorias.garden ?? tipos.garden ?? 0, coberturas: categorias.coberturas ?? tipos.cobertura ?? 0 };
   return CATEGORIAS_3D.filter((c) => (n[c.id] ?? 0) >= 8);
 }
 /** Título dos resultados com total (exceção à regra de não mostrar totais). */

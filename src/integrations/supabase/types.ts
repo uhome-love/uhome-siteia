@@ -740,6 +740,7 @@ export type Database = {
           banheiros: number | null
           cep: string | null
           cidade: string | null
+          comodidades: string[]
           condominio_id: string | null
           condominio_nome: string | null
           corretor_id: string | null
@@ -781,6 +782,7 @@ export type Database = {
           banheiros?: number | null
           cep?: string | null
           cidade?: string | null
+          comodidades?: string[]
           condominio_id?: string | null
           condominio_nome?: string | null
           corretor_id?: string | null
@@ -822,6 +824,7 @@ export type Database = {
           banheiros?: number | null
           cep?: string | null
           cidade?: string | null
+          comodidades?: string[]
           condominio_id?: string | null
           condominio_nome?: string | null
           corretor_id?: string | null
@@ -1923,6 +1926,7 @@ export type Database = {
           banheiros: number | null
           cep: string | null
           cidade: string | null
+          comodidades: string[]
           condominio_id: string | null
           condominio_nome: string | null
           corretor_id: string | null

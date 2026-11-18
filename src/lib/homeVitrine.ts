@@ -38,3 +38,12 @@ export function novoDesdeVisita(publicadoEm: string | null | undefined, ultimaVi
   const t = new Date(publicadoEm).getTime();
   return Number.isFinite(t) && t > ultimaVisita;
 }
+
+/** URL de /busca a partir dos filtros do painel (mesmos nomes de parâmetro da busca). */
+export function urlDeFiltros(f: Record<string, unknown>, base = '/busca'): string {
+  const nomes: Record<string, string> = { precoMax: 'preco_max', precoMin: 'preco_min', areaMin: 'area_min', areaMax: 'area_max', areaUtilMin: 'area_util_min', areaUtilMax: 'area_util_max' };
+  const p = new URLSearchParams();
+  for (const [k, v] of Object.entries(f)) { if (!v || k === 'bounds' || k === 'limit' || k === 'offset' || (k === 'secao' && v === 'imoveis') || (k === 'ordem' && v === 'recentes')) continue; p.set(nomes[k] ?? k, String(v)); }
+  const s = p.toString();
+  return s ? `${base}?${s}` : base;
+}

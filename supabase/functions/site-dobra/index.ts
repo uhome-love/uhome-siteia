@@ -67,6 +67,19 @@ function searchImageUrl(src: string, width: number): string {
   } catch { return src; }
 }
 
+/** Igual a cardFotoUrl em src/lib/searchImages.ts. Ligado só após publicar o app (UH_FOTO_CARD=1). */
+const FOTO_CARD_NOVA = Deno.env.get("UH_FOTO_CARD") === "1";
+function cardFotoUrl(src: string): string {
+  const local = (miniaturas as Record<string,string>)[src];
+  if (local) return local;
+  if (!FOTO_CARD_NOVA) return searchImageUrl(src, 768);
+  const base = searchImageUrl(src, 480);
+  if (!base.startsWith("https://wsrv.nl/")) return base;
+  const u = new URL("https://wsrv.nl/");
+  u.search = new URLSearchParams({ url: src, w: "480", h: "432", fit: "cover", output: "webp", q: "62" }).toString();
+  return u.toString();
+}
+
 async function calcularBusca() {
   const [{ data }, { data: count }] = await Promise.all([
     supabase.from("imoveis").select(LISTING_COLUMNS)
@@ -198,9 +211,9 @@ async function calcularBuscaV3(path:string):Promise<Corpo> {
  const config=BUSCA_URLS[path as keyof typeof BUSCA_URLS];
  const {data,error}=await supabase.rpc('busca_site',{p:{...config?.filtros,limit:40}});if(error)throw error;
  const rows=data?.rows??[];if(!rows.length)return {head:'',pre:'',script:''};
- const escHtml=(s:unknown)=>esc(s);const first=(miniaturas as Record<string,string>)[rows[0].foto_principal]??searchImageUrl(rows[0].foto_principal,768);
+ const escHtml=(s:unknown)=>esc(s);const first=cardFotoUrl(rows[0].foto_principal);
  const cats=categoriasVisiveis(data.categorias??{}).map(c=>{const selected=Object.entries(c.filtros).every(([k,v])=>String((config?.filtros as Record<string,unknown> | undefined)?.[k])===String(v));return `<button aria-pressed="${selected}" class="inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold hover:bg-secondary hover:text-foreground h-12 px-6 py-2 search-category">${ICONES_BUSCA_MOBILE[c.icone]}<span>${esc(c.nome)}</span></button>`;}).join('');
- const card=(r:any,i:number)=>{const tipo=({'casa_condominio':'Casa em Condomínio','garden':'Apartamento Garden'} as Record<string,string>)[r.tipo]??r.tipo.charAt(0).toUpperCase()+r.tipo.slice(1);const title=r.fonte==='produto'?r.titulo:`${tipo}${r.quartos>0?` ${r.quartos} quarto${r.quartos>1?'s':''}`:' para Venda'} — ${r.bairro}`;let h=CARD_V3;const values={HREF:`/${r.fonte==='produto'?'em-foco':'imovel'}/${r.slug}`,FOTO:(miniaturas as Record<string,string>)[r.foto_principal]??searchImageUrl(r.foto_principal,768),ALT:`${title} - foto 1`,PRIORIDADE:i===0?'high':'auto',TITULO:title,STATS:[r.area_util??r.area_total,r.quartos,r.vagas].map((v:number,j:number)=>v?`${v} ${j===0?'m²':j===1?`quarto${v>1?'s':''}`:`vaga${v>1?'s':''}`}`:null).filter(Boolean).join(' · '),LOCAL:`${r.bairro}, ${r.cidade}`,PRECO:(r.fonte==='produto'?'A partir de ':'')+BRL.format(r.preco)};for(const [k,v] of Object.entries(values))h=h.replaceAll('{{'+k+'}}',escHtml(v));return h;};
+ const card=(r:any,i:number)=>{const tipo=({'casa_condominio':'Casa em Condomínio','garden':'Apartamento Garden'} as Record<string,string>)[r.tipo]??r.tipo.charAt(0).toUpperCase()+r.tipo.slice(1);const title=r.fonte==='produto'?r.titulo:`${tipo}${r.quartos>0?` ${r.quartos} quarto${r.quartos>1?'s':''}`:' para Venda'} — ${r.bairro}`;let h=CARD_V3;const values={HREF:`/${r.fonte==='produto'?'em-foco':'imovel'}/${r.slug}`,FOTO:cardFotoUrl(r.foto_principal),ALT:`${title} - foto 1`,PRIORIDADE:i===0?'high':FOTO_CARD_NOVA?'low':'auto',TITULO:title,STATS:[r.area_util??r.area_total,r.quartos,r.vagas].map((v:number,j:number)=>v?`${v} ${j===0?'m²':j===1?`quarto${v>1?'s':''}`:`vaga${v>1?'s':''}`}`:null).filter(Boolean).join(' · '),LOCAL:`${r.bairro}, ${r.cidade}`,PRECO:(r.fonte==='produto'?'A partir de ':'')+BRL.format(r.preco)};for(const [k,v] of Object.entries(values))h=h.replaceAll('{{'+k+'}}',escHtml(v));return h;};
  const title=config?.titulo ?? tituloBusca();
  const filtros=config?.filtros as Record<string,unknown> | undefined;
  const labels=Object.entries(filtros??{}).filter(([k,v])=>v&&k!=='secao').map(([k,v])=>k==='precoMax'?`Até ${BRL.format(Number(v))}`:k==='tipo'?String(v).split(',').map(t=>({apartamento:'Apartamentos',casa_condominio:'Casas em condomínio',studio:'Studios',loft:'Lofts'} as Record<string,string>)[t]??t).join(', '):String(v));

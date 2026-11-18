@@ -5,6 +5,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { LeadSidebar } from "@/components/LeadSidebar";
+import { DetalheNavFixa } from "@/components/imovel/DetalheNavFixa";
 import { FinancingSimulator } from "@/components/FinancingSimulator";
 import { AgendamentoVisita } from "@/components/AgendamentoVisita";
 import { SimilarProperties } from "@/components/SimilarProperties";
@@ -13,7 +14,7 @@ import { FotoImovel } from "@/components/FotoImovel";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 const MaterialGallery = lazy(() => import("@/components/foco/MaterialGallery").then(m => ({ default: m.MaterialGallery })));
 import { AuthModal } from "@/components/AuthModal";
-import { Bed, Car, Maximize, Bath, MapPin, Share2, Heart, ChevronLeft, ChevronRight, Loader2, Camera, ArrowLeft, MoreVertical, Map as MapIcon, Play, MessageCircle, Building2, Eye, TrendingUp } from "lucide-react";
+import { Bed, Car, Maximize, Bath, MapPin, Share2, Heart, ChevronLeft, ChevronRight, Loader2, Camera, ArrowLeft, MoreVertical, Map as MapIcon, Play, MessageCircle, Building2, Eye, TrendingUp, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { buildWhatsAppUrl, buildCorretorWhatsAppUrl } from "@/lib/whatsapp";
 import { useCorretor } from "@/contexts/CorretorContext";
@@ -52,6 +53,7 @@ const PropertyDetail = () => {
   const openLeadModal = useWhatsAppLeadStore((s) => s.openModal);
   const [showAuth, setShowAuth] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
+  const [todasComodidades, setTodasComodidades] = useState(false);
   const [visitaOpen, setVisitaOpen] = useState(false);
   const galleryTrigger = useRef<HTMLElement | null>(null);
   const abrirVisita = () => { setGalleryOpen(false); setVisitaOpen(true); };
@@ -263,7 +265,7 @@ const PropertyDetail = () => {
 
       {isIndisponivel && (
         <div className="bg-amber-50 border-b border-amber-200 dark:bg-amber-950/30 dark:border-amber-800">
-          <div className="mx-auto max-w-7xl px-6 py-3 flex items-center justify-between">
+          <div className="mx-auto max-w-[1120px] px-6 py-3 flex items-center justify-between">
             <p className="font-body text-sm font-medium text-amber-800 dark:text-amber-200">
               Este imóvel está <strong>{statusLabel[imovel.status] || "indisponível"}</strong> e não está mais à venda.
             </p>
@@ -279,32 +281,31 @@ const PropertyDetail = () => {
         </div>
       )}
       <div className="mt-16 hidden sm:block">
-        <div className="mx-auto max-w-7xl px-6 pt-4 pb-2">
-          <button
-            onClick={() => window.history.length > 2 ? navigate(-1) : navigate(prefixLink("/busca"))}
-            className="flex items-center gap-1.5 rounded-full px-3 py-1.5 font-body text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Voltar
-          </button>
+        <div className="mx-auto flex max-w-[1120px] items-end justify-between gap-6 px-6 pb-4 pt-6">
+          <div className="min-w-0">
+            <p aria-hidden="true" className="truncate font-body text-[26px] font-bold leading-tight text-foreground">{imovel.titulo}</p>
+            <p className="mt-1 font-body text-sm text-muted-foreground">{imovel.bairro}, {imovel.cidade}</p>
+          </div>
+          <div className="flex shrink-0 gap-1">
+            <button onClick={handleShare} className="flex items-center gap-2 rounded-lg px-3 py-2 font-body text-sm font-semibold underline underline-offset-2 hover:bg-secondary"><Share2 className="h-4 w-4" />Compartilhar</button>
+            <button onClick={async () => { const r = await toggleFavorito(imovel.id); if (r === "needs_auth") setShowAuth(true); }} className="flex items-center gap-2 rounded-lg px-3 py-2 font-body text-sm font-semibold underline underline-offset-2 hover:bg-secondary"><Heart className={`h-4 w-4 ${isFavorito(imovel.id) ? "fill-primary text-primary" : ""}`} />{isFavorito(imovel.id) ? "Salvo" : "Salvar"}</button>
+          </div>
         </div>
         <div className="px-6">
-        <div className="mx-auto max-w-7xl gap-2 grid grid-cols-4 grid-rows-2" style={{ height: 480 }}>
+        <div id="fotos" className="detalhe-grade relative mx-auto max-w-[1120px] gap-2 grid grid-cols-4 grid-rows-2 overflow-hidden rounded-xl" style={{ height: 440 }}>
           <button
             onClick={(e) => { galleryTrigger.current = e.currentTarget; setCurrentImage(0); setGalleryOpen(true); }}
-            className="group relative col-span-2 row-span-2 overflow-hidden rounded-l-2xl"
+            className="group relative col-span-2 row-span-2 overflow-hidden"
           >
-            <FotoImovel src={images[0]} alt={imovel.titulo} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
+            <FotoImovel src={images[0]} alt={imovel.titulo} className="h-full w-full object-cover transition-transform duration-500 group-hover:brightness-90" />
           </button>
           {images.slice(1, 5).map((img, i) => (
             <button
               key={i}
               onClick={(e) => { galleryTrigger.current = e.currentTarget; setCurrentImage(i + 1); setGalleryOpen(true); }}
-              className={`group relative overflow-hidden ${
-                i === 1 ? "rounded-tr-2xl" : i === 3 ? "rounded-br-2xl" : ""
-              }`}
+              className="group relative overflow-hidden"
             >
-              <FotoImovel src={img} alt={`Foto ${i + 2}`} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
+              <FotoImovel src={img} alt={`Foto ${i + 2}`} className="h-full w-full object-cover transition-transform duration-500 group-hover:brightness-90" />
               {i === 3 && images.length > 5 && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/40">
                   <span className="font-body text-sm font-semibold text-white">+{images.length - 5} fotos</span>
@@ -312,20 +313,11 @@ const PropertyDetail = () => {
               )}
             </button>
           ))}
+          {images.length > 1 && <button onClick={(e) => { galleryTrigger.current = e.currentTarget; setCurrentImage(0); setGalleryOpen(true); }} className="absolute bottom-4 right-4 flex items-center gap-2 rounded-lg border border-foreground bg-card px-4 py-2 font-body text-sm font-semibold text-foreground shadow-sm transition-transform active:scale-[0.97]"><Camera className="h-4 w-4" />Mostrar todas as {images.length} fotos</button>}
         </div>
         </div>
-        {images.length > 1 && (
-          <div className="mx-auto mt-3 flex max-w-7xl justify-end px-4 sm:px-6 lg:px-8">
-            <button
-              onClick={(e) => { galleryTrigger.current = e.currentTarget; setCurrentImage(0); setGalleryOpen(true); }}
-              className="flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 font-body text-[13px] font-semibold text-foreground transition-colors hover:bg-secondary active:scale-[0.97]"
-            >
-              <Camera className="h-3.5 w-3.5" />
-              Ver todas as {images.length} fotos
-            </button>
-          </div>
-        )}
       </div>
+      <DetalheNavFixa preco={priceFormatted} onAgendar={isIndisponivel ? undefined : abrirVisita} />
 
       {/* Mobile hero — QuintoAndar style */}
       <div className="relative sm:hidden mt-16">
@@ -420,7 +412,7 @@ const PropertyDetail = () => {
       </Dialog>
 
       {/* Content */}
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
+      <div className="mx-auto max-w-[1120px] px-4 py-6 sm:px-6 sm:py-8">
         {imovel.slug.toUpperCase().endsWith("28238-UH") && <p className="mb-6 border-b border-border pb-4 text-sm text-muted-foreground">Ainda sem fotos por dentro. As imagens disponíveis mostram o condomínio.</p>}
         <div className="flex flex-col gap-8 sm:gap-10 lg:flex-row">
           {/* Left column */}
@@ -430,7 +422,7 @@ const PropertyDetail = () => {
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
             className="flex-1 space-y-8 lg:max-w-[63%]"
           >
-            <section aria-label="Resumo do imóvel" className="min-w-0 space-y-5">
+            <section id="detalhes" aria-label="Resumo do imóvel" className="min-w-0 scroll-mt-32 space-y-5">
             {/* Breadcrumb and property reference */}
             <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
               <nav aria-label="Navegação do imóvel" className="min-w-0 break-words font-body text-xs leading-relaxed text-muted-foreground">
@@ -475,7 +467,7 @@ const PropertyDetail = () => {
                   </span>
                 )}
               </div>
-              <h1 className="mt-3 break-words font-body text-2xl font-extrabold leading-tight tracking-normal text-foreground sm:text-3xl">
+              <h1 className="mt-3 sm:sr-only break-words font-body text-2xl font-extrabold leading-tight tracking-normal text-foreground sm:text-3xl">
                 {imovel.titulo}
               </h1>
               <div className="mt-2 font-body text-base text-muted-foreground">
@@ -567,15 +559,14 @@ const PropertyDetail = () => {
 
             {/* Diferenciais */}
             {imovel.diferenciais.length > 0 && (
-              <div>
-                <h2 className="font-body text-lg font-bold text-foreground">Diferenciais</h2>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {imovel.diferenciais.map((f) => (
-                    <span key={f} className="rounded-full border border-border px-3 py-1.5 font-body text-xs text-muted-foreground">
-                      {f}
-                    </span>
+              <div id="comodidades" className="scroll-mt-32">
+                <h2 className="font-body text-lg font-bold text-foreground">O que este imóvel oferece</h2>
+                <ul className="mt-4 grid grid-cols-1 gap-x-8 gap-y-3 sm:grid-cols-2">
+                  {(todasComodidades ? imovel.diferenciais : imovel.diferenciais.slice(0, 10)).map((f) => (
+                    <li key={f} className="flex items-center gap-3 font-body text-[15px] text-foreground"><Check className="h-5 w-5 shrink-0 text-muted-foreground" aria-hidden="true" />{f}</li>
                   ))}
-                </div>
+                </ul>
+                {imovel.diferenciais.length > 10 && <button type="button" onClick={() => setTodasComodidades((v) => !v)} className="mt-5 rounded-lg border border-foreground px-5 py-2.5 font-body text-sm font-semibold hover:bg-secondary">{todasComodidades ? "Mostrar menos" : `Mostrar todas as ${imovel.diferenciais.length} comodidades`}</button>}
               </div>
             )}
 
@@ -583,10 +574,10 @@ const PropertyDetail = () => {
 
             {/* Location */}
             {imovel.latitude && imovel.longitude && (
-              <div ref={mapRef}>
+              <div ref={mapRef} id="localizacao" className="scroll-mt-32">
                 <h2 className="font-body text-lg font-bold text-foreground">Localização</h2>
                 <p className="mt-2 font-body text-sm text-muted-foreground">
-                  {imovel.bairro}, Porto Alegre — endereço exato após contato
+                  {imovel.bairro}, {imovel.cidade} — endereço exato após contato
                 </p>
                 <div className="mt-4">
                   <Suspense fallback={<div className="h-64 w-full rounded-xl bg-muted animate-pulse" />}>
@@ -616,7 +607,7 @@ const PropertyDetail = () => {
             transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
             className="w-full lg:w-[35%]"
           >
-            <div className="sticky top-24 space-y-4">
+            <div className="detalhe-cartao sticky top-24 space-y-4">
               <LeadSidebar
                 imovelId={imovel.id}
                 imovelSlug={imovel.slug}
@@ -655,7 +646,7 @@ const PropertyDetail = () => {
       </div>
 
       {/* Similar properties */}
-      <div className="mx-auto max-w-7xl px-6 pb-12">
+      <div className="mx-auto max-w-[1120px] px-6 pb-12">
         <SimilarProperties
           currentId={imovel.id}
           bairro={imovel.bairro}

@@ -12,10 +12,10 @@ export function Footer() {
   return (
     <footer className="uhs-site-footer border-t border-border">
       {/* SEO Content Block — rich text for search engines */}
-      <div className="border-b border-border bg-secondary/20 py-10">
+      <div className="border-b border-border bg-secondary/20 py-4">
         <div className="mx-auto max-w-7xl px-6">
           <details className="group">
-          <summary className="flex cursor-pointer list-none items-center justify-between font-body text-sm font-bold text-foreground [&::-webkit-details-marker]:hidden">
+          <summary className="flex cursor-pointer list-none items-center gap-3 font-body text-sm font-bold text-foreground [&::-webkit-details-marker]:hidden">
             <h2 className="font-body text-sm font-bold">Imóveis à venda em Porto Alegre | Uhome Imóveis</h2>
             <span className="font-body text-xs font-semibold text-primary group-open:hidden">Saiba mais</span>
           </summary>
@@ -59,7 +59,7 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="py-16">
+      <div className="py-12">
         <div className="mx-auto max-w-7xl px-6">
           <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
             {/* Brand */}

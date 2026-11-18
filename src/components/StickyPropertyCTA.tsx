@@ -89,7 +89,7 @@ export function StickyPropertyCTA({ imovelId, imovelSlug, imovelTitulo, imovelBa
           exit={{ y: 80, opacity: 0 }}
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
           data-barra-baixo
-          className="fixed bottom-0 left-0 right-0 z-[55] hidden border-t border-border bg-card/95 backdrop-blur-md sm:block"
+          className="fixed bottom-0 left-0 right-0 z-[55] hidden border-t border-border bg-card/95 backdrop-blur-md sm:block lg:hidden"
         >
           <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-3">
             <div className="min-w-0 flex-1">

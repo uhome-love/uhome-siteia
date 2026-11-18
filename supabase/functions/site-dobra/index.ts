@@ -51,7 +51,7 @@ function compativel(corpo: Corpo): Corpo {
   const proteger = `<script>if(document.querySelector('meta[name="uh-dobra-versao"]')?.content!=='site-v3')document.getElementById('uh-pre')?.remove();</script>`;
   const buscaV3 = !!corpo.preV3 && corpo.script.includes('window.__UH_BUSCA_V3__=');
   const script = buscaV3 ? corpo.script.replace(/window\.__UH_BUSCA__=.*?;(?=window\.__UH_DOBRA__=)/s, '') : corpo.script;
-  const head = buscaV3 ? corpo.head.replace(/<link[^>]*rel="preload"[^>]*as="image"[^>]*>/g, '') : corpo.head;
+  const head = buscaV3 ? corpo.head.replace(/<link(?![^>]*data-uh-v3)[^>]*rel="preload"[^>]*as="image"[^>]*>/g, '') : corpo.head;
   // Nunca serializar preV2/preV3 ou os demais moldes no contrato público.
   return { head, pre: v3 ? v3 + proteger : '', script };
 }
@@ -207,9 +207,9 @@ async function calcularBuscaV3(path:string):Promise<Corpo> {
  const chips=labels.length?`<div class="search-chips" aria-label="Filtros aplicados">${labels.map(l=>`<button class="inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold" aria-label="Remover filtro ${esc(l)}">${esc(l)}<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 6-12 12M6 6l12 12"/></svg></button>`).join('')}<button class="inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold">Limpar filtros</button></div>`:'';
  const nav=NAV_BUSCA_V3.replace('data-active="imoveis"','aria-current="page"');
  const activeNav=filtros?.secao&&filtros.secao!=='imoveis'?nav.replaceAll('aria-current="page"','').replaceAll(`href="/busca?secao=${filtros.secao}"`,`aria-current="page" href="/busca?secao=${filtros.secao}"`):nav;
- const gate=`<script>if(document.querySelector('meta[name="uh-busca-layout"]')?.content!=='compacta-1')document.getElementById('uh-pre')?.remove();</script>`;
+ const gate=`<script>if(document.querySelector('meta[name="uh-busca-layout"]')?.content!=='compacta-1')document.querySelectorAll('#uh-pre .search-mobile-chips,#uh-pre .search-desktop-chips').forEach(function(e){e.remove()});</script>`;
  const preV3=`<div id="uh-pre" data-uh-alvo=".catalog-photo img" data-uh-max="1023"><div class="search-page bg-background text-foreground">${activeNav}<div class="uh-header-spacer"></div><div class="search-mobile-chips">${chips}</div><div class="search-categories border-b border-border">${cats}</div>${TOOLBAR_V3}<div class="search-desktop-chips">${chips}</div><div class="search-main"><main class="search-list"><header class="search-results-heading mb-6"><h1 class="text-xl font-extrabold sm:text-2xl">${esc(title)}</h1>${config?`<p class="mt-2 text-sm leading-relaxed text-muted-foreground">${esc(config.texto)}</p>`:''}</header><div class="search-grid">${rows.slice(0,4).map(card).join('')}</div></main></div></div></div>${gate}`;
- return {head:`<script>if(document.querySelector('meta[name="uh-dobra-versao"]')?.content==='site-v3'){var l=document.createElement('link');l.rel='preload';l.as='image';l.href=${json(first)};l.fetchPriority='high';document.head.appendChild(l);}</script>`,pre:'',preV3,script:`window.__UH_BUSCA_V3__=${json({...data,path})};`};
+ return {head:`<link rel="preload" as="image" fetchpriority="high" data-uh-v3 href="${esc(first)}">`,pre:'',preV3,script:`window.__UH_BUSCA_V3__=${json({...data,path})};`};
 }
 
 // ---------- Em foco: capa pronta (ProdutoFocoPage, mesmas regras) ----------

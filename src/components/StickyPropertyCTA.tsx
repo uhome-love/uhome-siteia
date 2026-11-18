@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { Send, Loader2, Check, X } from "lucide-react";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
@@ -16,9 +17,10 @@ interface Props {
   imovelTitulo?: string;
   imovelBairro?: string;
   imovelPreco?: number;
+  onAgendar?: () => void;
 }
 
-export function StickyPropertyCTA({ imovelId, imovelSlug, imovelTitulo, imovelBairro, imovelPreco }: Props) {
+export function StickyPropertyCTA({ imovelId, imovelSlug, imovelTitulo, imovelBairro, imovelPreco, onAgendar }: Props) {
   const [show, setShow] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [nome, setNome] = useState("");
@@ -135,20 +137,19 @@ export function StickyPropertyCTA({ imovelId, imovelSlug, imovelTitulo, imovelBa
                 </motion.form>
               ) : (
                 <motion.div key="buttons" className="flex items-center gap-2">
-                  <button
-                    onClick={() => setFormOpen(true)}
+                  <Button
+                    onClick={onAgendar ?? (() => setFormOpen(true))}
                     className="flex items-center gap-1.5 rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground hover:bg-primary/90"
                   >
                     <Send className="h-4 w-4" />
-                    Tenho interesse
-                  </button>
-                  <button
+                    Agendar visita
+                  </Button>
+                  <Button variant="outline"
                     onClick={handleWhatsApp}
-                    className="flex items-center gap-1.5 rounded-full bg-[#25D366] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#20bd5a]"
                   >
                     <WhatsAppIcon className="h-4 w-4" />
-                    WhatsApp
-                  </button>
+                    Receber informações
+                  </Button>
                 </motion.div>
               )}
             </AnimatePresence>

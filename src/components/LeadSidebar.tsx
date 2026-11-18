@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Send, Loader2, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Send, Loader2, Check, CalendarDays } from "lucide-react";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { formatPhone } from "@/lib/phoneMask";
 import { submitLead } from "@/services/leads";
@@ -16,9 +17,11 @@ interface LeadSidebarProps {
   imovelBairro?: string;
   imovelPreco?: number;
   viewCount: number;
+  onAgendar?: () => void;
 }
 
-export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, imovelPreco, viewCount }: LeadSidebarProps) {
+export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, imovelPreco, viewCount, onAgendar }: LeadSidebarProps) {
+  const [informacoesOpen, setInformacoesOpen] = useState(false);
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
   const [email, setEmail] = useState("");
@@ -80,7 +83,7 @@ export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, 
   if (corretor) {
     const primeiroNome = corretor.nome.split(" ")[0];
     return (
-      <div data-lead-sidebar className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+      <div data-lead-sidebar className="space-y-4 border-y border-border py-6">
         {priceLabel && (
           <p className="font-body text-2xl font-extrabold text-foreground">{priceLabel}</p>
         )}
@@ -107,33 +110,14 @@ export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, 
           </div>
         </div>
 
-        <button
-          onClick={handleWhatsApp}
-          className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg py-3.5 font-body text-sm font-semibold text-white transition-all hover:brightness-110 active:scale-[0.97]"
-          style={{ backgroundColor: "#25D366" }}
-        >
-          <WhatsAppIcon className="h-5 w-5" />
-          Falar com {primeiroNome} no WhatsApp
-        </button>
-
-        <div className="mt-5 space-y-2">
-          {viewsText && (
-          <p className="flex items-center gap-2 font-body text-xs text-muted-foreground">
-            <span>⚡</span>
-            <span>{viewsText}</span>
-          </p>
-          )}
-          <p className="flex items-center gap-2 font-body text-xs text-muted-foreground">
-            <span>✅</span>
-            <span>Corretor disponível agora</span>
-          </p>
-        </div>
+        {onAgendar && <Button className="w-full" onClick={onAgendar}><CalendarDays />Agendar visita</Button>}
+        <Button variant="outline" className="w-full" onClick={handleWhatsApp}><WhatsAppIcon />Receber informações</Button>
       </div>
     );
   }
 
   return (
-    <div data-lead-sidebar className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+    <div data-lead-sidebar className="space-y-4 border-y border-border py-6">
       {priceLabel && (
         <p className="font-body text-2xl font-extrabold text-foreground">{priceLabel}</p>
       )}
@@ -143,9 +127,10 @@ export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, 
 
       <div className="my-5 h-px bg-border" />
 
-      <h3 className="font-body text-base font-bold text-foreground">Tenho interesse</h3>
+      {onAgendar && <Button className="w-full" onClick={onAgendar}><CalendarDays />Agendar visita</Button>}
+      <Button variant="outline" className="w-full" aria-expanded={informacoesOpen} onClick={() => setInformacoesOpen(x => !x)}>Receber informações</Button>
 
-      {success ? (
+      {informacoesOpen && (success ? (
         <div className="mt-6 flex flex-col items-center gap-3 py-8">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-green-500/10">
             <Check className="h-7 w-7 text-green-500" />
@@ -188,16 +173,12 @@ export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, 
               maxLength={255}
             />
           </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3 font-body text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 active:scale-[0.97] disabled:opacity-50"
-          >
+          <Button type="submit" variant="outline" disabled={loading} className="w-full">
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-            Quero saber mais
-          </button>
+            Enviar pedido
+          </Button>
         </form>
-      )}
+      ))}
 
       <div className="my-4 flex items-center gap-3">
         <div className="h-px flex-1 bg-border" />
@@ -205,27 +186,7 @@ export function LeadSidebar({ imovelId, imovelSlug, imovelTitulo, imovelBairro, 
         <div className="h-px flex-1 bg-border" />
       </div>
 
-      <button
-        onClick={handleWhatsApp}
-        className="flex w-full items-center justify-center gap-2 rounded-lg py-3 font-body text-sm font-semibold text-white transition-all hover:brightness-110 active:scale-[0.97]"
-        style={{ backgroundColor: "#25D366" }}
-      >
-        <WhatsAppIcon className="h-4 w-4" />
-        Falar via WhatsApp
-      </button>
-
-      <div className="mt-5 space-y-2">
-        {viewsText && (
-        <p className="flex items-center gap-2 font-body text-xs text-muted-foreground">
-          <span>⚡</span>
-          <span>{viewsText}</span>
-        </p>
-        )}
-        <p className="flex items-center gap-2 font-body text-xs text-muted-foreground">
-          <span>✅</span>
-          <span>Corretor disponível agora</span>
-        </p>
-      </div>
+      <Button variant="outline" className="w-full" onClick={handleWhatsApp}><WhatsAppIcon />WhatsApp</Button>
     </div>
   );
 }

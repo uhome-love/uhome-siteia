@@ -10,7 +10,8 @@ import { AgendamentoVisita } from "@/components/AgendamentoVisita";
 import { SimilarProperties } from "@/components/SimilarProperties";
 const PropertyMap = lazy(() => import("../components/PropertyMap.tsx").then(m => ({ default: m.PropertyMap })));
 import { FotoImovel } from "@/components/FotoImovel";
-import { CardUhomePreco } from "@/components/CardUhomePreco";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+const MaterialGallery = lazy(() => import("@/components/foco/MaterialGallery").then(m => ({ default: m.MaterialGallery })));
 import { AuthModal } from "@/components/AuthModal";
 import { Bed, Car, Maximize, Bath, MapPin, Share2, Heart, ChevronLeft, ChevronRight, Loader2, Camera, ArrowLeft, MoreVertical, Map as MapIcon, Play, MessageCircle, Building2, Eye, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -51,6 +52,9 @@ const PropertyDetail = () => {
   const openLeadModal = useWhatsAppLeadStore((s) => s.openModal);
   const [showAuth, setShowAuth] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
+  const [visitaOpen, setVisitaOpen] = useState(false);
+  const galleryTrigger = useRef<HTMLElement | null>(null);
+  const abrirVisita = () => { setGalleryOpen(false); setVisitaOpen(true); };
 
   const [imovel, setImovel] = useState<Imovel | null>(null);
   const [loading, setLoading] = useState(true);
@@ -149,16 +153,6 @@ const PropertyDetail = () => {
 
   const nextImage = () => setCurrentImage((i) => (i + 1) % images.length);
   const prevImage = () => setCurrentImage((i) => (i - 1 + images.length) % images.length);
-
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "ArrowRight") nextImage();
-      if (e.key === "ArrowLeft") prevImage();
-      if (e.key === "Escape") setGalleryOpen(false);
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [images.length]);
 
   // Dynamic SEO meta tags
   useEffect(() => {
@@ -297,7 +291,7 @@ const PropertyDetail = () => {
         <div className="px-6">
         <div className="mx-auto max-w-7xl gap-2 grid grid-cols-4 grid-rows-2" style={{ height: 480 }}>
           <button
-            onClick={() => { setCurrentImage(0); setGalleryOpen(true); }}
+            onClick={(e) => { galleryTrigger.current = e.currentTarget; setCurrentImage(0); setGalleryOpen(true); }}
             className="group relative col-span-2 row-span-2 overflow-hidden rounded-l-2xl"
           >
             <FotoImovel src={images[0]} alt={imovel.titulo} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
@@ -305,7 +299,7 @@ const PropertyDetail = () => {
           {images.slice(1, 5).map((img, i) => (
             <button
               key={i}
-              onClick={() => { setCurrentImage(i + 1); setGalleryOpen(true); }}
+              onClick={(e) => { galleryTrigger.current = e.currentTarget; setCurrentImage(i + 1); setGalleryOpen(true); }}
               className={`group relative overflow-hidden ${
                 i === 1 ? "rounded-tr-2xl" : i === 3 ? "rounded-br-2xl" : ""
               }`}
@@ -323,7 +317,7 @@ const PropertyDetail = () => {
         {images.length > 1 && (
           <div className="mx-auto mt-3 flex max-w-7xl justify-end px-4 sm:px-6 lg:px-8">
             <button
-              onClick={() => { setCurrentImage(0); setGalleryOpen(true); }}
+              onClick={(e) => { galleryTrigger.current = e.currentTarget; setCurrentImage(0); setGalleryOpen(true); }}
               className="flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 font-body text-[13px] font-semibold text-foreground transition-colors hover:bg-secondary active:scale-[0.97]"
             >
               <Camera className="h-3.5 w-3.5" />
@@ -383,7 +377,7 @@ const PropertyDetail = () => {
           {/* Bottom pills */}
           <div className="absolute bottom-4 left-0 right-0 flex items-center justify-center gap-2 px-5">
             <button
-              onClick={() => { setCurrentImage(0); setGalleryOpen(true); }}
+              onClick={(e) => { galleryTrigger.current = e.currentTarget; setCurrentImage(0); setGalleryOpen(true); }}
               className="flex items-center gap-1.5 rounded-full bg-white/20 backdrop-blur-md px-4 py-2 active:scale-95"
             >
               <Camera className="h-3.5 w-3.5 text-white" />
@@ -414,94 +408,20 @@ const PropertyDetail = () => {
       </div>
 
 
-      {/* Fullscreen lightbox */}
-      {galleryOpen && (
-        <div
-          className="fixed inset-0 z-50 flex flex-col bg-black/95"
-          onClick={() => setGalleryOpen(false)}
-        >
-          {/* Header */}
-          <div className="flex shrink-0 items-center justify-between px-5 py-4 sm:px-8">
-            <div>
-              <p className="font-body text-sm font-semibold text-white/90 line-clamp-1">
-                {imovel.titulo}
-              </p>
-              <p className="font-body text-xs text-white/50">
-                {currentImage + 1} de {images.length} fotos
-              </p>
-            </div>
-            <button
-              onClick={(e) => { e.stopPropagation(); setGalleryOpen(false); }}
-              aria-label="Fechar galeria"
-              className="rounded-full bg-white/10 px-4 py-2 font-body text-sm font-medium text-white/80 backdrop-blur-sm transition-colors hover:bg-white/20 active:scale-95"
-            >
-              ✕ Fechar
-            </button>
-          </div>
-
-          {/* Main photo area */}
-          <div
-            className="relative flex flex-1 items-center justify-center overflow-hidden px-4 sm:px-16"
-            onClick={() => setGalleryOpen(false)}
-          >
-            <img
-              key={currentImage}
-              src={images[currentImage]}
-              alt={`Foto ${currentImage + 1}`}
-              onClick={(e) => e.stopPropagation()}
-              className="max-h-full max-w-full object-contain select-none animate-lightbox-appear"
-            />
-
-            {/* Left arrow */}
-            {currentImage > 0 && (
-              <button
-                onClick={(e) => { e.stopPropagation(); prevImage(); }}
-                aria-label="Foto anterior"
-                className="absolute left-3 top-1/2 flex h-[52px] w-[52px] -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-white/[0.12] text-2xl font-light text-white backdrop-blur-xl transition-colors hover:bg-white/25 active:scale-95 sm:left-6"
-              >
-                ‹
-              </button>
-            )}
-
-            {/* Right arrow */}
-            {currentImage < images.length - 1 && (
-              <button
-                onClick={(e) => { e.stopPropagation(); nextImage(); }}
-                aria-label="Próxima foto"
-                className="absolute right-3 top-1/2 flex h-[52px] w-[52px] -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-white/[0.12] text-2xl font-light text-white backdrop-blur-xl transition-colors hover:bg-white/25 active:scale-95 sm:right-6"
-              >
-                ›
-              </button>
-            )}
-          </div>
-
-          {/* Thumbnails */}
-          <div
-            className="flex shrink-0 items-center justify-center gap-2 overflow-x-auto px-4 py-4 scrollbar-hide"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {images.map((img, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrentImage(i)}
-                className="shrink-0 overflow-hidden rounded-md transition-all duration-150"
-                style={{
-                  width: 64,
-                  height: 48,
-                  border: i === currentImage ? "2px solid hsl(var(--primary))" : "2px solid transparent",
-                  opacity: i === currentImage ? 1 : 0.45,
-                  transform: i === currentImage ? "scale(1.05)" : "scale(1)",
-                }}
-              >
-                <img src={img} alt={`Thumb ${i + 1}`} className="h-full w-full object-cover" />
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+      {galleryOpen && <Suspense fallback={null}>
+        <MaterialGallery fotos={images.map(url => ({ url }))} index={currentImage} restoreFocus={galleryTrigger.current} onClose={() => setGalleryOpen(false)} onAgendar={isIndisponivel ? undefined : abrirVisita} />
+      </Suspense>}
+      <Dialog open={visitaOpen} onOpenChange={setVisitaOpen}>
+        <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-lg">
+          <DialogTitle>Agendar visita</DialogTitle>
+          <DialogDescription>{imovel.titulo}</DialogDescription>
+          <AgendamentoVisita imovelId={imovel.id} imovelSlug={imovel.slug} imovelTitulo={imovel.titulo} imovelBairro={imovel.bairro} imovelPreco={imovel.preco} />
+        </DialogContent>
+      </Dialog>
 
       {/* Content */}
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
+        {imovel.slug.toUpperCase().endsWith("28238-UH") && <p className="mb-6 border-b border-border pb-4 text-sm text-muted-foreground">Ainda sem fotos por dentro. As imagens disponíveis mostram o condomínio.</p>}
         <div className="flex flex-col gap-8 sm:gap-10 lg:flex-row">
           {/* Left column */}
           <motion.div
@@ -704,19 +624,9 @@ const PropertyDetail = () => {
                 imovelBairro={imovel.bairro}
                 imovelPreco={imovel.preco}
                 viewCount={viewCount}
+                onAgendar={isIndisponivel ? undefined : abrirVisita}
               />
 
-              {/* Agendamento de visita */}
-              <AgendamentoVisita
-                imovelId={imovel.id}
-                imovelSlug={imovel.slug}
-                imovelTitulo={imovel.titulo}
-                imovelBairro={imovel.bairro}
-                imovelPreco={imovel.preco}
-              />
-
-              {/* Análise de preço */}
-              <CardUhomePreco imovel={imovel} />
             </div>
 
             {/* Secondary actions below sidebar — desktop only */}
@@ -763,13 +673,15 @@ const PropertyDetail = () => {
         imovelTitulo={imovel.titulo}
         imovelBairro={imovel.bairro}
         imovelPreco={imovel.preco}
+        onAgendar={isIndisponivel ? undefined : abrirVisita}
       />
 
       {/* Fixed bottom bar — mobile only */}
-      <div data-barra-baixo className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-md px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:hidden">
+      {!isIndisponivel && <div data-barra-baixo className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-md px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:hidden">
+        <Button className="mb-2 h-11 w-full" onClick={abrirVisita}>Agendar visita</Button>
         <Button
-          variant="whatsapp"
-          className="w-full text-base font-bold py-3 h-auto"
+          variant="outline"
+          className="h-11 w-full text-sm"
           onClick={() => {
             if (!imovel) return;
             const url = corretor
@@ -795,11 +707,11 @@ const PropertyDetail = () => {
           }}
         >
           <MessageCircle className="h-5 w-5 mr-2" />
-          Falar no WhatsApp
+          Receber informações
         </Button>
-      </div>
+      </div>}
       {/* Spacer for fixed bottom bar */}
-      <div className="h-20 sm:hidden" />
+      <div className="h-32 sm:hidden" />
       <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
     </div>
   );

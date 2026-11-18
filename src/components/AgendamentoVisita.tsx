@@ -1,5 +1,6 @@
 import { trackEvent } from "@/lib/trackEvent";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { CalendarDays, Check, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { submitLead } from "@/services/leads";
@@ -29,7 +30,7 @@ function getProximosDias(): Date[] {
 }
 
 export function AgendamentoVisita({ imovelId, imovelSlug, imovelTitulo, imovelBairro, imovelPreco }: Props) {
-  const [etapa, setEtapa] = useState<"form" | "horario" | "confirmado">("form");
+  const [etapa, setEtapa] = useState<"form" | "horario" | "confirmado">("horario");
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
   const [dataEscolhida, setDataEscolhida] = useState<Date | null>(null);
@@ -39,7 +40,7 @@ export function AgendamentoVisita({ imovelId, imovelSlug, imovelTitulo, imovelBa
   const proximosDias = getProximosDias();
 
   const confirmar = async () => {
-    if (!dataEscolhida || !horario) return;
+    if (!dataEscolhida || !horario || !nome.trim() || !telefone.trim() || loading) return;
     setLoading(true);
     try {
       const refSlug = getCorretorRef();
@@ -72,7 +73,7 @@ export function AgendamentoVisita({ imovelId, imovelSlug, imovelTitulo, imovelBa
         contexto: { pedido: { tipo: "visita_pedida", dia: dataEscolhida.toISOString().split("T")[0], horario, periodo: Number(horario.slice(0, 2)) < 12 ? "manhã" : "tarde" } },
       });
       setEtapa("confirmado");
-      toast.success("Visita agendada com sucesso!");
+      toast.success("Visita pedida! Aguarde a confirmação do corretor.");
     } catch {
       toast.error("Erro ao agendar. Tente novamente.");
     } finally {
@@ -82,11 +83,11 @@ export function AgendamentoVisita({ imovelId, imovelSlug, imovelTitulo, imovelBa
 
   if (etapa === "confirmado") {
     return (
-      <div className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-card p-6 text-center">
+      <div className="flex flex-col items-center gap-3 py-2 text-center">
         <div className="flex h-14 w-14 items-center justify-center rounded-full bg-green-500/10">
-          <Check className="h-7 w-7 text-green-500" />
+          <Check className="h-7 w-7 text-primary" />
         </div>
-        <p className="font-body text-base font-bold text-foreground">Visita agendada!</p>
+        <p className="font-body text-base font-bold text-foreground">Visita pedida!</p>
         <p className="font-body text-sm text-muted-foreground">
           {dataEscolhida?.toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" })} às {horario}
         </p>
@@ -98,7 +99,7 @@ export function AgendamentoVisita({ imovelId, imovelSlug, imovelTitulo, imovelBa
   }
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-6">
+    <div className="py-2">
       <div className="flex items-center gap-2">
         <CalendarDays className="h-5 w-5 text-primary" />
         <h3 className="font-body text-base font-bold text-foreground">Agendar visita</h3>
@@ -106,6 +107,8 @@ export function AgendamentoVisita({ imovelId, imovelSlug, imovelTitulo, imovelBa
 
       {etapa === "form" && (
         <div className="mt-4 space-y-3">
+          <p className="text-sm text-muted-foreground">{dataEscolhida?.toLocaleDateString("pt-BR")} às {horario}</p>
+          <Button variant="ghost" onClick={() => setEtapa("horario")}>Alterar dia e horário</Button>
           <input
             type="text"
             placeholder="Seu nome"
@@ -122,13 +125,13 @@ export function AgendamentoVisita({ imovelId, imovelSlug, imovelTitulo, imovelBa
             className="w-full rounded-lg border-[1.5px] border-border bg-background px-4 py-3 font-body text-sm text-foreground outline-none transition-colors focus:border-primary"
             maxLength={16}
           />
-          <button
-            onClick={() => nome.trim() && telefone.trim() && setEtapa("horario")}
-            disabled={!nome.trim() || !telefone.trim()}
+          <Button
+            onClick={confirmar}
+            disabled={loading || !nome.trim() || !telefone.trim()}
             className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3 font-body text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 active:scale-[0.97] disabled:opacity-50"
           >
-            Ver horários disponíveis →
-          </button>
+            Pedir visita
+          </Button>
         </div>
       )}
 
@@ -142,17 +145,17 @@ export function AgendamentoVisita({ imovelId, imovelSlug, imovelTitulo, imovelBa
               {proximosDias.map((dia) => {
                 const selected = dataEscolhida?.toDateString() === dia.toDateString();
                 return (
-                  <button
+                  <Button
                     key={dia.toISOString()}
                     onClick={() => { setDataEscolhida(dia); void trackEvent({ tipo: "dia_escolhido", imovel_slug: imovelSlug, dados: { dia: dia.toISOString().split("T")[0] } }); }}
-                    className={`rounded-lg border-[1.5px] px-3 py-2 font-body text-xs font-medium transition-colors active:scale-[0.97] ${
+                    variant="outline" aria-pressed={selected} className={`rounded-lg border-[1.5px] px-3 py-2 font-body text-xs font-medium transition-colors active:scale-[0.97] ${
                       selected
-                        ? "border-primary bg-primary/10 text-primary"
+                        ? "border-foreground bg-foreground text-background"
                         : "border-border text-foreground hover:border-primary/30"
                     }`}
                   >
                     {dia.toLocaleDateString("pt-BR", { weekday: "short", day: "2-digit", month: "2-digit" })}
-                  </button>
+                  </Button>
                 );
               })}
             </div>
@@ -167,17 +170,17 @@ export function AgendamentoVisita({ imovelId, imovelSlug, imovelTitulo, imovelBa
                 {horariosDisponiveis.map((h) => {
                   const selected = horario === h;
                   return (
-                    <button
+                    <Button
                       key={h}
                       onClick={() => setHorario(h)}
-                      className={`rounded-lg border-[1.5px] px-3.5 py-2 font-body text-xs font-medium transition-colors active:scale-[0.97] ${
+                      variant="outline" aria-pressed={selected} className={`rounded-lg border-[1.5px] px-3.5 py-2 font-body text-xs font-medium transition-colors active:scale-[0.97] ${
                         selected
-                          ? "border-primary bg-primary/10 text-primary"
+                          ? "border-foreground bg-foreground text-background"
                           : "border-border text-foreground hover:border-primary/30"
                       }`}
                     >
                       {h}
-                    </button>
+                    </Button>
                   );
                 })}
               </div>
@@ -185,14 +188,14 @@ export function AgendamentoVisita({ imovelId, imovelSlug, imovelTitulo, imovelBa
           )}
 
           {dataEscolhida && horario && (
-            <button
-              onClick={confirmar}
+            <Button
+              onClick={() => setEtapa("form")}
               disabled={loading}
               className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3 font-body text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 active:scale-[0.97] disabled:opacity-50"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-              Confirmar visita
-            </button>
+              Continuar
+            </Button>
           )}
         </div>
       )}

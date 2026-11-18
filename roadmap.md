@@ -45,3 +45,5 @@
 - [x] Área nos cards da busca com vírgula (75,45 m²); tela pronta segue a mesma chave UH_FOTO_CARD
 - [ ] /apartamentos-petropolis com 0 imóveis (acento): conferir e corrigir
 - [ ] Próximas partes do design: Imóvel, Favoritos em pastas, Home nova, Lia celular, Movimento
+- [x] Continuação 18/11: imóvel com visita principal (dia → horário → dados), informações secundárias, análise de preço retirada, galeria acessível compartilhada, corretor real em links personalizados sem disponibilidade inventada e aviso 28238-UH. 7 testes com envios simulados; fluxo celular/computador conferido; aguarda publicação, sem Worker. Medição Brasil fica com o dono depois.
+- [ ] Imóvel: atribuição de corretor nas páginas gerais e frase pessoal aguardam dados oficiais; páginas gerais não inventam profissional. Favoritos, Home e Lia/Movimento seguem como próximas etapas após conferir/publicar esta parte.

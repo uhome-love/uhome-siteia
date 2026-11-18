@@ -10,6 +10,7 @@ import { supabase } from "@/lib/supabaseLazy";
 import { getLeadTracking } from "@/lib/leadTracking";
 import { getCorretorRef, getCorretorRefId } from "@/lib/session";
 import type { ProdutoFoco } from "@/lib/produtosFoco";
+import { journeyEnvelope } from "@/lib/journeyIdentity";
 
 const ASSUNTOS = ["Valores e condições", "Plantas e unidades", "Financiamento", "Localização e obra"];
 export type PedidoFoco = "visita" | "informacoes";
@@ -17,6 +18,7 @@ export function FocoContactForm({ p, modo, dia, periodo, planta, onVisita, setDi
   const [nome, setNome] = useState(""); const [telefone, setTelefone] = useState("");
   const [financiamento, setFinanciamento] = useState("Ainda não sei"); const [assunto, setAssunto] = useState(ASSUNTOS[0]);
   const [loading, setLoading] = useState(false); const [ok, setOk] = useState(false); const [erro, setErro] = useState("");
+  const [pedidoId] = useState(() => crypto.randomUUID());
   async function enviar(e: React.FormEvent) {
     e.preventDefault();
     const telErro = erroTelefoneFoco(telefone);
@@ -24,10 +26,11 @@ export function FocoContactForm({ p, modo, dia, periodo, planta, onVisita, setDi
     if (nome.trim().length < 2) { setErro("Informe seu nome."); return; }
     setErro(""); setLoading(true);
     try {
-      const pedido = { tipo: modo === "visita" ? "visita_pedida" : "informacoes_pedidas", origem: modo, dia: dataLocalFoco(dia), periodo: periodo.toLowerCase(), planta: planta ?? null, financiamento: modo === "visita" ? financiamento : null, assunto: modo === "informacoes" ? assunto : null };
+      const pedido = { id: pedidoId, tipo: modo === "visita" ? "visita_pedida" : "informacoes_pedidas", origem: modo, dia: modo === "visita" ? dataLocalFoco(dia) : null, periodo: modo === "visita" ? periodo.toLowerCase() : null, planta: planta ?? null, financiamento: modo === "visita" ? financiamento : null, assunto: modo === "informacoes" ? assunto : null, empreendimento: p.nome, pagina: window.location.origin + window.location.pathname, horario: new Date().toISOString() };
       if (modo === "visita") {
+        const envelope = await journeyEnvelope();
         const ref = getCorretorRef(); const tracking = getLeadTracking("agendamento_visita_foco");
-        const { error } = await supabase.from("agendamentos").insert({ nome: nome.trim(), telefone, imovel_slug: `em-foco/${p.slug}`, imovel_titulo: p.nome, data_visita: pedido.dia, turno: pedido.periodo, horario: periodo, status: "confirmado", corretor_ref_id: getCorretorRefId() || null, corretor_ref_slug: ref || null, origem_ref: ref ? "link_corretor" : "organico", origem_componente: "agendamento_visita_foco", contexto: pedido, ...tracking.colunas });
+        const { error } = await supabase.from("agendamentos").insert({ nome: nome.trim(), telefone, imovel_slug: `em-foco/${p.slug}`, imovel_titulo: p.nome, data_visita: pedido.dia, turno: pedido.periodo, horario: periodo, status: "confirmado", corretor_ref_id: getCorretorRefId() || null, corretor_ref_slug: ref || null, origem_componente: "agendamento_visita_foco", contexto: { ...pedido, ...tracking.contexto, visitor_id: envelope.visitor_id }, ...tracking.colunas });
         if (error) throw error;
       }
       await submitLead({ nome: nome.trim(), telefone, imovel_slug: `em-foco/${p.slug}`, imovel_titulo: p.nome, imovel_bairro: p.bairro ?? undefined, imovel_preco: p.preco_a_partir ?? undefined, tipo_interesse: modo, origem_componente: modo === "visita" ? "agendamento_visita_foco" : "foco_mais_informacoes", contexto: { origem: modo, pedido } });

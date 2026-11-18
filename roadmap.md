@@ -1,4 +1,7 @@
 # Roadmap — rodada pós-auditoria 16/11
+- [x] Pedidos UUID acumulados, último pedido/origem, atribuição das visitas; validação local sem leads reais
+- [ ] Jornada sem funil: código preparado; CRM precisa criar leads.dados_site (campo ausente). Retentativa no tick mantém pendência até disponível
+- [ ] Publicar app de pedidos; central repete teste autorizado. Limpeza de testes fica com CRM
 - [x] Parte 2: página em-foco, galeria, visita fixa, conteúdo real e formulários compartilhados; todos os produtos abrem
 - [x] Parte 2: modelos site-v2 e seed produto implantados; site-v1 mantém o modelo anterior; prévias com capa/título e FAQ; Worker intacto
 - [x] Parte 2: 23 testes com envios simulados, prints 390/1440 de Arvoredo/Bosque/Orygem e foco/troca conferidos

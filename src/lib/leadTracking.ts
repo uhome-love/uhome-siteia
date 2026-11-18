@@ -3,6 +3,8 @@
 import { canTrack } from "./consent";
 import { getSessionId } from "./session";
 import { safePage } from "./journeyIdentity";
+import { origins } from "./journeyIdentity";
+import { origemRef } from "../../supabase/functions/_shared/pedidos";
 import { getTrackingData, classifyOrigemCanal, getCorretorRef } from "@/lib/session";
 
 export const FORMULARIO_LABELS: Record<string, string> = {
@@ -106,6 +108,7 @@ export function getLeadTracking(origem_componente: string, formulario?: string) 
   const device = classificarDevice(ua, largura);
   const corretor = getCorretorRef();
   const colunas = {
+    origem_ref: origemRef(origins().ultima_origem, corretor),
     pagina_url: safePage(),
     origem_componente,
     formulario: nomeFormulario(origem_componente, formulario),
@@ -123,6 +126,8 @@ export function getLeadTracking(origem_componente: string, formulario?: string) 
     landing_url: t.landing_url || (t.landing_page ? `${window.location.origin}${t.landing_page}` : null),
   };
   const contexto = {
+    primeira_origem: origins().primeira_origem,
+    ultima_origem: origins().ultima_origem,
     rastreamento: {
       fonte: fonteLegivel(t, corretor),
       palavra_pesquisada: t.utm_term || null,

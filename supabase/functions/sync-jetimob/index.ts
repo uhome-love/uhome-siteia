@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
+import { retryPendingJourneys } from '../_shared/journey.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -253,6 +254,11 @@ serve(async (req) => {
 
     // Watchdog (tick): se não há varredura completa rodando, roda a incremental a cada ~10 min
     if (mode === "tick") {
+      const crmUrl=Deno.env.get('UHOMESALES_SUPABASE_URL'), crmKey=Deno.env.get('UHOMESALES_SERVICE_ROLE_KEY');
+      if(crmUrl && crmKey) {
+        try { await retryPendingJourneys(supabase,createClient(crmUrl,crmKey)); }
+        catch(e) { console.error('[journey retry]',(e as Error).message); }
+      }
       const [{ data: cfg }, { data: rodandoRows }] = await Promise.all([
         supabase.from("site_config").select("value").eq("key", "jetimob_last_incremental").maybeSingle(),
         supabase.from("sync_state").select("id").eq("status", "rodando").limit(1),

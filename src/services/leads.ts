@@ -75,7 +75,7 @@ export async function submitLead(data: LeadData) {
     session_id,
     corretor_ref_id,
     corretor_ref_slug: refSlug || null,
-    origem_ref: refSlug ? 'link_corretor' : 'organico',
+    origem_ref: rastreio.colunas.origem_ref,
     contexto: { ...(data.contexto ?? {}), ...rastreio.contexto },
   };
 

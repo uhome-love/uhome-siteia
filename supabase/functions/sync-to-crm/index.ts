@@ -2,6 +2,7 @@ import { createClient } from 'npm:@supabase/supabase-js@2'
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
 import { digest, buildJourney, deliverJourney } from '../_shared/journey.ts'
 import { decidirDistribuicao, temCorretorAtivo, variacoesTelefone } from './distribuicao.ts'
+import { dadosSiteRecord, mergeDadosSite, saveDadosLead } from '../_shared/pedidos.ts'
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -98,7 +99,7 @@ Deno.serve(async (req) => {
       result = await handleLead(supabaseSite, supabaseCRM, record, corretorCRMId)
       if(result.ok && record.visitor_id) await deliverJourney(supabaseSite,supabaseCRM,String(record.visitor_id));
     } else if (tipo === 'agendamento') {
-      result = record.origem_componente === 'agendamento_visita_foco' || record.origem_componente === 'agendamento_visita' ? {ok:true,crm_lead_id:null} : await handleAgendamento(supabaseCRM, record, corretorCRMId)
+      result = record.origem_componente === 'agendamento_visita_foco' || record.origem_componente === 'agendamento_visita' ? await syncVisitTracking(supabaseSite,supabaseCRM,record) : await handleAgendamento(supabaseCRM, record, corretorCRMId)
     } else if (tipo === 'captacao') {
       result = await handleCaptacao(supabaseCRM, record, corretorCRMId)
     } else if (tipo === 'whatsapp_click') {
@@ -280,6 +281,7 @@ async function handleLead(
   }
 
   if (leadCRM) {
+    await saveDadosLead(supabaseCRM,leadCRM.id,{...rastreioDoRecord(record),contexto:record.contexto??null,...dadosSiteRecord(record)});
     await moverParaFilaCEO(supabaseCRM, leadCRM.pipeline_lead_id, corretorCRMId, record, observacoes)
     await supabaseSite
       .from('public_leads')
@@ -294,6 +296,22 @@ async function handleLead(
 }
 
 // ─── Agendamento handler ─────────────────────────────────────────
+async function syncVisitTracking(site:any,crm:any,record:Record<string,unknown>) {
+  const tels=variacoesTelefone(record.telefone);
+  const {data:leads,error}=await site.from('public_leads').select('uhomesales_lead_id').in('telefone',tels).order('created_at').limit(1);
+  if(error)throw error;
+  const id=leads?.[0]?.uhomesales_lead_id;
+  // New contacts are forwarded by their public_leads callback, not a duplicate visit lead.
+  if(!id)return {ok:true,crm_lead_id:null};
+  const extra={agendamento:{id:record.id,data_visita:record.data_visita,periodo:record.turno,...rastreioDoRecord(record),origem_ref:record.origem_ref}};
+  await saveDadosLead(crm,id,extra);
+  const {data:lead,error:read}=await crm.from('leads').select('pipeline_lead_id').eq('id',id).maybeSingle();if(read)throw read;
+  if(lead?.pipeline_lead_id) {
+    const {data:row,error:r}=await crm.from('pipeline_leads').select('dados_site').eq('id',lead.pipeline_lead_id).maybeSingle();if(r)throw r;
+    const {error:e}=await crm.from('pipeline_leads').update({dados_site:mergeDadosSite(row?.dados_site||{},extra)}).eq('id',lead.pipeline_lead_id);if(e)throw e;
+  }
+  return {ok:true,crm_lead_id:id};
+}
 async function handleAgendamento(
   supabaseCRM: any,
   record: Record<string, unknown>,
@@ -454,7 +472,7 @@ async function moverParaFilaCEO(
   dadosExtra: Record<string, unknown> = {},
 ) {
   if (!pipelineLeadId) return
-  const dadosSite = { site_lead_id: record.id, visitor_id:record.visitor_id??null, jornada:(record.contexto as any)?.jornada??null, site_events:(record.contexto as any)?.jornada?.site_events??[], contexto: record.contexto ?? null, ...rastreioDoRecord(record), fonte: (record.contexto as any)?.rastreamento?.fonte ?? null, ...dadosExtra }
+  const dadosSite = { contexto: record.contexto ?? null, ...rastreioDoRecord(record), ...dadosSiteRecord(record), fonte: (record.contexto as any)?.rastreamento?.fonte ?? null, ...dadosExtra }
   const estados = await buscarEstados(supabaseCRM, pipelineLeadId, record)
 
   // Pessoa já existe no CRM com corretor ativo: só acrescenta dados, o CRM decide o resto.
@@ -466,7 +484,7 @@ async function moverParaFilaCEO(
         ? alvo.observacoes
         : `${observacoes}${extraTxt}\n\n${alvo.observacoes ?? ''}`.slice(0, 8000)
       const { error } = await supabaseCRM.from('pipeline_leads').update({
-        dados_site: { ...(alvo.dados_site ?? {}), ...dadosSite },
+        dados_site: mergeDadosSite(alvo.dados_site ?? {}, dadosSite),
         observacoes: obs,
         updated_at: new Date().toISOString(),
       }).eq('id', alvo.id)
@@ -476,7 +494,7 @@ async function moverParaFilaCEO(
     return
   }
 
-  const patch: Record<string, unknown> = { dados_site: dadosSite, observacoes, ...extra, updated_at: new Date().toISOString() }
+  const patch: Record<string, unknown> = { dados_site: mergeDadosSite(estados.find(r=>r.id===pipelineLeadId)?.dados_site??{},dadosSite), observacoes, ...extra, updated_at: new Date().toISOString() }
   if (!corretorCRMId) {
     Object.assign(patch, {
       corretor_id: null,

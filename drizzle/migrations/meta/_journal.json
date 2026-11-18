@@ -127,6 +127,41 @@
       "when": 1794941040109,
       "tag": "0017_site_dobra_cache",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1794963818294,
+      "tag": "0018_pedidos_acumulados_atribuicao",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1794963840118,
+      "tag": "0019_normalizar_pedido_antes_gravacao",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1794963960918,
+      "tag": "0020_pedidos_whatsapp_identificados",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1794964073093,
+      "tag": "0021_corrigir_operador_merge_pedido",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1794964099136,
+      "tag": "0022_simplificar_merge_pedidos_json",
+      "breakpoints": true
     }
   ]
 }

@@ -33,6 +33,14 @@ describe("rastreamento de leads", () => {
     await visitar("/");
     expect(getLeadTracking("exit_intent").colunas.referrer).toBe("");
   });
+  it("última origem central fica separada da primeira e classifica campanha", async()=>{
+    await visitar('/?utm_source=antiga');
+    await visitar('/em-foco/open-bosque?utm_source=central&utm_campaign=teste-parte2');
+    const t=getLeadTracking('agendamento_visita_foco');
+    expect(t.colunas.utm_source).toBe('antiga');
+    expect(t.colunas.origem_ref).toBe('campanha');
+    expect(t.contexto.ultima_origem.utm_source).toBe('central');
+  });
 
   it("classifica o aparelho", () => {
     expect(classificarDevice("Mozilla/5.0 (iPhone; CPU iPhone OS 17) Mobile", 390)).toBe("mobile");

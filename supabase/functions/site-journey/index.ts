@@ -1,5 +1,6 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { z } from 'npm:zod@3';
+import { origemRef } from '../_shared/pedidos.ts';
 import { siteClient, tokenFor, tokenValid, digest, safeDetails, safePath, BOT_UA, EVENT_NAMES, LEGACY, ALIAS_UNTIL, buildJourney } from '../_shared/journey.ts';
 const Origin=z.object({utm_source:z.string().max(200).optional(),utm_medium:z.string().max(200).optional(),utm_campaign:z.string().max(200).optional(),utm_content:z.string().max(200).optional(),utm_term:z.string().max(200).optional(),gclid:z.string().max(200).optional(),gbraid:z.string().max(200).optional(),wbraid:z.string().max(200).optional(),fbclid:z.string().max(200).optional(),referrer:z.string().max(1000).optional(),landing_page:z.string().max(1000).optional(),landing_url:z.string().max(1000).optional(),at:z.string().datetime().optional()});
 const Lead=z.object({nome:z.string().trim().min(2).max(120),telefone:z.string().min(10).max(30),email:z.string().email().optional().nullable(),tipo_interesse:z.string().max(60).optional().nullable(),imovel_id:z.string().max(100).optional().nullable(),imovel_slug:z.string().max(300).optional().nullable(),imovel_titulo:z.string().max(300).optional().nullable(),imovel_bairro:z.string().max(200).optional().nullable(),imovel_preco:z.number().nonnegative().optional().nullable(),origem_pagina:z.string().max(1000).optional(),origem_componente:z.string().max(100),corretor_ref_id:z.string().uuid().optional().nullable(),corretor_ref_slug:z.string().max(200).optional().nullable(),origem_ref:z.string().max(100).optional(),pagina_url:z.string().max(1000).optional(),formulario:z.string().max(200).optional(),device:z.string().max(30).optional(),contexto:z.record(z.unknown()).optional()});
@@ -37,7 +38,8 @@ Deno.serve(async req=>{
  if(!b.lead)return json({error:'lead required'},400);
  if(uaBot)return json({error:'automated contact ignored'},403);
  const journey=await buildJourney(sb,b.visitor_id,v.lead_id||undefined);
- const payload={...b.lead,...v.primeira_origem,session_id:b.session_id,visitor_id:b.visitor_id,is_bot:false,contexto:{...b.lead.contexto,jornada:journey}};
+ const last=b.ultima_origem||v.ultima_origem||{};
+ const payload={...b.lead,...v.primeira_origem,origem_ref:origemRef(last,b.lead.corretor_ref_slug||b.lead.corretor_ref_id),session_id:b.session_id,visitor_id:b.visitor_id,is_bot:false,contexto:{...b.lead.contexto,primeira_origem:v.primeira_origem,ultima_origem:last,jornada:journey}};
  const {data:id,error}=await sb.rpc('journey_upsert_lead',{p_payload:payload});if(error)throw error;
  return json({ok:true,lead_id:id});
  }

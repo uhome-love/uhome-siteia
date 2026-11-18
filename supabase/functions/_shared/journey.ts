@@ -1,4 +1,5 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { saveDadosLead, mergeDadosSite, dadosSiteRecord } from './pedidos.ts';
 export const BOT_UA = /bot|crawler|spider|headless|slurp|facebookexternalhit|whatsapp|telegrambot|preview|lighthouse/i;
 export const EVENT_NAMES = ['pagina_vista','busca_feita','categoria_tocada','filtro_aplicado','imovel_visto','foto_aberta','favorito_salvo','dia_escolhido','formulario_iniciado','visita_pedida','informacoes_pedidas','lia_aberta','lia_lead','whatsapp_tocado','simulacao_feita','pedido_corretor','rolagem_50','pagina_anuncio_vista'] as const;
 export const LEGACY: Record<string,string> = { imovel_visualizado:'imovel_visto',busca_realizada:'busca_feita',whatsapp_click:'whatsapp_tocado',galeria_aberta:'foto_aberta',formulario_enviado:'pedido_corretor' };
@@ -61,19 +62,37 @@ export async function buildJourney(sb:any, visitorId:string, leadId?:string) {
 export async function deliverJourney(sb:any,crm:any,visitorId:string,eventId?:string) {
   const {data:v}=await sb.from('site_visitors').select('lead_id,analytics_allowed').eq('id',visitorId).maybeSingle();
   if(!v?.lead_id||!v.analytics_allowed)return {ok:true,skipped:true};
-  const {data:lead}=await sb.from('public_leads').select('id,uhomesales_lead_id,is_bot').eq('id',v.lead_id).maybeSingle();
+  const {data:lead}=await sb.from('public_leads').select('id,uhomesales_lead_id,is_bot,contexto').eq('id',v.lead_id).maybeSingle();
   if(!lead?.uhomesales_lead_id||lead.is_bot)return {ok:false,error:'lead_not_synced'};
   const journey=await buildJourney(sb,visitorId,lead.id);if(!journey)return {ok:true,skipped:true};
-  const pendingId=crypto.randomUUID();
+  const dados={...dadosSiteRecord({...lead,visitor_id:visitorId,contexto:{...lead.contexto,jornada:journey}}),jornada:journey,site_events:journey.site_events};
   const {data:crmLead,error:readError}=await crm.from('leads').select('id,pipeline_lead_id').eq('id',lead.uhomesales_lead_id).maybeSingle();
   if(readError)throw readError;
   let error:any=null;
-  if(crmLead?.pipeline_lead_id) {
+  if(crmLead) {
+    try {
+      const saved=await saveDadosLead(crm, crmLead.id, dados);
+      if(!saved && !crmLead.pipeline_lead_id) error={message:'CRM leads.dados_site column not yet available'};
+    } catch(e) { error=e; }
+  } else error={message:'CRM lead not yet available'};
+  if(!error && crmLead?.pipeline_lead_id) {
     const {data:row,error:read}=await crm.from('pipeline_leads').select('dados_site').eq('id',crmLead.pipeline_lead_id).maybeSingle();if(read)throw read;
-    const result=await crm.from('pipeline_leads').update({dados_site:{...(row?.dados_site||{}),visitor_id:visitorId,jornada:journey,site_events:journey.site_events},updated_at:new Date().toISOString()}).eq('id',crmLead.pipeline_lead_id);error=result.error;
-  }else error={message:'CRM pipeline not yet available'};
+    const result=await crm.from('pipeline_leads').update({dados_site:mergeDadosSite(row?.dados_site||{},dados),updated_at:new Date().toISOString()}).eq('id',crmLead.pipeline_lead_id);error=result.error;
+  }
   const delivery={visitor_id:visitorId,lead_id:lead.id,event_id:eventId||null,status:error?'pending':'sent',attempts:1,event_count:journey.site_events.length,crm_lead_id:crmLead?.id,http_status:error?null:200,error:error?.message||null,sent_at:error?null:new Date().toISOString()};
   await sb.from('site_journey_deliveries').insert(delivery);
   if (!error) await sb.from('site_journey_deliveries').update({status:'sent',sent_at:new Date().toISOString(),error:null}).eq('visitor_id',visitorId).eq('status','pending');
   return {ok:!error,error:error?.message,crm_lead_id:crmLead?.id,event_count:journey.site_events.length};
+}
+export async function retryPendingJourneys(sb:any,crm:any) {
+  const {data,error}=await sb.from('site_journey_deliveries').select('id,visitor_id,attempts').eq('status','pending').order('created_at').limit(100);
+  if(error)throw error;
+  const visitors=[...new Set<string>((data||[]).map((r:any)=>r.visitor_id))];
+  for(const visitor of visitors) {
+    for(const row of (data||[]).filter((r:any)=>r.visitor_id===visitor)) await sb.from('site_journey_deliveries').update({attempts:row.attempts+1}).eq('id',row.id);
+    try { await deliverJourney(sb,crm,visitor); } catch(e) {
+      await sb.from('site_journey_deliveries').update({error:(e as Error).message}).eq('visitor_id',visitor).eq('status','pending');
+    }
+  }
+  return {retried:visitors.length};
 }

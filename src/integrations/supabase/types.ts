@@ -1957,6 +1957,10 @@ export type Database = {
         Returns: boolean
       }
       journey_upsert_lead: { Args: { p_payload: Json }; Returns: string }
+      site_merge_pedidos: {
+        Args: { incoming: Json; old_context: Json }
+        Returns: Json
+      }
       upsert_corretor_from_crm: {
         Args: {
           _crm_user_id: string

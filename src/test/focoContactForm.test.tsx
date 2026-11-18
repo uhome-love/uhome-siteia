@@ -8,6 +8,7 @@ vi.mock("@/lib/supabaseLazy", () => ({ supabase: { from: () => ({ insert: mocks.
 vi.mock("@/lib/session", () => ({ getCorretorRef: () => null, getCorretorRefId: () => null }));
 vi.mock("@/lib/leadTracking", () => ({ getLeadTracking: () => ({ colunas: {} }) }));
 vi.mock("@/lib/trackEvent", () => ({ trackEvent: vi.fn() }));
+vi.mock("@/lib/journeyIdentity", () => ({ journeyEnvelope: async () => ({visitor_id:"00000000-0000-4000-8000-000000000001"}) }));
 const p = { slug: "open-bosque", nome: "Open Bosque", bairro: "Passo d'Areia", preco_a_partir: 247000 } as ProdutoFoco;
 function montar(modo: "visita" | "informacoes") { return render(<FocoContactForm p={p} modo={modo} dia={new Date(2026, 10, 21, 12)} periodo="Manhã" planta="2 dormitórios" setDia={vi.fn()} setPeriodo={vi.fn()} onVisita={vi.fn()} />); }
 function preencher() { fireEvent.change(screen.getByLabelText("Seu nome"), { target: { value: "Pessoa" } }); fireEvent.change(screen.getByLabelText("Seu WhatsApp"), { target: { value: "51999999999" } }); }

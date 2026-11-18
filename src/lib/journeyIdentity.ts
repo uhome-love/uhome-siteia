@@ -62,7 +62,7 @@ export async function captureJourneyOrigin(): Promise<void> {
   const { primeira_origem } = origins();
   if (!Object.keys(primeira_origem).length) writeCookie("uhs_first", JSON.stringify(incoming));
   const last = origins().ultima_origem;
-  if (last.landing_page !== incoming.landing_page || last.utm_campaign !== incoming.utm_campaign || last.utm_source !== incoming.utm_source) writeCookie("uhs_last", JSON.stringify(incoming));
+  if (last.landing_page !== incoming.landing_page || KEYS.some(k => last[k] !== incoming[k])) writeCookie("uhs_last", JSON.stringify(incoming));
 }
 export async function journeyEnvelope() {
   const allowed = await canTrack("analytics");

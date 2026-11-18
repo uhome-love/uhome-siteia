@@ -47,6 +47,15 @@ A categoria e o filtro "Apartamento garden" passam a incluir apartamentos do tip
 - Mapa mais claro e limpo, botões de zoom e "tela cheia" no canto em estilo Airbnb.
 - Celular: lista por cima do mapa como uma gaveta que se arrasta para cima e para baixo.
 
+### 5. Validação de cada filtro
+Antes de liberar, cada filtro é testado de verdade contra os imóveis do banco:
+- Para cada opção (cada tipo, faixa de preço, quartos, banheiros, vagas, área, etapa, cidade, bairro e cada comodidade), a busca é feita e **todos** os imóveis que voltam são conferidos um a um contra a regra (ex.: "3+ quartos" → nenhum com menos de 3; "Piscina" → todos têm piscina; "Garden" → todos são garden ou apartamento com pátio).
+- O total do botão "Mostrar N imóveis" é comparado com uma contagem direta no banco; precisam ser iguais.
+- Combinações comuns (ex.: Porto Alegre + 2 quartos + até R$ 700 mil + Sacada) também são conferidas.
+- Opções que dariam zero imóveis não aparecem.
+- Teste na tela (celular e computador): escolher filtros, ver os cards e abrir alguns imóveis para confirmar.
+Entrego a lista com o resultado de cada filtro (ok / corrigido).
+
 ## O que não muda
 - Regras de lead, CRM, rastreamento e corretor seguem como estão.
 - Velocidade: ícones e fotos extras continuam carregando só quando necessários; meta LCP até 2,5 s e CLS abaixo de 0,1.

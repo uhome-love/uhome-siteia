@@ -4,6 +4,7 @@
 
 ### 1. Filtros completos e organizados (janela estilo Airbnb)
 Uma janela única, com seções separadas por linhas finas, e o rodapé fixo "Limpar tudo" + "Mostrar 1.284 imóveis" (o número atualiza enquanto a pessoa escolhe).
+0. **Recomendados para você** – 4 cartões grandes com ícone 3D (Pátio, Piscina, Pet friendly, Vista panorâmica).
 1. **Tipo de imóvel** – cartões grandes com os ícones 3D: Apartamento, Casa, Casa em condomínio, Apartamento garden, Cobertura, Studio, Terreno.
 2. **Faixa de preço** – gráfico de barras com a distribuição dos preços, controle deslizante com duas pontas e campos "mínimo / máximo".
 3. **Quartos, banheiros e vagas** – botões redondos "Qualquer · 1 · 2 · 3 · 4+" (contador estilo Airbnb).
@@ -16,6 +17,16 @@ Uma janela única, com seções separadas por linhas finas, e o rodapé fixo "Li
    - Prédio: Elevador, Pet friendly, Acessibilidade
 7. **Cidade e bairros** – busca por nome com sugestões.
 No celular a janela ocupa a tela toda, desliza de baixo para cima e o rodapé fica fixo.
+
+### 1b. Pílula "Onde vai ser seu novo lar?" com painel completo
+Tocar na pílula (celular e computador) abre o mesmo painel completo, em etapas como no Airbnb:
+- **Onde:** campo de texto com sugestões de bairros, cidades e condomínios enquanto digita, e atalhos ("Perto de mim", Porto Alegre, Litoral, Serra).
+- **Valor:** gráfico de barras + slider de arrastar com duas pontas.
+- **Quartos, banheiros, vagas:** contadores.
+- **Tipo:** cartões com os ícones 3D.
+- **Detalhes:** comodidades em botões com ícone e "Mostrar mais".
+- Rodapé fixo "Limpar tudo" + "Mostrar N imóveis", com número atualizando ao vivo.
+O painel de filtros e o da pílula são o mesmo componente, para nunca ficarem diferentes.
 
 ### 2. Apartamento garden = apartamento com pátio
 A categoria e o filtro "Apartamento garden" passam a incluir apartamentos do tipo garden e também apartamentos que têm "Pátio". O ícone será refeito mostrando claramente um apartamento térreo com pátio/jardim privativo.

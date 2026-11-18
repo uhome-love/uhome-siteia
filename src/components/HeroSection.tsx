@@ -46,13 +46,11 @@ function HeroFocoButtons() {
   );
 }
 import { useCorretor } from "@/contexts/CorretorContext";
-import { useTotalImoveis, formatTotal } from "@/hooks/useTotalImoveis";
 
 
 
-function HeroPropertyCount() {
-  return <>{formatTotal(useTotalImoveis())}</>;
-}
+
+
 
 export function HeroSection() {
   const navigate = useNavigate();
@@ -210,7 +208,7 @@ export function HeroSection() {
               Encontre o imóvel perfeito para você
             </h1>
             <p className="mt-3 max-w-md font-body text-sm leading-relaxed text-white/75 sm:mt-4 sm:text-base">
-              <HeroPropertyCount /> imóveis com curadoria Uhome, busca inteligente e atendimento humano.
+              Imóveis com curadoria Uhome, busca inteligente e atendimento humano.
             </p>
             <div className="hidden sm:block"><HeroFocoButtons /></div>
             <a
@@ -481,7 +479,7 @@ export function HeroSection() {
               <>
                 <h3 className="font-body text-lg font-extrabold text-foreground">Venda mais rápido</h3>
                 <p className="mb-5 mt-1 font-body text-xs text-muted-foreground">
-                  <HeroPropertyCount /> imóveis na vitrine em Porto Alegre
+                  Curadoria de imóveis em Porto Alegre
                 </p>
 
                 {[

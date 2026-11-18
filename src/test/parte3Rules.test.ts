@@ -1,11 +1,10 @@
 import {describe,it,expect} from 'vitest';
-import {categoriasVisiveis,BUSCA_URLS,totalHome} from '../../supabase/functions/_shared/buscaConfig';
+import {categoriasVisiveis,BUSCA_URLS} from '../../supabase/functions/_shared/buscaConfig';
 import {devePedirAviso,pedidoAviso,lerFavoritos,salvarFavoritos} from '@/lib/favoritosLocais';
 import {mergeDadosSite} from '../../supabase/functions/_shared/pedidos';
 import {xmlUrl} from '../../supabase/functions/_shared/sitemapPolicy';
 describe('regras da Parte 3',()=>{
  it('categoria com 7 sai e com 8 permanece',()=>expect(categoriasVisiveis({apartamentos:7,studios:8}).map(c=>c.id)).toEqual(['studios']));
- it('home arredonda para baixo no milhar',()=>expect(totalHome(19239)).toBe('19 mil+'));
  it('lançamentos filtra a seção e a cidade',()=>expect(BUSCA_URLS['/lancamentos-porto-alegre'].filtros).toEqual({secao:'lancamentos',cidade:'Porto Alegre'}));
  it('apartamentos até 400 mil usa o limite exato',()=>expect(BUSCA_URLS['/apartamentos-ate-400-mil-porto-alegre'].filtros.precoMax).toBe(400000));
  it('casas em condomínio não vira casas avulsas',()=>expect(BUSCA_URLS['/casas-em-condominio-porto-alegre'].filtros.tipo).toBe('casa_condominio'));

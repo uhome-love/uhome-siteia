@@ -66,7 +66,6 @@ const SeoLanding = () => {
       name: config.h1,
       description: config.metaDescription,
       url: `https://uhome.com.br${config.canonicalPath}`,
-      numberOfItems: total || undefined,
       itemListOrder: "https://schema.org/ItemListUnordered",
     });
 
@@ -237,13 +236,6 @@ const SeoLanding = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="mt-6 flex flex-wrap items-center gap-6"
           >
-            <div className="flex items-center gap-2">
-              <Building2 className="h-5 w-5 text-primary" />
-              <span className="font-body text-2xl font-extrabold text-foreground tabular-nums">
-                {loading ? "—" : total.toLocaleString("pt-BR")}
-              </span>
-              <span className="font-body text-sm text-muted-foreground">imóveis disponíveis</span>
-            </div>
             {stats && (
               <>
                 <div className="hidden sm:flex items-center gap-2 border-l border-border pl-6">
@@ -322,7 +314,7 @@ const SeoLanding = () => {
       <section className="py-10 sm:py-14">
         <div className="mx-auto max-w-7xl px-6">
           <h2 className="text-h3 text-foreground">
-            {total.toLocaleString("pt-BR")} resultados
+            Imóveis disponíveis
           </h2>
           <p className="mt-1 font-body text-sm text-muted-foreground">
             {config.metaDescription.split(".")[0]}
@@ -386,7 +378,7 @@ const SeoLanding = () => {
                         Carregando...
                       </span>
                     ) : (
-                      `Ver mais (${imoveis.length} de ${total.toLocaleString("pt-BR")})`
+                      "Ver mais imóveis"
                     )}
                   </button>
                 </div>

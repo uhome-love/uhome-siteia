@@ -125,7 +125,7 @@ export default function AvaliacaoPage() {
             Quanto vale seu imóvel em Porto Alegre?
           </h1>
           <p className="mx-auto mt-3 max-w-md font-body text-sm text-primary-foreground/75">
-            Baseado em dados reais de {totalImoveis.toLocaleString("pt-BR")} imóveis em POA.
+            Baseado em dados reais do mercado imobiliário de Porto Alegre.
             Resultado em segundos, 100% gratuito.
           </p>
         </div>
@@ -488,7 +488,7 @@ export default function AvaliacaoPage() {
             </p>
             <div className="grid gap-8 sm:grid-cols-3">
               {[
-                { Icon: BarChart3, titulo: "Dados reais de POA", texto: `Analisamos ${totalImoveis.toLocaleString("pt-BR")}+ imóveis disponíveis no mercado imobiliário de Porto Alegre.` },
+                { Icon: BarChart3, titulo: "Dados reais de POA", texto: "Analisamos dados reais do mercado imobiliário de Porto Alegre." },
                 { Icon: MapPin, titulo: "Preço por bairro", texto: "Calculamos o preço médio do m² em cada bairro e aplicamos multiplicadores baseados nas características." },
                 { Icon: Settings2, titulo: "Ajuste por características", texto: "Tipo, área, quartos, vagas, estado de conservação e diferenciais são considerados na estimativa." },
               ].map(item => (

@@ -82,7 +82,6 @@ export function buildBairroJsonLd(
     name: `Imóveis à Venda em ${bairro.nome}, Porto Alegre`,
     description: bairro.descricao.slice(0, 300),
     url: `https://uhome.com.br/bairros/${bairro.slug}`,
-    numberOfItems: total,
     itemListElement: {
       "@type": "ListItem",
       position: 1,
@@ -209,7 +208,6 @@ export function buildAggregateOfferJsonLd(opts: {
     name: opts.name,
     description: opts.description,
     url: opts.url,
-    numberOfItems: opts.count,
     itemListOrder: "https://schema.org/ItemListUnordered",
     ...(opts.lowPrice && {
       offers: {
@@ -217,7 +215,6 @@ export function buildAggregateOfferJsonLd(opts: {
         lowPrice: opts.lowPrice,
         highPrice: opts.highPrice || opts.lowPrice,
         priceCurrency: "BRL",
-        offerCount: opts.count,
       },
     }),
   };

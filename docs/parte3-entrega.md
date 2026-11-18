@@ -30,7 +30,9 @@ Lead: `tipo_interesse=favorito`, `origem_componente=favorito`, `formulario=aviso
 - A hospedagem estática não atualiza o arquivo publicado quando o banco muda. A central deve encaminhar `/sitemap.xml` ao sitemap dinâmico na camada que já atende os mapas do site, sem mudar o Worker, para saída automática de páginas inativas; uma cópia publicada é apenas uma fotografia do catálogo.
 - Miniaturas próprias imutáveis dos primeiros cards estão em `buscaMiniaturas.json`. A atualização de catálogo a cada três minutos é automática; criação de novos Assets exige o uploader da central/ambiente de publicação. Na ausência de miniatura própria de imóvel recém-entrado, o fallback segue wsrv; o mecanismo de upload da CDN não está disponível na função.
 - Medição oficial do domínio é feita pela central no Brasil; não contornar bloqueio regional.
-## Contagens conferidas em 18/11/2026
+## Contagens internas conferidas em 18/11/2026
+
+Por decisão do Lucas, os totais não são vitrine: Home, títulos, textos e prévias ficam sem quantidade de imóveis. Mantidos o botão Mostrar N imóveis, categorias com pelo menos 8 resultados e proteção contra URLs vazias. A remoção na tela pronta é exclusiva de site-v3; site-v1/site-v2 preservados.
 
 | Categoria | Imóveis | Lançamentos | Investir |
 |---|---:|---:|---:|

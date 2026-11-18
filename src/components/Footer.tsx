@@ -3,13 +3,11 @@ import { Link } from "react-router-dom";
 import { UhomeLogo } from "@/components/UhomeLogo";
 import { WHATSAPP_NUMBER, WHATSAPP_DISPLAY } from "@/lib/whatsapp";
 import { useCorretor } from "@/contexts/CorretorContext";
-import { useTotalImoveis, formatTotal } from "@/hooks/useTotalImoveis";
 
 // Footer uses content-auto for below-fold performance
 
 export function Footer() {
   const { prefixLink } = useCorretor();
-  const total = useTotalImoveis();
 
   return (
     <footer className="uhs-site-footer border-t border-border">
@@ -28,7 +26,7 @@ export function Footer() {
               <Link to={prefixLink("/casas-porto-alegre")} className="text-primary hover:underline">casas</Link>,{" "}
               <Link to={prefixLink("/coberturas-porto-alegre")} className="text-primary hover:underline">coberturas</Link> e{" "}
               <Link to={prefixLink("/studios-porto-alegre")} className="text-primary hover:underline">studios</Link>.
-              Com {formatTotal(total)} imóveis disponíveis e tecnologia de busca inteligente por IA, ajudamos você a encontrar o imóvel perfeito nos melhores bairros da capital gaúcha.
+              Com curadoria de imóveis e tecnologia de busca inteligente por IA, ajudamos você a encontrar o imóvel perfeito nos melhores bairros da capital gaúcha.
             </p>
             <p>
               Encontre <strong>apartamentos à venda</strong> nos bairros mais valorizados:{" "}

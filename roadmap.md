@@ -1,7 +1,8 @@
 # Roadmap — rodada pós-auditoria 16/11
 - [x] Parte 3: seções/categorias com contagens reais, modal, chips, vazio e paginação manual
 - [x] Parte 3: favoritos locais e pedido de aviso de preço UUID, jornada/CRM sem enviar leads de teste
-- [x] Parte 3: cinco URLs Google e contagem única; sitemap dinâmico/estático regenerados sem datas artificiais
+- [x] Parte 3: cinco URLs Google; sitemap dinâmico/estático regenerados sem datas artificiais
+- [x] Ajuste Lucas: remover vitrine do total na Home, busca, SEO e site-v3; preservar contagens práticas e modelos publicados
 - [ ] Parte 3: saída automática em /sitemap.xml aguarda central encaminhar ao dynamic-sitemap sem alterar Worker
 - [x] Parte 3: 22 fotos WebP próprias (768 px, ≤50 KB), modelo site-v3, prints e trace local LCP anterior ao main
 - [ ] Parte 3: renovar Assets de novas fotos a cada mudança aguarda uploader da central; função não dispõe de credencial CDN

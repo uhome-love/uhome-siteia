@@ -7,7 +7,7 @@ import * as NOVO from "./moldes.ts";
 import { HERO_FOCO_V2, HEADER_FOCO_V2 } from "./moldes-foco-v2.ts";
 import { tituloFoco, numerosFoco } from "../_shared/focoPresentation.ts";
 import { NAV_BUSCA_V3, TOOLBAR_V3, CARD_V3 } from './moldes-busca-v3.ts';
-import { BUSCA_URLS, categoriasVisiveis, totalHome } from '../_shared/buscaConfig.ts';
+import { BUSCA_URLS, categoriasVisiveis, tituloBusca } from '../_shared/buscaConfig.ts';
 import miniaturas from '../_shared/buscaMiniaturas.json' with { type: 'json' };
 import { NAV, NAV_BUSCA, HERO, BUSCA_TOPO, BUSCA_GRADE, CABECALHO_FOCO, BOTOES_FOCO } from "./moldes-legado.ts";
 
@@ -42,7 +42,11 @@ function compativel(corpo: Corpo): Corpo {
   }
   novo = novo.replace('<main class="pt-14">','<main class="pt-[var(--uh-header-height)]">');
   const v2 = corpo.preV2 ?? novo;
-  return { ...corpo, pre: corpo.pre || corpo.preV3 ? `<script>var v=document.querySelector('meta[name="uh-dobra-versao"]')?.content;document.write(v === 'site-v3' ? ${json(corpo.preV3 ?? v2)} : v === 'site-v2' ? ${json(v2)} : v === 'site-v1' ? ${json(novo)} : ${json(corpo.pre)});</script>` : "" };
+  // Só site-v3 remove a vitrine do total; site-v1/v2 ficam byte-compatíveis.
+  const v3 = (corpo.preV3 ?? v2)
+    .replace(/(?:[\d.]+\+|milhares de) imóveis com curadoria/g, 'Imóveis com curadoria')
+    .replace(/(<h1[^>]*>)[\d.]+ imóveis(?: em ([^<]+)| à venda)(<\/h1>)/g, (_m, a, cidade, b) => a + esc(tituloBusca(cidade)) + b);
+  return { ...corpo, pre: corpo.pre || corpo.preV3 ? `<script>var v=document.querySelector('meta[name="uh-dobra-versao"]')?.content;document.write(v === 'site-v3' ? ${json(v3)} : v === 'site-v2' ? ${json(v2)} : v === 'site-v1' ? ${json(novo)} : ${json(corpo.pre)});</script>` : "" };
 }
 
 /** Igual a src/lib/searchImages.ts */
@@ -190,7 +194,7 @@ async function calcularBuscaV3(path:string):Promise<Corpo> {
  const escHtml=(s:unknown)=>esc(s);const first=(miniaturas as Record<string,string>)[rows[0].foto_principal]??searchImageUrl(rows[0].foto_principal,768);
  const cats=categoriasVisiveis(data.categorias??{}).map(c=>`<button class="inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold hover:bg-secondary hover:text-foreground h-12 px-6 py-2 search-category"><span aria-hidden="true" style="width:32px;height:32px;display:block"></span><span>${esc(c.nome)}</span></button>`).join('');
  const card=(r:any,i:number)=>{const tipo=({'casa_condominio':'Casa em Condomínio','garden':'Apartamento Garden'} as Record<string,string>)[r.tipo]??r.tipo.charAt(0).toUpperCase()+r.tipo.slice(1);const title=r.fonte==='produto'?r.titulo:`${tipo}${r.quartos>0?` ${r.quartos} quarto${r.quartos>1?'s':''}`:' para Venda'} — ${r.bairro}`;let h=CARD_V3;const values={HREF:`/${r.fonte==='produto'?'em-foco':'imovel'}/${r.slug}`,FOTO:(miniaturas as Record<string,string>)[r.foto_principal]??searchImageUrl(r.foto_principal,768),ALT:`${title} - foto 1`,PRIORIDADE:i===0?'high':'auto',TITULO:title,STATS:[r.area_util??r.area_total,r.quartos,r.vagas].map((v:number,j:number)=>v?`${v} ${j===0?'m²':j===1?`quarto${v>1?'s':''}`:`vaga${v>1?'s':''}`}`:null).filter(Boolean).join(' · '),LOCAL:`${r.bairro}, ${r.cidade}`,PRECO:(r.fonte==='produto'?'A partir de ':'')+BRL.format(r.preco)};for(const [k,v] of Object.entries(values))h=h.replaceAll('{{'+k+'}}',escHtml(v));return h;};
- const title=`${Number(data.count).toLocaleString('pt-BR')} imóveis${config?.filtros.cidade?` em ${config.filtros.cidade}`:' à venda'}`;
+ const title=config?.titulo ?? tituloBusca();
  const preV3=`<div id="uh-pre" data-uh-alvo=".catalog-photo img" data-uh-max="1023"><div class="search-page bg-background text-foreground">${NAV_BUSCA_V3}<div class="uh-header-spacer"></div><div class="search-categories border-b border-border">${cats}</div>${TOOLBAR_V3}<div class="search-main"><main class="search-list"><header class="mb-6"><h1 class="text-xl font-extrabold sm:text-2xl">${esc(title)}</h1>${config?`<p class="mt-2 text-sm leading-relaxed text-muted-foreground">${esc(config.texto)}</p>`:''}</header><div class="search-grid">${rows.slice(0,4).map(card).join('')}</div></main></div></div></div>`;
  return {head:`<script>if(document.querySelector('meta[name="uh-dobra-versao"]')?.content==='site-v3'){var l=document.createElement('link');l.rel='preload';l.as='image';l.href=${json(first)};l.fetchPriority='high';document.head.appendChild(l);}</script>`,pre:'',preV3,script:`window.__UH_BUSCA_V3__=${json({...data,path})};`};
 }

@@ -1,16 +1,13 @@
-import { Building2, Star, Users } from "lucide-react";
-import { useTotalImoveis, formatTotal } from "@/hooks/useTotalImoveis";
+import { Star, Users } from "lucide-react";
 import { useGoogleReviews } from "@/hooks/useGoogleReviews";
 import { useCorretoresVitrine } from "@/hooks/useCorretoresVitrine";
 
 /** Faixa fina com números reais logo abaixo da abertura. */
 export function HomeFaixaConfianca() {
-  const total = useTotalImoveis();
   const { data: g } = useGoogleReviews();
   const { data: corretores } = useCorretoresVitrine();
   const itens = [
-    { i: Building2, t: `${formatTotal(total)} imóveis à venda` },
-    g ? { i: Star, t: `Nota ${g.nota.toFixed(1).replace(".", ",")} no Google · ${g.total} avaliações` } : null,
+    g ? { i: Star, t: `Nota ${g.nota.toFixed(1).replace(".", ",")} no Google` } : null,
     corretores?.length ? { i: Users, t: `${corretores.length} corretores especialistas` } : null,
   ].filter(Boolean) as { i: typeof Star; t: string }[];
   return (

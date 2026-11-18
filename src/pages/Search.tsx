@@ -141,7 +141,7 @@ export function ProgressiveGrid({
                   Carregando...
                 </span>
               ) : (
-                `Ver mais imóveis (${imoveis.length} de ${total.toLocaleString("pt-BR")})`
+                "Ver mais imóveis"
               )}
             </button>
           </div>
@@ -842,7 +842,7 @@ const Search = () => {
         <div className="flex items-center gap-2">
           <div>
             <h1 className="font-body text-lg font-extrabold leading-tight text-foreground sm:text-[22px]">
-              {animatedTotal.toLocaleString("pt-BR")} imóveis<span className="sr-only"> à venda em {filters.cidade || "Porto Alegre"}</span>
+              Imóveis à venda em {filters.cidade || "Porto Alegre"}
             </h1>
             <div className="mt-0.5 font-body text-xs text-muted-foreground sm:text-sm">
               à venda em {filters.cidade || "Porto Alegre"}

@@ -17,4 +17,4 @@ export const CATEGORIAS = [
   { id: 'canoas', nome: 'Em Canoas', icone: 'local', filtros: { cidade: 'Canoas' } },
 ] as const;
 export function categoriasVisiveis(contagens: Record<string, number>) { return CATEGORIAS.filter(c => (contagens[c.id] ?? 0) >= 8); }
-export function totalHome(total: number | null) { return total ? `${Math.floor(total / 1000)} mil+` : 'milhares de'; }
+export function tituloBusca(cidade?: string) { return `Imóveis à venda em ${cidade || 'Porto Alegre'}`; }

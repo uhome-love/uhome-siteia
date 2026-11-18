@@ -31,7 +31,7 @@ const Sobre = () => {
         url: "https://uhome.com.br",
         logo: "https://uhome.com.br/uhome-logo.svg",
         foundingDate: "2024",
-        description: "Imobiliária digital em Porto Alegre com mais de 14.600 imóveis, busca por IA e curadoria especializada.",
+        description: "Imobiliária digital em Porto Alegre com busca por IA e curadoria especializada.",
         address: {
           "@type": "PostalAddress",
           streetAddress: "Porto Alegre",
@@ -86,7 +86,6 @@ const Sobre = () => {
           <div className="mx-auto max-w-7xl px-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
               {[
-                { num: "14.600+", label: "Imóveis disponíveis" },
                 { num: "80+", label: "Bairros cobertos" },
                 { num: "CRECI-RS", label: "25682J" },
                 { num: "100%", label: "Digital e transparente" },

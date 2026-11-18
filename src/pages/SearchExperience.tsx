@@ -33,6 +33,12 @@ export function urlFiltros(params: URLSearchParams, preset: Record<string, unkno
 const brl=(v:unknown)=>reais(Number(v));
 const AREAS:Record<string,string>={areaUtilMin:'Área priv. a partir de',areaUtilMax:'Área priv. até',areaMin:'Área total a partir de',areaMax:'Área total até'};
 /** Texto legível de cada filtro aplicado. */
+/** Nome oficial da cidade (como está no cadastro), ignorando maiúsculas e acentos do que foi digitado. */
+export function nomeCidade(filtro:unknown, rows:{cidade?:string|null}[]):string{
+  const t=String(filtro??''); if(!t)return '';
+  const norm=(x:unknown)=>String(x??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+  return rows.find(r=>norm(r.cidade)===norm(t))?.cidade ?? t;
+}
 export function rotuloChip(k:string,v:unknown):string{
   if(k==='novidades')return 'Novidades';
   if(k==='tipo')return String(v).split(',').map(x=>TIPOS[x]??x).join(', ');
@@ -66,14 +72,13 @@ function SearchExperience() {
   useEffect(() => { document.title=preset ? `${preset.titulo} | Uhome` : `Imóveis${filtros.cidade ? ` em ${filtros.cidade}` : ' à venda'} | Uhome`; },[path,filtros.cidade]);
   const apply = (next: Record<string, any>) => { const p=new URLSearchParams(); const keys:Record<string,string>={precoMax:'preco_max',precoMin:'preco_min',areaMin:'area_min',areaMax:'area_max',areaUtilMin:'area_util_min',areaUtilMax:'area_util_max'};Object.entries(next).forEach(([k,v])=>{if(v && k!=='bounds')p.set(keys[k]??k,String(v));});setParams(p);void trackEvent({tipo:'filtro_aplicado',dados:{secao:next.secao,filtros:next}}); };
   const remove = (k:string) => { const next={...filtros};next[k]=typeof next[k]==='number'?0:'';apply(next); };
-  const chips=Object.entries(filtros).filter(([k,v])=>v && !['ordem','secao'].includes(k)).map(([k,v])=>({k,label:rotuloChip(k,v)}));
+  const cidadeNome = nomeCidade(filtros.cidade, rows);
+  const chips=Object.entries(filtros).filter(([k,v])=>v && !['ordem','secao'].includes(k)).map(([k,v])=>({k,label:k==='cidade'?cidadeNome:rotuloChip(k,v)}));
   const areaChip=area&&<Button variant="secondary" aria-label="Remover filtro Área do mapa" onClick={()=>setArea(null)}>Área do mapa<X/></Button>;
   const [restriction,setRestriction]=useState<{k:string;label:string;count:number}|null>(null);
   useEffect(()=>{let ativo=true;if(data?.count!==0){setRestriction(null);return;}Promise.all(chips.map(async c=>({ ...c,count:(await buscarSite({...filtros,[c.k]:typeof filtros[c.k]==='number'?0:'',limit:0})).count }))).then(all=>{if(ativo)setRestriction(all.sort((a,b)=>b.count-a.count)[0]??null);});return()=>{ativo=false;};},[key,data?.count]);
   const mapPins=(pins?.rows ?? []).filter(r=>r.latitude!==null&&r.longitude!==null).map(r=>({...r,latitude:Number(r.latitude),longitude:Number(r.longitude),foto:(r as any).foto ?? r.foto_principal ?? "",publicado_em:(r as any).publicado_em,fase:r.fase}));
   const appliedChips = (chips.length>0||area)&&<div className="search-chips" aria-label="Filtros aplicados">{areaChip}{chips.map(c=><Button key={c.k} variant="secondary" aria-label={`Remover filtro ${c.label}`} onClick={()=>remove(c.k)}>{c.label}<X/></Button>)}<Button variant="ghost" onClick={()=>apply({secao:'imoveis',cidade:'',ordem:'recentes'})}>Limpar filtros</Button></div>;
-  const norm=(t:any)=>String(t??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
-  const cidadeNome = filtros.cidade ? (rows.find((r:any)=>norm(r.cidade)===norm(filtros.cidade))?.cidade ?? filtros.cidade) : filtros.cidade;
   return <div className="search-page bg-background text-foreground"><Navbar/><div className="uh-header-spacer"/><div className="search-mobile-chips">{appliedChips}</div><div className="border-b border-border"><div className="search-cat-linha"><FaixaRolavel className="search-categories" rotulo="categorias">{categories.map(c=>{const selected=Object.entries(c.filtros).every(([k,v])=>String(filtros[k])===String(v));return <Button key={c.id} variant="ghost" aria-pressed={selected} className="search-category" onClick={()=>{const next={secao:filtros.secao,cidade:'',ordem:'recentes',...c.filtros};apply(next);void trackEvent({tipo:'categoria_tocada',dados:{categoria:c.id,secao:filtros.secao,filtros:next}});}}><img src={c.icone} alt="" width={32} height={32} loading="lazy" decoding="async" className="search-category-3d"/><span>{c.nome}</span></Button>;})}</FaixaRolavel><Button variant="outline" className="search-cat-filtros" onClick={e=>{opener.current=e.currentTarget;setModal(true);}}><SlidersHorizontal/>Filtros</Button></div></div>
     <div className="search-pilula-linha"><PilulaBusca inicial={filtros} onApply={apply} compacta/><Button variant="outline" className="search-pilula-filtros" onClick={e=>{opener.current=e.currentTarget;setModal(true);}}><SlidersHorizontal/>Filtros</Button></div><div className="search-toolbar border-b border-border"><form className="flex min-w-0 flex-1 items-center gap-2" onSubmit={e=>{e.preventDefault();apply({...filtros,q});}}><SearchIcon className="h-5 w-5 shrink-0 text-muted-foreground"/><input aria-label="Bairro, endereço ou código" className="min-h-11 w-full min-w-0 bg-transparent text-sm outline-none" placeholder="Bairro, endereço ou código" value={q} onChange={e=>setQ(e.target.value)}/></form><Button variant="outline" onClick={e=>{opener.current=e.currentTarget;setModal(true);}}><SlidersHorizontal/>Filtros</Button><select aria-label="Ordenar imóveis" className="hidden min-h-11 rounded-md border border-input bg-background px-3 text-sm sm:block" value={filtros.ordem} onChange={e=>apply({...filtros,ordem:e.target.value})}>{[['recentes','Mais recentes'],['preco_asc','Menor preço'],['preco_desc','Maior preço'],['area_desc','Maior área']].map(([v,l])=><option key={v} value={v}>{l}</option>)}</select></div>
     <div className="search-desktop-chips">{appliedChips}</div>

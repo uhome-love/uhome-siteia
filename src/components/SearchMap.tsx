@@ -2,7 +2,7 @@ import { selosDoCard } from "@/lib/novidade";
 import { FotosCard } from "@/components/search/FotosCard";
 import { useRef, useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, X, Bed, Maximize, ToggleLeft, ToggleRight, PenTool, Navigation, Check } from "lucide-react";
+import { Search, X, Bed, Maximize, ToggleLeft, ToggleRight, PenTool, Navigation, Check, Eye } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type mapboxgl from "mapbox-gl";
 
@@ -148,6 +148,25 @@ interface SearchMapProps {
   autoSearchPadrao?: boolean;
 }
 
+const ALTURA_MINI_CARD = 270;
+/** Decide se o mini card abre para cima ou para baixo do preço e quanto mover o mapa quando não cabe em nenhum lado
+ *  (no celular a gaveta da lista cobre a parte de baixo e o botão "Voltar à lista" ocupa o topo). */
+export function planoMiniCard(y: number, container: HTMLElement | null): { abreBaixo: boolean; moverY: number } {
+  const caixa = container?.getBoundingClientRect();
+  if (!caixa) return { abreBaixo: y < ALTURA_MINI_CARD, moverY: 0 };
+  const gaveta = typeof document !== "undefined" ? document.querySelector(".gaveta-mapa") : null;
+  const topo = gaveta ? 72 : 8;
+  const limiteBaixo = gaveta ? Math.min(caixa.height, gaveta.getBoundingClientRect().top - caixa.top) - 8 : caixa.height - 8;
+  const espacoBaixo = limiteBaixo - (y + 22);
+  const espacoCima = y - 10 - topo;
+  if (espacoBaixo >= ALTURA_MINI_CARD) return { abreBaixo: true, moverY: 0 };
+  if (espacoCima >= ALTURA_MINI_CARD) return { abreBaixo: false, moverY: 0 };
+  // Não cabe: leva o preço para baixo o suficiente para o card abrir para cima inteiro
+  const alvo = topo + 10 + ALTURA_MINI_CARD;
+  if (alvo + 20 <= limiteBaixo) return { abreBaixo: false, moverY: alvo - y };
+  return { abreBaixo: espacoBaixo > espacoCima, moverY: 0 };
+}
+
 function vistosSet(): Set<string> {
   try { return new Set((JSON.parse(localStorage.getItem("imoveis_vistos") || "[]") as unknown[]).filter((v): v is string => typeof v === "string")); } catch { return new Set(); }
 }
@@ -191,6 +210,15 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
   // Preview popup state
   const [previewPin, setPreviewPin] = useState<MapPinData | null>(null);
   const [previewPos, setPreviewPos] = useState<{ x: number; y: number } | null>(null);
+  // Recalcula os preços cinza (já vistos) quando a pessoa volta para esta aba/página
+  const [vistosVersao, setVistosVersao] = useState(0);
+  useEffect(() => {
+    const atualizar = () => { if (document.visibilityState !== "hidden") setVistosVersao((v) => v + 1); };
+    window.addEventListener("focus", atualizar);
+    window.addEventListener("pageshow", atualizar);
+    document.addEventListener("visibilitychange", atualizar);
+    return () => { window.removeEventListener("focus", atualizar); window.removeEventListener("pageshow", atualizar); document.removeEventListener("visibilitychange", atualizar); };
+  }, []);
 
   // Draw mode state
   const [drawMode, setDrawMode] = useState(false);
@@ -463,9 +491,19 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         if (!props) return;
         const pinData = pinsRef.current.find(p => p.id === props.id);
         if (pinData) {
-          const point = map.project((e.features![0].geometry as GeoJSON.Point).coordinates as [number, number]);
+          const coords = (e.features![0].geometry as GeoJSON.Point).coordinates as [number, number];
+          const point = map.project(coords);
           setPreviewPin(pinData);
-          setPreviewPos({ x: point.x, y: point.y });
+          const { moverY } = planoMiniCard(point.y, map.getContainer());
+          if (moverY) {
+            // Move o mapa para o mini card caber inteiro (sem disparar a busca ao mover)
+            setPreviewPos(null);
+            programmaticMoveRef.current = true;
+            map.once("moveend", () => { const p = map.project(coords); setPreviewPin(pinData); setPreviewPos({ x: p.x, y: p.y }); });
+            map.panBy([0, -moverY], { duration: 300 });
+          } else {
+            setPreviewPos({ x: point.x, y: point.y });
+          }
         }
       });
 
@@ -560,6 +598,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
     });
 
     mapRef.current = map;
+    if (import.meta.env.DEV) (window as any).__uhMapa = map;
     }); // end getMapboxReady().then
 
     return () => {
@@ -756,7 +795,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         doFit();
       });
     }
-  }, [pins, fitToPins, mapaPronto, visivel]);
+  }, [pins, fitToPins, mapaPronto, visivel, vistosVersao]);
 
   // Mapa aberto depois (celular): reenquadra quando o contêiner ganha tamanho
   useEffect(() => {
@@ -796,19 +835,33 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
 
       {/* Property preview popup — with photo */}
       <AnimatePresence>
-        {previewPin && previewPos && (
+        {previewPin && previewPos && (() => {
+          const { abreBaixo } = planoMiniCard(previewPos.y, containerRef.current);
+          const larg = containerRef.current?.offsetWidth ?? 400;
+          const esq = Math.min(Math.max(previewPos.x - 130, 8), larg - 268);
+          const setaX = Math.min(Math.max(previewPos.x - esq, 16), 244);
+          const jaVisto = vistosSet().has(String(previewPin.id));
+          return (
           <motion.div
-            initial={{ opacity: 0, y: previewPos.y < 270 ? 8 : "calc(-100% + 8px)", scale: 0.95 }}
-            animate={{ opacity: 1, y: previewPos.y < 270 ? 0 : "-100%", scale: 1 }}
-            exit={{ opacity: 0, y: previewPos.y < 270 ? 4 : "calc(-100% + 4px)", scale: 0.97 }}
+            data-testid="mini-card-mapa"
+            data-abre={abreBaixo ? "baixo" : "cima"}
+            initial={{ opacity: 0, y: abreBaixo ? 8 : "calc(-100% + 8px)", scale: 0.95 }}
+            animate={{ opacity: 1, y: abreBaixo ? 0 : "-100%", scale: 1 }}
+            exit={{ opacity: 0, y: abreBaixo ? 4 : "calc(-100% + 4px)", scale: 0.97 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="absolute z-30 w-[260px] cursor-pointer"
             style={{
-              left: Math.min(Math.max(previewPos.x - 130, 8), (containerRef.current?.offsetWidth ?? 400) - 268),
-              top: previewPos.y < 270 ? previewPos.y + 22 : previewPos.y - 10,
+              left: esq,
+              top: abreBaixo ? previewPos.y + 22 : previewPos.y - 10,
             }}
             onClick={() => navigate(prefixLink(`/imovel/${previewPin.slug}`))}
           >
+            {/* Pontinha apontando para o preço quando o card abre para baixo */}
+            {abreBaixo && (
+              <div className="relative h-[6px]">
+                <div data-testid="seta-mini-card" data-direcao="cima" className="absolute top-[1px] h-2.5 w-2.5 -translate-x-1/2 rotate-45 border-l border-t border-border bg-card" style={{ left: setaX }} />
+              </div>
+            )}
             <div className="relative overflow-hidden rounded-xl border border-border bg-card shadow-xl">
               {previewPin.foto ? (
                 <div className="relative h-[130px] w-full overflow-hidden"><FotosCard id={String(previewPin.id)} produto={false} titulo={previewPin.titulo ?? ""}><img
@@ -841,17 +894,25 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
                   )}
                   <span>· {previewPin.bairro}</span>
                 </div>
+                {jaVisto && (
+                  <p data-testid="ja-visto" className="mt-1 inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 font-body text-[11px] font-semibold text-muted-foreground">
+                    <Eye className="h-3 w-3" aria-hidden="true" /> Você já viu
+                  </p>
+                )}
                 <div className="mt-2 rounded-lg bg-primary px-3 py-1.5 text-center font-body text-[12px] font-bold text-primary-foreground">
                   Ver imóvel →
                 </div>
               </div>
             </div>
-            {/* Triangle pointer */}
-            <div className="flex justify-center">
-              <div className="h-2.5 w-2.5 rotate-45 border-b border-r border-border bg-card -mt-[6px]" />
-            </div>
+            {/* Pontinha apontando para o preço quando o card abre para cima */}
+            {!abreBaixo && (
+              <div className="relative h-[6px]">
+                <div data-testid="seta-mini-card" data-direcao="baixo" className="absolute -top-[6px] h-2.5 w-2.5 -translate-x-1/2 rotate-45 border-b border-r border-border bg-card" style={{ left: setaX }} />
+              </div>
+            )}
           </motion.div>
-        )}
+          );
+        })()}
       </AnimatePresence>
 
       {/* Map toolbar — draw, nearby, auto-search */}

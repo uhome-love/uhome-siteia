@@ -6,3 +6,12 @@ export function ehNovo(publicadoEm: string | null | undefined, agora: number = D
   const t = new Date(publicadoEm).getTime();
   return Number.isFinite(t) && t <= agora && agora - t <= DIAS_NOVIDADE * 864e5;
 }
+
+const FASES: Record<string, string> = { na_planta: 'Lançamento', em_construcao: 'Em obras', novo: 'Pronto pra morar' };
+/** Selo da foto (prioridade: personalizado > Novo > fase) e selo que desce para a linha de informações. */
+export function selosDoCard(publicadoEm: string | null | undefined, fase: string | null | undefined, personalizado?: string, agora = Date.now()): { foto?: string; linha?: string } {
+  const f = fase ? FASES[fase] : undefined;
+  const fotoPrincipal = personalizado ?? (ehNovo(publicadoEm, agora) ? 'Novo' : undefined);
+  if (fotoPrincipal) return { foto: fotoPrincipal, linha: f && f !== 'Pronto pra morar' ? f : undefined };
+  return { foto: f };
+}

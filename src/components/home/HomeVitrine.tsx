@@ -53,7 +53,7 @@ function ContinueDeOndeParou() {
 export function HomeVitrine({ entreFileiras }: { entreFileiras?: React.ReactNode }) {
   const { prefixLink } = useCorretor(); const { isFavorito, toggleFavorito } = useFavoritos();
   const [ultimaVisita] = useState(() => (typeof window === 'undefined' ? null : registrarVisitaHome()));
-  const novos = useQuery({ queryKey: ['home-novos'], queryFn: () => buscarSite({ secao: 'imoveis', cidade: 'Porto Alegre', ordem: 'recentes', limit: 5 }), staleTime: 180000 });
+  const novos = useQuery({ queryKey: ['home-novos'], queryFn: () => buscarSite({ secao: 'imoveis', cidade: 'Porto Alegre', ordem: 'recentes', novidades: 30, limit: 5 } as any), staleTime: 180000 });
   const ate700 = useQuery({ queryKey: ['home-ate700'], queryFn: () => buscarSite({ secao: 'imoveis', cidade: 'Porto Alegre', ordem: 'recentes', precoMax: 700000, limit: 5 }), staleTime: 180000 });
   const categorias = categorias3dVisiveis(novos.data?.categorias ?? {}, novos.data?.tipos ?? {}, (novos.data as any)?.comodidades ?? {});
   useEffect(() => { document.documentElement.classList.add('uh-home-vitrine'); return () => document.documentElement.classList.remove('uh-home-vitrine'); }, []);
@@ -75,7 +75,7 @@ export function HomeVitrine({ entreFileiras }: { entreFileiras?: React.ReactNode
       </nav>
       <div className="home-conteudo">
         <ContinueDeOndeParou />
-        <Fileira titulo={<>Novos no site<span className="hidden sm:inline"> em Porto Alegre</span></>} verTodos={prefixLink('/busca?ordem=recentes')}>
+        <Fileira titulo={<>Novos no site<span className="hidden sm:inline"> em Porto Alegre</span></>} verTodos={prefixLink('/busca?novidades=30&ordem=recentes')}>
           {novos.data ? novos.data.rows.map((r, i) => card(r, i, 0)) : Array.from({ length: 5 }, (_, i) => <div key={i} className="catalog-card"><div className="catalog-photo" /></div>)}
         </Fileira>
         {entreFileiras}

@@ -101,7 +101,7 @@ export function HomeConfianca() {
                       {c.creci && <p className="truncate font-body text-[11px] text-muted-foreground">CRECI {c.creci}</p>}
                       {tel && (
                         <a
-                          href={`https://wa.me/55${tel}?text=${encodeURIComponent(`Olá ${primeiro}! Vi seu perfil no site da Uhome e quero ajuda para encontrar um imóvel.`)}`}
+                          href={`https://wa.me/${tel.startsWith("55") && tel.length > 11 ? tel : "55" + tel}?text=${encodeURIComponent(`Olá ${primeiro}! Vi seu perfil no site da Uhome e quero ajuda para encontrar um imóvel.`)}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="mt-3 flex h-9 items-center justify-center gap-1.5 rounded-full border border-border font-body text-xs font-semibold text-foreground transition-colors hover:border-foreground"

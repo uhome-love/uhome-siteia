@@ -147,6 +147,7 @@ interface SearchMapProps {
   onPertoDeVoce?: () => void;
   fitToPins?: boolean;
   autoSearchPadrao?: boolean;
+  carregando?: boolean;
 }
 
 const ALTURA_MINI_CARD = 270;
@@ -172,7 +173,7 @@ function vistosSet(): Set<string> {
   try { return new Set((JSON.parse(localStorage.getItem("imoveis_vistos") || "[]") as unknown[]).filter((v): v is string => typeof v === "string")); } catch { return new Set(); }
 }
 
-export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, onBoundsChange, onDrawFilter, onPertoDeVoce, fitToPins = false, autoSearchPadrao = false }: SearchMapProps) {
+export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, onBoundsChange, onDrawFilter, onPertoDeVoce, fitToPins = false, autoSearchPadrao = false, carregando = false }: SearchMapProps) {
   const navigate = useNavigate();
   const { prefixLink } = useCorretor();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -337,15 +338,17 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       });
 
       // Pontinhos (padrão Airbnb): todo imóvel tem um ponto; o preço aparece por cima quando cabe
+      const dot = (fill: string) => { const c = document.createElement("canvas"); c.width = 44; c.height = 28; const g = c.getContext("2d")!; g.shadowColor = "rgba(0,0,0,0.22)"; g.shadowBlur = 4; g.shadowOffsetY = 1; g.fillStyle = fill; g.beginPath(); g.roundRect(6, 5, 32, 17, 8.5); g.fill(); g.shadowColor = "transparent"; g.strokeStyle = "rgba(0,0,0,0.12)"; g.lineWidth = 1; g.stroke(); return g.getImageData(0, 0, 44, 28); };
+      map.addImage("pin-dot", dot("#FFFFFF"), { pixelRatio: 2 });
+      map.addImage("pin-dot-visto", dot("#EBEBEB"), { pixelRatio: 2 });
       map.addLayer({
         id: "clusters",
-        type: "circle",
+        type: "symbol",
         source: "imoveis",
-        paint: {
-          "circle-color": ["case", ["boolean", ["get", "visto"], false], "#EBEBEB", "#FFFFFF"],
-          "circle-radius": 5,
-          "circle-stroke-width": 1,
-          "circle-stroke-color": "rgba(0,0,0,0.18)",
+        layout: {
+          "icon-image": ["case", ["boolean", ["get", "visto"], false], "pin-dot-visto", "pin-dot"],
+          "icon-allow-overlap": true,
+          "icon-ignore-placement": true,
         },
       });
 
@@ -880,6 +883,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
           {cheio ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
         </button>
       )}
+      {carregando && <div aria-hidden className="mapa-carregando absolute inset-x-0 top-0 z-30 h-[3px] overflow-hidden"><span /></div>}
       {/* Map toolbar — draw, nearby */}
       {onBoundsSearch && !drawMode && !hasDrawn && (
         <div role="toolbar" aria-label="Ferramentas do mapa" className="absolute left-3 top-3 z-20 flex items-center gap-0.5 rounded-full bg-card p-1 shadow-lg">

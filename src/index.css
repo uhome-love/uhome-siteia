@@ -673,3 +673,5 @@ body:has(.gaveta-mapa) .aviso-cookies{display:none}
 .mapboxgl-ctrl-group button{width:40px;height:40px}
 .mapboxgl-ctrl-group button+button{border-top:1px solid hsl(var(--border))}
 @media(min-width:1024px){body.mapa-cheio .search-list{display:none}body.mapa-cheio .search-map{width:100%;padding-left:32px}.search-map .mapboxgl-ctrl-top-right{top:52px}}
+.mapa-carregando span{position:absolute;inset:0 auto 0 0;width:35%;background:hsl(var(--foreground));border-radius:2px;animation:mapa-carga 1s ease-in-out infinite}
+@keyframes mapa-carga{0%{transform:translateX(-100%)}100%{transform:translateX(300%)}}

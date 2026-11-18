@@ -30,4 +30,4 @@
 - Below-fold home photos use `FotoPerto` (loads near the viewport) with WebP card versions mapped in `src/data/miniaturas.json`; originals stay untouched. Why: keep first load light without altering source assets.
 - Search grid mounts 4 cards first and the rest as the visitor nears them (`PRIMEIROS_CARDS`). Why: first-screen render cost on mobile.
 - Retained-pre transition rules must be inline in index.html, not only in async CSS; late CSS otherwise moves root by a viewport and produces CLS 1. Why: the pre leaving flow and app becoming visible must be atomic even under delayed styles.
-- Foco pages use shared presentation helpers for headings/FAQ, version-gated site-v2 molds, and one deferred contact form for both modes. Preserve original CRM/journey transport; tests mock writes. Why: page/pre/social parity and safe verification.
+- Foco uses shared type/title/FAQ helpers, ficha.titulo_manual overrides, site-v2 molds and one deferred form. Preserve CRM/journey; mock test writes. Why: page/pre/social parity and safe verification.

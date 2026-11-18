@@ -1,5 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
-import { tituloFoco, faqFoco } from "../_shared/focoPresentation.ts";
+import { tituloFoco, tituloPreviaFoco, faqFoco } from "../_shared/focoPresentation.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -177,7 +177,9 @@ function localBusinessJsonLd() {
 
 function html(title: string, description: string, rawOgImage: string, canonical: string, jsonLdBlocks: string[], bodyHtml: string) {
   const marca = "Uhome · Você e seu novo lar | Imóveis em Porto Alegre e Canoas";
-  title = canonical.replace(/\/$/, "") === "https://uhome.com.br".replace(/\/$/, "") ? marca : `${title.split(" | ")[0]} | ${marca}`;
+  if (!new URL(canonical).pathname.startsWith("/em-foco/")) {
+    title = canonical.replace(/\/$/, "") === "https://uhome.com.br".replace(/\/$/, "") ? marca : `${title.split(" | ")[0]} | ${marca}`;
+  }
   const ogImage = ogImageUrl(rawOgImage);
   const isJpeg = ogImage.includes(".jpg") || ogImage.includes(".jpeg") || ogImage.includes("unsplash.com") || ogImage.includes("output=jpg");
   const own = isOwnAsset(rawOgImage || "");
@@ -865,7 +867,7 @@ async function renderStudios() {
 async function renderProdutoFoco(slug: string, corretorSlug?: string) {
   const { data: p } = await supabase
     .from("produtos_foco")
-    .select("slug, nome, bairro, cidade, incorporadora, preco_a_partir, resumo, capa_url, galeria, entrega, tipo, ficha")
+    .select("slug, nome, bairro, cidade, incorporadora, preco_a_partir, resumo, capa_url, galeria, entrega, tipo, segmento, ficha")
     .eq("slug", slug)
     .eq("ativo", true)
     .maybeSingle();
@@ -873,8 +875,8 @@ async function renderProdutoFoco(slug: string, corretorSlug?: string) {
   const nomeCorretor = await corretorNome(corretorSlug);
   const preco = precoCurto(p.preco_a_partir);
   const title = nomeCorretor
-    ? `${tituloFoco(p)} · enviado por ${nomeCorretor} | Uhome`
-    : `${tituloFoco(p)} | Uhome`;
+    ? `${p.nome} · ${tituloFoco(p)} · enviado por ${nomeCorretor} | Uhome`
+    : tituloPreviaFoco(p);
   const ficha = (p.ficha ?? {}) as Record<string, unknown>;
   const tip = typeof ficha.tipologias === "string" ? ficha.tipologias : Array.isArray(ficha.tipologias) ? (() => { const ds = [...new Set((ficha.tipologias as { dorm?: number | string }[]).map((t) => Number(t?.dorm)).filter((n) => n > 0))].sort(); return ds.length ? `${ds.join(ds.length > 2 ? ", " : " e ")} dormitório${ds.length > 1 || ds[0] > 1 ? "s" : ""}` : ""; })() : (p.tipo ?? "");
   const partes = [tip ? `${p.nome}: ${tip}` : p.nome, preco ? `a partir de ${preco}` : "", p.entrega ? `entrega ${p.entrega}` : ""].filter(Boolean);

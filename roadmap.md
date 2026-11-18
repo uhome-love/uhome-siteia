@@ -2,6 +2,7 @@
 - [x] Parte 2: página em-foco, galeria, visita fixa, conteúdo real e formulários compartilhados; todos os produtos abrem
 - [x] Parte 2: modelos site-v2 e seed produto implantados; site-v1 mantém o modelo anterior; prévias com capa/título e FAQ; Worker intacto
 - [x] Parte 2: 23 testes com envios simulados, prints 390/1440 de Arvoredo/Bosque/Orygem e foco/troca conferidos
+- [x] Ajustes pré-publicação: Essence lotes, tipos do catálogo, título manual e nome nas prévias; dez páginas/prévias verificadas, site-v1 preservado
 - [ ] Parte 2: publicar app e central conferir pedidos reais/LCP oficial; sem envio de teste ao CRM nesta rodada
 - [x] A / rodada 4: capa 44,9 KB ativada, preconnect como alternativa autorizada, foto da tela pronta conservada; trace local antes da execução do app
 - [x] B / parte 1: tokens, cabeçalho/barras, rodapé, Lia e modelos versionados; 390/1440 px e fluxos conferidos

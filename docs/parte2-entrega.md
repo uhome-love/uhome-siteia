@@ -10,6 +10,7 @@
 ## Funções implantadas
 - site-dobra: molde foco-v2 gerado a partir do app; selecionado apenas por site-v2. site-v1 segue usando o molde anterior e demais páginas continuam usando seus modelos atuais. Seed do produto evita nova espera por dados. CSS da troca permanece inline. Worker não mudou.
 - ssr-render: mesmo helper de título usado pelo app, foto de capa direta e FAQ JSON-LD. Verificado HTTP 200 e capa dos três produtos.
+- Ajuste pré-publicação: classificação pela oferta principal em tipo/segmento, incluindo lotes, sobrados, casas, studios, apartamentos e coberturas. Essence: Lotes em condomínio clube no São José. Dez prévias e páginas conferidas com nome · título | Uhome, sem slogan. Override opcional em ficha.titulo_manual (apenas o título descritivo, sem nome/marca); vazio usa cálculo automático. site-dobra redeployada pelo helper, site-v1 verificado intacto.
 
 ## Conferido
 - Arvoredo, Bosque e Orygem em 390/1440; todos os outros produtos abrem.

@@ -6,6 +6,7 @@ export interface MidiaFoco { url: string; url_mobile?: string | null; legenda?: 
 export interface PrecoFoco { tipologia: string; valor: number; texto: string }
 export interface BlackFoco { titulo: string; texto: string; itens: string[]; feed: string | null; story: string | null }
 export interface FichaFoco {
+  titulo_manual?: string | null;
   segmento?: string | null;
   tipo?: string | null;
   ficha_tecnica?: { item: string; valor: string }[];

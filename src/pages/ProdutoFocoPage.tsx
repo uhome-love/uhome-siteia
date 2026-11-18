@@ -14,10 +14,9 @@ import { lazyRetry } from "@/lib/lazyRetry";
 import { useCanonical } from "@/hooks/useCanonical";
 import { useCorretor } from "@/contexts/CorretorContext";
 import { useProdutoFoco, useProdutosFoco, useCampanhasAtivas, formatPreco, SITE_URL, absUrl, type MidiaFoco } from "@/lib/produtosFoco";
-import { tituloFoco, destaquesFoco, faqFoco } from "../../supabase/functions/_shared/focoPresentation";
+import { tituloFoco, tituloPreviaFoco, destaquesFoco, faqFoco } from "../../supabase/functions/_shared/focoPresentation";
 import { proximosDiasFoco, diaInicialFoco } from "@/lib/focoVisit";
 import { setJsonLd, removeJsonLd } from "@/lib/jsonld";
-import { siteTitle } from "@/lib/siteTitle";
 import { trackEvent } from "@/lib/trackEvent";
 import type { PedidoFoco } from "@/components/foco/FocoContactForm";
 const MaterialGallery = lazyRetry(() => import("@/components/foco/MaterialGallery").then(m => ({ default: m.MaterialGallery })));
@@ -37,8 +36,8 @@ export default function ProdutoFocoPage() {
   const faq = p ? faqFoco(p, natal?.config.condicoes_gerais) : [];
   useEffect(() => {
     if (!p) return;
-    document.title = siteTitle(titulo);
-    for (const [prop, value] of [["og:title", siteTitle(titulo)], ["og:image", absUrl(p.capa_url) ?? ""]]) {
+    document.title = tituloPreviaFoco(p);
+    for (const [prop, value] of [["og:title", tituloPreviaFoco(p)], ["og:image", absUrl(p.capa_url) ?? ""]]) {
       let el = document.querySelector(`meta[property="${prop}"]`); if (!el) { el = document.createElement("meta"); el.setAttribute("property", prop); document.head.append(el); } el.setAttribute("content", value);
     }
     void trackEvent({ tipo: "imovel_visto", imovel_slug: `em-foco/${p.slug}`, imovel_titulo: p.nome, imovel_bairro: p.bairro, imovel_preco: p.preco_a_partir });

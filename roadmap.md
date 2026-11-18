@@ -41,7 +41,7 @@
 - [ ] 3. Página de produto + mídias
 - [ ] 5. Velocidade
 - [ ] Entrega (prints, testes de formulário até CRM)
-- [ ] Publicar app (busca compacta + foto de card 480x432) e depois ligar UH_FOTO_CARD=1 na site-dobra e renovar cache — aguarda publicação
+- [x] Publicar app (busca compacta + foto de card 480x432): publicação registrada em 18/11 17:00:39 UTC; UH_FOTO_CARD=1 ativada e cache renovado; paridade foto conservada/app/preload nas três páginas; fotos 20.280/50.772/32.082 bytes. Worker intacto; medição oficial com central no Brasil.
 - [x] Área nos cards da busca com vírgula (75,45 m²); tela pronta segue a mesma chave UH_FOTO_CARD
 - [ ] /apartamentos-petropolis com 0 imóveis (acento): conferir e corrigir
 - [ ] Próximas partes do design: Imóvel, Favoritos em pastas, Home nova, Lia celular, Movimento

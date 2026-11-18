@@ -27,11 +27,19 @@ export const CATEGORIAS_3D = [
   { id: 'ate400', nome: 'Até R$ 400 mil', icone: '/categorias/ate400.webp', filtros: { precoMax: 400000 } },
   { id: 'canoas', nome: 'Em Canoas', icone: '/categorias/canoas.webp', filtros: { cidade: 'Canoas' } },
   { id: 'coberturas', nome: 'Coberturas', icone: '/categorias/cobertura.webp', filtros: { tipo: 'cobertura' } },
+  { id: 'piscina', nome: 'Com piscina', icone: '/categorias/piscina.webp', filtros: { comodidades: 'Piscina' }, comodidade: 'Piscina' },
+  { id: 'vista', nome: 'Vista panorâmica', icone: '/categorias/vista.webp', filtros: { comodidades: 'Vista panorâmica' }, comodidade: 'Vista panorâmica' },
+  { id: 'pet', nome: 'Aceita pet', icone: '/categorias/pet.webp', filtros: { comodidades: 'Pet friendly' }, comodidade: 'Pet friendly' },
+  { id: 'churrasqueira', nome: 'Churrasqueira', icone: '/categorias/churrasqueira.webp', filtros: { comodidades: 'Churrasqueira' }, comodidade: 'Churrasqueira' },
+  { id: 'sacada', nome: 'Com sacada', icone: '/categorias/sacada.webp', filtros: { comodidades: 'Sacada' }, comodidade: 'Sacada' },
+  { id: 'prontos', nome: 'Pronto pra morar', icone: '/categorias/pronto.webp', filtros: { fase: 'novo,usado' } },
+  { id: 'casas', nome: 'Casas', icone: '/categorias/casa.webp', filtros: { tipo: 'casa' } },
+  { id: 'apartamentos', nome: 'Apartamentos', icone: '/categorias/apartamento.webp', filtros: { tipo: 'apartamento' } },
 ] as const;
 /** Contagem por categoria: usa `categorias` e, para garden/coberturas, `tipos` da busca_site. */
-export function categorias3dVisiveis(categorias: Record<string, number>, tipos: Record<string, number>) {
-  const n: Record<string, number> = { ...categorias, garden: categorias.garden ?? tipos.garden ?? 0, coberturas: categorias.coberturas ?? tipos.cobertura ?? 0 };
-  return CATEGORIAS_3D.filter((c) => (n[c.id] ?? 0) >= 8);
+export function categorias3dVisiveis(categorias: Record<string, number>, tipos: Record<string, number>, comodidades: Record<string, number> = {}) {
+  const n: Record<string, number> = { ...categorias, garden: categorias.garden ?? tipos.garden ?? 0, coberturas: categorias.coberturas ?? tipos.cobertura ?? 0, casas: categorias.casas ?? tipos.casa ?? 0 };
+  return CATEGORIAS_3D.filter((c) => (('comodidade' in c ? comodidades[c.comodidade] : n[c.id]) ?? 0) >= 8);
 }
 /** Título dos resultados com total (exceção à regra de não mostrar totais). */
 export function tituloBuscaComTotal(count: number | null | undefined, cidade?: string) {

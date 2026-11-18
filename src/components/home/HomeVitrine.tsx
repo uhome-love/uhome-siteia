@@ -55,7 +55,7 @@ export function HomeVitrine({ entreFileiras }: { entreFileiras?: React.ReactNode
   const [ultimaVisita] = useState(() => (typeof window === 'undefined' ? null : registrarVisitaHome()));
   const novos = useQuery({ queryKey: ['home-novos'], queryFn: () => buscarSite({ secao: 'imoveis', cidade: 'Porto Alegre', ordem: 'recentes', limit: 5 }), staleTime: 180000 });
   const ate700 = useQuery({ queryKey: ['home-ate700'], queryFn: () => buscarSite({ secao: 'imoveis', cidade: 'Porto Alegre', ordem: 'recentes', precoMax: 700000, limit: 5 }), staleTime: 180000 });
-  const categorias = categorias3dVisiveis(novos.data?.categorias ?? {}, novos.data?.tipos ?? {});
+  const categorias = categorias3dVisiveis(novos.data?.categorias ?? {}, novos.data?.tipos ?? {}, (novos.data as any)?.comodidades ?? {});
   useEffect(() => { document.documentElement.classList.add('uh-home-vitrine'); return () => document.documentElement.classList.remove('uh-home-vitrine'); }, []);
   const card = (r: Imovel, i: number, base: number) => (
     <CatalogCard key={r.id} imovel={r} index={base + i} saved={isFavorito(r.id)} onSave={() => toggleFavorito(r.id)} highlighted={false} onHover={() => {}}

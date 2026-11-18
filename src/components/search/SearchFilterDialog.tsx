@@ -43,7 +43,7 @@ export const listaComodidades = (s?: string) => (s ? String(s).split(',').filter
 export function alternarComodidade(atual: string | undefined, c: string) { const l = listaComodidades(atual); return (l.includes(c) ? l.filter((x) => x !== c) : [...l, c]).join(','); }
 
 function Contador({ rotulo, valor, onChange }: { rotulo: string; valor: number; onChange: (v: number) => void }) {
-  return <div className="filtro-contador" role="group" aria-label={rotulo}><span>{rotulo}</span><div>{[0, 1, 2, 3, 4].map((n) => <button type="button" key={n} aria-pressed={(valor || 0) === n} onClick={() => onChange(n)}>{n ? (n === 4 ? '4+' : n) : 'Qualquer'}</button>)}</div></div>;
+  return <div className="filtro-contador" role="group" aria-label={rotulo}><span>{rotulo}</span><div className="filtro-stepper"><button type="button" aria-label={`Menos ${rotulo.toLowerCase()}`} disabled={!valor} onClick={() => onChange(Math.max(0, (valor || 0) - 1))}>−</button><output aria-live="polite">{valor ? `${valor}+` : 'Qualquer'}</output><button type="button" aria-label={`Mais ${rotulo.toLowerCase()}`} disabled={(valor || 0) >= 5} onClick={() => onChange(Math.min(5, (valor || 0) + 1))}>+</button></div></div>;
 }
 
 let bairrosCache: Promise<string[]> | null = null;

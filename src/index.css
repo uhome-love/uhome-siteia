@@ -598,3 +598,16 @@ body:has(.search-filter-dialog[data-state=open]) [aria-label="Preferências de p
 .filtro-slider-ponta:hover{transform:scale(1.06)}
 .filtro-slider-ponta:active,.filtro-slider-ponta:focus-visible{transform:scale(1.12)!important;box-shadow:0 4px 12px hsl(var(--foreground)/.22)!important;z-index:2}
 .filtro-precos label{border-radius:999px!important}
+/* Filtros padrão Airbnb: contador − Qualquer +, janela mais larga */
+.filtro-contador{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
+.filtro-contador>span{font-size:16px;font-weight:500}
+.filtro-stepper{display:flex;align-items:center;gap:12px}
+.filtro-stepper button{width:32px;height:32px;border-radius:999px;border:1px solid hsl(var(--border));font-size:18px;line-height:1;display:grid;place-items:center;transition:border-color .15s}
+.filtro-stepper button:hover:not(:disabled){border-color:hsl(var(--foreground))}
+.filtro-stepper button:disabled{opacity:.35;cursor:not-allowed}
+.filtro-stepper output{min-width:72px;text-align:center;font-size:15px}
+@media(min-width:1024px){.search-filter-dialog{max-width:780px}}
+.search-categories{flex-wrap:nowrap}
+.filtro-stepper button{min-width:32px!important;padding:0!important;height:32px!important;background:hsl(var(--background))!important;color:hsl(var(--foreground))!important}
+.filtro-contador>.filtro-stepper{flex-wrap:nowrap!important}
+@media(max-width:1023px){.filtro-contador{flex-direction:row!important;align-items:center!important}}

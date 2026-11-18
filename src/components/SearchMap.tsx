@@ -265,7 +265,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
 
       const map = new mb.default.Map({
         container: containerRef.current,
-        style: "mapbox://styles/mapbox/light-v11",
+        style: "mapbox://styles/mapbox/streets-v12",
         center: [-51.2177, -30.0346],
         zoom: 11,
         minZoom: 7,

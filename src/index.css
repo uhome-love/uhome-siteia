@@ -554,3 +554,47 @@ body:has(.search-filter-dialog[data-state=open]) [aria-label="Preferências de p
 .pilula-painel-carregando{height:160px}
 @keyframes pilula-entra{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.pilula-painel{animation:none}}
+/* Rodada Airbnb 360 */
+.pilula-compacta{display:flex;align-items:center;gap:0;height:48px;padding:0 8px 0 10px;border:1px solid hsl(var(--border));border-radius:999px;background:hsl(var(--card));box-shadow:var(--sombra-1);font-size:14px;font-weight:600;color:hsl(var(--foreground));transition:box-shadow .2s;animation:pilula-entra .2s ease-out}
+.pilula-compacta:hover{box-shadow:var(--sombra-2)}
+.pilula-compacta img{margin-right:6px}
+.pilula-compacta>span{padding:0 14px;white-space:nowrap;max-width:180px;overflow:hidden;text-overflow:ellipsis}
+.pilula-compacta>span+span{border-left:1px solid hsl(var(--border))}
+.pilula-compacta>i{display:grid;place-items:center;width:34px;height:34px;border-radius:999px;background:hsl(var(--primary));color:hsl(var(--primary-foreground))}.pilula-compacta>i svg{width:16px;height:16px}
+.faixa-rolavel{position:relative;display:flex;align-items:center;min-width:0;flex:1}
+.faixa-rolavel>div{flex:1;min-width:0;scroll-behavior:smooth}
+.faixa-seta{position:absolute;top:50%;z-index:3;display:grid;place-items:center;width:32px;height:32px;margin-top:-16px;border-radius:999px;border:1px solid hsl(var(--border));background:hsl(var(--card));box-shadow:var(--sombra-1);opacity:0;pointer-events:none;transition:opacity .15s,transform .15s,box-shadow .15s}
+.faixa-seta svg{width:16px;height:16px}.faixa-seta:hover{transform:scale(1.06);box-shadow:var(--sombra-2)}
+.faixa-seta-esq{left:4px}.faixa-seta-dir{right:4px}
+.faixa-rolavel[data-esq] .faixa-seta-esq,.faixa-rolavel[data-dir] .faixa-seta-dir{opacity:1;pointer-events:auto}
+.faixa-rolavel[data-dir]::after,.faixa-rolavel[data-esq]::before{content:"";position:absolute;top:0;bottom:0;width:56px;z-index:2;pointer-events:none}
+.faixa-rolavel[data-dir]::after{right:0;background:linear-gradient(90deg,hsl(var(--background)/0),hsl(var(--background)) 70%)}
+.faixa-rolavel[data-esq]::before{left:0;background:linear-gradient(270deg,hsl(var(--background)/0),hsl(var(--background)) 70%)}
+@media (hover:none){.faixa-seta{display:none}}
+.search-rapidos{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:12px 32px}
+.search-rapidos::-webkit-scrollbar{display:none}
+.search-rapido{flex-shrink:0;height:36px!important;border-radius:999px!important;padding:0 14px!important;font-size:13px!important;font-weight:500!important;border-color:hsl(var(--border))!important;transition:border-color .15s,background .15s}
+.search-rapido:hover{border-color:hsl(var(--foreground))!important}
+.search-rapido[aria-pressed=true]{background:hsl(var(--secondary))!important;border:2px solid hsl(var(--foreground))!important}
+.search-rapido-filtros{margin-right:6px;position:relative}.search-rapido-filtros svg{width:16px;height:16px}
+@media(max-width:1023px){.search-rapidos{padding:8px 12px}.search-rapido-filtros{display:none}}
+.gaveta-mapa{position:absolute;left:0;right:0;bottom:0;z-index:40;background:hsl(var(--background));border-radius:24px 24px 0 0;box-shadow:0 -6px 24px hsl(var(--foreground)/.12);transition:transform .25s cubic-bezier(.2,.8,.2,1),height .25s cubic-bezier(.2,.8,.2,1);height:46dvh;display:flex;flex-direction:column}
+.gaveta-mapa[data-altura=baixa]{height:84px}.gaveta-mapa[data-altura=cheia]{height:92dvh}
+.gaveta-alca{display:flex;flex-direction:column;align-items:center;gap:8px;padding:10px 0 12px;touch-action:none;cursor:grab}
+.gaveta-alca>span{width:40px;height:4px;border-radius:999px;background:hsl(var(--muted-foreground)/.5)}
+.gaveta-alca strong{font-size:14px;font-weight:700}
+.gaveta-conteudo{flex:1;overflow:hidden}
+.gaveta-trilho{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 16px 16px;scrollbar-width:none}
+.gaveta-trilho>*{flex:0 0 78%;scroll-snap-align:start}
+@media (prefers-reduced-motion:reduce){.gaveta-mapa{transition:none}}
+/* Faixa de preço Airbnb */
+.filtro-histograma{gap:2px!important;height:72px!important;padding:0 16px!important}
+.filtro-histograma span{flex-basis:0;border-radius:3px 3px 0 0!important;background:hsl(var(--border))!important;transition:background .12s ease,height .2s ease!important}
+.filtro-histograma span[data-dentro]{background:hsl(var(--foreground))!important}
+.filtro-slider{margin:-16px 16px 0!important;height:36px!important}
+.filtro-slider-trilho{height:2px!important;background:hsl(var(--border))!important}
+.filtro-slider-faixa{background:hsl(var(--foreground))!important}
+.filtro-slider-ponta{width:32px!important;height:32px!important;border:1px solid hsl(var(--foreground)/.12)!important;box-shadow:0 2px 6px hsl(var(--foreground)/.18)!important;transition:transform .12s ease,box-shadow .12s ease!important;position:relative}
+.filtro-slider-ponta:hover{transform:scale(1.06)}
+.filtro-slider-ponta:active,.filtro-slider-ponta:focus-visible{transform:scale(1.12)!important;box-shadow:0 4px 12px hsl(var(--foreground)/.22)!important;z-index:2}
+.filtro-precos label{border-radius:999px!important}

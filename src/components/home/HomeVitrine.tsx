@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { SlidersHorizontal, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { FaixaRolavel } from '@/components/FaixaRolavel';
 import { PilulaBusca } from '@/components/PilulaBusca';
 import { CatalogCard } from '@/components/search/CatalogCard';
 import { useCorretor } from '@/contexts/CorretorContext';
@@ -64,12 +65,12 @@ export function HomeVitrine({ entreFileiras }: { entreFileiras?: React.ReactNode
     <>
       <section data-uh-capa className="home-capa">
         <h1 className="home-titulo">Você e seu <span>novo lar</span>.</h1>
-        <PilulaBusca />
+        <PilulaBusca compacta />
       </section>
       <nav aria-label="Categorias" className="home-categorias">
-        <div className="home-categorias-trilho">
+        <FaixaRolavel className="home-categorias-trilho" rotulo="categorias">
           {categorias.map((c) => <Link key={c.id} to={prefixLink(urlCategoria(c.filtros))} className="home-categoria"><img src={c.icone} alt="" width={32} height={32} loading="lazy" decoding="async" /><span>{c.nome}</span></Link>)}
-        </div>
+        </FaixaRolavel>
         <Button asChild variant="outline" className="home-filtros"><Link to={prefixLink('/busca')}><SlidersHorizontal />Filtros</Link></Button>
       </nav>
       <div className="home-conteudo">

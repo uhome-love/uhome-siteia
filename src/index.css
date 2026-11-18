@@ -659,3 +659,6 @@ body:has(.search-filter-dialog[data-state=open]) [aria-label="Preferências de p
 .detalhe-nav-cta{display:flex;align-items:center;gap:16px;opacity:0;transform:translateY(4px);transition:opacity .2s,transform .2s;pointer-events:none}.detalhe-nav-cta[data-on]{opacity:1;transform:none;pointer-events:auto}.detalhe-nav-cta strong{font-size:18px}
 @media(min-width:1024px){.detalhe-cartao>*:first-child{padding:24px;border-radius:16px;box-shadow:0 6px 24px hsl(var(--foreground)/.12);border:1px solid hsl(var(--border))}}
 @media(min-width:1024px) and (hover:hover){.uhs-site-footer li a{min-height:0!important;padding-top:2px;padding-bottom:2px;display:inline-block}}
+
+/* Aviso de cookies não cobre janelas abertas (agendamento, filtros). */
+body:has([role="dialog"][data-state="open"]) .aviso-cookies{display:none}

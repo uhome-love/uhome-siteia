@@ -153,8 +153,11 @@ export function AgendamentoVisita({ imovelId, imovelSlug, imovelTitulo, imovelBa
               disabled={[{ before: proximosDias[0] }, { dayOfWeek: [0] }]}
               showOutsideDays={false}
               onSelect={(dia) => { if (!dia) return; setDataEscolhida(dia); setHorario(""); void trackEvent({ tipo: "dia_escolhido", imovel_slug: imovelSlug, dados: { dia: dia.toISOString().split("T")[0] } }); }}
-              className="visita-calendario pointer-events-auto rounded-xl border border-border p-3"
+              className="visita-calendario pointer-events-auto w-full max-w-full overflow-hidden rounded-xl border border-border p-2 sm:p-3"
               classNames={{
+                months: "w-full",
+                month: "w-full space-y-3",
+                table: "w-full border-collapse",
                 caption_label: "font-body text-[15px] font-bold capitalize",
                 nav_button: "grid h-8 w-8 place-items-center rounded-full border border-border bg-background transition hover:bg-secondary disabled:opacity-30",
                 head_cell: "w-full font-body text-[11px] font-semibold uppercase text-muted-foreground",

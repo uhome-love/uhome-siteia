@@ -48,7 +48,7 @@ export function CookieNotice() {
 
   return (
     <div ref={panel} tabIndex={-1} role="region" aria-label="Preferências de privacidade" style={{ bottom: base ? base + 8 : undefined }}
-      className="fixed inset-x-2 bottom-2 z-[110] rounded-xl border border-border bg-background/95 px-3 py-1.5 shadow-lg backdrop-blur sm:inset-x-auto sm:bottom-4 sm:left-4 sm:max-w-[420px] sm:px-3 sm:py-2">
+      className="aviso-cookies fixed inset-x-2 bottom-2 z-[110] rounded-xl border border-border bg-background/95 px-3 py-1.5 shadow-lg backdrop-blur sm:inset-x-auto sm:bottom-4 sm:left-4 sm:max-w-[420px] sm:px-3 sm:py-2">
       {settings ? (
         <div className="max-h-[60dvh] space-y-3 overflow-auto py-1 text-sm">
           <p className="font-semibold text-foreground">Preferências de cookies</p>

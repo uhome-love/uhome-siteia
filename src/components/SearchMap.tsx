@@ -1,3 +1,4 @@
+import { selosDoCard } from "@/lib/novidade";
 import { FotosCard } from "@/components/search/FotosCard";
 import { useRef, useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
@@ -706,6 +707,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
 
 
   const lastFitIdsRef = useRef<string>("");
+  const [visivel, setVisivel] = useState(false);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -719,8 +721,10 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
     const doFit = () => {
       if (fitToPins && pins.length > 0) {
         const idsKey = pins.map(p => p.id).sort().join(",");
-        if (idsKey !== lastFitIdsRef.current) {
+        const caixa = map.getContainer().getBoundingClientRect();
+        if (idsKey !== lastFitIdsRef.current && caixa.height > 200 && caixa.width > 200) {
           lastFitIdsRef.current = idsKey;
+          map.resize();
           // Ignora coordenadas isoladas (geocodificação errada) para enquadrar a região real
           const corte = (v: number[]) => { const o = [...v].sort((x, y) => x - y); const n = o.length; const k = n > 20 ? Math.floor(n * 0.03) : 0; return [o[k], o[n - 1 - k]]; };
           const [lngMin, lngMax] = corte(pins.map(p => Number(p.longitude)));
@@ -728,7 +732,9 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
           const sw: [number, number] = [lngMin, latMin];
           const ne: [number, number] = [lngMax, latMax];
           programmaticMoveRef.current = true;
-          map.fitBounds([sw, ne], { padding: 60, maxZoom: 15, duration: 800 });
+          const gaveta = typeof document !== 'undefined' ? document.querySelector('.gaveta-mapa') : null;
+          const cobre = gaveta ? Math.max(0, map.getContainer().getBoundingClientRect().bottom - gaveta.getBoundingClientRect().top) : 0;
+          map.fitBounds([sw, ne], { padding: { top: 80, left: 40, right: 40, bottom: Math.min(cobre + 40, caixa.height - 160) }, maxZoom: 15, duration: 800 });
         }
       } else if (!fitToPins) {
         lastFitIdsRef.current = "";
@@ -747,7 +753,16 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         doFit();
       });
     }
-  }, [pins, fitToPins, mapaPronto]);
+  }, [pins, fitToPins, mapaPronto, visivel]);
+
+  // Mapa aberto depois (celular): reenquadra quando o contêiner ganha tamanho
+  useEffect(() => {
+    const el = mapRef.current?.getContainer();
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(([e]) => setVisivel(e.contentRect.height > 200 && e.contentRect.width > 200));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [mapaPronto]);
 
   // Hover from card OR selected pin (popup aberto) → destaque escuro no topo
   useEffect(() => {
@@ -780,27 +795,28 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       <AnimatePresence>
         {previewPin && previewPos && (
           <motion.div
-            initial={{ opacity: 0, y: 8, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 4, scale: 0.97 }}
+            initial={{ opacity: 0, y: "calc(-100% + 8px)", scale: 0.95 }}
+            animate={{ opacity: 1, y: "-100%", scale: 1 }}
+            exit={{ opacity: 0, y: "calc(-100% + 4px)", scale: 0.97 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="absolute z-30 w-[260px] cursor-pointer"
             style={{
               left: Math.min(Math.max(previewPos.x - 130, 8), (containerRef.current?.offsetWidth ?? 400) - 268),
-              top: previewPos.y - 10,
-              transform: "translateY(-100%)",
+              top: Math.max(previewPos.y - 10, 250),
             }}
             onClick={() => navigate(prefixLink(`/imovel/${previewPin.slug}`))}
           >
-            <div className="overflow-hidden rounded-xl border border-border bg-card shadow-xl">
+            <div className="relative overflow-hidden rounded-xl border border-border bg-card shadow-xl">
               {previewPin.foto ? (
-                <FotosCard id={String(previewPin.id)} produto={false} titulo={previewPin.titulo ?? ""}><img
+                <div className="relative h-[130px] w-full overflow-hidden"><FotosCard id={String(previewPin.id)} produto={false} titulo={previewPin.titulo ?? ""}><img
                   src={previewPin.foto}
                   alt={previewPin.titulo}
                   className="h-[130px] w-full object-cover"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                /></FotosCard>
-              ) : (
+                /></FotosCard></div>
+              ) : null}
+              {(() => { const c = pins.find((x) => String(x.id) === String(previewPin.id)) as any; const sl = selosDoCard(c?.publicado_em, c?.fase).foto; return sl ? <span className="absolute left-2 top-2 z-10 rounded-full bg-background px-2.5 py-1 font-body text-xs font-bold text-foreground shadow">{sl}</span> : null; })()}
+              {previewPin.foto ? null : (
                 <div className="flex h-[80px] w-full items-center justify-center bg-muted">
                   <span className="text-2xl opacity-30">🏠</span>
                 </div>

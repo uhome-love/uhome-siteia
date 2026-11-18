@@ -31,5 +31,5 @@
 - Search uses busca_site for catalog/counts, four initial cards and manual pages; site-v3 gates molds. Why: parity and safe rollout.
 - Compact search molds need uh-busca-layout=compacta-1; older apps fail open (no mismatched photos).
 - Home lar-1 (meta uh-home-layout) has no mold yet; site-dobra drops the legacy home pre. Why: no cover swap.
-- Retained-pre transition rules must be inline in index.html, not only in async CSS; late CSS otherwise moves root by a viewport and produces CLS 1. Why: the pre leaving flow and app becoming visible must be atomic even under delayed styles.
+- Retained-pre transition rules stay inline in index.html, not only in async CSS. Why: late CSS caused CLS 1.
 - Foco uses shared type/title/FAQ/numbers helpers, ficha.titulo_manual overrides, site-v2 molds and one deferred form. Preserve CRM/journey; mock test writes. Why: page/pre/social parity and safe verification.

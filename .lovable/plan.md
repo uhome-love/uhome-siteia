@@ -26,7 +26,11 @@
 ## 5. Botão Filtros da Home
 - Na Home, o botão "Filtros" abre o painel completo de filtros em vez da busca; ao aplicar, leva aos resultados já filtrados.
 
-## 6. Validação antes de entregar
+## 6. Página do imóvel: local e comodidades
+- Celular: mostrar bairro e cidade uma vez só (sem repetir no título, subtítulo e breadcrumb), conferido em 360, 390 e 430 px e no computador.
+- Comodidades: exibir as cadastradas no anúncio (lista normalizada do imóvel + diferenciais), com ícones em duas colunas e "Mostrar todas"; conferir com imóveis reais do banco.
+
+## 7. Validação antes de entregar
 Teste no navegador (computador e celular): Filtros da Home abrindo o painel; buscar Capão e Canoas e ver o mapa ir até lá; dar zoom e arrastar sem pins sumirem; "Buscar nessa região" mudando lista e total; mini card, etiqueta cinza e gaveta; tempo de abertura do imóvel; título; escolher dia e horário no calendário. Sem enviar lead de teste. Só aviso como pronto com tudo isso conferido.
 
 ## Detalhes técnicos

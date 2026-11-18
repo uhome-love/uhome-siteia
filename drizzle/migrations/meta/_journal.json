@@ -176,6 +176,13 @@
       "when": 1795022729738,
       "tag": "0024_favoritos_pastas",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1795026435593,
+      "tag": "0025_busca_comodidades_garden",
+      "breakpoints": true
     }
   ]
 }

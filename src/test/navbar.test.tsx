@@ -25,6 +25,7 @@ function renderNavbar(path = "/") {
   );
 }
 
+globalThis.ResizeObserver ??= class { observe() {} unobserve() {} disconnect() {} } as any;
 describe("ações do cabeçalho", () => {
   it.each(['/busca', '/lancamentos-porto-alegre', '/imoveis-canoas'])('abre os filtros do catálogo em %s', path => {
     const abrir = vi.fn(); window.addEventListener('uhome:abrir-filtros', abrir);
@@ -33,11 +34,19 @@ describe("ações do cabeçalho", () => {
     expect(abrir).toHaveBeenCalledTimes(1);
     window.removeEventListener('uhome:abrir-filtros', abrir);
   });
-  it("abre busca e permite enviar um bairro real", () => {
+  it("abre o painel completo de busca e permite digitar um bairro", async () => {
     renderNavbar();
-    fireEvent.click(screen.getByRole("button", {name: "Onde vai ser seu novo lar?"}));
-    fireEvent.change(screen.getByLabelText("Bairro, endereço ou código"), {target: {value: "Moinhos de Vento"}});
-    expect(screen.getByLabelText("Bairro, endereço ou código")).toHaveValue("Moinhos de Vento");
+    fireEvent.click(screen.getAllByRole("button", {name: /Onde vai ser seu novo lar\?/})[0]);
+    const onde = await screen.findByLabelText("Onde");
+    fireEvent.change(onde, {target: {value: "Moinhos de Vento"}});
+    expect(onde).toHaveValue("Moinhos de Vento");
+  });
+  it.each(['/busca', '/imoveis-canoas'])('no catálogo a pílula abre os filtros da página em %s', path => {
+    const abrir = vi.fn(); window.addEventListener('uhome:abrir-filtros', abrir);
+    renderNavbar(path);
+    fireEvent.click(screen.getAllByRole('button', {name: /Onde vai ser seu novo lar\?/})[0]);
+    expect(abrir).toHaveBeenCalledTimes(1);
+    window.removeEventListener('uhome:abrir-filtros', abrir);
   });
   it("Lia somente abre por ação", () => {
     const abrir = vi.fn(); window.addEventListener("uhome:abrir-lia", abrir);

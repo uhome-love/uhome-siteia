@@ -1,25 +1,31 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCorretor } from '@/contexts/CorretorContext';
-import { urlBuscaHome, type BuscaHome } from '@/lib/homeVitrine';
+import { urlDeFiltros } from '@/lib/homeVitrine';
 
-const TIPOS = [['', 'Qualquer tipo'], ['apartamento', 'Apartamento'], ['casa', 'Casa'], ['casa_condominio', 'Casa em condomínio'], ['cobertura', 'Cobertura'], ['studio,loft', 'Studio'], ['garden', 'Garden'], ['terreno', 'Terreno']];
-const QUARTOS = [['', 'Qualquer'], ['1', '1+'], ['2', '2+'], ['3', '3+'], ['4', '4+']];
-const VALORES = [['', 'Qualquer valor'], ['400000', 'R$ 400 mil'], ['700000', 'R$ 700 mil'], ['1000000', 'R$ 1 milhão'], ['2000000', 'R$ 2 milhões']];
+const Painel = lazy(() => import('@/components/search/SearchFilterDialog').then((m) => ({ default: m.SearchFilterDialog })));
+const NOMES_TIPO: Record<string, string> = { apartamento: 'Apartamento', casa: 'Casa', casa_condominio: 'Casa em condomínio', cobertura: 'Cobertura', 'studio,loft': 'Studio', garden: 'Garden', terreno: 'Terreno' };
+const valor = (v: number) => (v >= 1_000_000 ? `R$ ${(v / 1_000_000).toLocaleString('pt-BR', { maximumFractionDigits: 2 })} mi` : `R$ ${Math.round(v / 1000)} mil`);
 
-export function PilulaBusca({ inicial = {} }: { inicial?: BuscaHome }) {
+/** Pílula Onde · Tipo · Quartos · Valor: cada parte abre o painel completo de busca. */
+export function PilulaBusca({ inicial = {}, onApply }: { inicial?: Record<string, any>; onApply?: (f: Record<string, any>) => void }) {
   const navigate = useNavigate(); const { prefixLink } = useCorretor();
-  const [onde, setOnde] = useState(inicial.onde ?? ''), [tipo, setTipo] = useState(inicial.tipo ?? ''), [quartos, setQuartos] = useState(inicial.quartos ?? ''), [valor, setValor] = useState(inicial.valor ?? '');
-  return (
-    <form role="search" className="home-pilula" onSubmit={(e) => { e.preventDefault(); navigate(prefixLink(urlBuscaHome({ onde, tipo, quartos, valor, cidade: inicial.cidade }))); }}>
-      <label className="home-campo home-campo-onde"><span>Onde</span><input value={onde} onChange={(e) => setOnde(e.target.value)} placeholder="Bairro, cidade ou empreendimento" /></label>
-      <label className="home-campo"><span>Tipo</span><select value={tipo} onChange={(e) => setTipo(e.target.value)}>{TIPOS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select></label>
-      <label className="home-campo"><span>Quartos</span><select value={quartos} onChange={(e) => setQuartos(e.target.value)}>{QUARTOS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select></label>
-      <label className="home-campo"><span>Valor até</span><select value={valor} onChange={(e) => setValor(e.target.value)}>{VALORES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select></label>
-      <Button type="submit" className="home-buscar"><Search />Buscar</Button>
-    </form>
-  );
+  const [aberto, setAberto] = useState(false);
+  const f: Record<string, any> = { secao: 'imoveis', ordem: 'recentes', ...inicial };
+  const aplicar = (n: Record<string, any>) => (onApply ? onApply(n) : navigate(prefixLink(urlDeFiltros(n))));
+  const partes: [string, string, string][] = [
+    ['Onde', f.bairro || f.q || f.cidade || '', 'Bairro, cidade ou código'],
+    ['Tipo', NOMES_TIPO[f.tipo] ?? '', 'Qualquer tipo'],
+    ['Quartos', f.quartos ? `${f.quartos}+ quartos` : '', 'Qualquer'],
+    ['Valor', f.precoMax ? `até ${valor(f.precoMax)}` : f.precoMin ? `a partir de ${valor(f.precoMin)}` : '', 'Qualquer valor'],
+  ];
+  return <>
+    <div role="search" className="home-pilula">
+      {partes.map(([r, v, ph], i) => <button type="button" key={r} className={`home-campo${i === 0 ? ' home-campo-onde' : ''}`} onClick={() => setAberto(true)}><span>{r}</span><strong data-vazio={!v || undefined}>{v || ph}</strong></button>)}
+      <Button type="button" className="home-buscar" aria-label="Buscar" onClick={() => setAberto(true)}><Search /><span>Buscar</span></Button>
+    </div>
+    {aberto && <Suspense fallback={null}><Painel open={aberto} onClose={() => setAberto(false)} filtros={f} onApply={aplicar} /></Suspense>}
+  </>;
 }
-

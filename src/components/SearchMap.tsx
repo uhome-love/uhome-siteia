@@ -259,7 +259,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
 
       const map = new mb.default.Map({
         container: containerRef.current,
-        style: "mapbox://styles/mapbox/streets-v12",
+        style: "mapbox://styles/mapbox/light-v11",
         center: [-51.2177, -30.0346],
         zoom: 11,
         minZoom: 7,
@@ -305,8 +305,8 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
         source: "imoveis",
         filter: ["has", "point_count"],
         paint: {
-          "circle-color": "#5B6CF9",
-          "circle-opacity": 0.1,
+          "circle-color": "#222222",
+          "circle-opacity": 0.06,
           "circle-radius": [
             "interpolate", ["linear"], ["get", "point_count"],
             1, 26, 25, 32, 100, 39, 500, 47,
@@ -327,8 +327,8 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
             "interpolate", ["linear"], ["get", "point_count"],
             1, 16, 25, 20, 100, 25, 500, 31,
           ],
-          "circle-stroke-width": 2,
-          "circle-stroke-color": "#5B6CF9",
+          "circle-stroke-width": 1,
+          "circle-stroke-color": "rgba(0,0,0,0.12)",
           "circle-opacity": 1,
           "circle-radius-transition": { duration: 260, delay: 0 },
         },
@@ -346,7 +346,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
           "text-allow-overlap": true,
           "text-ignore-placement": true,
         },
-        paint: { "text-color": "#3A47C9" },
+        paint: { "text-color": "#222222" },
       });
 
       // Pill images — high-DPI with 9-slice stretch so corners never distort
@@ -374,14 +374,14 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
           "icon-padding": 3,
           "text-field": ["get", "preco_label"],
           "text-font": ["DIN Pro Bold", "Arial Unicode MS Bold"],
-          "text-size": 11.5,
+          "text-size": 12.5,
           "text-allow-overlap": false,
           "text-optional": false,
           "text-anchor": "center",
           "symbol-sort-key": ["-", 0, ["get", "preco"]],
         },
         paint: {
-          "text-color": "#1A1A1A",
+          "text-color": "#222222",
           "icon-opacity": 1,
           "icon-opacity-transition": { duration: 180, delay: 0 },
         },
@@ -401,7 +401,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
           "icon-ignore-placement": true,
           "text-field": ["get", "preco_label"],
           "text-font": ["DIN Pro Bold", "Arial Unicode MS Bold"],
-          "text-size": 12.5,
+          "text-size": 13.5,
           "text-allow-overlap": true,
           "text-ignore-placement": true,
           "text-anchor": "center",

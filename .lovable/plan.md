@@ -66,3 +66,20 @@ Troca os ícones de traço atuais por ícones 3D próprios da Uhome, como os de 
 - Título: `tituloBuscaComTotal(count, cidade)` em `buscaConfig.ts`, usado pelo app e pelo molde, com teste para 0, 1, 999 e 1.000+.
 - Atualizar a memória "Sem vitrine de totais" com a exceção do título da busca.
 - Pins de preço: camada de símbolos do Mapbox com texto de preço quando o zoom ≥ 13, e grupos como hoje abaixo disso.
+
+---
+
+# Parte 3: fotos que passam no próprio card (padrão Airbnb), em todas as páginas
+
+- Todo card de imóvel mostra até 5 fotos, sem precisar abrir o imóvel: na Home, na busca, nas páginas prontas (lançamentos, Canoas etc.), nos favoritos, nos similares e nas páginas de bairro.
+- **Computador:** setas redondas brancas (‹ ›) aparecem ao passar o mouse, e há pontinhos embaixo, como no Airbnb.
+- **Celular:** basta arrastar a foto para o lado, e os pontinhos mostram em qual foto a pessoa está. Tocar na foto abre o imóvel, como hoje.
+- Passar fotos não abre o imóvel nem liga o coração.
+- **Velocidade:** só a 1ª foto carrega junto com a página. A 2ª só carrega quando a pessoa encosta no card ou começa a passar, e as demais vão carregando uma a uma. A foto conservada da tela pronta continua igual, então o LCP não muda.
+- As fotos usam as mesmas miniaturas leves (480 px, WebP) da primeira foto.
+
+## Detalhes técnicos (parte 3)
+- Novo `FotosCard` (rolagem lateral com encaixe + setas `Button` com aria-label "Foto anterior/Próxima foto" + pontinhos) usado dentro de `CatalogCard` e `SearchPropertyCard`, para cobrir todas as páginas que usam esses cards.
+- A `busca_site` passa a devolver `fotos_card` (até 5 URLs de `imoveis.fotos`; produtos usam a `galeria`). É um campo novo, e os campos existentes não mudam.
+- O molde da tela pronta mantém só a 1ª foto. O app monta as outras depois, sem mudar a altura do card.
+- Teste: as setas trocam a foto sem navegar, e a 2ª foto não é pedida antes da interação.

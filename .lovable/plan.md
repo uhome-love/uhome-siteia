@@ -8,6 +8,14 @@
 ## 2. Buscar sem filtro
 - Apertar **Buscar** com a pílula vazia abre todos os imóveis (todas as cidades, todos os tipos), sem cidade nem filtros escondidos aplicados.
 
+## 2b. Faixa de preço no padrão Airbnb
+- Histograma com barras finas e arredondadas: as barras dentro da faixa ficam escuras e as de fora cinza-claro, mudando enquanto a pessoa arrasta.
+- Pontas brancas redondas (32 px) com sombra suave, que crescem levemente ao segurar. A linha escura fica só entre as duas pontas, e a ponta ativa fica acima da outra.
+- Arraste fluido no dedo e no mouse. Passos menores até R$ 1 mi (R$ 10 mil) e maiores acima disso, para ajustar com precisão onde há mais imóveis.
+- Campos "Mínimo" e "Máximo" em cápsulas, que se atualizam ao vivo e aceitam digitação. O máximo no fim da faixa mostra "R$ 3 mi+".
+- Contagem "Mostrar N imóveis" atualizando enquanto a pessoa arrasta, sem travar.
+- Teclado: setas movem a ponta, e Home/End levam ao início ou ao fim.
+
 ## 3. Pílula que encolhe ao rolar e setas nas categorias
 - **Computador:** ao rolar a página, a pílula grande vira uma pílula compacta no topo ("Qualquer lugar · Qualquer tipo · Qualquer valor"). Clicar nela abre de novo a pílula grande no campo escolhido. A transição é suave, sem a página pular.
 - **Celular:** a barra de busca do topo fica fixa e mais baixa ao rolar. As categorias somem com suavidade e voltam ao subir.
@@ -32,4 +40,5 @@ Percorrer etapa por etapa no computador (1440) e no celular (390): Home → píl
 - Categorias: setas com `scrollBy`, visibilidade por `scroll` + ResizeObserver.
 - Mapa: `visto` vem do `imoveis_vistos`. O popup passa a abrir no clique ou toque do pin (hoje é só hover) e usa `FotosCard`. A gaveta usa pointer events com três alturas fixas e `touch-action` controlado.
 - Imagens: `lovable image generate`, convertidas para WebP card/original em `public/images/`, mantendo os nomes de arquivo para não quebrar a tela pronta.
+- Slider: escala não linear (mapeamento valor↔posição), barras do histograma ligadas à mesma escala, `requestAnimationFrame` no arraste.
 - Validação: script com combinações → busca_site × SQL direto × Playwright (botão vs título).

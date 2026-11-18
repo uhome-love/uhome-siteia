@@ -82,9 +82,24 @@ Deno.serve(async (req) => {
     })
   }
 
+  // 3. Desligar no site quem não está mais ativo no CRM (nada é apagado)
+  // Os ids do CRM não batem com uhomesales_id do site; comparamos por e-mail e nome.
+  const emails = new Set(corretoresCRM.map((c) => (c.email ?? '').trim().toLowerCase()).filter(Boolean))
+  const slugs = new Set(corretoresCRM.map((c) => gerarSlug(c.nome ?? '')).filter(Boolean))
+  const { data: site } = await supabaseSite.from('profiles').select('id, nome, email, slug_ref').eq('role', 'corretor').eq('ativo', true)
+  const sair = (site ?? []).filter((p) => !emails.has((p.email ?? '').trim().toLowerCase()) && !slugs.has(gerarSlug(p.nome ?? '')) && !slugs.has(p.slug_ref ?? ''))
+  // Proteção: nunca desliga mais da metade de uma vez (evita apagar a equipe por erro de leitura)
+  const desligados = sair.length && sair.length <= (site?.length ?? 0) / 2 ? sair : []
+  if (desligados.length) await supabaseSite.from('profiles').update({ ativo: false }).in('id', desligados.map((d) => d.id))
+  if (desligados.length) {
+    await supabaseSite.from('sync_log').insert({ direcao: 'crm->site', tipo: 'corretor_desligado', payload: { nomes: desligados.map((d) => d.nome) }, sucesso: true })
+  }
+
   return new Response(JSON.stringify({
     ok: true,
     sincronizados,
+    desligados: desligados.map((d) => d.nome),
+    candidatos_bloqueados: desligados.length ? undefined : sair.map((d) => d.nome),
     total: corretoresCRM.length,
     erros: erros.length > 0 ? erros : undefined
   }), {

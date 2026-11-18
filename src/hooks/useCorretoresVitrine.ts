@@ -17,7 +17,7 @@ export function useCorretoresVitrine() {
         .like("foto_url", "/__l5e/%") // só quem recebeu foto oficial = corretor em atividade
         .order("nome");
       if (error) throw error;
-      return (data ?? []).filter((c) => c.nome && c.foto_url) as CorretorVitrine[];
+      return (data ?? []).filter((c) => c.nome && c.foto_url && c.telefone && !/teste/i.test(c.nome)) as CorretorVitrine[];
     },
   });
 }

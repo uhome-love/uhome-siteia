@@ -182,6 +182,7 @@ function HorizontalCarousel({ items }: { items: CondominioData[] }) {
       {canLeft && (
         <button
           onClick={() => scroll("left")}
+          aria-label="Ver anteriores"
           className="absolute -left-3 top-[35%] z-10 hidden h-10 w-10 items-center justify-center rounded-full border border-border bg-card shadow-md transition-colors hover:bg-secondary sm:flex"
         >
           <ChevronLeft className="h-5 w-5 text-foreground" />
@@ -190,6 +191,7 @@ function HorizontalCarousel({ items }: { items: CondominioData[] }) {
       {canRight && (
         <button
           onClick={() => scroll("right")}
+          aria-label="Ver próximos"
           className="absolute -right-3 top-[35%] z-10 hidden h-10 w-10 items-center justify-center rounded-full border border-border bg-card shadow-md transition-colors hover:bg-secondary sm:flex"
         >
           <ChevronRight className="h-5 w-5 text-foreground" />

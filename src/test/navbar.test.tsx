@@ -26,11 +26,18 @@ function renderNavbar(path = "/") {
 }
 
 describe("ações do cabeçalho", () => {
+  it.each(['/busca', '/lancamentos-porto-alegre', '/imoveis-canoas'])('abre os filtros do catálogo em %s', path => {
+    const abrir = vi.fn(); window.addEventListener('uhome:abrir-filtros', abrir);
+    renderNavbar(path);
+    fireEvent.click(screen.getByRole('button', {name: 'Abrir filtros'}));
+    expect(abrir).toHaveBeenCalledTimes(1);
+    window.removeEventListener('uhome:abrir-filtros', abrir);
+  });
   it("abre busca e permite enviar um bairro real", () => {
     renderNavbar();
     fireEvent.click(screen.getByRole("button", {name: "Onde vai ser seu novo lar?"}));
-    fireEvent.change(screen.getByLabelText("Bairro ou endereço"), {target: {value: "Moinhos de Vento"}});
-    expect(screen.getByLabelText("Bairro ou endereço")).toHaveValue("Moinhos de Vento");
+    fireEvent.change(screen.getByLabelText("Bairro, endereço ou código"), {target: {value: "Moinhos de Vento"}});
+    expect(screen.getByLabelText("Bairro, endereço ou código")).toHaveValue("Moinhos de Vento");
   });
   it("Lia somente abre por ação", () => {
     const abrir = vi.fn(); window.addEventListener("uhome:abrir-lia", abrir);

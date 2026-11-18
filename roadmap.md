@@ -1,4 +1,6 @@
 # Roadmap — rodada pós-auditoria 16/11
+- [x] Busca celular compacta: foto 248/308 px, uma busca e filtros nas URLs prontas; site-v3 protegido por compacta-1, paridade sem salto; prints 390×844 e 3 traces locais, computador/Worker preservados; aguarda publicação do app e medição oficial da central
+- [x] Site-dobra simplificada: apenas site-v3 direto, sem document.write; /busca 195.618 → 53.456 bytes
 - [x] Ajuste Lucas: faixa Home e nota agregada/equipe removidas; imagem padrão sem números; junção sem espaço e 12 avaliações individuais conferidas em 390/1440; modelos publicados preservados
 - [x] Parte 3: seções/categorias com contagens reais, modal, chips, vazio e paginação manual
 - [x] Parte 3: favoritos locais e pedido de aviso de preço UUID, jornada/CRM sem enviar leads de teste

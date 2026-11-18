@@ -23,12 +23,18 @@ describe('preço digitado', () => {
   });
 });
 
-import { rotuloChip } from '@/pages/SearchExperience';
+import { rotuloChip, nomeCidade } from '@/pages/SearchExperience';
 describe('chips de filtros aplicados', () => {
   it('mostram valores legíveis', () => {
     expect(rotuloChip('precoMin', 400000)).toBe('A partir de R$ 400 mil');
     expect(rotuloChip('comodidades', 'Pet friendly,Piscina')).toBe('Aceita pet, Piscina');
     expect(rotuloChip('vagas', 2)).toBe('2+ vagas');
+  });
+  it('chip da cidade usa o nome oficial, sem depender de maiúsculas ou acento', () => {
+    const rows = [{ cidade: 'Xangri-Lá' }, { cidade: 'Capão da Canoa' }];
+    expect(nomeCidade('xangri-la', rows)).toBe('Xangri-Lá');
+    expect(nomeCidade('CAPAO DA CANOA', rows)).toBe('Capão da Canoa');
+    expect(nomeCidade('Gramado', rows)).toBe('Gramado');
   });
 });
 

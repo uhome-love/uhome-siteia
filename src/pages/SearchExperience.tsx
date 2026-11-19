@@ -24,12 +24,8 @@ const SearchMap = lazy(() => import('@/components/SearchMap').then(m => ({ defau
 const LegacyAI = lazyRetry(() => import('@/pages/Search'));
 const icons: Record<string, typeof House> = { apartamento: Building2, casa: House, studio: Building2, terreno: LandPlot, pronto: KeyRound, valor: Banknote, local: MapPin };
 const mobileIcons: Record<string, typeof House> = { apartamento: Building, casa: Castle, studio: PanelsTopLeft, terreno: LandPlot, pronto: KeyRound, valor: Banknote, local: MapPin };
-export function urlFiltros(params: URLSearchParams, preset: Record<string, unknown> = {}) {
-  const f: Record<string, any> = { secao: 'imoveis', cidade: '', ordem: 'recentes', ...preset };
-  const keys: Record<string, string> = { preco_max: 'precoMax', preco_min: 'precoMin', area_min: 'areaMin', area_max: 'areaMax', area_util_min: 'areaUtilMin', area_util_max: 'areaUtilMax', andar_min: 'andarMin', condominio_max: 'condominioMax', iptu_max: 'iptuMax' };
-  params.forEach((v,k) => { const key = keys[k] ?? k; if (['precoMax','precoMin','quartos','vagas','banheiros','areaMin','areaMax','areaUtilMin','areaUtilMax','andarMin','condominioMax','iptuMax','novidades'].includes(key)) f[key]=Number(v); else if (['secao','cidade','tipo','fase','bairro','ordem','q','codigo','condominio','comodidades'].includes(key)) f[key]=v; });
-  return f;
-}
+export { urlFiltros } from '@/lib/buscaUrl';
+import { urlFiltros } from '@/lib/buscaUrl';
 const brl=(v:unknown)=>reais(Number(v));
 const AREAS:Record<string,string>={areaUtilMin:'Área priv. a partir de',areaUtilMax:'Área priv. até',areaMin:'Área total a partir de',areaMax:'Área total até'};
 /** Texto legível de cada filtro aplicado. */

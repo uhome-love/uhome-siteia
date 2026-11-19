@@ -31,7 +31,12 @@ export function FotosCard({ id, produto, titulo, children }: { id: string; produ
   const extras = fotos.slice(1);
   const total = Math.max(fotos.length, 1);
   useEffect(() => { if (fotos.length > 1) { preparar(fotos[(i + 1) % fotos.length]); if (i > 0) preparar(fotos[i - 1]); } }, [fotos, i]);
-  useEffect(() => { const el = caixa.current; if (!el || !('IntersectionObserver' in window)) return; const io = new IntersectionObserver((es) => { if (es.some((x) => x.isIntersecting)) { io.disconnect(); carregar(); } }, { rootMargin: '200px' }); io.observe(el); return () => io.disconnect(); }, [id]);
+  useEffect(() => { const el = caixa.current; if (!el || !('IntersectionObserver' in window)) return; let io: IntersectionObserver | null = null, vivo = true;
+    // Fotos extras só depois da página pronta: não disputam com a 1ª foto.
+    const iniciar = () => { if (!vivo) return; io = new IntersectionObserver((es) => { if (es.some((x) => x.isIntersecting)) { io?.disconnect(); carregar(); } }, { rootMargin: '200px' }); io.observe(el); };
+    const ocioso = () => ((window as any).requestIdleCallback ?? ((f: () => void) => setTimeout(f, 300)))(iniciar, { timeout: 2500 });
+    if (document.readyState === 'complete') ocioso(); else window.addEventListener('load', ocioso, { once: true });
+    return () => { vivo = false; io?.disconnect(); window.removeEventListener('load', ocioso); }; }, [id]);
   const aoRolar = () => { cancelAnimationFrame(raf.current); raf.current = requestAnimationFrame(() => { const t = trilho.current; if (t) setI(indiceDoScroll(t.scrollLeft, t.clientWidth, total)); }); };
   const ir = (d: number) => { const t = trilho.current; if (!t) return; const n = (i + d + total) % total; t.scrollTo({ left: n * t.clientWidth, behavior: 'smooth' }); };
   const abrir = () => { caixa.current?.querySelector<HTMLAnchorElement>('.fotos-card-trilho > a')?.click(); };

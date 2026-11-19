@@ -2,7 +2,8 @@ import { selosDoCard } from "@/lib/novidade";
 import { FotosCard } from "@/components/search/FotosCard";
 import { useRef, useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, X, Bed, Maximize, ToggleLeft, ToggleRight, PenTool, Navigation, Check, Eye, Maximize2, Minimize2 } from "lucide-react";
+import { Search, X, Bed, Maximize, ToggleLeft, ToggleRight, PenTool, Navigation, Check, Eye, Maximize2, Minimize2, Heart } from "lucide-react";
+import { useFavoritos } from "@/hooks/useFavoritos";
 import { motion, AnimatePresence } from "framer-motion";
 import type mapboxgl from "mapbox-gl";
 
@@ -212,6 +213,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
 
   // Preview popup state
   const [previewPin, setPreviewPin] = useState<MapPinData | null>(null);
+  const { isFavorito, toggleFavorito } = useFavoritos();
   const [previewPos, setPreviewPos] = useState<{ x: number; y: number } | null>(null);
   // Recalcula os preços cinza (já vistos) quando a pessoa volta para esta aba/página
   const [vistosVersao, setVistosVersao] = useState(0);
@@ -823,7 +825,11 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
                 <div data-testid="seta-mini-card" data-direcao="cima" className="absolute top-[1px] h-2.5 w-2.5 -translate-x-1/2 rotate-45 border-l border-t border-border bg-card" style={{ left: setaX }} />
               </div>
             )}
-            <div className="relative overflow-hidden rounded-xl border border-border bg-card shadow-xl">
+            <div className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-xl">
+              <div className="absolute right-2 top-2 z-20 flex gap-1.5">
+                <button type="button" aria-label={isFavorito(String(previewPin.id)) ? "Remover dos favoritos" : "Salvar imóvel"} aria-pressed={isFavorito(String(previewPin.id))} className="grid h-8 w-8 place-items-center rounded-full bg-background/95 text-foreground shadow" onClick={(e) => { e.stopPropagation(); void toggleFavorito(String(previewPin.id)); }}><Heart className={`h-4 w-4 ${isFavorito(String(previewPin.id)) ? "fill-primary text-primary" : ""}`} /></button>
+                <button type="button" aria-label="Fechar" className="grid h-8 w-8 place-items-center rounded-full bg-background/95 text-foreground shadow" onClick={(e) => { e.stopPropagation(); setPreviewPin(null); }}><X className="h-4 w-4" /></button>
+              </div>
               {previewPin.foto ? (
                 <div className="relative h-[130px] w-full overflow-hidden"><FotosCard id={String(previewPin.id)} produto={false} titulo={previewPin.titulo ?? ""}><img
                   src={previewPin.foto}
@@ -886,7 +892,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       {carregando && <div aria-hidden className="mapa-carregando absolute inset-x-0 top-0 z-30 h-[3px] overflow-hidden"><span /></div>}
       {/* Map toolbar — draw, nearby */}
       {onBoundsSearch && !drawMode && !hasDrawn && (
-        <div role="toolbar" aria-label="Ferramentas do mapa" className="absolute left-3 top-3 z-20 flex items-center gap-0.5 rounded-full bg-card p-1 shadow-lg">
+        <div role="toolbar" aria-label="Ferramentas do mapa" className="absolute left-3 top-[68px] z-20 flex items-center gap-0.5 rounded-full bg-card p-1 shadow-lg lg:top-3">
           <button
             onClick={() => window.dispatchEvent(new CustomEvent("uhome:draw-area"))}
             className="flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 font-body text-[12px] font-semibold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.97]"
@@ -909,7 +915,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       {/* Draw mode indicator + confirm button */}
       <AnimatePresence>
         {drawMode && (
-          <div className="absolute left-3 right-3 top-16 z-40 flex flex-wrap items-center gap-2 sm:left-4 sm:right-auto sm:top-4">
+          <div className="absolute left-3 right-3 top-16 z-40 pointer-events-none flex flex-wrap items-center gap-2 [&>*]:pointer-events-auto sm:left-4 sm:right-auto sm:top-4">
             <motion.div
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}

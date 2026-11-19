@@ -35,7 +35,8 @@ const AREAS:Record<string,string>={areaUtilMin:'Área priv. a partir de',areaUti
 /** Texto legível de cada filtro aplicado. */
 /** Nome oficial da cidade (como está no cadastro), ignorando maiúsculas e acentos do que foi digitado. */
 const TIPO_PLURAL:Record<string,string>={apartamento:'apartamentos',casa:'casas',cobertura:'coberturas',studio:'studios',terreno:'terrenos',garden:'gardens',sobrado:'sobrados'};
-export function comTipo(tipo:unknown,t:string):string{const k=typeof tipo==='string'?tipo.toLowerCase():'';const pl=TIPO_PLURAL[k];if(!pl)return t;return t.replace(/\bimóve(is|l)\b/,pl).replace(/^([a-zà-ú])/,m=>m.toUpperCase()).replace(/^(\d[\d.]*|Mais de [\d.]+) (\w)/,(m)=>m);}
+const TIPO_SINGULAR:Record<string,string>={apartamento:'apartamento',casa:'casa',cobertura:'cobertura',studio:'studio',terreno:'terreno',garden:'garden',sobrado:'sobrado'};
+export function comTipo(tipo:unknown,t:string):string{const k=typeof tipo==='string'?tipo.toLowerCase():'';const pl=TIPO_PLURAL[k];if(!pl)return t;return t.replace(/\bimóveis\b/,pl).replace(/\bimóvel\b/,TIPO_SINGULAR[k]).replace(/^Nenhum (casa|cobertura)/,'Nenhuma $1').replace(/^([a-zà-ú])/,m=>m.toUpperCase());}
 export function nomeCidade(filtro:unknown, rows:{cidade?:string|null}[]):string{
   const t=String(filtro??''); if(!t)return '';
   const norm=(x:unknown)=>String(x??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useCorretor } from '@/contexts/CorretorContext';
 import { urlDeFiltros } from '@/lib/homeVitrine';
 
-const Painel = lazy(() => import('@/components/search/SearchFilterDialog').then((m) => ({ default: m.SearchFilterDialog })));
+const Etapas = lazy(() => import('@/components/search/BuscaEtapas').then((m) => ({ default: m.BuscaEtapas })));
 const Secoes = lazy(() => import('@/components/search/SearchFilterDialog').then((m) => ({ default: m.FiltroSecoes })));
 const NOMES_TIPO: Record<string, string> = { apartamento: 'Apartamento', casa: 'Casa', casa_condominio: 'Casa em condomínio', cobertura: 'Cobertura', 'studio,loft': 'Studio', garden: 'Garden', terreno: 'Terreno' };
 const valor = (v: number) => (v >= 1_000_000 ? `R$ ${(v / 1_000_000).toLocaleString('pt-BR', { maximumFractionDigits: 2 })} mi` : `R$ ${Math.round(v / 1000)} mil`);
@@ -55,6 +55,6 @@ export function PilulaBusca({ inicial = {}, onApply }: { inicial?: Record<string
     {campo && <div id="pilula-painel" className="pilula-painel" data-campo={campo} role="dialog" aria-label={`Escolher ${campo}`}>
       <Suspense fallback={<div className="pilula-painel-carregando" />}><Secoes key={campo} draft={draft} setDraft={setDraft} secoes={SECOES_DO_CAMPO[campo]} autoFocoOnde /></Suspense>
     </div>}
-    {cheio && <Suspense fallback={null}><Painel open={cheio} onClose={() => setCheio(false)} filtros={draft} onApply={aplicar} /></Suspense>}
+    {cheio && <Suspense fallback={null}><Etapas open={cheio} onClose={() => setCheio(false)} filtros={draft} onApply={aplicar} /></Suspense>}
   </div>;
 }

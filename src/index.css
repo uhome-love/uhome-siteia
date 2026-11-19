@@ -680,3 +680,22 @@ body:has(.gaveta-mapa) .aviso-cookies{display:none}
 .filtro-slider{z-index:3}.filtro-slider-ponta::before{content:"";position:absolute;inset:-7px;border-radius:999px}
 /* Sem abas Imóveis/Lançamentos/Investir no celular (padrão Airbnb; ficam no menu e na barra de baixo) */
 @media (max-width:1023px){.uhs-mobile-tabs{display:none!important}:root{--uh-header-height:80px}}
+
+/* Busca em etapas no celular (padrão Airbnb) */
+.busca-etapas{display:flex;flex-direction:column;gap:0;padding:0;max-width:100vw;width:100vw;height:100dvh;max-height:100dvh;border-radius:0;background:hsl(var(--muted));border:0}
+@media (min-width:744px){.busca-etapas{width:560px;height:auto;max-height:90dvh;border-radius:24px}}
+.busca-etapas-topo{display:flex;justify-content:flex-end;padding:12px 16px 4px}
+.busca-etapas-fechar{display:grid;place-items:center;width:40px;height:40px;border-radius:999px;background:hsl(var(--background));box-shadow:0 2px 8px hsl(var(--foreground)/.12)}
+.busca-etapas-fechar svg{width:18px;height:18px}
+.busca-etapas-corpo{flex:1;overflow-y:auto;padding:4px 12px 16px;display:flex;flex-direction:column;gap:12px}
+.busca-etapa{background:hsl(var(--background));border-radius:24px;box-shadow:0 4px 16px hsl(var(--foreground)/.08)}
+.busca-etapa--aberta{padding:20px 20px 8px}
+.busca-etapa--aberta>h2{font-size:24px;font-weight:800;margin-bottom:8px}
+.busca-etapa--aberta .filtro-secao{border:0;padding-top:0}
+.busca-etapa--aberta .filtro-secao>h3{display:none}
+.busca-etapa--fechada{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:60px;padding:0 20px;text-align:left;font-size:15px}
+.busca-etapa--fechada span{color:hsl(var(--muted-foreground))}
+.busca-etapa--fechada strong{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.busca-etapas .filtro-rodape{background:hsl(var(--background))}
+/* Lia some enquanto um painel (filtros, busca) está aberto */
+body[data-scroll-locked] .uhs-lia-float{display:none!important}

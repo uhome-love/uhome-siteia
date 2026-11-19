@@ -9,17 +9,18 @@ import { useCorretor } from "@/contexts/CorretorContext";
 import { useCampanhaDestaque } from "@/lib/produtosFoco";
 import { SiteBottomBar } from "@/components/SiteBottomBar";
 import { urlDeFiltros } from "@/lib/homeVitrine";
+const Etapas = lazy(() => import("@/components/search/BuscaEtapas").then((m) => ({ default: m.BuscaEtapas })));
 const PainelBusca = lazy(() => import("@/components/search/SearchFilterDialog").then((m) => ({ default: m.SearchFilterDialog })));
 import { BUSCA_URLS } from "../../supabase/functions/_shared/buscaConfig";
 
 export function Navbar() {
-  const [menu, setMenu] = useState(false), [busca, setBusca] = useState(false), [rolou, setRolou] = useState(false);
+  const [menu, setMenu] = useState(false), [busca, setBusca] = useState(false), [etapas, setEtapas] = useState(false), [rolou, setRolou] = useState(false);
   const { prefixLink } = useCorretor(); const location = useLocation(), navigate = useNavigate();
   const [params] = useSearchParams(); const { campanha, black } = useCampanhaDestaque();
   const searchPath = location.pathname.replace(/^\/c\/[^/]+/, '');
   const isCatalog = searchPath === '/busca' || searchPath in BUSCA_URLS;
   useEffect(() => { const on = () => setRolou(window.scrollY > 120); window.addEventListener('scroll', on, { passive: true }); return () => window.removeEventListener('scroll', on); }, []);
-  useEffect(() => { setMenu(false); setBusca(false); }, [location.pathname]);
+  useEffect(() => { setMenu(false); setBusca(false); setEtapas(false); }, [location.pathname]);
   useEffect(() => { const f = () => setBusca(true); window.addEventListener('uhome:abrir-painel', f); return () => window.removeEventListener('uhome:abrir-painel', f); }, []);
   const tabs = [{ label: 'Imóveis', to: '/busca', icon: House }, { label: 'Lançamentos', to: '/busca?secao=lancamentos', icon: Building2 }, { label: 'Investir', to: '/busca?secao=investir', icon: ChartNoAxesCombined }];
   const ativo = params.get('secao') === 'investir' || location.pathname.includes('investir') ? 'Investir' : params.get('secao') === 'lancamentos' || /em-foco|campanha|lancamentos/.test(location.pathname) ? 'Lançamentos' : 'Imóveis';
@@ -31,10 +32,11 @@ export function Navbar() {
         <div className="uhs-desktop-tabs">{(rolou || searchPath !== '/') ? <button type="button" className="pilula-compacta" aria-label="Abrir busca" onClick={() => { if (isCatalog) window.dispatchEvent(new Event('uhome:abrir-filtros')); else if (document.querySelector('.pilula-raiz')) window.dispatchEvent(new Event('uhome:pilula-abrir')); else if (isCatalog) window.dispatchEvent(new Event('uhome:abrir-filtros')); else setBusca(true); }}><img src="/categorias/apartamento.webp" alt="" width={28} height={28} /><span>{params.get('bairro') || params.get('q') || params.get('cidade') || 'Qualquer lugar'}</span><span>{params.get('tipo') ? 'Tipo escolhido' : 'Qualquer tipo'}</span><span>{params.get('preco_max') ? 'Valor escolhido' : 'Qualquer valor'}</span><i aria-hidden="true"><Search /></i></button> : tabs.map(t => <Link className="uhs-tab" key={t.label} to={prefixLink(t.to)} aria-current={ativo === t.label ? 'page' : undefined}>{t.label}</Link>)}</div>
         <div className="uhs-header__lado--dir uhs-header-actions"><Button variant="ghost" className="uhs-desktop-lia" onClick={abrirLia}><MessageCircle />Falar com a Lia</Button><Button asChild variant="ghost" size="icon" aria-label="Favoritos"><Link to={prefixLink('/favoritos')}><Heart /></Link></Button><UserMenu /><Button variant="outline" size="icon" aria-label="Abrir menu" onClick={() => setMenu(true)}><Menu /></Button></div>
       </div>
-      <div className={`uhs-mobile-header${/(^|\/)imovel\//.test(location.pathname) ? " uhs-mobile-header--oculto" : ""}`}><div className="uhs-mobile-search-row"><Link to={prefixLink('/')} className="uhs-mobile-logo" aria-label="Uhome, página inicial"><img src="/favicon-192.png" alt="" width={40} height={40} /></Link><Button variant="outline" className="uhs-busca-celular" onClick={() => { if (isCatalog) window.dispatchEvent(new Event('uhome:abrir-filtros')); else setBusca(true); }}><Search /><span>Onde vai ser seu novo lar?</span></Button><Button variant="outline" size="icon" aria-label="Abrir filtros" onClick={() => { if (isCatalog) window.dispatchEvent(new Event('uhome:abrir-filtros')); else setBusca(true); }}><SlidersHorizontal /></Button></div></div>
+      <div className={`uhs-mobile-header${/(^|\/)imovel\//.test(location.pathname) ? " uhs-mobile-header--oculto" : ""}`}><div className="uhs-mobile-search-row"><Link to={prefixLink('/')} className="uhs-mobile-logo" aria-label="Uhome, página inicial"><img src="/favicon-192.png" alt="" width={40} height={40} /></Link><Button variant="outline" className="uhs-busca-celular" onClick={() => { if (isCatalog) window.dispatchEvent(new Event('uhome:abrir-filtros')); else setEtapas(true); }}><Search /><span>Onde vai ser seu novo lar?</span></Button><Button variant="outline" size="icon" aria-label="Abrir filtros" onClick={() => { if (isCatalog) window.dispatchEvent(new Event('uhome:abrir-filtros')); else setBusca(true); }}><SlidersHorizontal /></Button></div></div>
     </nav>
     <SiteBottomBar />
     <Sheet open={menu} onOpenChange={setMenu}><SheetContent className="overflow-y-auto"><SheetHeader><SheetTitle>Uhome</SheetTitle></SheetHeader><div className="mt-6 flex flex-col gap-2">{tabs.map(t => <Button asChild variant="ghost" className="justify-start" key={t.label}><Link to={prefixLink(t.to)}><t.icon />{t.label}</Link></Button>)}<Button asChild variant="outline"><Link to={prefixLink(campanha ? '/campanha/' + campanha.slug : '/em-foco')}>{campanha ? black ? 'Black Natal' : campanha.nome : 'Uhome em Foco'}</Link></Button>{[['/anunciar','Anunciar imóvel'],['/avaliar-imovel','Quanto vale meu imóvel?'],['/bairros','Bairros'],['/condominios','Condomínios'],['/sobre','Sobre a Uhome'],['/faq','Ajuda']].map(([to,l]) => <Button asChild variant="ghost" className="justify-start" key={to}><Link to={prefixLink(to)}>{l}</Link></Button>)}<Button variant="outline" onClick={() => { setMenu(false); abrirLia(); }}>Falar com a Lia</Button></div></SheetContent></Sheet>
+    {etapas && <Suspense fallback={null}><Etapas open={etapas} onClose={() => setEtapas(false)} filtros={{ secao: 'imoveis', ordem: 'recentes' }} onApply={(f) => navigate(prefixLink(urlDeFiltros(f)))} /></Suspense>}
     {busca && <Suspense fallback={null}><PainelBusca open={busca} onClose={() => setBusca(false)} filtros={{ secao: 'imoveis', ordem: 'recentes' }} onApply={(f) => navigate(prefixLink(urlDeFiltros(f)))} /></Suspense>}
   </>;
 }

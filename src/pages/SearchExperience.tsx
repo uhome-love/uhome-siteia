@@ -74,7 +74,8 @@ function SearchExperience() {
   useEffect(() => { document.title=preset ? `${preset.titulo} | Uhome` : `Imóveis${filtros.cidade ? ` em ${filtros.cidade}` : ' à venda'} | Uhome`; },[path,filtros.cidade]);
   const apply = (next: Record<string, any>) => { const p=new URLSearchParams(); const keys:Record<string,string>={precoMax:'preco_max',precoMin:'preco_min',areaMin:'area_min',areaMax:'area_max',areaUtilMin:'area_util_min',areaUtilMax:'area_util_max'};Object.entries(next).forEach(([k,v])=>{if(v && k!=='bounds')p.set(keys[k]??k,String(v));});setParams(p);void trackEvent({tipo:'filtro_aplicado',dados:{secao:next.secao,filtros:next}}); };
   const remove = (k:string) => { const next={...filtros};next[k]=typeof next[k]==='number'?0:'';apply(next); };
-  const cidadeNome = nomeCidade(filtros.cidade, rows);
+  const cidadeUnica = (filtros.bairro || filtros.q) && rows.length && rows.every(r => r.cidade && r.cidade === rows[0].cidade) ? rows[0].cidade as string : '';
+  const cidadeNome = cidadeUnica || nomeCidade(filtros.cidade, rows);
   const chips=Object.entries(filtros).filter(([k,v])=>v && !['ordem','secao'].includes(k)).map(([k,v])=>({k,label:k==='cidade'?cidadeNome:rotuloChip(k,v)}));
   const areaChip=area&&<Button variant="secondary" aria-label="Remover filtro Área do mapa" onClick={()=>setArea(null)}>Área do mapa<X/></Button>;
   const [restriction,setRestriction]=useState<{k:string;label:string;count:number}|null>(null);

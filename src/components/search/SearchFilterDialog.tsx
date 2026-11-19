@@ -59,7 +59,7 @@ export function useContagem(draft: Record<string, any>, ativo: boolean) {
   useEffect(() => { if (!ativo) return; let vivo = true; setLoading(true); const t = setTimeout(() => buscarSite({ ...draft, limit: 0 }).then((r) => { if (vivo) setResult(r as any); }).finally(() => { if (vivo) setLoading(false); }), 200); return () => { vivo = false; clearTimeout(t); }; }, [ativo, JSON.stringify(draft)]);
   return { result, loading };
 }
-export const textoMostrar = (loading: boolean, result: Resultado) => loading || !result ? 'Contando…' : result.count === 0 ? 'Nenhum imóvel' : `Mostrar ${result.count > 1000 ? '1.000+' : result.count.toLocaleString('pt-BR')} imóveis`;
+export const textoMostrar = (loading: boolean, result: Resultado) => loading || !result ? 'Contando…' : result.count === 0 ? 'Nenhum imóvel' : result.count === 1 ? 'Mostrar 1 imóvel' : `Mostrar ${result.count > 1000 ? '1.000+' : result.count.toLocaleString('pt-BR')} imóveis`;
 
 /** Converte texto digitado ("500 mil", "1,2 mi", "450000") em reais. */
 export function lerPreco(t: string): number {

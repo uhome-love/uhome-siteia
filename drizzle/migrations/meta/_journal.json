@@ -225,6 +225,20 @@
       "when": 1795051892254,
       "tag": "0031_busca_preco_simbolico_por_ultimo",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1795117613577,
+      "tag": "0032_foto_principal_em_contagem_e_pinos",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1795117661819,
+      "tag": "0033_busca_site_sem_abrir_fotos",
+      "breakpoints": true
     }
   ]
 }

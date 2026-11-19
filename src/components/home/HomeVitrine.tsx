@@ -54,7 +54,7 @@ function ContinueDeOndeParou() {
 export function HomeVitrine({ entreFileiras }: { entreFileiras?: React.ReactNode }) {
   const { prefixLink } = useCorretor(); const { isFavorito, toggleFavorito } = useFavoritos();
   const [ultimaVisita] = useState(() => (typeof window === 'undefined' ? null : registrarVisitaHome()));
-  const novos = useQuery({ queryKey: ['home-novos'], queryFn: () => buscarSite({ ...HOME_NOVOS }), staleTime: 180000 });
+  const novos = useQuery({ queryKey: ['home-novos'], queryFn: () => buscarSite({ ...HOME_NOVOS }), staleTime: 180000, retry: 3, retryDelay: (n) => 800 * (n + 1) });
   const ate700 = useQuery({ queryKey: ['home-ate700'], queryFn: () => buscarSite({ secao: 'imoveis', cidade: 'Porto Alegre', ordem: 'recentes', precoMax: 700000, limit: 5 }), staleTime: 180000 });
   const categorias = categorias3dVisiveis(novos.data?.categorias ?? {}, novos.data?.tipos ?? {}, (novos.data as any)?.comodidades ?? {});
   useEffect(() => { document.documentElement.classList.add('uh-home-vitrine'); return () => document.documentElement.classList.remove('uh-home-vitrine'); }, []);

@@ -1,0 +1,1 @@
+DO $do$ BEGIN EXECUTE replace(pg_get_functiondef('public.busca_site'::regproc), 'i.fotos IS NOT NULL AND i.fotos<>''[]''::jsonb AND ', ''); END $do$;

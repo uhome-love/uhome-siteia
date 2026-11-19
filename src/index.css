@@ -313,7 +313,7 @@ html { scroll-behavior: smooth; }
 
 :root { --uh-header-height: 80px; --uh-bottom-height: 0px; }
 .uhs-site-header{position:fixed;inset:0 0 auto;z-index:var(--camada-cabecalho);background:var(--surface)}
-.uhs-desktop-tabs{display:flex;align-items:center;gap:4px}
+.uhs-desktop-tabs{display:flex;align-items:center;gap:4px;position:absolute;left:50%;transform:translateX(-50%)}
 .uhs-header-actions{display:flex;align-items:center;gap:8px}
 .uhs-mobile-header,.uhs-bottom-nav{display:none}
 .uhs-header--compact .uhs-header__bar{height:64px}

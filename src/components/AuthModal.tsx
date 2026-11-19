@@ -18,6 +18,14 @@ const emailSchema = z.string().trim().email("E-mail inválido").max(255);
 const senhaSchema = z.string().min(6, "Mínimo 6 caracteres").max(72);
 const nomeSchema = z.string().trim().min(2, "Nome muito curto").max(100);
 
+/** Conta nova com WhatsApp vira lead (mesmo caminho dos formulários → CRM). Sem WhatsApp, não. */
+export async function registrarContaComoLead(nome: string, telefone: string, email?: string) {
+  try {
+    const { submitLead } = await import("@/services/leads");
+    await submitLead({ nome, telefone, email, tipo_interesse: "conta_criada", origem_componente: "cadastro", formulario: "Conta criada" });
+  } catch { /* a conta já foi criada; o lead não bloqueia */ }
+}
+
 const MAX_ATTEMPTS = 5;
 const LOCKOUT_MS = 60_000; // 1 min
 
@@ -40,6 +48,7 @@ export const AuthModal = forwardRef<HTMLDivElement, Props>(function AuthModal({ 
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [nome, setNome] = useState("");
+  const [telefone, setTelefone] = useState("");
   const [loading, setLoading] = useState(false);
   const [attempts, setAttempts] = useState(0);
   const [lockedUntil, setLockedUntil] = useState(0);
@@ -124,12 +133,18 @@ export const AuthModal = forwardRef<HTMLDivElement, Props>(function AuthModal({ 
       return;
     }
 
+    const fone = telefone.replace(/\D/g, "").replace(/^55(?=\d{10,11}$)/, "");
+    if (fone && (fone.length < 10 || fone.length > 11)) {
+      toast.error("WhatsApp inválido (DDD + número)");
+      return;
+    }
+
     setLoading(true);
     const { error } = await supabase.auth.signUp({
       email: emailResult.data,
       password: senha,
       options: {
-        data: { nome: nomeResult.data },
+        data: { nome: nomeResult.data, ...(fone ? { telefone: fone } : {}) },
         emailRedirectTo: window.location.origin,
       },
     });
@@ -138,6 +153,7 @@ export const AuthModal = forwardRef<HTMLDivElement, Props>(function AuthModal({ 
     if (error) {
       toast.error(error.message);
     } else {
+      if (fone) await registrarContaComoLead(nomeResult.data, fone, emailResult.data);
       toast.success("Conta criada! Verifique seu e-mail para confirmar.");
       onClose();
     }
@@ -267,6 +283,21 @@ export const AuthModal = forwardRef<HTMLDivElement, Props>(function AuthModal({ 
                       maxLength={100}
                       className={inputClass}
                     />
+                  )}
+                  {tab === "cadastro" && (
+                    <div>
+                      <input
+                        value={telefone}
+                        onChange={(e) => setTelefone(e.target.value)}
+                        placeholder="WhatsApp (opcional)"
+                        type="tel"
+                        inputMode="tel"
+                        autoComplete="tel"
+                        maxLength={20}
+                        className={inputClass}
+                      />
+                      <p className="mt-1 font-body text-xs text-muted-foreground">Deixe seu WhatsApp para um corretor te ajudar.</p>
+                    </div>
                   )}
                   <input
                     value={email}

@@ -18,6 +18,7 @@ const LiaChat = lazyRetry(() => import("./components/lia/LiaChat.tsx"));
 
 /** Lia, avisos e janelas só baixam depois da primeira pintura e do carregamento da página, para não disputar com o conteúdo principal. */
 const SalvarNaPasta = lazyRetry(() => import('@/components/favoritos/SalvarNaPasta').then((m) => ({ default: m.SalvarNaPasta })));
+const ConviteWhatsApp = React.lazy(() => import("@/components/ConviteWhatsApp"));
 function DepoisDaPintura({ children }: { children: React.ReactNode }) {
   const [pronta, setPronta] = useState(false);
   useEffect(() => {
@@ -67,6 +68,7 @@ const App = () => (
                 <ExitIntentModal />
                 <LiaChat />
                 <SalvarNaPasta />
+                <Suspense fallback={null}><ConviteWhatsApp /></Suspense>
               </DepoisDaPintura>
             </TooltipProvider>
           </CorretorProvider>

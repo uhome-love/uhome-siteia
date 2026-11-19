@@ -25,6 +25,7 @@ const ADS = {
   whatsapp: `${ADS_ID}/Y4peCLbL6LUdEKOh7pVF`,
   busca_salva: `${ADS_ID}/6VGTCPjR1LsdEKOh7pVF`,
   comparar: `${ADS_ID}/Ay8kCPvR1LsdEKOh7pVF`,
+  conta_criada: `${ADS_ID}/1MUFCN3A0bsdEKOh7pVF`,
 };
 
 /** Valor em reais de cada conversão: visita R$ 100, formulário R$ 50; WhatsApp, busca salva e comparar são secundárias sem valor. */
@@ -37,6 +38,7 @@ export function conversaoDoEvento(event: string, params: Record<string, unknown>
   if (event === "generate_lead") {
     const tipo = String(params.lead_tipo ?? params.lead_source ?? "");
     if (/busca_salva|salvar_busca/i.test(tipo)) return "busca_salva";
+    if (/conta_criada|cadastro/i.test(tipo)) return "conta_criada";
     return /visita|agend/i.test(tipo) ? "visita" : "lead";
   }
   if (event === "click_whatsapp") return "whatsapp";

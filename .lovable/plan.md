@@ -1,25 +1,15 @@
-# Home no celular: primeira tela pronta (passo 3)
+# Urgente: busca dando "Não foi possível carregar os imóveis"
 
-## Evolução no celular (laboratório, maior elemento)
-10,0 s → 5,4 s → 4,6 s. Pulo da página 0,03 (bom). No computador: 1,1 s (bom, nada a fazer agora).
-
-O que sobra no celular:
-- A foto chega em ~0,9 s, mas só aparece ~1 s depois, porque o card só é desenhado quando todo o código do site termina de carregar.
-- 260 KB de código não usado na primeira tela.
+## O que encontrei
+- O clique no ícone 3D funciona e abre a busca certa (ex.: Garden, Novidades). O que falha é a lista de imóveis: o banco está estourando o tempo limite e devolve erro, inclusive na busca sem filtro.
+- A causa é a contagem de imóveis e os pinos do mapa: essas duas consultas abrem o pacote inteiro de fotos de cada imóvel (~20 mil) só para conferir se ele tem foto. Cada uma leva ~7,5 s, e com várias rodando ao mesmo tempo o banco fica ocupado e a busca principal também cai.
+- Testei a mesma contagem conferindo só a foto principal: 0,14 s (50 vezes mais rápido) e o mesmo resultado (imóveis sem foto continuam escondidos).
 
 ## O que vou fazer
-1. Primeira tela pronta da Home nova (como a busca já tem): o servidor manda pronto no HTML o topo do celular, "Você e seu novo lar.", a pílula de busca, os ícones 3D e o 1º card de "Novos no site" com a foto. Atualizada a cada 3 min junto com o que já existe.
-2. Gerada a partir da Home real renderizada, para ficar idêntica; a troca para a Home de verdade acontece no mesmo quadro, sem piscar e sem pular (mesmo mecanismo da busca).
-3. Só no celular (até 1023 px) e só para quem tem a versão nova do site; versões antigas descartam a prévia sozinhas.
-4. Sem a tela de abertura por cima (já resolvido na rodada anterior).
-5. Conferir com Playwright em 390 px: foto visível antes do código principal, sem piscar, sem pulo; tocar na pílula e nos ícones funciona logo após a troca. Depois você publica e mede.
-
-## Fora do escopo
-- Cortar os 260 KB de código não usado (rodada separada, mexe no início de todo o site).
-- Visual da Home não muda.
+1. Trocar a verificação de foto nessas duas consultas (contagem e pinos do mapa) para usar a foto principal, como a busca principal já faz. Nenhuma mudança visual.
+2. Conferir na hora: consultas voltam abaixo de 1 s e a busca para de dar erro.
+3. Testar no site oficial: clicar em Garden, Novidades e mais 2 ícones no celular e no computador, todos mostrando imóveis.
+4. Depois retomo o plano da primeira tela pronta da Home.
 
 ## Detalhes técnicos
-- `site-dobra`: `calcularHome` gera `preV3` para lar-1 com `data-uh-alvo=".home-fileira .catalog-photo img"` e `data-uh-max="1023"`, foto via `fotoCardApp`; protegido por `meta uh-home-layout=lar-1` (o script `lar` passa a remover só o molde antigo).
-- Molde extraído do DOM renderizado em 390 px (`moldes-home-v1.ts`), placeholders para título/preço/foto/bairro.
-- App: `HomeVitrine` já usa `__UH_HOME_NOVOS__`; garantir mesma URL/dimensões da foto do 1º card.
-- Deploy `site-dobra` + teste de paridade (molde × card do app).
+- Migration: `count_imoveis` e `get_map_pins` com `coalesce(i.foto_principal,'') <> ''` no lugar de `i.fotos IS NOT NULL AND i.fotos::text != '[]'`; assinaturas, grants e o resto iguais.

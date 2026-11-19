@@ -16,12 +16,18 @@ export function buscarCedo(filtros: Record<string, unknown>) {
 }
 /** Fileira "Novos no site" da Home: mesmo objeto (mesma chave) no início do site e na página. */
 export const HOME_NOVOS = { secao: 'imoveis', cidade: 'Porto Alegre', ordem: 'recentes', novidades: 30, limit: 5 } as const;
+/** Dados de "Novos no site" já vindos no HTML: a Home usa sem nova consulta. */
+export function usarSementeHome(semente: unknown) { const k = JSON.stringify({ ...HOME_NOVOS }); pedidosCedo.set(k, Promise.resolve(semente)); setTimeout(() => pedidosCedo.delete(k), 20000); }
 /** Na busca, pede os imóveis junto com o resto do site, sem esperar a página carregar. */
 export function iniciarBuscaCedo() {
   try {
     const path = location.pathname.replace(/^\/c\/[^/]+/, '');
     const preset = BUSCA_URLS[path as keyof typeof BUSCA_URLS] as { filtros?: Record<string, unknown> } | undefined;
-    if (path === '/') { buscarCedo({ ...HOME_NOVOS }); return; }
+    if (path === '/') {
+      const semente = (window as any).__UH_HOME_NOVOS__;
+      if (semente?.rows?.length) { usarSementeHome(semente); return; }
+      buscarCedo({ ...HOME_NOVOS }); return;
+    }
     if (path !== '/busca' && !preset) return;
     const params = new URLSearchParams(location.search);
     if (params.get('modo') === 'ia') return;

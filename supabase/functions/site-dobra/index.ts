@@ -82,6 +82,16 @@ function cardFotoUrl(src: string): string {
   return u.toString();
 }
 
+/** Exatamente cardFotoUrl do app (480x432 q62), sem depender de UH_FOTO_CARD. */
+function fotoCardApp(src: string): string {
+  const local = (miniaturas as Record<string,string>)[src];
+  if (local) return local;
+  if (!searchImageUrl(src, 480).startsWith("https://wsrv.nl/")) return searchImageUrl(src, 480);
+  const u = new URL("https://wsrv.nl/");
+  u.search = new URLSearchParams({ url: src, w: "480", h: "432", fit: "cover", output: "webp", q: "62" }).toString();
+  return u.toString();
+}
+
 async function calcularBusca() {
   const [{ data }, { data: count }] = await Promise.all([
     supabase.from("imoveis").select(LISTING_COLUMNS)
@@ -147,7 +157,14 @@ async function calcularHome() {
   const totalTxt = total ? `${(Math.floor(total / 100) * 100).toLocaleString("pt-BR")}+` : "milhares de";
   const pre = `<div id="uh-pre" data-uh-alvo="[data-uh-capa]"><div class="min-h-screen bg-background">${NAV.replace("{{DESTAQUE}}", linkDestaque(camps))}<main>${HERO.replace("{{TOTAL}}", totalTxt).replace("{{BOTAO}}", botao)}</main></div></div>`;
   // Título em Montserrat 800 já na primeira pintura (mesmo tamanho do título do app).
-  return { head: `<link rel="preload" href="/fonts/mont-800.woff2" as="font" type="font/woff2" crossorigin>`, pre, script: `window.__UH_DOBRA__=${json({ campanhas: camps, total })};` };
+  // Home nova: 1ª foto de "Novos no site" anunciada no HTML + dados prontos (mesmo pedido de HOME_NOVOS em src/lib/buscaCedo.ts).
+  let fotoHead = "", novos = "";
+  try {
+    const { data, error } = await supabase.rpc("busca_site", { p: { secao: "imoveis", cidade: "Porto Alegre", ordem: "recentes", novidades: 30, limit: 5 } });
+    const f = !error && data?.rows?.[0]?.foto_principal;
+    if (f) { fotoHead = `<link rel="preload" as="image" fetchpriority="high" href="${esc(fotoCardApp(f))}">`; novos = `window.__UH_HOME_NOVOS__=${json(data)};`; }
+  } catch (e) { console.error("home novos", e); }
+  return { head: `<link rel="preload" href="/fonts/mont-800.woff2" as="font" type="font/woff2" crossorigin>${fotoHead}`, pre, script: `window.__UH_DOBRA__=${json({ campanhas: camps, total })};${novos}` };
 }
 
 // ---------- Busca: 4 primeiros cards (SearchPropertyCard, celular) ----------

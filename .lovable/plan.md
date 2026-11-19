@@ -39,3 +39,13 @@ Um documento de auditoria com o placar de cada anúncio e de cada página, e a l
 - Google Ads via mutate: grupos e palavras-chave, negativas e RSAs. Conferir o vínculo das conversões com gtag `send_to` e a deduplicação.
 - gclid/gbraid guardados na chegada (session) e enviados ao contexto do lead e ao CRM, para depois subir a conversão offline.
 - É preciso publicar o site antes de mexer nos anúncios.
+
+## 6. Busca abre mais leve no celular
+Hoje, 75% das visitas veem a foto principal em até 4,5 s. A meta é 2,5 s.
+- Medir o que a busca baixa ao abrir, peça por peça, na versão final do site.
+- Deixar para depois da primeira tela o que não aparece nela: filtros completos, mapa, "Salvar busca", calendário, Lia e as medições.
+- Cortar bibliotecas pesadas que a primeira tela não usa, e o que a busca baixa duas vezes.
+- Medir de novo no celular simulado lento e comparar com 3,8 s.
+- Depois de publicar, medir com os visitantes reais.
+
+Detalhes técnicos: analisar o bundle de /busca (vite build + rollup visualizer em /tmp). Usar import dinâmico para SearchFilterDialog, BuscaEtapas, SalvarBusca e framer-motion onde estiver na rota. Conferir que o cliente do banco continua fora da entrada. Sem manualChunks.

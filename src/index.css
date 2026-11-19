@@ -699,3 +699,10 @@ body:has(.gaveta-mapa) .aviso-cookies{display:none}
 .busca-etapas .filtro-rodape{background:hsl(var(--background))}
 /* Lia some enquanto um painel (filtros, busca) está aberto */
 body[data-scroll-locked] .uhs-lia-float{display:none!important}
+
+/* Movimento padrão (Airbnb): uma curva só, leve afundar ao toque */
+:root{--ease-padrao:cubic-bezier(.2,0,0,1);--dur-curta:200ms}
+.catalog-card,.home-categoria,.home-filtros,.pilula-compacta,.uhs-busca-celular,.busca-etapa--fechada,.filtro-mostrar{transition:transform var(--dur-curta) var(--ease-padrao),box-shadow var(--dur-curta) var(--ease-padrao)}
+.catalog-card:active,.home-categoria:active,.home-filtros:active,.pilula-compacta:active,.uhs-busca-celular:active,.busca-etapa--fechada:active,.filtro-mostrar:active{transform:scale(.97)}
+.catalog-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}.catalog-chips span{font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;background:hsl(var(--muted));color:hsl(var(--muted-foreground))}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}

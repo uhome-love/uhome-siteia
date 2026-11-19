@@ -317,7 +317,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
       });
 
       map.addControl(new mb.default.NavigationControl({ showCompass: false }), "top-right");
-      map.on("style.load", () => { for (const l of map.getStyle().layers ?? []) { if (/poi|transit/.test(l.id) && l.type === "symbol") map.setLayoutProperty(l.id, "visibility", "none"); if (l.type === "fill" && /^water/.test(l.id)) map.setPaintProperty(l.id, "fill-color", "#CDE6F2"); if (l.type === "fill" && /landuse|park|national-park/.test(l.id)) map.setPaintProperty(l.id, "fill-color", "#E3EFD9"); if (l.type === "background") map.setPaintProperty(l.id, "background-color", "#F5F3EF"); } });
+      map.on("style.load", () => { for (const l of map.getStyle().layers ?? []) { if (/poi|transit/.test(l.id) && l.type === "symbol") { if (l.id === "poi-label") { map.setFilter(l.id, ["match", ["get", "class"], ["education", "food_and_drink_stores", "park_like", "medical"], true, false]); map.setPaintProperty(l.id, "text-opacity", 0.7); map.setPaintProperty(l.id, "icon-opacity", 0.6); } else if (l.id === "transit-label") map.setPaintProperty(l.id, "text-opacity", 0.6); else map.setLayoutProperty(l.id, "visibility", "none"); } if (l.type === "fill" && /^water/.test(l.id)) map.setPaintProperty(l.id, "fill-color", "#CDE6F2"); if (l.type === "fill" && /landuse|park|national-park/.test(l.id)) map.setPaintProperty(l.id, "fill-color", "#E3EFD9"); if (l.type === "background") map.setPaintProperty(l.id, "background-color", "#F5F3EF"); } });
 
     map.on("load", () => {
       // Cluster settings — lower maxZoom/radius to show price pins earlier
@@ -407,7 +407,7 @@ export function SearchMap({ pins = [], hoveredId, onPinHover, onBoundsSearch, on
           "icon-ignore-placement": true,
           "text-field": ["get", "preco_label"],
           "text-font": ["DIN Pro Bold", "Arial Unicode MS Bold"],
-          "text-size": 14.5,
+          "text-size": 15.5,
           "text-allow-overlap": true,
           "text-ignore-placement": true,
           "text-anchor": "center",

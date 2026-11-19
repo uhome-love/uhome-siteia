@@ -49,15 +49,17 @@ function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
+const NOME_TIPO: Record<string, string> = { casa_condominio: "Casa em condomínio", sala_comercial: "Sala comercial" };
+const nomeTipo = (t: string) => NOME_TIPO[t] ?? capitalize(t.replace(/_/g, " "));
 function gerarTitulo(j: any, tipo: string, bairro: string): string {
   const finalidade = mapFinalidade(j.finalidade || j.operacao || j.contrato);
   const label = finalidade === "locacao" ? "para Alugar" : "para Venda";
   const quartos = j.dormitorios ?? j.quartos ?? j.bedrooms;
   if (quartos && Number(quartos) > 0) {
     const q = Number(quartos);
-    return `${capitalize(tipo)} ${q} quarto${q > 1 ? "s" : ""} — ${bairro}`;
+    return `${nomeTipo(tipo)} ${q} quarto${q > 1 ? "s" : ""} — ${bairro}`;
   }
-  return `${capitalize(tipo)} ${label} — ${bairro}`;
+  return `${nomeTipo(tipo)} ${label} — ${bairro}`;
 }
 
 function mapStatus(s?: string): string {

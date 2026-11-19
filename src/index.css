@@ -481,7 +481,7 @@ body:has(.search-filter-dialog[data-state=open]) [aria-label="Preferências de p
 .fotos-card-pontos{position:absolute;bottom:10px;left:0;right:0;display:flex;justify-content:center;gap:5px;pointer-events:none;z-index:2}
 .fotos-card-pontos span{width:6px;height:6px;border-radius:999px;background:hsl(var(--background)/.6)}
 .fotos-card-pontos span[data-ativo]{background:hsl(var(--background))}
-@media(hover:none){.fotos-card-seta{display:none}}
+@media(hover:none){.fotos-card-seta{display:none}.home-trilho .fotos-card-seta,.gaveta-trilho .fotos-card-seta{display:inline-flex;opacity:1;width:28px!important;height:28px!important}}.home-trilho .fotos-card,.gaveta-trilho .fotos-card{touch-action:auto}
 .fotos-card>a{position:absolute;inset:0}
 
 /* Painel de filtros padrão Airbnb */
@@ -676,3 +676,5 @@ body:has(.gaveta-mapa) .aviso-cookies{display:none}
 .mapa-carregando span{position:absolute;inset:0 auto 0 0;width:35%;background:hsl(var(--foreground));border-radius:2px;animation:mapa-carga 1s ease-in-out infinite}
 @keyframes mapa-carga{0%{transform:translateX(-100%)}100%{transform:translateX(300%)}}
 @media(max-width:639px){.uhs-mobile-header--oculto{display:none!important}}
+/* Pontas do preço sempre por cima do gráfico e com área de toque de 44px */
+.filtro-slider{z-index:3}.filtro-slider-ponta::before{content:"";position:absolute;inset:-7px;border-radius:999px}

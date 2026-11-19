@@ -40,3 +40,14 @@
 - Quantos leads do site viraram visita ou venda no CRM.
 - Separação celular × computador dentro dos anúncios.
 - Se o tráfego direto tem robôs.
+
+## Sua ideia: cada ícone 3D como destino dos anúncios
+**Concordo, e ela encaixa no que já começamos.** Cada ícone 3D já abre uma busca pronta, com os mesmos filtros e o mesmo endereço. Então cada ícone pode ser a página de chegada de um grupo de anúncio. A pessoa que busca "studio porto alegre" cai direto na lista de studios, não numa página genérica. Isso tende a subir a nota de qualidade e a conversão.
+
+Como fazer:
+- Para cada ícone (Apartamentos garden, Studios, Casas em condomínio, Coberturas, Terrenos, Lançamentos e os demais), ligar um grupo de anúncio com palavras daquela intenção. Exemplos: "apartamento garden porto alegre", "cobertura à venda porto alegre", "casa em condomínio canoas". O anúncio leva ao endereço do ícone.
+- Juntar com os 5 grupos criados hoje, sem duplicar: Casas e Coberturas já existem e só passam a usar o mesmo endereço do ícone.
+- **Studios:** testar o ícone Studios, que é uma lista real de studios, como destino, no lugar da página `/investir-studios`. Isso ataca direto a nota 4.
+- "Novidades" não vira anúncio, porque não é algo que as pessoas buscam.
+- Os anúncios só usam categorias com imóveis suficientes, a mesma regra de 8 que o site já usa. Assim ninguém cai numa lista vazia.
+- Medir por ícone: quantas pessoas chegaram por anúncio, quantas abriram um imóvel e quantas pediram contato.

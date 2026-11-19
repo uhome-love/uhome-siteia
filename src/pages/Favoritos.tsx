@@ -6,8 +6,8 @@ import { SearchPropertyCard } from "@/components/SearchPropertyCard";
 import { useAuth } from "@/hooks/useAuth";
 import { useFavoritos } from "@/hooks/useFavoritos";
 import { supabase } from "@/integrations/supabase/client";
-import { type Imovel } from "@/services/imoveis";
-import { CalendarDays, FolderPlus, Heart, Loader2, Pencil, Share2, Trash2 } from "lucide-react";
+import { type Imovel, formatPreco } from "@/services/imoveis";
+import { CalendarDays, Columns3, FolderPlus, Heart, Loader2, Pencil, Share2, Trash2 } from "lucide-react";
 import { useProdutosFoco } from "@/lib/produtosFoco";
 import { ProdutoFocoCard } from "@/components/foco/FocoShared";
 import { PriceNotice } from '@/components/search/PriceNotice';
@@ -89,6 +89,7 @@ function MeusFavoritos() {
   const [escolher, setEscolher] = useState<string | null>(params.get("escolher"));
   const [visitas, setVisitas] = useState<Set<string>>(new Set());
   const [agendar, setAgendar] = useState(false);
+  const [comparar, setComparar] = useState(false);
   const { data: produtosFoco = [] } = useProdutosFoco();
   const [focoSalvos] = useState<string[]>(() => { try { return JSON.parse(localStorage.getItem("uh-foco-favoritos") ?? "[]"); } catch { return []; } });
   const empreendimentos = produtosFoco.filter(p => focoSalvos.includes(p.slug));
@@ -133,6 +134,7 @@ function MeusFavoritos() {
         <div className="mt-4 flex flex-wrap gap-2">
           {lista.length > 0 && <button className={chip(false)} onClick={compartilhar}><Share2 className="h-5 w-5" /> Compartilhar</button>}
           {selecionados.length > 0 && <button className="inline-flex min-h-[44px] items-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground" onClick={() => setAgendar(true)}><CalendarDays className="h-5 w-5" /> Agendar {selecionados.length} {selecionados.length === 1 ? "visita" : "visitas"}</button>}
+          {selecionados.length >= 2 && selecionados.length <= 3 && <button className={chip(false)} onClick={() => setComparar(true)}><Columns3 className="h-5 w-5" /> Comparar {selecionados.length}</button>}
           {pastaAtiva && <><button className={chip(false)} onClick={renomear}><Pencil className="h-4 w-4" /> Renomear</button><button className={chip(false)} onClick={apagar}><Trash2 className="h-4 w-4" /> Apagar pasta</button></>}
         </div>
 
@@ -173,6 +175,13 @@ function MeusFavoritos() {
         </DialogContent>
       </Dialog>
 
+      <Dialog open={comparar} onOpenChange={setComparar}>
+        <DialogContent className="max-h-[90vh] max-w-3xl overflow-auto"><DialogHeader><DialogTitle>Comparar imóveis</DialogTitle></DialogHeader>
+          <table className="w-full text-left text-sm"><thead><tr><th className="p-2" />{selecionados.map(m => <th key={m.id} className="p-2 align-top font-bold"><Link to={`/imovel/${m.slug}`} className="hover:underline">{m.titulo}</Link></th>)}</tr></thead>
+            <tbody>{linhasComparacao.map(([rotulo, f]) => <tr key={rotulo} className="border-t border-border"><th className="p-2 font-semibold text-muted-foreground">{rotulo}</th>{selecionados.map(m => <td key={m.id} className="p-2">{f(m)}</td>)}</tr>)}</tbody></table>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={agendar} onOpenChange={setAgendar}>
         <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto"><DialogHeader><DialogTitle>Agendar visitas</DialogTitle></DialogHeader>
           {selecionados.map(m => <section key={m.id} className="border-b border-border pb-4 last:border-0"><h3 className="mb-2 text-sm font-bold">{m.titulo}</h3><AgendamentoVisita imovelId={m.id} imovelSlug={m.slug} imovelTitulo={m.titulo} imovelBairro={m.bairro} imovelPreco={m.preco} /></section>)}
@@ -181,5 +190,16 @@ function MeusFavoritos() {
     </div>
   );
 }
+
+const FASES: Record<string, string> = { novo: 'Pronto', usado: 'Pronto', na_planta: 'Na planta', em_construcao: 'Em obras' };
+const linhasComparacao: [string, (m: Imovel) => string][] = [
+  ['Preço', m => formatPreco(m.preco)],
+  ['Área privativa', m => (m.area_util ?? m.area_total) ? `${Number(m.area_util ?? m.area_total).toLocaleString('pt-BR')} m²` : '—'],
+  ['Quartos', m => m.quartos ? String(m.quartos) : '—'],
+  ['Vagas', m => m.vagas ? String(m.vagas) : '—'],
+  ['Bairro', m => [m.bairro, m.cidade].filter(Boolean).join(', ')],
+  ['Condomínio', m => (m as any).preco_condominio ? formatPreco((m as any).preco_condominio) : '—'],
+  ['Fase', m => FASES[(m as any).fase] ?? '—'],
+];
 
 export default Favoritos;

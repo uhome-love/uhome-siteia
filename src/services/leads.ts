@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabaseLazy";
-import { getSessionId, getTrackingData, classifyOrigemCanal, getCorretorRef, getCorretorRefId, setLeadIdentity } from "@/lib/session";
+import { getSessionId, getTrackingData, classifyOrigemCanal, getCorretorRef, getCorretorRefId, setLeadIdentity, getUltimoEnvio } from "@/lib/session";
 import { getVisitorId } from "@/lib/visitor";
 import { postJourney, trackEvent } from "@/lib/trackEvent";
 import { trackGenerateLead } from "@/lib/gtag";
@@ -76,7 +76,7 @@ export async function submitLead(data: LeadData) {
     corretor_ref_id,
     corretor_ref_slug: refSlug || null,
     origem_ref: rastreio.colunas.origem_ref,
-    contexto: { ...(data.contexto ?? {}), ...rastreio.contexto },
+    contexto: { ...(data.contexto ?? {}), ...rastreio.contexto, ...(getUltimoEnvio() ? { retorno_envio: getUltimoEnvio() } : {}) },
   };
 
   const pedido = (data.contexto?.pedido as Record<string, unknown> | undefined) || {};

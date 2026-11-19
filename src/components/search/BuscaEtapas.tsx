@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Search, X } from 'lucide-react';
+import { Search, X, History } from 'lucide-react';
+import { lerBuscas, limparBuscas, type BuscaRecente } from '@/lib/buscasRecentes';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { FiltroSecoes, useContagem, TIPOS_PAINEL, reais } from './SearchFilterDialog';
@@ -24,13 +25,16 @@ export function BuscaEtapas({ open, onClose, filtros, onApply }: { open: boolean
   const { result, loading } = useContagem(draft, open);
   const i = ETAPAS.findIndex((e) => e.id === etapa), ultima = i === ETAPAS.length - 1;
   const buscar = () => { onApply(draft); onClose(); };
+  const [recentes, setRecentes] = useState<BuscaRecente[]>([]);
+  useEffect(() => { if (open) setRecentes(lerBuscas()); }, [open]);
+  const repetir = (b: BuscaRecente) => { onApply({ secao: 'imoveis', cidade: '', ordem: 'recentes', ...b.filtros }); onClose(); };
   return <Dialog open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
     <DialogContent className="busca-etapas [&>button:last-child]:hidden">
       <DialogTitle className="sr-only">Buscar imóveis</DialogTitle>
       <div className="busca-etapas-topo"><button type="button" aria-label="Fechar" className="busca-etapas-fechar" onClick={onClose}><X /></button></div>
       <div className="busca-etapas-corpo">
         {ETAPAS.map((e) => e.id === etapa
-          ? <section key={e.id} className="busca-etapa busca-etapa--aberta" data-etapa={e.id}><h2>{e.titulo}</h2><FiltroSecoes draft={draft} setDraft={setDraft} result={result} secoes={e.secoes} autoFocoOnde={e.id === 'onde'} /></section>
+          ? <section key={e.id} className="busca-etapa busca-etapa--aberta" data-etapa={e.id}><h2>{e.titulo}</h2>{e.id === 'onde' && recentes.length > 0 && <div className="busca-recentes"><div className="busca-recentes-topo"><span>Buscas recentes</span><button type="button" onClick={() => { limparBuscas(); setRecentes([]); }}>Limpar</button></div>{recentes.map((b) => <button key={b.em} type="button" className="busca-recente" onClick={() => repetir(b)}><History />{b.rotulo}</button>)}</div>}<FiltroSecoes draft={draft} setDraft={setDraft} result={result} secoes={e.secoes} autoFocoOnde={e.id === 'onde'} /></section>
           : <button key={e.id} type="button" className="busca-etapa busca-etapa--fechada" data-etapa={e.id} onClick={() => setEtapa(e.id)}><span>{e.rotulo}</span><strong>{resumoEtapa(e.id, draft)}</strong></button>)}
       </div>
       <div className="filtro-rodape"><button type="button" className="filtro-limpar" onClick={() => { setDraft({ secao: draft.secao || 'imoveis', cidade: '', ordem: 'recentes' }); setEtapa('onde'); }}>Limpar tudo</button>

@@ -8,10 +8,11 @@ import { instalarRastreioWhatsApp } from "./services/whatsappTracker";
 import App from "./App.tsx";
 import { iniciarBuscaCedo } from "./lib/buscaCedo";
 import { instalarJornada } from "./lib/journeyBrowser";
-import { initGA4 } from "./lib/gtag";
+import { initGA4, initMeta } from "./lib/gtag";
 performance.mark("uh-app-evaluation");
 iniciarBuscaCedo();
 initGA4();
+initMeta();
 
 // Capture UTMs + referrer on first page load (first-touch attribution)
 captureUtmParams();

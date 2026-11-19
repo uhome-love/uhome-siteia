@@ -13,6 +13,7 @@ declare global {
 function push(event: string, params: Record<string, unknown> = {}) {
   void canTrack("analytics").then(allowed => { if (allowed) window.gtag?.("event", event, params); });
   reportAdsConversion(event, params);
+  metaEvent(event, params);
 }
 
 /* Google Ads (conta Site Uhome) */
@@ -141,4 +142,29 @@ export function journeyMediaEvent(name: string, params: Record<string, unknown> 
     fbq?.("trackCustom", name, params);
     window.gtag?.("event", name, { ...params, send_to: ADS_ID });
   });
+}
+
+/* Pixel da Meta: vazio = desligado. Carrega só com "Aceitar" (anúncios), depois da página pronta e nunca para robôs. */
+export const META_PIXEL_ID = "";
+const META_EVENTOS: Record<string, string> = { imovel_visto: "ViewContent", imovel_visualizado: "ViewContent", busca_feita: "Search", busca_realizada: "Search", favorito_salvo: "AddToWishlist", visita_pedida: "Schedule", formulario_enviado: "Lead", generate_lead: "Lead" };
+/** Nome do evento padrão da Meta para um evento do site (ou null). */
+export function eventoMeta(tipo: string): string | null { return META_EVENTOS[tipo] ?? null; }
+type Fbq = ((...a: unknown[]) => void) & { queue?: unknown[]; loaded?: boolean; version?: string; push?: unknown; callMethod?: (...a: unknown[]) => void };
+export function initMeta(id = META_PIXEL_ID) {
+  if (!id || typeof window === "undefined" || /lovableproject\.com|localhost/.test(location.hostname) || isBotBrowser()) return;
+  const carregar = async () => {
+    if (!(await canTrack("advertising")) || document.querySelector("script[data-uhome-meta]")) return;
+    const w = window as unknown as { fbq?: Fbq; _fbq?: Fbq };
+    if (!w.fbq) { const f = function (...a: unknown[]) { f.callMethod ? f.callMethod(...a) : f.queue!.push(a); } as Fbq; f.queue = []; f.loaded = true; f.version = "2.0"; f.push = f; w.fbq = f; w._fbq = f; }
+    const s = document.createElement("script"); s.async = true; s.dataset.uhomeMeta = "true"; s.src = "https://connect.facebook.net/en_US/fbevents.js"; document.head.appendChild(s);
+    w.fbq!("init", id); w.fbq!("track", "PageView");
+  };
+  const depois = () => setTimeout(carregar, 2000);
+  if (document.readyState === "complete") depois(); else addEventListener("load", depois, { once: true });
+  onConsentChange(() => { void carregar(); });
+}
+/** Evento padrão da Meta, só com consentimento de anúncios e pixel carregado. */
+export function metaEvent(tipo: string, params: Record<string, unknown> = {}) {
+  const nome = eventoMeta(tipo); if (!nome) return;
+  void canTrack("advertising").then(ok => { if (!ok) return; (window as unknown as { fbq?: Fbq }).fbq?.("track", nome, params); });
 }

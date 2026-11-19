@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { SlidersHorizontal, ChevronRight } from 'lucide-react';
+import { SlidersHorizontal, ChevronRight, History } from 'lucide-react';
+import { lerBuscas, urlDaBusca } from '@/lib/buscasRecentes';
 import { Button } from '@/components/ui/button';
 import { FaixaRolavel } from '@/components/FaixaRolavel';
 import { PilulaBusca } from '@/components/PilulaBusca';
@@ -26,6 +27,7 @@ function Fileira({ titulo, verTodos, children }: { titulo: React.ReactNode; verT
 function ContinueDeOndeParou() {
   const { prefixLink } = useCorretor();
   const ids = useMemo(() => { try { return (JSON.parse(localStorage.getItem('imoveis_vistos') || '[]') as unknown[]).filter((v): v is string => typeof v === 'string').slice(-3).reverse(); } catch { return []; } }, []);
+  const [ultima] = useState(() => lerBuscas()[0]);
   const { data = [] } = useQuery({
     queryKey: ['home-vistos', ids], enabled: ids.length > 0, staleTime: 300000,
     queryFn: async () => {
@@ -33,10 +35,11 @@ function ContinueDeOndeParou() {
       return ids.map((id) => (data ?? []).find((r: any) => r.id === id)).filter(Boolean) as any[];
     },
   });
-  if (!data.length) return null;
+  if (!data.length && !ultima) return null;
   return (
     <section className="home-fileira">
       <div className="home-fileira-topo"><h2>Continue de onde parou</h2></div>
+      {ultima && <Link to={prefixLink(urlDaBusca(ultima.filtros))} className="busca-recente home-ultima-busca"><History /><span>Sua última busca: <strong>{ultima.rotulo}</strong></span></Link>}
       <div className="home-trilho home-trilho-vistos">
         {data.map((r) => (
           <Link key={r.id} to={prefixLink(`/imovel/${r.slug}`)} className="home-visto">

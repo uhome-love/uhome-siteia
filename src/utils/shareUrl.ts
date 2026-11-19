@@ -13,7 +13,12 @@ export function getShareUrl(slug: string, corretorSlug?: string): string {
   const path = corretorSlug
     ? `/c/${corretorSlug}/imovel/${slug}`
     : `/imovel/${slug}`;
-  return `https://uhome.com.br${path}`;
+  return `https://uhome.com.br${path}${origemCompartilhar(corretorSlug)}`;
+}
+
+/** Origem medida do link compartilhado no WhatsApp (corretor ou visitante). */
+export function origemCompartilhar(corretorSlug?: string): string {
+  return `?utm_source=whatsapp&utm_medium=compartilhar&utm_campaign=${corretorSlug ? 'corretor' : 'visitante'}`;
 }
 
 /**

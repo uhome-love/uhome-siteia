@@ -1,4 +1,4 @@
-import { journeyMediaEvent } from './gtag';
+import { journeyMediaEvent, metaEvent } from './gtag';
 import { canTrack } from './consent';
 import { journeyEnvelope, safePage } from './journeyIdentity';
 import { getCorretorRef, getTrackingData } from './session';
@@ -13,6 +13,7 @@ export async function postJourney(body:Record<string,unknown>) {
  if(!r.ok)throw new Error(`journey ${r.status}`);return r.json();
 }
 export async function trackEvent(params:TrackEventParams){
+ metaEvent(params.tipo,{content_ids:params.imovel_slug?[params.imovel_slug]:undefined,content_type:params.imovel_slug?'home_listing':undefined});
  try {
  if(!(await canTrack('analytics')))return;
  await postJourney({action:'event',event:{event_key:crypto.randomUUID(),tipo:params.tipo,pagina:safePage(),imovel_slug:params.imovel_slug||null,imovel_titulo:params.imovel_titulo||null,dados:{imovel_bairro:params.imovel_bairro,imovel_preco:params.imovel_preco,...params.dados,...(params.busca_filtros?{filtros:params.busca_filtros,secao:'Imóveis'}:{})}},button_key:params.dados?.button_key});

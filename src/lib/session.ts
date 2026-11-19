@@ -31,6 +31,8 @@ export function captureLeadIdentity(): void {
     const tel = params.get('telefone');
     const email = params.get('email');
     if (tel || email) setLeadIdentity({ telefone: tel || undefined, email: email || undefined }, 'link_crm');
+    const envio = params.get('send_id');
+    if (envio && /^[\w-]{1,80}$/.test(envio)) localStorage.setItem('uh_send_id', JSON.stringify({ send_id: envio, utm_campaign: params.get('utm_campaign') || undefined, em: new Date().toISOString() }));
   } catch { /* silent */ }
 }
 
@@ -138,3 +140,6 @@ export function getCorretorRefId(): string | null {
   if (!getCorretorRef()) return null;
   return _cachedId;
 }
+
+/** Último envio do CRM (alerta, campanha) que trouxe a pessoa de volta ao site. */
+export function getUltimoEnvio(): { send_id: string; utm_campaign?: string; em: string } | null { try { return JSON.parse(localStorage.getItem('uh_send_id') || 'null'); } catch { return null; } }

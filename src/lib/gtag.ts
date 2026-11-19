@@ -25,14 +25,23 @@ const ADS = {
   whatsapp: `${ADS_ID}/Y4peCLbL6LUdEKOh7pVF`,
 };
 
+/** Valor em reais de cada conversão: visita R$ 100, formulário R$ 50, WhatsApp sem valor (secundária). */
+export function valorConversao(tipo: "lead" | "visita" | "whatsapp"): number | undefined {
+  return tipo === "visita" ? 100 : tipo === "lead" ? 50 : undefined;
+}
+
 /** Converte eventos do site em conversões do Google Ads. */
 export function reportAdsConversion(event: string, params: Record<string, unknown> = {}) {
-  let send_to: string | undefined;
+  let chave: keyof typeof ADS | undefined;
   if (event === "generate_lead") {
     const tipo = String(params.lead_tipo ?? params.lead_source ?? "");
-    send_to = /visita|agend/i.test(tipo) ? ADS.visita : ADS.lead;
-  } else if (event === "click_whatsapp") send_to = ADS.whatsapp;
-  if (send_to) { const target = send_to; void canTrack("advertising").then(allowed => { if (allowed) window.gtag?.("event", "conversion", { send_to: target }); }); }
+    chave = /visita|agend/i.test(tipo) ? "visita" : "lead";
+  } else if (event === "click_whatsapp") chave = "whatsapp";
+  if (!chave) return;
+  const valor = valorConversao(chave);
+  const id = params.lead_id ?? params.transaction_id;
+  const dados: Record<string, unknown> = { send_to: ADS[chave], ...(valor ? { value: valor, currency: "BRL" } : {}), ...(id ? { transaction_id: String(id) } : {}) };
+  void canTrack("advertising").then(allowed => { if (allowed) window.gtag?.("event", "conversion", dados); });
 }
 
 /** Track form lead submissions */

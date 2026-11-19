@@ -7,7 +7,9 @@
 - [x] Calendário de visita mensal
 - [x] Filtros da Home abre o painel de filtros
 - [ ] Conferir gaveta do mapa e mini card no celular em aparelho real
-- [ ] Home: busca em destaque + atalhos de 1 toque com medição
-- [ ] Google Ads: palavras negativas e auditoria das páginas dos anúncios (documento)
-- [ ] Rastreamento: conferir gclid no lead e conversões com valor
-- [ ] Busca: reduzir JavaScript inicial e adiar o que não está na 1ª tela
+- [x] Home: busca em destaque + atalhos de 1 toque com medição
+- [x] Google Ads: palavras negativas e auditoria das páginas dos anúncios (documento)
+- [x] Rastreamento: conferir gclid no lead e conversões com valor
+- [x] Busca: reduzir JavaScript inicial e adiar o que não está na 1ª tela
+- [ ] Conferir páginas dos anúncios no site publicado (firewall bloqueia o teste daqui)
+- [ ] Trocar lances para 'maximizar conversões' quando houver leads suficientes

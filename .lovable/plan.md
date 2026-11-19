@@ -1,29 +1,19 @@
-# Topo do computador no estilo Airbnb, com o que a Uhome já tem
+# Conta criada vira lead (só com WhatsApp)
 
-## Recomendação: fazer, porque reaproveita o que já criamos
-O topo do Airbnb funciona porque as abas ficam centralizadas, têm ícone 3D e ficam **acima** da busca, sem disputar com ela. O que tínhamos antes era só texto preso à esquerda. Dá para ter o mesmo resultado usando os ícones 3D que já existem.
+## O que muda para o visitante
+- Na tela "Criar conta" aparece o campo **WhatsApp (opcional)**, com a frase "Deixe seu WhatsApp para um corretor te ajudar".
+- Quem entra com Google e ainda não deixou WhatsApp vê, uma única vez depois de entrar, um convite discreto para deixar o número (pode pular).
+- Quem só entra de novo numa conta que já existe não vira lead novo.
 
-```text
-[Logo Uhome]   [casa 3D] Imóveis   [prédio 3D] Lançamentos   [studio 3D] Investir     Anunciar imóvel  [♡] [Entrar] [≡]
-                         ─────
-              [  Onde  |  Tipo  |  Quartos  |  Valor   (Buscar) ]
-                    [foto] Continue sua busca  Canoas · até R$ 800 mil  →
-```
-
-1. **Abas centralizadas com ícone 3D**, só na página inicial e só no computador, antes de rolar:
-   - Imóveis (ícone de apartamento): busca completa.
-   - Lançamentos (ícone de lançamento): na planta e em obras.
-   - Investir (ícone de studio): página de investimento.
-   A aba ativa ganha um sublinhado. Ao rolar, as abas somem e a busca compacta fica no centro, como já está hoje.
-2. **"Anunciar imóvel" à direita**, como o "Torne-se um anfitrião": é o caminho para quem quer vender (página que já existe).
-3. **Faixa "Continue sua busca"** logo abaixo da pílula, para quem já buscou, com a foto do último imóvel visto e o resumo da busca. Um toque retoma a busca. Quem nunca buscou não vê a faixa.
-4. Celular continua igual: só a busca e os ícones 3D.
-
-## Alternativa
-Deixar como está (topo limpo). Também funciona, mas perde o caminho rápido para Lançamentos e Investir na primeira tela do computador.
+## O que acontece por trás
+- Conta nova **com WhatsApp**: vira lead pelo mesmo caminho dos outros formulários, então chega ao CRM na Fila do CEO (ou só adiciona histórico, se a pessoa já tem corretor ativo). Tipo de interesse: "conta_criada".
+- Conta nova **sem WhatsApp**: não vira lead. Só fica registrada a ligação do e-mail com o histórico da pessoa no site.
+- Google Ads: nova conversão secundária **"Conta criada"**, sem valor, que não muda os lances. Ela nunca conta como "Lead site".
+- O lead de cadastro não soma R$ 50 no Google Ads (o valor só conta para formulários de contato de verdade).
 
 ## Detalhes técnicos
-- `Navbar.tsx`: em `uhs-desktop-tabs`, na Home e sem rolar, renderizar as abas com `<img>` 32px de `/categorias/apartamento|lancamento|studio.webp` (lazy, com tamanho fixo); mantendo a `pilula-compacta` ao rolar ou fora da Home. Link "Anunciar imóvel" em `uhs-header-actions` (só a partir de 1024px).
-- `HomeVitrine.tsx`: componente `ContinueSuaBusca` abaixo da `PilulaBusca`, usando `lerBuscas()[0]` + primeira foto de `imoveis_vistos`; evento `categoria_tocada` com `continue_busca`.
-- CSS com tokens existentes; sem mudança de altura que cause salto na tela (reservar a altura da faixa só quando existir busca salva, calculado já na 1ª pintura via localStorage).
-- Validar em 1280/1440 (topo e rolado) e 390 px (sem mudança).
+- `AuthModal.tsx`: campo de telefone validado (10–11 dígitos, opcional), salvo em `options.data.telefone`; quando preenchido, chama `submitLead` (import dinâmico) com `tipo_interesse: 'conta_criada'`, `origem_componente: 'cadastro'`, depois `setLeadIdentity`.
+- Pedido do WhatsApp pós-Google: pequeno aviso lazy, mostrado uma vez quando `created_at` do usuário tem menos de 2 min e não existe telefone; marca em localStorage para não repetir.
+- `gtag.ts`: `conversaoDoEvento` mapeia `conta_criada` para a nova ação secundária, nunca para "lead"; criar a ação "Conta criada" no Google Ads.
+- Teste em `conversoesAds.test.ts`: conta_criada nunca vira lead e não tem valor.
+- Sem teste de envio real de lead (regra do projeto: o agente não envia leads de teste).

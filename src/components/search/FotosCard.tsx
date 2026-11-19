@@ -20,7 +20,7 @@ export function fotosDoCard(id: string, produto: boolean): Promise<string[]> {
     const { data } = await supabase.from('imoveis').select('fotos').eq('id', id).maybeSingle();
     return ((data?.fotos as any[]) ?? []).slice().sort((a, b) => (a?.ordem ?? 0) - (b?.ordem ?? 0)).map((f) => f?.url).filter(Boolean).slice(0, 5);
   })().catch(() => []));
-  return cache.get(id)!;
+  return cache.get(id) ?? Promise.resolve([]);
 }
 
 /** Fotos do card num trilho que desliza com o dedo (1ª foto original intacta). */
@@ -70,7 +70,7 @@ export function FotosCard({ id, produto, titulo, children }: { id: string; produ
         {children}
         {extras.map((u, k) => (
           <div key={u} className="fotos-card-slide" role="link" tabIndex={-1} onClick={abrir}>
-            <img src={cardFotoUrl(u)} alt={`${titulo} - foto ${k + 2}`} loading="lazy" decoding="async" draggable={false} onError={(e) => { if (e.currentTarget.src !== u) e.currentTarget.src = u; }} />
+            <img src={Math.abs(k + 1 - i) <= 1 ? cardFotoUrl(u) : undefined} alt={`${titulo} - foto ${k + 2}`} loading="lazy" decoding="async" draggable={false} onError={(e) => { if (e.currentTarget.src !== u) e.currentTarget.src = u; }} />
           </div>
         ))}
       </div>

@@ -6,7 +6,8 @@ import { Search, X, ChevronDown, Waves, Flame, ChefHat, FlameKindling, Trees, Do
 import { buscarSite, type BuscaSiteResult } from '@/services/buscaSite';
 import { supabase } from '@/lib/supabaseLazy';
 
-export const TIPOS: Record<string, string> = { apartamento: 'Apartamentos', casa: 'Casas', casa_condominio: 'Casas em condomínio', studio: 'Studios', loft: 'Lofts', cobertura: 'Coberturas', garden: 'Garden', terreno: 'Terrenos', comercial: 'Comerciais' };
+import { reais } from './filtroRotulos';
+export { TIPOS, reais } from './filtroRotulos';
 
 /** Tipos do painel (cartões com ícone 3D). Garden inclui apartamento com pátio. */
 export const TIPOS_PAINEL = [
@@ -38,7 +39,6 @@ export const posParaPreco = (p: number) => (p <= 100 ? p * 10_000 : 1_000_000 + 
 export const precoParaPos = (v: number) => (!v ? 0 : v <= 1_000_000 ? Math.round(v / 10_000) : Math.min(POS_MAX, 100 + Math.round((v - 1_000_000) / 50_000)));
 const LARGURA_BALDE = (i: number) => (i < 10 ? 10 : 2);
 const CIDADES = ['Porto Alegre', 'Canoas', 'Cachoeirinha', 'Gravataí', 'Guaíba', 'Capão da Canoa', 'Torres', 'Gramado', 'Canela'];
-export const reais = (v: number) => !v ? 'R$ 0' : v >= 1_000_000 ? `R$ ${(v / 1_000_000).toLocaleString('pt-BR', { maximumFractionDigits: 2 })} mi` : `R$ ${Math.round(v / 1000)} mil`;
 export const listaComodidades = (s?: string) => (s ? String(s).split(',').filter(Boolean) : []);
 export function alternarComodidade(atual: string | undefined, c: string) { const l = listaComodidades(atual); return (l.includes(c) ? l.filter((x) => x !== c) : [...l, c]).join(','); }
 

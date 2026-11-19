@@ -1,0 +1,3 @@
+/** Labels shared by the results and the on-demand filter panel. */
+export const TIPOS: Record<string, string> = { apartamento: 'Apartamentos', casa: 'Casas', casa_condominio: 'Casas em condomínio', studio: 'Studios', loft: 'Lofts', cobertura: 'Coberturas', garden: 'Garden', terreno: 'Terrenos', comercial: 'Comerciais' };
+export const reais = (v: number) => !v ? 'R$ 0' : v >= 1_000_000 ? `R$ ${(v / 1_000_000).toLocaleString('pt-BR', { maximumFractionDigits: 2 })} mi` : `R$ ${Math.round(v / 1000)} mil`;

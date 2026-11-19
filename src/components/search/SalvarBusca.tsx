@@ -3,7 +3,7 @@ import { Bell, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { submitLead } from '@/services/leads';
+
 import { filtrosUteis } from '@/lib/buscasRecentes';
 import { toast } from 'sonner';
 
@@ -15,6 +15,7 @@ export function SalvarBusca({ filtros, rotulo }: { filtros: Record<string, unkno
   const enviar = async () => {
     if (!valido) return; setEnviando(true);
     try {
+      const { submitLead } = await import('@/services/leads');
       await submitLead({ nome: nome.trim(), telefone: digitos, tipo_interesse: 'busca_salva', origem_componente: 'salvar_busca', formulario: 'Salvar busca', origem_pagina: location.pathname + location.search, contexto: { busca_salva: { filtros: filtrosUteis(filtros), descricao: rotulo, url: location.pathname + location.search, aceite_avisos_whatsapp: true } } });
       setFeito(true);
     } catch { toast.error('Não foi possível salvar agora. Tente de novo.'); } finally { setEnviando(false); }

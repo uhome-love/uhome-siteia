@@ -12,6 +12,7 @@ import { buscarSite, categorias3dVisiveis } from '@/services/buscaSite';
 import { formatPreco, type Imovel } from '@/services/imoveis';
 import { supabase } from '@/lib/supabaseLazy';
 import { cardFotoUrl } from '@/lib/searchImages';
+import { HOME_NOVOS } from '@/lib/buscaCedo';
 import { urlCategoria, registrarVisitaHome, novoDesdeVisita } from '@/lib/homeVitrine';
 
 function Fileira({ titulo, verTodos, children }: { titulo: React.ReactNode; verTodos?: string; children: React.ReactNode }) {
@@ -53,7 +54,7 @@ function ContinueDeOndeParou() {
 export function HomeVitrine({ entreFileiras }: { entreFileiras?: React.ReactNode }) {
   const { prefixLink } = useCorretor(); const { isFavorito, toggleFavorito } = useFavoritos();
   const [ultimaVisita] = useState(() => (typeof window === 'undefined' ? null : registrarVisitaHome()));
-  const novos = useQuery({ queryKey: ['home-novos'], queryFn: () => buscarSite({ secao: 'imoveis', cidade: 'Porto Alegre', ordem: 'recentes', novidades: 30, limit: 5 } as any), staleTime: 180000 });
+  const novos = useQuery({ queryKey: ['home-novos'], queryFn: () => buscarSite({ ...HOME_NOVOS }), staleTime: 180000 });
   const ate700 = useQuery({ queryKey: ['home-ate700'], queryFn: () => buscarSite({ secao: 'imoveis', cidade: 'Porto Alegre', ordem: 'recentes', precoMax: 700000, limit: 5 }), staleTime: 180000 });
   const categorias = categorias3dVisiveis(novos.data?.categorias ?? {}, novos.data?.tipos ?? {}, (novos.data as any)?.comodidades ?? {});
   useEffect(() => { document.documentElement.classList.add('uh-home-vitrine'); return () => document.documentElement.classList.remove('uh-home-vitrine'); }, []);
@@ -69,14 +70,14 @@ export function HomeVitrine({ entreFileiras }: { entreFileiras?: React.ReactNode
       </section>
       <nav aria-label="Categorias" className="home-categorias">
         <FaixaRolavel className="home-categorias-trilho" rotulo="categorias">
-          {categorias.map((c) => <Link key={c.id} to={prefixLink(urlCategoria(c.filtros))} className="home-categoria"><img src={c.icone} alt="" width={32} height={32} loading="lazy" decoding="async" /><span>{c.nome}</span></Link>)}
+          {categorias.map((c) => <Link key={c.id} to={prefixLink(urlCategoria(c.filtros))} className="home-categoria"><img src={c.icone.replace('/categorias/', '/categorias/p/')} alt="" width={32} height={32} loading="lazy" decoding="async" /><span>{c.nome}</span></Link>)}
         </FaixaRolavel>
         <Button variant="outline" className="home-filtros" onClick={() => window.dispatchEvent(new Event('uhome:abrir-painel'))}><SlidersHorizontal />Filtros</Button>
       </nav>
       <div className="home-conteudo">
         <ContinueDeOndeParou />
         <Fileira titulo={<>Novos no site<span className="hidden sm:inline"> em Porto Alegre</span></>} verTodos={prefixLink('/busca?novidades=30&ordem=recentes')}>
-          {novos.data ? novos.data.rows.map((r, i) => card(r, i, 0)) : Array.from({ length: 5 }, (_, i) => <div key={i} className="catalog-card"><div className="catalog-photo" /></div>)}
+          {novos.data ? novos.data.rows.map((r, i) => card(r, i, 0)) : Array.from({ length: 5 }, (_, i) => <div key={i} className="catalog-card" aria-hidden="true"><div className="catalog-photo" /><div className="catalog-esqueleto-texto" /></div>)}
         </Fileira>
         {entreFileiras}
         <Fileira titulo="Até R$ 700 mil" verTodos={prefixLink('/busca?preco_max=700000')}>

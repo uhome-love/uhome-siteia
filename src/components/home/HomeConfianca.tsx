@@ -63,7 +63,7 @@ export function HomeConfianca() {
                   <Estrelas n={r.estrelas} />
                   <blockquote className="mt-4 line-clamp-6 flex-1 font-body text-sm leading-relaxed text-foreground">“{r.texto}”</blockquote>
                   <figcaption className="mt-5 flex items-center gap-3">
-                    {r.foto ? <img src={r.foto} alt="" loading="lazy" referrerPolicy="no-referrer" className="h-9 w-9 rounded-full object-cover" /> : <span className="h-9 w-9 rounded-full bg-secondary" />}
+                    {r.foto ? <img src={/googleusercontent\.com/.test(r.foto) ? r.foto.replace(/=s\d+(-[a-z-]+)?$/, "").concat("=s72-c") : r.foto} alt="" width={36} height={36} loading="lazy" decoding="async" referrerPolicy="no-referrer" className="h-9 w-9 rounded-full object-cover" /> : <span className="h-9 w-9 rounded-full bg-secondary" />}
                     <span>
                       <span className="block font-body text-sm font-semibold text-foreground">{r.nome}</span>
                       <span className="block font-body text-xs text-muted-foreground">Avaliação no Google</span>

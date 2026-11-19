@@ -717,3 +717,4 @@ body[data-scroll-locked] .uhs-lia-float{display:none!important}
 .uhs-busca-celular .uhs-busca-linhas small{font-size:12px;font-weight:500;color:hsl(var(--muted-foreground));max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 .mapa-fantasma{background:linear-gradient(135deg,hsl(var(--muted)) 0%,hsl(var(--background)) 50%,hsl(var(--muted)) 100%);background-size:200% 200%;animation:mapa-fantasma 1.6s ease-in-out infinite}@keyframes mapa-fantasma{50%{background-position:100% 100%}}@media (prefers-reduced-motion:reduce){.mapa-fantasma{animation:none}}
+.catalog-esqueleto-texto{height:68px;border-radius:8px;background:var(--foto-vazia);opacity:.5}

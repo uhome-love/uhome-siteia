@@ -14,11 +14,14 @@ export function buscarCedo(filtros: Record<string, unknown>) {
   // Assim que os dados chegam, já baixa a 1ª foto, antes da página desenhar o card.
   pr.then((d: any) => { const f = d?.rows?.[0]?.foto_principal; if (f) { const im = new Image(); (im as any).fetchPriority = 'high'; im.src = cardFotoUrl(f); } }).catch(() => {}); pr.catch(() => pedidosCedo.delete(k)); pedidosCedo.set(k, pr); setTimeout(() => pedidosCedo.delete(k), 20000);
 }
+/** Fileira "Novos no site" da Home: mesmo objeto (mesma chave) no início do site e na página. */
+export const HOME_NOVOS = { secao: 'imoveis', cidade: 'Porto Alegre', ordem: 'recentes', novidades: 30, limit: 5 } as const;
 /** Na busca, pede os imóveis junto com o resto do site, sem esperar a página carregar. */
 export function iniciarBuscaCedo() {
   try {
     const path = location.pathname.replace(/^\/c\/[^/]+/, '');
     const preset = BUSCA_URLS[path as keyof typeof BUSCA_URLS] as { filtros?: Record<string, unknown> } | undefined;
+    if (path === '/') { buscarCedo({ ...HOME_NOVOS }); return; }
     if (path !== '/busca' && !preset) return;
     const params = new URLSearchParams(location.search);
     if (params.get('modo') === 'ia') return;

@@ -115,7 +115,7 @@ gtag("consent", "default", {
 
   <body>
     <style>
-      #uh-splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;background:#fff;opacity:0;animation:uhIn .35s ease .3s forwards;transition:opacity .3s ease}
+      html,body{overflow-x:clip;max-width:100%}#uh-splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;background:#fff;opacity:0;animation:uhIn .35s ease .3s forwards;transition:opacity .3s ease}
       #uh-splash.uh-out{opacity:0!important;animation:none;pointer-events:none}
       #uh-splash img{width:148px;height:auto;animation:uhBreath 1.8s ease-in-out infinite}
       #uh-splash .uh-bar{width:120px;height:3px;border-radius:3px;background:#eef0fb;overflow:hidden;position:relative}

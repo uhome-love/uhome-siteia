@@ -79,11 +79,11 @@ export function HomeCampanhaBanner() {
       {produtos.length > 0 && (
         <div className="mt-5 sm:mt-8">
           <div className="flex items-end justify-between gap-4">
-            <h2 className="flex items-center gap-2 font-heading text-xl font-bold text-foreground sm:text-2xl">
-              {c ? <img src={NATAL_ART.chave} alt="" className="h-5 w-auto" /> : <Sparkles className="h-5 w-5 text-primary" />}
+            <h2 className="flex min-w-0 items-center gap-2 font-heading text-xl font-bold text-foreground sm:text-2xl">
+              {c ? <img src={NATAL_ART.chave} alt="" width={40} height={20} className="h-5 w-10 flex-shrink-0 object-contain" /> : <Sparkles className="h-5 w-5 text-primary" />}
               {c ? "Empreendimentos do Natal" : "Uhome em Foco"}
             </h2>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-shrink-0 items-center gap-2">
               <Link to={prefixLink(linkTodos)} className="whitespace-nowrap font-body text-sm font-semibold text-primary">Ver todos →</Link>
               <button onClick={() => rolar(-1)} aria-label="Anteriores" className="hidden h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-secondary md:flex"><ChevronLeft className="h-4 w-4" /></button>
               <button onClick={() => rolar(1)} aria-label="Próximos" className="hidden h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-secondary md:flex"><ChevronRight className="h-4 w-4" /></button>

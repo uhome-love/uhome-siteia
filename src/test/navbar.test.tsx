@@ -48,10 +48,10 @@ describe("ações do cabeçalho", () => {
     expect(abrir).toHaveBeenCalledTimes(1);
     window.removeEventListener('uhome:abrir-filtros', abrir);
   });
-  it("Lia somente abre por ação", () => {
+  it("topo não abre a Lia sozinho nem tem botão próprio (Lia fica no botão fixo)", () => {
     const abrir = vi.fn(); window.addEventListener("uhome:abrir-lia", abrir);
     renderNavbar(); expect(abrir).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole("button", {name: "Falar com a Lia"}));
-    expect(abrir).toHaveBeenCalledTimes(1); window.removeEventListener("uhome:abrir-lia", abrir);
+    expect(screen.queryByRole("button", {name: "Falar com a Lia"})).toBeNull();
+    window.removeEventListener("uhome:abrir-lia", abrir);
   });
 });

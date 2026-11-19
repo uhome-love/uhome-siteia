@@ -7,16 +7,27 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { FiltroSecoes, useContagem, TIPOS_PAINEL, reais } from './SearchFilterDialog';
 
-type Etapa = 'onde' | 'tipo' | 'valor';
+type Etapa = 'onde' | 'tipo' | 'valor' | 'mais';
 const ETAPAS: { id: Etapa; titulo: string; rotulo: string; secoes: any[] }[] = [
   { id: 'onde', titulo: 'Onde?', rotulo: 'Onde', secoes: ['onde'] },
   { id: 'tipo', titulo: 'Qual tipo?', rotulo: 'Tipo', secoes: ['tipo'] },
   { id: 'valor', titulo: 'Quanto quer investir?', rotulo: 'Valor', secoes: ['preco'] },
+  { id: 'mais', titulo: 'Mais filtros', rotulo: 'Mais filtros', secoes: ['quartos', 'recomendados', 'comodidades', 'area', 'etapa'] },
 ];
 /** Resumo exibido no cartão recolhido de cada etapa. */
 export function resumoEtapa(e: Etapa, f: Record<string, any>): string {
   if (e === 'onde') return f.bairro || f.q || f.cidade || 'Qualquer lugar';
   if (e === 'tipo') { const sel = TIPOS_PAINEL.filter((t) => t.id.split(',').every((k) => String(f.tipo ?? '').split(',').includes(k))); return sel.length ? sel.map((t) => t.nome).join(', ') : 'Qualquer tipo'; }
+  if (e === 'mais') {
+    const p: string[] = [];
+    if (Number(f.quartos) > 0) p.push(`${f.quartos}+ quarto${Number(f.quartos) > 1 ? 's' : ''}`);
+    if (Number(f.banheiros) > 0) p.push(`${f.banheiros}+ banheiro${Number(f.banheiros) > 1 ? 's' : ''}`);
+    if (Number(f.vagas) > 0) p.push(`${f.vagas}+ vaga${Number(f.vagas) > 1 ? 's' : ''}`);
+    p.push(...String(f.comodidades ?? '').split(',').filter(Boolean));
+    if (Number(f.areaUtilMin) > 0 || Number(f.areaUtilMax) > 0) p.push('Área');
+    if (f.fase) p.push(f.fase === 'na_planta' ? 'Na planta' : f.fase === 'em_construcao' ? 'Em obras' : 'Pronto pra morar');
+    return p.length ? p.join(' · ') : 'Opcional';
+  }
   return f.precoMin && f.precoMax ? `${reais(f.precoMin)} – ${reais(f.precoMax)}` : f.precoMax ? `até ${reais(f.precoMax)}` : f.precoMin ? `a partir de ${reais(f.precoMin)}` : 'Qualquer valor';
 }
 
@@ -25,7 +36,7 @@ export function BuscaEtapas({ open, onClose, filtros, onApply }: { open: boolean
   const [draft, setDraft] = useState(filtros), [etapa, setEtapa] = useState<Etapa>('onde');
   useEffect(() => { if (open) { setDraft(filtros); setEtapa('onde'); } }, [open]);
   const { result, loading } = useContagem(draft, open);
-  const i = ETAPAS.findIndex((e) => e.id === etapa), ultima = i === ETAPAS.length - 1;
+  const i = ETAPAS.findIndex((e) => e.id === etapa), ultima = etapa === 'valor' || etapa === 'mais';
   const buscar = () => { onApply(draft); onClose(); };
   const [recentes, setRecentes] = useState<BuscaRecente[]>([]);
   useEffect(() => { if (open) setRecentes(lerBuscas()); }, [open]);
@@ -40,7 +51,7 @@ export function BuscaEtapas({ open, onClose, filtros, onApply }: { open: boolean
           : <button key={e.id} type="button" className="busca-etapa busca-etapa--fechada" data-etapa={e.id} onClick={() => setEtapa(e.id)}><span>{e.rotulo}</span><strong>{resumoEtapa(e.id, draft)}</strong></button>)}
       </div>
       <div className="filtro-rodape"><button type="button" className="filtro-limpar" onClick={() => { setDraft({ secao: draft.secao || 'imoveis', cidade: '', ordem: 'recentes' }); setEtapa('onde'); }}>Limpar tudo</button>
-        {ultima ? <Button className="filtro-mostrar" disabled={loading || !result || result.count === 0} onClick={buscar}><Search />Buscar</Button>
+        {ultima ? <span className="flex items-center gap-3">{etapa === 'valor' && <button type="button" className="filtro-limpar" onClick={() => setEtapa('mais')}>Mais filtros</button>}<Button className="filtro-mostrar" disabled={loading || !result || result.count === 0} onClick={buscar}><Search />Buscar</Button></span>
           : <Button className="filtro-mostrar" onClick={() => setEtapa(ETAPAS[i + 1].id)}>Próximo</Button>}</div>
     </DialogContent>
   </Dialog>;

@@ -1,0 +1,1 @@
+- Hooks used at startup import the backend client only via supabaseLazy (guard: src/test/entradaLeve.test.ts). Why: a direct import put ~200 KB back into the entry bundle.

@@ -33,4 +33,3 @@
 - Home lar-1 (uh-home-layout) = HomeVitrine, no mold yet; site-dobra drops legacy home pre. Why: no cover swap.
 - Retained-pre transition rules stay inline in index.html, not only in async CSS. Why: late CSS caused CLS 1.
 - Foco uses shared type/title/FAQ/numbers helpers, ficha.titulo_manual overrides, site-v2 molds and one deferred form. Preserve CRM/journey; mock test writes. Why: page/pre/social parity and safe verification.
-- Startup files (hooks, Navbar, Home, App) import the backend client only via supabaseLazy; guarded by src/test/entradaLeve.test.ts. Why: a direct import put ~200 KB back into the entry bundle.

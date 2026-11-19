@@ -211,6 +211,20 @@
       "when": 1795034986659,
       "tag": "0029_busca_cidade_sem_maiusculas",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1795051806001,
+      "tag": "0030_busca_preco_sem_valor_por_ultimo",
+      "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1795051892254,
+      "tag": "0031_busca_preco_simbolico_por_ultimo",
+      "breakpoints": true
     }
   ]
 }

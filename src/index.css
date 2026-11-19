@@ -467,7 +467,7 @@ body:has(.search-filter-dialog[data-state=open]) [aria-label="Preferências de p
 .search-ordem{min-height:44px;border:1px solid hsl(var(--border));border-radius:999px;background:hsl(var(--background));padding:0 14px;font-size:14px}
 .search-total{margin-top:4px;font-size:14px;font-weight:600;color:hsl(var(--muted-foreground))}
 @media(min-width:1024px){.search-toolbar{display:none!important}}
-@media(max-width:1023px){.search-pilula-linha{display:none}.search-ordem{display:none}.search-category img.search-category-3d{width:24px;height:24px}}
+@media(max-width:1023px){.search-pilula-linha{display:none}.search-ordem{min-height:36px;font-size:13px;padding:0 10px;flex-shrink:0;max-width:140px}.search-category img.search-category-3d{width:24px;height:24px}}
 
 /* Fotos que passam no card (padrão Airbnb) */
 .fotos-card{position:absolute;inset:0;touch-action:pan-y}

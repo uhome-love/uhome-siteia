@@ -1,2 +1,3 @@
 - Favorite folders/notes: localStorage first (favoritosPastas.ts), mirrored to favorito_pastas when signed in; shares are read-only snapshots via RPC. Why: works signed-out, never exposes the owner.
 - Search data starts in `src/lib/buscaCedo.ts` (called from main.tsx, raw PostgREST fetch + first photo preload); `buscarSite` reuses that promise by filter JSON. Why: the list must not wait for the route chunk or the backend client.
+- Google Ads conversion routing lives in `conversaoDoEvento` (src/lib/gtag.ts): saved searches and comparisons map to their own secondary, valueless actions and must never fall into the primary lead action. Why: soft actions would inflate primary leads and skew bidding.

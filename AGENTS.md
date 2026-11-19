@@ -33,4 +33,3 @@
 - Home lar-1 (uh-home-layout) = HomeVitrine, no mold yet; site-dobra drops legacy home pre. Why: no cover swap.
 - Retained-pre transition rules stay inline in index.html, not only in async CSS. Why: late CSS caused CLS 1.
 - Foco uses shared type/title/FAQ/numbers helpers, ficha.titulo_manual overrides, site-v2 molds and one deferred form. Preserve CRM/journey; mock test writes. Why: page/pre/social parity and safe verification.
-- Google Ads conversion routing lives in `conversaoDoEvento` (src/lib/gtag.ts): saved searches and comparisons map to their own secondary, valueless actions and must never fall into the primary lead action. Why: soft actions would inflate primary leads and skew bidding.

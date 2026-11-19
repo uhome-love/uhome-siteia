@@ -150,6 +150,17 @@ gtag("consent", "default", {
     </style>
     <script>
       /* Primeira tela pronta da borda (#uh-pre): fica até o app montar o mesmo trecho (data-uh-alvo) e sai no mesmo quadro. */
+      /* Com primeira tela pronta, a tela de abertura não cobre a foto: a dobra só espera o CSS. */
+      (function () {
+        var p = document.getElementById("uh-pre"), s = document.getElementById("uh-splash");
+        if (!p || !s) return;
+        s.style.display = "none";
+        var l = document.querySelector("link[data-uh-css]");
+        if (!l || l.sheet) return;
+        p.style.visibility = "hidden";
+        var ok = function () { p.style.visibility = ""; };
+        l.addEventListener("load", ok, { once: true }); l.addEventListener("error", ok, { once: true }); setTimeout(ok, 2500);
+      })();
       (function () {
         var p = document.getElementById("uh-pre"), r = document.getElementById("root");
         if (!p || !r || !p.getAttribute("data-uh-alvo")) return;

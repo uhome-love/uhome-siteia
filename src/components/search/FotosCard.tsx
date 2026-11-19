@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/lib/supabaseLazy';
 import { cardFotoUrl } from '@/lib/searchImages';
+import { indiceDoScroll } from './fotosIndice';
 
 const cache = new Map<string, Promise<string[]>>();
 /** Até 5 fotos do card, pedidas só na primeira interação. */
@@ -22,28 +23,31 @@ export function fotosDoCard(id: string, produto: boolean): Promise<string[]> {
   return cache.get(id)!;
 }
 
-/** Camada de fotos extras sobre a 1ª foto (que fica intacta para a tela pronta). */
+/** Fotos do card num trilho que desliza com o dedo (1ª foto original intacta). */
 export function FotosCard({ id, produto, titulo, children }: { id: string; produto: boolean; titulo: string; children: React.ReactNode }) {
   const [fotos, setFotos] = useState<string[]>([]), [i, setI] = useState(0);
-  const arrasto = useRef<{ x: number; moveu: boolean } | null>(null), bloqueia = useRef(false);
+  const caixa = useRef<HTMLDivElement>(null), trilho = useRef<HTMLDivElement>(null), raf = useRef(0);
   const carregar = () => { void fotosDoCard(id, produto).then((f) => setFotos(f)); };
+  const extras = fotos.slice(1);
   const total = Math.max(fotos.length, 1);
-  const ir = (d: number) => { carregar(); setI((v) => { const n = fotos.length || 1; return (v + d + n) % n; }); };
-  useEffect(() => { if (fotos.length > 1) { preparar(fotos[(i + 1) % fotos.length]); preparar(fotos[(i + 2) % fotos.length]); if (i > 0) preparar(fotos[i - 1]); } }, [fotos, i]);
-  const caixa = useRef<HTMLDivElement>(null);
+  useEffect(() => { if (fotos.length > 1) { preparar(fotos[(i + 1) % fotos.length]); if (i > 0) preparar(fotos[i - 1]); } }, [fotos, i]);
   useEffect(() => { const el = caixa.current; if (!el || !('IntersectionObserver' in window)) return; const io = new IntersectionObserver((es) => { if (es.some((x) => x.isIntersecting)) { io.disconnect(); carregar(); } }, { rootMargin: '200px' }); io.observe(el); return () => io.disconnect(); }, [id]);
-  const atual = i > 0 ? fotos[i] : null;
+  const aoRolar = () => { cancelAnimationFrame(raf.current); raf.current = requestAnimationFrame(() => { const t = trilho.current; if (t) setI(indiceDoScroll(t.scrollLeft, t.clientWidth, total)); }); };
+  const ir = (d: number) => { const t = trilho.current; if (!t) return; const n = (i + d + total) % total; t.scrollTo({ left: n * t.clientWidth, behavior: 'smooth' }); };
+  const abrir = () => { caixa.current?.querySelector<HTMLAnchorElement>('.fotos-card-trilho > a')?.click(); };
   return (
-    <div ref={caixa} className="fotos-card" onPointerEnter={carregar}
-      onPointerDown={(e) => { carregar(); arrasto.current = { x: e.clientX, moveu: false }; }}
-      onPointerUp={(e) => { const a = arrasto.current; arrasto.current = null; if (!a || Math.abs(e.clientX - a.x) <= 40) return; if ((e.currentTarget as HTMLElement).closest('.home-trilho,.gaveta-trilho')) return; const d = e.clientX < a.x ? 1 : -1; bloqueia.current = true; if (fotos.length > 1) ir(d); else void fotosDoCard(id, produto).then((f) => { setFotos(f); if (f.length > 1) setI((v) => (v + d + f.length) % f.length); }); }}
-      onPointerCancel={() => { arrasto.current = null; }}
-      onClickCapture={(e) => { if (bloqueia.current) { bloqueia.current = false; e.preventDefault(); e.stopPropagation(); } }}>
-      {children}
-      {atual && <img key={atual} className="fotos-card-extra" src={cardFotoUrl(atual)} alt={`${titulo} - foto ${i + 1}`} decoding="async" onError={(e) => { e.currentTarget.src = atual; }} />}
+    <div ref={caixa} className="fotos-card" onPointerEnter={carregar} onTouchStart={carregar}>
+      <div ref={trilho} className="fotos-card-trilho" onScroll={aoRolar}>
+        {children}
+        {extras.map((u, k) => (
+          <div key={u} className="fotos-card-slide" role="link" tabIndex={-1} onClick={abrir}>
+            <img src={cardFotoUrl(u)} alt={`${titulo} - foto ${k + 2}`} loading="lazy" decoding="async" draggable={false} onError={(e) => { if (e.currentTarget.src !== u) e.currentTarget.src = u; }} />
+          </div>
+        ))}
+      </div>
       {fotos.length > 1 && <>
         {i > 0 && <Button type="button" variant="secondary" size="icon" className="fotos-card-seta fotos-card-ant" aria-label="Foto anterior" onClick={(e) => { e.preventDefault(); e.stopPropagation(); ir(-1); }}><ChevronLeft /></Button>}
-        <Button type="button" variant="secondary" size="icon" className="fotos-card-seta fotos-card-prox" aria-label="Próxima foto" onClick={(e) => { e.preventDefault(); e.stopPropagation(); ir(1); }}><ChevronRight /></Button>
+        {i < total - 1 && <Button type="button" variant="secondary" size="icon" className="fotos-card-seta fotos-card-prox" aria-label="Próxima foto" onClick={(e) => { e.preventDefault(); e.stopPropagation(); ir(1); }}><ChevronRight /></Button>}
         <div className="fotos-card-pontos" aria-hidden="true">{Array.from({ length: total }, (_, k) => <span key={k} data-ativo={k === i || undefined} />)}</div>
       </>}
     </div>

@@ -470,7 +470,7 @@ body:has(.search-filter-dialog[data-state=open]) [aria-label="Preferências de p
 @media(max-width:1023px){.search-pilula-linha{display:none}.search-ordem{min-height:36px;font-size:13px;padding:0 10px;flex-shrink:0;max-width:140px}.search-category img.search-category-3d{width:24px;height:24px}}
 
 /* Fotos que passam no card (padrão Airbnb) */
-.fotos-card{position:absolute;inset:0;touch-action:pan-y}
+.fotos-card{position:absolute;inset:0}.fotos-card-trilho{position:absolute;inset:0;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y}.fotos-card-trilho::-webkit-scrollbar{display:none}.fotos-card-trilho>a,.fotos-card-slide{position:relative!important;inset:auto!important;flex:0 0 100%;width:100%;height:100%;scroll-snap-align:start;scroll-snap-stop:always;cursor:pointer}.fotos-card-slide img,.fotos-card-trilho img{width:100%;height:100%;object-fit:cover;-webkit-user-drag:none;user-select:none}.home-trilho .fotos-card-trilho,.gaveta-trilho .fotos-card-trilho{overflow-x:hidden;touch-action:auto}
 .fotos-card-extra{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;animation:fotoEntra .18s ease-out}
 @keyframes fotoEntra{from{opacity:.4}to{opacity:1}}
 .fotos-card-seta{position:absolute;top:50%;transform:translateY(-50%);width:32px!important;height:32px!important;border-radius:999px!important;background:hsl(var(--background)/.92)!important;box-shadow:0 2px 8px hsl(var(--foreground)/.18);opacity:0;transition:opacity .15s,transform .15s;z-index:2}
@@ -481,8 +481,8 @@ body:has(.search-filter-dialog[data-state=open]) [aria-label="Preferências de p
 .fotos-card-pontos{position:absolute;bottom:10px;left:0;right:0;display:flex;justify-content:center;gap:5px;pointer-events:none;z-index:2}
 .fotos-card-pontos span{width:6px;height:6px;border-radius:999px;background:hsl(var(--background)/.6)}
 .fotos-card-pontos span[data-ativo]{background:hsl(var(--background))}
-@media(hover:none){.fotos-card-seta{display:none}.home-trilho .fotos-card-seta,.gaveta-trilho .fotos-card-seta{display:inline-flex;opacity:1;width:28px!important;height:28px!important}}.home-trilho .fotos-card,.gaveta-trilho .fotos-card{touch-action:auto}
-.fotos-card>a{position:absolute;inset:0}
+@media(hover:none){.fotos-card-seta{display:none}.home-trilho .fotos-card-seta,.gaveta-trilho .fotos-card-seta{display:inline-flex;opacity:1;width:28px!important;height:28px!important}}
+
 
 /* Painel de filtros padrão Airbnb */
 :root{--sombra-1:0 1px 2px hsl(var(--foreground)/.08),0 4px 12px hsl(var(--foreground)/.06);--sombra-2:0 6px 16px hsl(var(--foreground)/.12);--sombra-3:0 8px 28px hsl(var(--foreground)/.18)}
@@ -537,8 +537,8 @@ body:has(.search-filter-dialog[data-state=open]) [aria-label="Preferências de p
 .home-pilula{box-shadow:var(--sombra-1);transition:box-shadow .2s}.home-pilula:hover{box-shadow:var(--sombra-2)}
 /* Acabamento Airbnb: cards, categorias */
 .catalog-photo{border-radius:14px;overflow:hidden}
-.catalog-photo .fotos-card>a img{transition:transform .35s cubic-bezier(.2,0,0,1)}
-@media(hover:hover){.catalog-card:hover .catalog-photo .fotos-card>a img{transform:scale(1.03)}}
+.catalog-photo .fotos-card-trilho>a img{transition:transform .35s cubic-bezier(.2,0,0,1)}
+@media(hover:hover){.catalog-card:hover .catalog-photo .fotos-card-trilho>a img{transform:scale(1.03)}}
 .search-category img.search-category-3d,.home-categoria img{opacity:.78;filter:saturate(.9);transition:opacity .2s,transform .2s,filter .2s}
 .search-category:hover img.search-category-3d,.home-categoria:hover img,.search-category[aria-pressed=true] img.search-category-3d{opacity:1;filter:none}
 .search-category{transition:color .2s}

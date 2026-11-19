@@ -15,6 +15,7 @@ import { CriarPastaInline } from "@/components/favoritos/CriarPastaInline";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AgendamentoVisita } from "@/components/AgendamentoVisita";
 import { toast } from "sonner";
+import { trackComparar } from "@/lib/gtag";
 import { type EstadoPastas, lerPastas, salvarPastas, criarPasta, renomearPasta, apagarPasta, alternarNaPasta, definirNota, juntarPastas, linkPasta } from "@/lib/favoritosPastas";
 
 function parseFotos(fotos: any) {
@@ -134,7 +135,7 @@ function MeusFavoritos() {
         <div className="mt-4 flex flex-wrap gap-2">
           {lista.length > 0 && <button className={chip(false)} onClick={compartilhar}><Share2 className="h-5 w-5" /> Compartilhar</button>}
           {selecionados.length > 0 && <button className="inline-flex min-h-[44px] items-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground" onClick={() => setAgendar(true)}><CalendarDays className="h-5 w-5" /> Agendar {selecionados.length} {selecionados.length === 1 ? "visita" : "visitas"}</button>}
-          {selecionados.length >= 2 && selecionados.length <= 3 && <button className={chip(false)} onClick={() => setComparar(true)}><Columns3 className="h-5 w-5" /> Comparar {selecionados.length}</button>}
+          {selecionados.length >= 2 && selecionados.length <= 3 && <button className={chip(false)} onClick={() => { setComparar(true); trackComparar(selecionados.length); }}><Columns3 className="h-5 w-5" /> Comparar {selecionados.length}</button>}
           {pastaAtiva && <><button className={chip(false)} onClick={renomear}><Pencil className="h-4 w-4" /> Renomear</button><button className={chip(false)} onClick={apagar}><Trash2 className="h-4 w-4" /> Apagar pasta</button></>}
         </div>
 

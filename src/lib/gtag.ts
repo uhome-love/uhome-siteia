@@ -23,25 +23,40 @@ const ADS = {
   lead: `${ADS_ID}/bHQ5CLDL6LUdEKOh7pVF`,
   visita: `${ADS_ID}/IGu4CLPL6LUdEKOh7pVF`,
   whatsapp: `${ADS_ID}/Y4peCLbL6LUdEKOh7pVF`,
+  busca_salva: `${ADS_ID}/6VGTCPjR1LsdEKOh7pVF`,
+  comparar: `${ADS_ID}/Ay8kCPvR1LsdEKOh7pVF`,
 };
 
-/** Valor em reais de cada conversão: visita R$ 100, formulário R$ 50, WhatsApp sem valor (secundária). */
-export function valorConversao(tipo: "lead" | "visita" | "whatsapp"): number | undefined {
+/** Valor em reais de cada conversão: visita R$ 100, formulário R$ 50; WhatsApp, busca salva e comparar são secundárias sem valor. */
+export function valorConversao(tipo: keyof typeof ADS): number | undefined {
   return tipo === "visita" ? 100 : tipo === "lead" ? 50 : undefined;
+}
+
+/** Qual conversão do Google Ads um evento do site representa (busca salva e comparar nunca contam como lead). */
+export function conversaoDoEvento(event: string, params: Record<string, unknown> = {}): keyof typeof ADS | undefined {
+  if (event === "generate_lead") {
+    const tipo = String(params.lead_tipo ?? params.lead_source ?? "");
+    if (/busca_salva|salvar_busca/i.test(tipo)) return "busca_salva";
+    return /visita|agend/i.test(tipo) ? "visita" : "lead";
+  }
+  if (event === "click_whatsapp") return "whatsapp";
+  if (event === "comparar_imoveis") return "comparar";
+  return undefined;
 }
 
 /** Converte eventos do site em conversões do Google Ads. */
 export function reportAdsConversion(event: string, params: Record<string, unknown> = {}) {
-  let chave: keyof typeof ADS | undefined;
-  if (event === "generate_lead") {
-    const tipo = String(params.lead_tipo ?? params.lead_source ?? "");
-    chave = /visita|agend/i.test(tipo) ? "visita" : "lead";
-  } else if (event === "click_whatsapp") chave = "whatsapp";
+  const chave = conversaoDoEvento(event, params);
   if (!chave) return;
   const valor = valorConversao(chave);
   const id = params.lead_id ?? params.transaction_id;
   const dados: Record<string, unknown> = { send_to: ADS[chave], ...(valor ? { value: valor, currency: "BRL" } : {}), ...(id ? { transaction_id: String(id) } : {}) };
   void canTrack("advertising").then(allowed => { if (allowed) window.gtag?.("event", "conversion", dados); });
+}
+
+/** Pessoa abriu a comparação de imóveis nos Favoritos (conversão secundária). */
+export function trackComparar(quantidade: number) {
+  push("comparar_imoveis", { quantidade });
 }
 
 /** Track form lead submissions */

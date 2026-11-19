@@ -76,27 +76,43 @@ export default function CampanhaPage() {
       <main className="pt-[var(--uh-header-height)]">
         <section className={`relative overflow-hidden ${tema}`}>
           <NatalLuzes />
-          <div className="relative mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:py-10">
-            <img src={NATAL_ART.selo} alt="Natal Chave de Ouro" className="h-10 w-auto sm:h-12" />
-            <p className="mt-4 inline-flex items-center gap-2 rounded-full border border-natal-gold/40 px-4 py-1.5 font-body text-[11px] font-bold uppercase tracking-[0.2em] text-natal-gold sm:text-xs">
-              <KeyRound className="h-3.5 w-3.5" /> {black ? "Semana Black · 23 a 29/11" : "Campanha de Natal Uhome"}
-            </p>
-            <h1 className="mt-5 max-w-3xl font-natal text-4xl font-extrabold leading-[1.05] sm:text-5xl lg:text-6xl">
-              {black ? <>Black Natal <Ouro>Uhome</Ouro></> : <>Natal <Ouro>Chave de Ouro</Ouro></>}
-            </h1>
-            <p className="mt-4 max-w-xl font-body text-lg opacity-90">{c.subtitulo}</p>
-            <p className="mt-3 max-w-xl font-body text-sm opacity-75">{c.descricao}</p>
-
-            <div className="mt-6 flex flex-wrap gap-3">
+          <div className="relative mx-auto max-w-7xl px-5 py-5 sm:px-8 lg:py-10">
+            <div className="flex items-center gap-3">
+              <img src={NATAL_ART.selo} alt="Natal Chave de Ouro" width={40} height={40} className="h-10 w-10 flex-shrink-0 sm:h-12 sm:w-12" />
+              <h1 className="min-w-0 font-natal text-3xl font-extrabold leading-[1.05] sm:text-5xl lg:text-6xl">
+                {black ? <>Black Natal <Ouro>Uhome</Ouro></> : <>Natal <Ouro>Chave de Ouro</Ouro></>}
+              </h1>
+            </div>
+            <p className="mt-3 max-w-xl font-body text-base opacity-90 lg:text-lg">{black ? "Condições Black só até 29/11" : "Condições especiais e presente na urna até 18/12"}</p>
+            <p className="mt-3 hidden max-w-xl font-body text-sm opacity-75 lg:block">{c.descricao}</p>
+            <div className="mt-6 hidden flex-wrap gap-3 lg:flex">
               <Button asChild size="lg" className="bg-natal-gold text-natal-deep hover:bg-natal-gold/90"><a href="#contato" onClick={() => setModo("visita")}><CalendarDays /> Agendar visita</a></Button>
               <Button asChild size="lg" variant="ghost" className="border border-natal-gold/40 text-natal-foreground hover:bg-natal-foreground/10 hover:text-natal-foreground"><a href="#contato" onClick={() => setModo("info")}>Receber informações</a></Button>
               {isDirectAccess && corretor && <Button asChild size="lg" variant="ghost" className="text-natal-foreground hover:bg-natal-foreground/10 hover:text-natal-foreground"><a href={`https://wa.me/${numero}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer"><MessageCircle /> Falar com {corretor.nome.split(" ")[0]}</a></Button>}
             </div>
-            <p className="mt-5 flex items-center gap-2 font-body text-sm text-natal-gold"><Clock3 className="h-4 w-4" /> Faltam <span className="tabular-nums font-semibold">{dias} dias · {String(horas).padStart(2, "0")}h · {String(min).padStart(2, "0")}min</span></p>
-
+            <p className="mt-3 flex items-center gap-2 font-body text-sm text-natal-gold lg:mt-5"><Clock3 className="h-4 w-4" /> Faltam <span className="tabular-nums font-semibold">{dias} dias · {String(horas).padStart(2, "0")}h · {String(min).padStart(2, "0")}min</span></p>
           </div>
         </section>
 
+        {isDirectAccess && corretor && <section className="border-b border-border"><div className="mx-auto flex max-w-7xl items-center gap-4 px-5 py-5 sm:px-8">
+          {corretor.foto_url && <img src={corretor.foto_url} alt={corretor.nome} loading="lazy" className="h-14 w-14 shrink-0 rounded-full object-cover" />}
+          <div className="min-w-0"><p className="font-body text-xs text-muted-foreground">Seu corretor Uhome</p><p className="break-words font-heading font-semibold">{corretor.nome}</p>{corretor.creci && <p className="text-xs text-muted-foreground">CRECI {corretor.creci}</p>}</div>
+        </div></section>}
+        <section id="empreendimentos" className="mx-auto max-w-7xl scroll-mt-20 px-5 py-8 sm:px-8">
+          <h2 className="text-h2 text-foreground">Empreendimentos participantes</h2>
+          <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <div className="-mx-5 flex w-[calc(100%+2.5rem)] gap-2 overflow-x-auto px-5 [scrollbar-width:none] sm:mx-0 sm:w-auto sm:flex-wrap sm:px-0" role="group" aria-label="Cidade">{["todas", ...cidades].map(x => <button key={x} type="button" aria-pressed={cidade === x} onClick={() => setCidade(x)} className="h-11 flex-shrink-0 rounded-full border border-border px-4 font-body text-sm font-semibold text-foreground aria-pressed:border-foreground aria-pressed:bg-foreground aria-pressed:text-background">{x === "todas" ? "Todas as cidades" : x}</button>)}</div>
+            <div className="-mx-5 flex w-[calc(100%+2.5rem)] gap-2 overflow-x-auto px-5 [scrollbar-width:none] sm:mx-0 sm:w-auto sm:flex-wrap sm:px-0" role="group" aria-label="Preço inicial">{FAIXAS_CAMPANHA.map(x => <button key={x.id} type="button" aria-pressed={faixa === x.id} onClick={() => setFaixa(x.id)} className="h-11 flex-shrink-0 rounded-full border border-border px-4 font-body text-sm font-semibold text-foreground aria-pressed:border-foreground aria-pressed:bg-foreground aria-pressed:text-background">{x.label}</button>)}</div>
+            {(cidade !== "todas" || faixa !== "todos") && <Button variant="ghost" className="self-end" onClick={() => { setCidade("todas"); setFaixa("todos"); }}>Limpar filtros</Button>}
+          </div>
+          <p aria-live="polite" className="mt-4 font-body text-sm text-muted-foreground">{lista.length} {lista.length === 1 ? "empreendimento" : "empreendimentos"}</p>
+          {!lista.length && <div className="py-10"><p className="font-body text-muted-foreground">Nenhum empreendimento nesta combinação. Experimente outra cidade ou faixa de preço.</p><Button variant="link" onClick={() => { setCidade("todas"); setFaixa("todos"); }}>Ver todos os empreendimentos</Button></div>}
+          <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {lista.map((p) => (
+              <ProdutoFocoCard key={p.id} p={p} selo={black ? "Black Natal" : "Condição de Natal"} campanha={black ? "black" : "natal"} contato />
+            ))}
+          </div>
+        </section>
         <section className="border-b border-border/60 bg-secondary/40">
           <div className="mx-auto grid max-w-7xl gap-6 px-5 py-6 sm:grid-cols-3 sm:px-8">
             {[
@@ -115,26 +131,6 @@ export default function CampanhaPage() {
           </div>
         </section>
 
-        {isDirectAccess && corretor && <section className="border-b border-border"><div className="mx-auto flex max-w-7xl items-center gap-4 px-5 py-5 sm:px-8">
-          {corretor.foto_url && <img src={corretor.foto_url} alt={corretor.nome} loading="lazy" className="h-14 w-14 shrink-0 rounded-full object-cover" />}
-          <div className="min-w-0"><p className="font-body text-xs text-muted-foreground">Seu corretor Uhome</p><p className="break-words font-heading font-semibold">{corretor.nome}</p>{corretor.creci && <p className="text-xs text-muted-foreground">CRECI {corretor.creci}</p>}</div>
-        </div></section>}
-        <section id="empreendimentos" className="mx-auto max-w-7xl scroll-mt-20 px-5 py-8 sm:px-8">
-          <h2 className="text-h2 text-foreground">Empreendimentos participantes</h2>
-          <p className="mt-2 font-body text-muted-foreground">{data.produtos.length} produtos selecionados, do primeiro apê ao alto padrão.</p>
-          <div className="mt-5 flex flex-wrap gap-4">
-            <label className="flex min-w-0 flex-col gap-1.5 font-body text-sm font-medium">Cidade<select aria-label="Cidade" value={cidade} onChange={e => setCidade(e.target.value)} className="h-11 max-w-full rounded-lg border border-border bg-background px-3 text-foreground"><option value="todas">Todas as cidades</option>{cidades.map(x => <option key={x} value={x}>{x}</option>)}</select></label>
-            <label className="flex min-w-0 flex-col gap-1.5 font-body text-sm font-medium">Preço inicial<select aria-label="Preço inicial" value={faixa} onChange={e => setFaixa(e.target.value)} className="h-11 max-w-full rounded-lg border border-border bg-background px-3 text-foreground">{FAIXAS_CAMPANHA.map(x => <option key={x.id} value={x.id}>{x.label}</option>)}</select></label>
-            {(cidade !== "todas" || faixa !== "todos") && <Button variant="ghost" className="self-end" onClick={() => { setCidade("todas"); setFaixa("todos"); }}>Limpar filtros</Button>}
-          </div>
-          <p aria-live="polite" className="mt-4 font-body text-sm text-muted-foreground">{lista.length} {lista.length === 1 ? "empreendimento" : "empreendimentos"}</p>
-          {!lista.length && <div className="py-10"><p className="font-body text-muted-foreground">Nenhum empreendimento nesta combinação. Experimente outra cidade ou faixa de preço.</p><Button variant="link" onClick={() => { setCidade("todas"); setFaixa("todos"); }}>Ver todos os empreendimentos</Button></div>}
-          <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {lista.map((p) => (
-              <ProdutoFocoCard key={p.id} p={p} selo={black ? "Black Natal" : "Condição de Natal"} campanha={black ? "black" : "natal"} contato />
-            ))}
-          </div>
-        </section>
         {!(isDirectAccess && corretor) && <section id="contato" className="scroll-mt-20 bg-secondary/40">
           <div className="mx-auto grid max-w-5xl gap-6 px-5 py-10 sm:px-8 lg:grid-cols-2 lg:items-center [&>*]:min-w-0">
             <div>
@@ -168,7 +164,7 @@ export default function CampanhaPage() {
         ) : (
           <div className="flex gap-2">
             <Button size="lg" className="min-w-0 flex-1 px-2 bg-natal-gold text-natal-deep hover:bg-natal-gold/90" onClick={() => irContato("visita")}><CalendarDays /> Agendar visita</Button>
-            <Button size="lg" variant="outline" className="min-w-0 flex-1 px-2" onClick={() => irContato("info")}>Informações</Button>
+            <Button size="lg" variant="ghost" className="min-w-0 flex-1 border border-natal-gold/40 px-2 text-natal-foreground hover:bg-natal-foreground/10 hover:text-natal-foreground" onClick={() => irContato("info")}>Informações</Button>
           </div>
         )}
       </div>

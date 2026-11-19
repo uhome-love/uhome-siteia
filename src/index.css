@@ -678,3 +678,5 @@ body:has(.gaveta-mapa) .aviso-cookies{display:none}
 @media(max-width:639px){.uhs-mobile-header--oculto{display:none!important}}
 /* Pontas do preço sempre por cima do gráfico e com área de toque de 44px */
 .filtro-slider{z-index:3}.filtro-slider-ponta::before{content:"";position:absolute;inset:-7px;border-radius:999px}
+/* Sem abas Imóveis/Lançamentos/Investir no celular (padrão Airbnb; ficam no menu e na barra de baixo) */
+@media (max-width:1023px){.uhs-mobile-tabs{display:none!important}:root{--uh-header-height:80px}}

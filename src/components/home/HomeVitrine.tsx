@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { SlidersHorizontal, ChevronRight, History } from 'lucide-react';
-import { lerBuscas, urlDaBusca } from '@/lib/buscasRecentes';
+import { SlidersHorizontal, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FaixaRolavel } from '@/components/FaixaRolavel';
 import { PilulaBusca } from '@/components/PilulaBusca';
@@ -13,16 +12,7 @@ import { buscarSite, categorias3dVisiveis } from '@/services/buscaSite';
 import { formatPreco, type Imovel } from '@/services/imoveis';
 import { supabase } from '@/lib/supabaseLazy';
 import { cardFotoUrl } from '@/lib/searchImages';
-import { trackEvent } from '@/lib/trackEvent';
 import { urlCategoria, registrarVisitaHome, novoDesdeVisita } from '@/lib/homeVitrine';
-
-export const ATALHOS_HOME: [string, string][] = [
-  ['Porto Alegre', '/busca?cidade=Porto%20Alegre'],
-  ['Canoas', '/busca?cidade=Canoas'],
-  ['Na planta', '/busca?fase=na_planta'],
-  ['Até R$ 500 mil', '/busca?preco_max=500000'],
-  ['Xangri-lá', '/busca?cidade=Xangri-l%C3%A1'],
-];
 
 function Fileira({ titulo, verTodos, children }: { titulo: React.ReactNode; verTodos?: string; children: React.ReactNode }) {
   return (
@@ -36,7 +26,6 @@ function Fileira({ titulo, verTodos, children }: { titulo: React.ReactNode; verT
 function ContinueDeOndeParou() {
   const { prefixLink } = useCorretor();
   const ids = useMemo(() => { try { return (JSON.parse(localStorage.getItem('imoveis_vistos') || '[]') as unknown[]).filter((v): v is string => typeof v === 'string').slice(-3).reverse(); } catch { return []; } }, []);
-  const [ultima] = useState(() => lerBuscas()[0]);
   const { data = [] } = useQuery({
     queryKey: ['home-vistos', ids], enabled: ids.length > 0, staleTime: 300000,
     queryFn: async () => {
@@ -44,11 +33,10 @@ function ContinueDeOndeParou() {
       return ids.map((id) => (data ?? []).find((r: any) => r.id === id)).filter(Boolean) as any[];
     },
   });
-  if (!data.length && !ultima) return null;
+  if (!data.length) return null;
   return (
     <section className="home-fileira">
       <div className="home-fileira-topo"><h2>Continue de onde parou</h2></div>
-      {ultima && <Link to={prefixLink(urlDaBusca(ultima.filtros))} className="busca-recente home-ultima-busca"><History /><span>Sua última busca: <strong>{ultima.rotulo}</strong></span></Link>}
       <div className="home-trilho home-trilho-vistos">
         {data.map((r) => (
           <Link key={r.id} to={prefixLink(`/imovel/${r.slug}`)} className="home-visto">
@@ -84,12 +72,6 @@ export function HomeVitrine({ entreFileiras }: { entreFileiras?: React.ReactNode
           {categorias.map((c) => <Link key={c.id} to={prefixLink(urlCategoria(c.filtros))} className="home-categoria"><img src={c.icone} alt="" width={32} height={32} loading="lazy" decoding="async" /><span>{c.nome}</span></Link>)}
         </FaixaRolavel>
         <Button variant="outline" className="home-filtros" onClick={() => window.dispatchEvent(new Event('uhome:abrir-painel'))}><SlidersHorizontal />Filtros</Button>
-      </nav>
-      <nav aria-label="Buscas rápidas" className="home-atalhos">
-        <span className="home-atalhos-rotulo">Comece por aqui</span>
-        <div className="home-atalhos-trilho">
-          {ATALHOS_HOME.map(([nome, url]) => <Link key={url} to={prefixLink(url)} className="home-atalho" onClick={() => { void trackEvent({ tipo: 'categoria_tocada', dados: { atalho_home: nome } }).catch(() => {}); }}>{nome}</Link>)}
-        </div>
       </nav>
       <div className="home-conteudo">
         <ContinueDeOndeParou />

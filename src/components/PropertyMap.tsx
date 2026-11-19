@@ -28,7 +28,7 @@ export function PropertyMap({ neighborhood, city, lat = -30.0277, lng = -51.2287
           observer.disconnect();
         }
       },
-      { rootMargin: "200px" }
+      { rootMargin: "800px" }
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -90,19 +90,19 @@ export function PropertyMap({ neighborhood, city, lat = -30.0277, lng = -51.2287
   }, [isVisible, lat, lng]);
 
   const fallbackMap = mapError || !MAPBOX_TOKEN;
+  const estatico = MAPBOX_TOKEN ? `https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-l+5B6CF9(${lng},${lat})/${lng},${lat},15,0/640x360@2x?attribution=false&logo=false&access_token=${MAPBOX_TOKEN}` : "";
   const mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.008}%2C${lat - 0.005}%2C${lng + 0.008}%2C${lat + 0.005}&layer=mapnik&marker=${lat}%2C${lng}`;
 
   return (
     <div ref={wrapperRef} className="overflow-hidden rounded-2xl border border-border">
       <div className="aspect-[16/9] w-full">
-        {!isVisible ? (
-          <div className="flex h-full w-full items-center justify-center bg-muted">
-            <MapPin className="h-8 w-8 text-muted-foreground/40" />
-          </div>
-        ) : fallbackMap ? (
+        {fallbackMap ? (
           <iframe title="Mapa do imóvel" src={mapUrl} className="h-full w-full border-0" loading="lazy" referrerPolicy="no-referrer" />
         ) : (
-          <div ref={mapContainer} className="h-full w-full" />
+          <div className="relative h-full w-full bg-muted" style={estatico ? { backgroundImage: `url("${estatico}")`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}>
+            {!estatico && <MapPin className="absolute left-1/2 top-1/2 h-8 w-8 -translate-x-1/2 -translate-y-1/2 text-muted-foreground/40" />}
+            {isVisible && <div ref={mapContainer} className="absolute inset-0" />}
+          </div>
         )}
       </div>
     </div>

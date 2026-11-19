@@ -6,7 +6,6 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { LeadSidebar } from "@/components/LeadSidebar";
 import { DetalheNavFixa } from "@/components/imovel/DetalheNavFixa";
-import { FinancingSimulator } from "@/components/FinancingSimulator";
 import { AgendamentoVisita } from "@/components/AgendamentoVisita";
 import { SimilarProperties } from "@/components/SimilarProperties";
 const PropertyMap = lazy(() => import("../components/PropertyMap.tsx").then(m => ({ default: m.PropertyMap })));
@@ -320,14 +319,14 @@ const PropertyDetail = () => {
       <DetalheNavFixa preco={priceFormatted} onAgendar={isIndisponivel ? undefined : abrirVisita} />
 
       {/* Mobile hero — QuintoAndar style */}
-      <div className="relative sm:hidden mt-16">
+      <div className="relative sm:hidden">
         <div className="relative aspect-[4/3] overflow-hidden">
           {/* Embla carousel */}
           <div ref={emblaRef} className="h-full overflow-hidden">
             <div className="flex h-full">
               {images.map((img, i) => (
                 <div key={i} className="relative h-full min-w-0 flex-[0_0_100%]">
-                  <img src={img} alt={`Foto ${i + 1}`} className="h-full w-full object-cover" draggable={false} />
+                  <img src={img} alt={`Foto ${i + 1}`} className="h-full w-full object-cover" draggable={false} onClick={(e) => { galleryTrigger.current = e.currentTarget as any; setCurrentImage(i); setGalleryOpen(true); }} />
                 </div>
               ))}
             </div>
@@ -509,11 +508,6 @@ const PropertyDetail = () => {
                         Custo mensal: <strong>R$ {custo.toLocaleString("pt-BR")}</strong> <span className="text-muted-foreground">(cond. + IPTU)</span>
                       </span>
                     )}
-                    {!isIndisponivel && parcela > 0 && (
-                      <a href="#simulador" className="rounded-lg bg-primary/10 px-3 py-1.5 font-body text-[13px] font-medium text-primary transition-colors hover:bg-primary/15">
-                        Parcelas a partir de R$ {Math.round(parcela).toLocaleString("pt-BR")}/mês · simular →
-                      </a>
-                    )}
                   </div>
                 );
               })()}
@@ -594,10 +588,6 @@ const PropertyDetail = () => {
 
             <div className="h-px bg-border" />
 
-            {/* Financing */}
-            <div id="simulador" className="scroll-mt-28">
-              <FinancingSimulator propertyPrice={imovel.preco} />
-            </div>
           </motion.div>
 
           {/* Right — Lead Sidebar */}

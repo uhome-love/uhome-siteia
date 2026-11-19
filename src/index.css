@@ -675,3 +675,4 @@ body:has(.gaveta-mapa) .aviso-cookies{display:none}
 @media(min-width:1024px){body.mapa-cheio .search-list{display:none}body.mapa-cheio .search-map{width:100%;padding-left:32px}.search-map .mapboxgl-ctrl-top-right{top:52px}}
 .mapa-carregando span{position:absolute;inset:0 auto 0 0;width:35%;background:hsl(var(--foreground));border-radius:2px;animation:mapa-carga 1s ease-in-out infinite}
 @keyframes mapa-carga{0%{transform:translateX(-100%)}100%{transform:translateX(300%)}}
+@media(max-width:639px){.uhs-mobile-header--oculto{display:none!important}}

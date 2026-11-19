@@ -4,17 +4,18 @@ import { Menu, Search, SlidersHorizontal, Heart, House, Building2, ChartNoAxesCo
 import { UhomeLogo } from "@/components/UhomeLogo";
 import { UserMenu } from "@/components/UserMenu";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useCorretor } from "@/contexts/CorretorContext";
 import { useCampanhaDestaque } from "@/lib/produtosFoco";
 import { SiteBottomBar } from "@/components/SiteBottomBar";
 import { urlDeFiltros } from "@/lib/homeVitrine";
 const Etapas = lazy(() => import("@/components/search/BuscaEtapas").then((m) => ({ default: m.BuscaEtapas })));
+const MenuSite = lazy(() => import("@/components/MenuSite").then((m) => ({ default: m.MenuSite })));
 const PainelBusca = lazy(() => import("@/components/search/SearchFilterDialog").then((m) => ({ default: m.SearchFilterDialog })));
 import { BUSCA_URLS } from "../../supabase/functions/_shared/buscaConfig";
 
 export function Navbar() {
-  const [menu, setMenu] = useState(false), [busca, setBusca] = useState(false), [etapas, setEtapas] = useState(false), [rolou, setRolou] = useState(false);
+  const [menu, setMenu] = useState(false), [busca, setBusca] = useState(false), [etapas, setEtapas] = useState(false), [rolou, setRolou] = useState(false), [menuUsado, setMenuUsado] = useState(false);
+  useEffect(() => { if (menu) setMenuUsado(true); }, [menu]);
   const { prefixLink } = useCorretor(); const location = useLocation(), navigate = useNavigate();
   const [params] = useSearchParams(); const { campanha, black } = useCampanhaDestaque();
   const searchPath = location.pathname.replace(/^\/c\/[^/]+/, '');
@@ -35,7 +36,7 @@ export function Navbar() {
       <div className={`uhs-mobile-header${/(^|\/)imovel\//.test(location.pathname) ? " uhs-mobile-header--oculto" : ""}`}><div className="uhs-mobile-search-row"><Link to={prefixLink('/')} className="uhs-mobile-logo" aria-label="Uhome, página inicial"><img src="/favicon-192.png" alt="" width={40} height={40} /></Link><Button variant="outline" className="uhs-busca-celular" onClick={() => { if (isCatalog) window.dispatchEvent(new Event('uhome:abrir-filtros')); else setEtapas(true); }}><Search /><span>Onde vai ser seu novo lar?</span></Button><Button variant="outline" size="icon" aria-label="Abrir filtros" onClick={() => { if (isCatalog) window.dispatchEvent(new Event('uhome:abrir-filtros')); else setBusca(true); }}><SlidersHorizontal /></Button></div></div>
     </nav>
     <SiteBottomBar />
-    <Sheet open={menu} onOpenChange={setMenu}><SheetContent className="overflow-y-auto"><SheetHeader><SheetTitle>Uhome</SheetTitle></SheetHeader><div className="mt-6 flex flex-col gap-2">{tabs.map(t => <Button asChild variant="ghost" className="justify-start" key={t.label}><Link to={prefixLink(t.to)}><t.icon />{t.label}</Link></Button>)}<Button asChild variant="outline"><Link to={prefixLink(campanha ? '/campanha/' + campanha.slug : '/em-foco')}>{campanha ? black ? 'Black Natal' : campanha.nome : 'Uhome em Foco'}</Link></Button>{[['/anunciar','Anunciar imóvel'],['/avaliar-imovel','Quanto vale meu imóvel?'],['/bairros','Bairros'],['/condominios','Condomínios'],['/sobre','Sobre a Uhome'],['/faq','Ajuda']].map(([to,l]) => <Button asChild variant="ghost" className="justify-start" key={to}><Link to={prefixLink(to)}>{l}</Link></Button>)}<Button variant="outline" onClick={() => { setMenu(false); abrirLia(); }}>Falar com a Lia</Button></div></SheetContent></Sheet>
+    {menuUsado && <Suspense fallback={null}><MenuSite open={menu} onOpenChange={setMenu} tabs={tabs} campanha={campanha} black={black} abrirLia={abrirLia} /></Suspense>}
     {etapas && <Suspense fallback={null}><Etapas open={etapas} onClose={() => setEtapas(false)} filtros={{ secao: 'imoveis', ordem: 'recentes' }} onApply={(f) => navigate(prefixLink(urlDeFiltros(f)))} /></Suspense>}
     {busca && <Suspense fallback={null}><PainelBusca open={busca} onClose={() => setBusca(false)} filtros={{ secao: 'imoveis', ordem: 'recentes' }} onApply={(f) => navigate(prefixLink(urlDeFiltros(f)))} /></Suspense>}
   </>;

@@ -440,6 +440,12 @@ body:has(.search-filter-dialog[data-state=open]) [aria-label="Preferências de p
 .home-visto-texto strong{font-size:14px;color:hsl(var(--foreground));overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .home-visto-texto b{color:hsl(var(--foreground))}
 .home-visto-seta{width:18px;height:18px;flex-shrink:0}
+.home-atalhos{max-width:1120px;margin:4px auto 8px;padding:0 16px;display:flex;flex-direction:column;gap:8px}
+.home-atalhos-rotulo{font-size:13px;font-weight:700;color:hsl(var(--muted-foreground))}
+.home-atalhos-trilho{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.home-atalhos-trilho::-webkit-scrollbar{display:none}
+.home-atalho{flex-shrink:0;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border:1px solid hsl(var(--border));border-radius:999px;font-size:14px;font-weight:600;color:hsl(var(--foreground));background:hsl(var(--background));transition:border-color .2s var(--ease-padrao,ease),transform .15s}
+.home-atalho:hover{border-color:hsl(var(--foreground))}.home-atalho:active{transform:scale(.97)}
 @media (max-width:1100px){.home-trilho{grid-template-columns:repeat(3,minmax(0,1fr))}.home-trilho>:nth-child(n+4){display:none}}
 @media (max-width:639px){
   .home-capa{display:none}

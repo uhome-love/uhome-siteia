@@ -13,7 +13,16 @@ import { buscarSite, categorias3dVisiveis } from '@/services/buscaSite';
 import { formatPreco, type Imovel } from '@/services/imoveis';
 import { supabase } from '@/lib/supabaseLazy';
 import { cardFotoUrl } from '@/lib/searchImages';
+import { trackEvent } from '@/lib/trackEvent';
 import { urlCategoria, registrarVisitaHome, novoDesdeVisita } from '@/lib/homeVitrine';
+
+export const ATALHOS_HOME: [string, string][] = [
+  ['Porto Alegre', '/busca?cidade=Porto%20Alegre'],
+  ['Canoas', '/busca?cidade=Canoas'],
+  ['Na planta', '/busca?fase=na_planta'],
+  ['Até R$ 500 mil', '/busca?preco_max=500000'],
+  ['Xangri-lá', '/busca?cidade=Xangri-l%C3%A1'],
+];
 
 function Fileira({ titulo, verTodos, children }: { titulo: React.ReactNode; verTodos?: string; children: React.ReactNode }) {
   return (
@@ -75,6 +84,12 @@ export function HomeVitrine({ entreFileiras }: { entreFileiras?: React.ReactNode
           {categorias.map((c) => <Link key={c.id} to={prefixLink(urlCategoria(c.filtros))} className="home-categoria"><img src={c.icone} alt="" width={32} height={32} loading="lazy" decoding="async" /><span>{c.nome}</span></Link>)}
         </FaixaRolavel>
         <Button variant="outline" className="home-filtros" onClick={() => window.dispatchEvent(new Event('uhome:abrir-painel'))}><SlidersHorizontal />Filtros</Button>
+      </nav>
+      <nav aria-label="Buscas rápidas" className="home-atalhos">
+        <span className="home-atalhos-rotulo">Comece por aqui</span>
+        <div className="home-atalhos-trilho">
+          {ATALHOS_HOME.map(([nome, url]) => <Link key={url} to={prefixLink(url)} className="home-atalho" onClick={() => { void trackEvent({ tipo: 'categoria_tocada', dados: { atalho_home: nome } }).catch(() => {}); }}>{nome}</Link>)}
+        </div>
       </nav>
       <div className="home-conteudo">
         <ContinueDeOndeParou />

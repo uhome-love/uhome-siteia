@@ -7,3 +7,7 @@
 - [x] Calendário de visita mensal
 - [x] Filtros da Home abre o painel de filtros
 - [ ] Conferir gaveta do mapa e mini card no celular em aparelho real
+- [ ] Home: busca em destaque + atalhos de 1 toque com medição
+- [ ] Google Ads: palavras negativas e auditoria das páginas dos anúncios (documento)
+- [ ] Rastreamento: conferir gclid no lead e conversões com valor
+- [ ] Busca: reduzir JavaScript inicial e adiar o que não está na 1ª tela

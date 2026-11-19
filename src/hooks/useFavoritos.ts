@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseLazy";
 import { useAuth } from "./useAuth";
 import { trackEvent } from "@/lib/trackEvent";
 import { lerPastas, salvarPastas, removerImovel } from '@/lib/favoritosPastas';

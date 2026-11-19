@@ -1,15 +1,5 @@
 # Roadmap
-- [x] Reduzir fotos e painéis no carregamento inicial da busca; validar rolagem, fotos, filtros e mapa
-- [x] Mapa: ir até a cidade buscada, pins sem sumir, buscar na região/ao mover filtrando lista e total
-- [x] Abrir imóvel sem atraso (pré-carregamento)
-- [x] Título do imóvel com respiro; local sem repetir
-- [x] Comodidades reais do anúncio
-- [x] Calendário de visita mensal
-- [x] Filtros da Home abre o painel de filtros
-- [ ] Conferir gaveta do mapa e mini card no celular em aparelho real
-- [x] Home: busca em destaque + atalhos de 1 toque com medição
-- [x] Google Ads: palavras negativas e auditoria das páginas dos anúncios (documento)
-- [x] Rastreamento: conferir gclid no lead e conversões com valor
-- [x] Busca: reduzir JavaScript inicial e adiar o que não está na 1ª tela
-- [ ] Conferir páginas dos anúncios no site publicado (firewall bloqueia o teste daqui)
-- [ ] Trocar lances para 'maximizar conversões' quando houver leads suficientes
+- [x] Anúncios ligados aos ícones 3D (Garden, Casas em condomínio, Terrenos, Studios)
+- [x] Studios R$ 8/dia + destino lista de studios
+- [ ] SEO: reforçar páginas de bairro/empreendimentos (próxima rodada)
+- [ ] Decidir verba de Imóveis do Site — espera o valor de um lead e 2 semanas de dados

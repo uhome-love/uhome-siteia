@@ -33,8 +33,8 @@ const brl=(v:unknown)=>reais(Number(v));
 const AREAS:Record<string,string>={areaUtilMin:'Área priv. a partir de',areaUtilMax:'Área priv. até',areaMin:'Área total a partir de',areaMax:'Área total até'};
 /** Texto legível de cada filtro aplicado. */
 /** Nome oficial da cidade (como está no cadastro), ignorando maiúsculas e acentos do que foi digitado. */
-const TIPO_PLURAL:Record<string,string>={apartamento:'apartamentos',casa:'casas',cobertura:'coberturas',studio:'studios',terreno:'terrenos',garden:'gardens',sobrado:'sobrados'};
-const TIPO_SINGULAR:Record<string,string>={apartamento:'apartamento',casa:'casa',cobertura:'cobertura',studio:'studio',terreno:'terreno',garden:'garden',sobrado:'sobrado'};
+const TIPO_PLURAL:Record<string,string>={apartamento:'apartamentos',casa:'casas',cobertura:'coberturas',studio:'studios',terreno:'terrenos',garden:'gardens',sobrado:'sobrados','studio,loft':'studios',loft:'lofts',casa_condominio:'casas em condomínio'};
+const TIPO_SINGULAR:Record<string,string>={apartamento:'apartamento',casa:'casa',cobertura:'cobertura',studio:'studio',terreno:'terreno',garden:'garden',sobrado:'sobrado','studio,loft':'studio',loft:'loft',casa_condominio:'casa em condomínio'};
 export function comTipo(tipo:unknown,t:string):string{const k=typeof tipo==='string'?tipo.toLowerCase():'';const pl=TIPO_PLURAL[k];if(!pl)return t;return t.replace(/\bimóveis\b/,pl).replace(/\bimóvel\b/,TIPO_SINGULAR[k]).replace(/^Nenhum (casa|cobertura)/,'Nenhuma $1').replace(/^([a-zà-ú])/,m=>m.toUpperCase());}
 export function nomeCidade(filtro:unknown, rows:{cidade?:string|null}[]):string{
   const t=String(filtro??''); if(!t)return '';

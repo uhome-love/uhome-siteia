@@ -15,3 +15,8 @@ test("aluguel nunca aparece no título", () => {
   expect(tituloBuscaComTotal(5, "Porto Alegre")).toContain("à venda");
   expect(tituloBuscaComTotal(5, "Porto Alegre")).not.toMatch(/alug/i);
 });
+
+test("ícones de anúncio: studios e casas em condomínio no título", () => {
+  expect(comTipo("studio,loft", tituloBuscaComTotal(435, "Porto Alegre"))).toBe("435 studios à venda em Porto Alegre");
+  expect(comTipo("casa_condominio", tituloBuscaComTotal(1, "Porto Alegre"))).toBe("1 casa em condomínio à venda em Porto Alegre");
+});

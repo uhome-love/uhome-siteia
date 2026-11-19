@@ -71,7 +71,7 @@ export function HomeVitrine({ entreFileiras }: { entreFileiras?: React.ReactNode
         <FaixaRolavel className="home-categorias-trilho" rotulo="categorias">
           {categorias.map((c) => <Link key={c.id} to={prefixLink(urlCategoria(c.filtros))} className="home-categoria"><img src={c.icone} alt="" width={32} height={32} loading="lazy" decoding="async" /><span>{c.nome}</span></Link>)}
         </FaixaRolavel>
-        <Button asChild variant="outline" className="home-filtros"><Link to={prefixLink('/busca?filtros=1')}><SlidersHorizontal />Filtros</Link></Button>
+        <Button variant="outline" className="home-filtros" onClick={() => window.dispatchEvent(new Event('uhome:abrir-painel'))}><SlidersHorizontal />Filtros</Button>
       </nav>
       <div className="home-conteudo">
         <ContinueDeOndeParou />

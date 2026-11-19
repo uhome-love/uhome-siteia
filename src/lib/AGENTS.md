@@ -1,1 +1,2 @@
 - Favorite folders/notes: localStorage first (favoritosPastas.ts), mirrored to favorito_pastas when signed in; shares are read-only snapshots via RPC. Why: works signed-out, never exposes the owner.
+- Search data starts in `src/lib/buscaCedo.ts` (called from main.tsx, raw PostgREST fetch + first photo preload); `buscarSite` reuses that promise by filter JSON. Why: the list must not wait for the route chunk or the backend client.

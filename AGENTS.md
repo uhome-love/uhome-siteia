@@ -33,4 +33,3 @@
 - Home lar-1 (uh-home-layout) = HomeVitrine, no mold yet; site-dobra drops legacy home pre. Why: no cover swap.
 - Retained-pre transition rules stay inline in index.html, not only in async CSS. Why: late CSS caused CLS 1.
 - Foco uses shared type/title/FAQ/numbers helpers, ficha.titulo_manual overrides, site-v2 molds and one deferred form. Preserve CRM/journey; mock test writes. Why: page/pre/social parity and safe verification.
-- Search data starts in `src/lib/buscaCedo.ts` (called from main.tsx, raw PostgREST fetch + first photo preload); `buscarSite` reuses that promise by filter JSON. Why: the list must not wait for the route chunk or the backend client.

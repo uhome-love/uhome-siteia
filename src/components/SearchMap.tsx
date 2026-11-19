@@ -38,7 +38,7 @@ function formatPreco(preco: number): string {
   if (!preco) return "";
   if (preco >= 1_000_000) return `R$${(preco / 1_000_000).toFixed(1).replace(".0", "")}M`;
   if (preco >= 1_000) return `R$${Math.round(preco / 1_000)}k`;
-  return `R$${preco}`;
+  return "Consulte";
 }
 
 function formatPrecoFull(preco: number): string {

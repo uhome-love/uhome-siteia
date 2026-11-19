@@ -17,7 +17,7 @@ export const CATEGORIAS = [
   { id: 'canoas', nome: 'Em Canoas', icone: 'local', filtros: { cidade: 'Canoas' } },
 ] as const;
 export function categoriasVisiveis(contagens: Record<string, number>) { return CATEGORIAS.filter(c => (contagens[c.id] ?? 0) >= 8); }
-export function tituloBusca(cidade?: string) { return `Imóveis à venda em ${cidade || 'Porto Alegre'}`; }
+export function tituloBusca(cidade?: string) { return cidade ? `Imóveis à venda em ${cidade}` : 'Imóveis à venda'; }
 /** Faixa de categorias com ícones 3D (Home e busca). Ícones em /public/categorias. */
 export const CATEGORIAS_3D = [
   { id: 'novidades', nome: 'Novidades', icone: '/categorias/novidades.webp', filtros: { novidades: 30 } },
@@ -44,10 +44,11 @@ export function categorias3dVisiveis(categorias: Record<string, number>, tipos: 
 }
 /** Título dos resultados com total (exceção à regra de não mostrar totais). */
 export function tituloBuscaComTotal(count: number | null | undefined, cidade?: string) {
-  const lugar = `à venda em ${cidade || 'Porto Alegre'}`;
-  if (count == null) return `Imóveis ${lugar}`;
-  if (count === 0) return `Nenhum imóvel ${lugar}`;
-  if (count === 1) return `1 imóvel ${lugar}`;
-  if (count > 1000) return `Mais de 1.000 imóveis ${lugar}`;
-  return `${count.toLocaleString('pt-BR')} imóveis ${lugar}`;
+  // Sem cidade escolhida a busca traz todas as cidades: título curto, sem lugar.
+  const lugar = cidade ? ` à venda em ${cidade}` : '';
+  if (count == null) return cidade ? `Imóveis${lugar}` : 'Imóveis à venda';
+  if (count === 0) return `Nenhum imóvel${lugar}`;
+  if (count === 1) return `1 imóvel${lugar}`;
+  if (count > 1000) return `Mais de ${cidade ? '1.000' : 'mil'} imóveis${lugar}`;
+  return `${count.toLocaleString('pt-BR')} imóveis${lugar}`;
 }

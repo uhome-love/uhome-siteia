@@ -392,7 +392,7 @@ body:has(.search-filter-dialog[data-state=open]) [aria-label="Preferências de p
  .search-category{flex-direction:row;gap:8px;height:44px!important;min-width:0;padding:0 12px!important;font-size:12px!important;border:1px solid var(--line);border-radius:var(--radius-pill)}
  .search-category .search-category-desktop-icon{display:none}.search-category .search-category-mobile-icon{display:block;width:20px!important;height:20px!important;color:var(--ink)}
  .search-category[aria-pressed=true]{background:var(--ink);color:var(--surface)}.search-category[aria-pressed=true] .search-category-mobile-icon{color:var(--surface)}
- .search-results-heading{margin-bottom:16px}.search-results-heading h1{font-size:20px;font-weight:700;line-height:1.4}.search-results-heading>p{display:none}
+ .search-results-heading{margin-bottom:16px}.search-results-heading h1{font-size:18px;font-weight:600;line-height:1.4}@media(min-width:1024px){.search-results-heading h1{font-size:20px}}.search-results-heading>p{display:none}
  .search-list{padding-top:16px}
  .search-page .uhs-header--compact .uhs-mobile-header{padding-top:8px;padding-bottom:8px}.search-page .uhs-header--compact .uhs-busca-celular{height:44px}
  .search-page .uhs-header--compact .uhs-mobile-tabs{display:none}
@@ -715,3 +715,5 @@ body[data-scroll-locked] .uhs-lia-float{display:none!important}
 .busca-sugestao[aria-pressed=true]{border-color:hsl(var(--foreground));background:hsl(var(--muted))}
 .uhs-busca-celular .uhs-busca-linhas{display:flex;flex-direction:column;align-items:flex-start;min-width:0;line-height:1.2}
 .uhs-busca-celular .uhs-busca-linhas small{font-size:12px;font-weight:500;color:hsl(var(--muted-foreground));max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.mapa-fantasma{background:linear-gradient(135deg,hsl(var(--muted)) 0%,hsl(var(--background)) 50%,hsl(var(--muted)) 100%);background-size:200% 200%;animation:mapa-fantasma 1.6s ease-in-out infinite}@keyframes mapa-fantasma{50%{background-position:100% 100%}}@media (prefers-reduced-motion:reduce){.mapa-fantasma{animation:none}}

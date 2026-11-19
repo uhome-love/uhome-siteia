@@ -7,7 +7,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/lib/supabaseLazy';
 import { cardFotoUrl } from '@/lib/searchImages';
-import { indiceDoScroll } from './fotosIndice';
+import { indiceDoScroll, decidirFoto, ehHorizontal } from './fotosIndice';
 
 const cache = new Map<string, Promise<string[]>>();
 /** Até 5 fotos do card, pedidas só na primeira interação. */
@@ -39,9 +39,33 @@ export function FotosCard({ id, produto, titulo, children }: { id: string; produ
     return () => { vivo = false; io?.disconnect(); window.removeEventListener('load', ocioso); }; }, [id]);
   const aoRolar = () => { cancelAnimationFrame(raf.current); raf.current = requestAnimationFrame(() => { const t = trilho.current; if (t) setI(indiceDoScroll(t.scrollLeft, t.clientWidth, total)); }); };
   const ir = (d: number) => { const t = trilho.current; if (!t) return; const n = (i + d + total) % total; t.scrollTo({ left: n * t.clientWidth, behavior: 'smooth' }); };
-  const abrir = () => { caixa.current?.querySelector<HTMLAnchorElement>('.fotos-card-trilho > a')?.click(); };
+  const bloqueia = useRef(false), iRef = useRef(0); iRef.current = i;
+  const totalRef = useRef(1); totalRef.current = total;
+  // Deslize pelo próprio dedo: o iPhone nem sempre rola a fileira sozinho.
+  useEffect(() => {
+    const t = trilho.current; if (!t || t.closest('.home-trilho,.gaveta-trilho')) return;
+    let x0 = 0, y0 = 0, base = 0, t0 = 0, eixo: '' | 'x' | 'y' = '', dx = 0;
+    const ini = (e: TouchEvent) => { if (e.touches.length !== 1) return; carregar(); x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; base = t.scrollLeft; t0 = performance.now(); eixo = ''; dx = 0; };
+    const mov = (e: TouchEvent) => {
+      const ddx = e.touches[0].clientX - x0, ddy = e.touches[0].clientY - y0;
+      if (!eixo) { if (ehHorizontal(ddx, ddy)) { eixo = 'x'; t.dataset.arrastando = '1'; } else if (Math.abs(ddy) > 8) eixo = 'y'; }
+      if (eixo !== 'x' || totalRef.current < 2) return;
+      e.preventDefault(); dx = ddx; t.scrollLeft = base - dx;
+    };
+    const fim = () => {
+      if (eixo !== 'x') return; eixo = '';
+      const w = t.clientWidth, de = Math.round(base / (w || 1));
+      const n = decidirFoto(dx, w, dx / Math.max(1, performance.now() - t0), de, totalRef.current);
+      bloqueia.current = Math.abs(dx) > 8; setTimeout(() => { bloqueia.current = false; }, 400);
+      delete t.dataset.arrastando; t.scrollTo({ left: n * w, behavior: 'smooth' }); setI(n);
+    };
+    t.addEventListener('touchstart', ini, { passive: true }); t.addEventListener('touchmove', mov, { passive: false });
+    t.addEventListener('touchend', fim); t.addEventListener('touchcancel', fim);
+    return () => { t.removeEventListener('touchstart', ini); t.removeEventListener('touchmove', mov); t.removeEventListener('touchend', fim); t.removeEventListener('touchcancel', fim); };
+  }, [id]);
+  const abrir = () => { if (bloqueia.current) return; caixa.current?.querySelector<HTMLAnchorElement>('.fotos-card-trilho > a')?.click(); };
   return (
-    <div ref={caixa} className="fotos-card" onPointerEnter={carregar} onTouchStart={carregar}>
+    <div ref={caixa} className="fotos-card" onPointerEnter={carregar} onClickCapture={(e) => { if (bloqueia.current) { bloqueia.current = false; e.preventDefault(); e.stopPropagation(); } }}>
       <div ref={trilho} className="fotos-card-trilho" onScroll={aoRolar}>
         {children}
         {extras.map((u, k) => (

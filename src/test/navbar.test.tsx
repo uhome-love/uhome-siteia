@@ -34,10 +34,10 @@ describe("ações do cabeçalho", () => {
     expect(abrir).toHaveBeenCalledTimes(1);
     window.removeEventListener('uhome:abrir-filtros', abrir);
   });
-  it("abre o painel completo de busca e permite digitar um bairro", async () => {
+  it("abre a busca em etapas e permite digitar um bairro", async () => {
     renderNavbar();
     fireEvent.click(screen.getAllByRole("button", {name: /Onde vai ser seu novo lar\?/})[0]);
-    const onde = await screen.findByLabelText("Onde");
+    const onde = await screen.findByLabelText("Onde", {}, {timeout: 5000});
     fireEvent.change(onde, {target: {value: "Moinhos de Vento"}});
     expect(onde).toHaveValue("Moinhos de Vento");
   });

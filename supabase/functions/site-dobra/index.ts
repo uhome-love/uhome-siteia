@@ -5,7 +5,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import * as NOVO from "./moldes.ts";
 import { HERO_FOCO_V2, HEADER_FOCO_V2 } from "./moldes-foco-v2.ts";
-import { tituloFoco, numerosFoco } from "../_shared/focoPresentation.ts";
+import { tituloFoco, numerosFoco, ofertaFoco, CONFIANCA_FOCO } from "../_shared/focoPresentation.ts";
 import { NAV_BUSCA_V3, TOOLBAR_V3, CARD_V3, ICONES_BUSCA_MOBILE } from './moldes-busca-v3.ts';
 import { BUSCA_URLS, categoriasVisiveis, tituloBusca } from '../_shared/buscaConfig.ts';
 import miniaturas from '../_shared/buscaMiniaturas.json' with { type: 'json' };
@@ -55,7 +55,9 @@ function compativel(corpo: Corpo): Corpo {
   // Nunca serializar preV2/preV3 ou os demais moldes no contrato público.
   // Home nova ("Você e seu novo lar.") ainda sem molde: o app novo descarta a capa antiga em vez de trocar de tela.
   const lar = String(corpo.pre ?? '').includes('gasometro-') ? `<script>if(document.querySelector('meta[name="uh-home-layout"]')?.content==='lar-1')document.getElementById('uh-pre')?.remove();</script>` : '';
-  return { head, pre: v3 ? v3 + proteger + lar : '', script };
+  // Capa do em-foco com bloco de oferta: app antigo (sem uh-foco-layout=oferta-1) descarta a capa em vez de trocar de tela.
+  const oferta = String(corpo.preV2 ?? '').includes('data-foco-oferta') ? `<script>if(document.querySelector('meta[name="uh-foco-layout"]')?.content!=='oferta-1')document.getElementById('uh-pre')?.remove();</script>` : '';
+  return { head, pre: v3 ? v3 + proteger + lar + oferta : '', script };
 }
 
 /** Igual a src/lib/searchImages.ts */
@@ -309,10 +311,14 @@ async function produto(slug: string, corretor: boolean) {
   const fotosV2 = galeria.slice(0, 5).map((g: any, i: number) => `<button type="button" aria-label="Abrir foto ${i + 1} de ${esc(p.nome)}" class="inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold foco-photo ${i === 0 ? "foco-photo-main" : ""}"><img src="${esc(g.url)}"${g.url_mobile ? ` srcset="${esc(g.url_mobile)} 800w, ${esc(g.url)} 1600w" sizes="${i === 0 ? "(min-width:1024px) 640px, 100vw" : "(min-width:1024px) 320px, 100vw"}"` : ""} alt="${esc(g.legenda ?? p.nome)}" width="1600" height="1200" loading="${i === 0 ? "eager" : "lazy"}" fetchpriority="${i === 0 ? "high" : "low"}" decoding="async"></button>`).join("");
   let heroV2 = HERO_FOCO_V2.replace("{{FOTOS}}", fotosV2).replaceAll("{{NOME}}", esc(p.nome)).replaceAll("{{N}}", String(galeria.length));
   if (!natal) heroV2 = heroV2.replace(/<span[^>]*>Condição de Natal até 18\/12<\/span>/g, "");
-  const headingV2 = `<div data-foco-title="true" class="foco-heading"><p class="text-sm font-semibold text-muted-foreground">${esc(p.nome)} · ${esc(p.incorporadora)}</p><div class="mt-3 flex flex-wrap gap-2"><span class="rounded-md bg-secondary px-3 py-1 text-xs font-semibold">${esc(p.status_obra ?? "Empreendimento")}</span>${natal ? '<span class="rounded-md bg-natal-red px-3 py-1 text-xs font-semibold text-natal-foreground">Condição de Natal até 18/12</span>' : ''}</div><h1 class="mt-3 text-3xl font-extrabold leading-tight lg:text-4xl">${esc(tituloFoco(p))}</h1><p class="mt-3 flex items-center gap-2 text-sm text-muted-foreground">${PIN}${esc(p.bairro)}, ${esc(p.cidade)}</p></div>`;
+  // Bloco de oferta e barra fixa: gerados do app renderizado (ProdutoFocoPage) em 390px.
+  const of = ofertaFoco(p.preco_a_partir, condGerais, !!natal);
+  const ofertaV2 = `<div data-foco-oferta="true" class="foco-oferta">${of.preco ? `<p class="foco-oferta-preco">${esc(of.preco)}</p>` : ""}${of.condicao ? `<p class="foco-oferta-condicao">${esc(of.condicao)}</p>` : ""}<button class="inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 active:scale-[0.97] bg-primary text-primary-foreground hover:bg-brand-strong h-12 px-6 py-2 foco-oferta-botao">Receber tabela e plantas</button><button type="button" class="foco-oferta-visita">ou agendar visita</button><p class="foco-oferta-confianca">${CONFIANCA_FOCO}</p></div>`;
+  const barraV2 = `<div data-barra-baixo="true" class="uhs-contact-bar fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-border bg-background/95 p-3 backdrop-blur lg:hidden"><button class="inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-md font-semibold ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 active:scale-[0.97] bg-primary text-primary-foreground hover:bg-brand-strong h-12 py-2 flex-1 px-2 text-sm">Receber tabela</button><span aria-label="WhatsApp" class="flex items-center justify-center rounded-xl border border-border px-4 py-3.5 text-foreground"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-circle h-5 w-5 text-whatsapp"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path></svg></span></div>`;
+  const headingV2 = `<div data-foco-title="true" class="foco-heading"><p class="text-sm font-semibold text-muted-foreground">${esc(p.nome)} · ${esc(p.incorporadora)}</p><div class="mt-3 flex flex-wrap gap-2"><span class="rounded-md bg-secondary px-3 py-1 text-xs font-semibold">${esc(p.status_obra ?? "Empreendimento")}</span></div><h1 class="mt-3 text-3xl font-extrabold leading-tight lg:text-4xl">${esc(tituloFoco(p))}</h1><p class="mt-3 flex items-center gap-2 text-sm text-muted-foreground">${PIN}${esc(p.bairro)}, ${esc(p.cidade)}</p>${ofertaV2}</div>`;
   const numerosV2 = numerosFoco(p);
   const gradeV2 = numerosV2.length ? `<section class="border-b border-border pb-6"><dl class="grid grid-cols-2 gap-5 sm:grid-cols-3">${numerosV2.map(n => `<div><dt class="text-xs text-muted-foreground">${esc(n.label)}</dt><dd class="mt-1 text-sm font-bold">${esc(n.valor)}</dd></div>`).join("")}</dl></section>` : "";
-  const preV2 = `<div id="uh-pre" data-uh-alvo="[data-uh-capa]"><div class="foco-page min-h-screen bg-background">${HEADER_FOCO_V2}<main class="foco-container">${headingV2}${heroV2}<div class="foco-columns"><div class="foco-content">${gradeV2}</div></div></main></div></div>`;
+  const preV2 = `<div id="uh-pre" data-uh-alvo="[data-uh-capa]"><div class="foco-page min-h-screen bg-background">${HEADER_FOCO_V2}<main class="foco-container">${headingV2}${heroV2}<div class="foco-columns"><div class="foco-content">${gradeV2}</div></div></main>${barraV2}</div></div>`;
   return { head, pre, preV2, script: `window.__UH_DOBRA__=${json({ campanhas: camps, produto: p })};` };
 }
 

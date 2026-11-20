@@ -35,3 +35,12 @@ describe("números visíveis", () => {
     expect(numerosFoco({ ficha: { tipologias: [{ suites: 0 }, { suites: 1 }] } })).toEqual([{ label: "Suíte", valor: "1" }]);
   });
 });
+import { ofertaFoco } from "../../supabase/functions/_shared/focoPresentation";
+describe("oferta da primeira tela do em-foco", () => {
+  it("mostra preço e condição da campanha", () => {
+    expect(ofertaFoco(329000, ["Entrada a partir de 10%", "Parcelas facilitadas"], true)).toEqual({ preco: "A partir de R$ 329 mil", condicao: "Natal: Entrada a partir de 10% · Parcelas facilitadas · até 18/12" });
+  });
+  it("sem preço e sem campanha não inventa nada", () => {
+    expect(ofertaFoco(null, ["Entrada a partir de 10%"], false)).toEqual({ preco: null, condicao: null });
+  });
+});

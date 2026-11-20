@@ -59,3 +59,17 @@ export function faqFoco(p: Produto, condicoes: string[] = []) {
     { p: "Como pedir uma visita?", r: "Escolha o dia e o período. Um especialista confirma pelo WhatsApp." },
   ].filter((x): x is { p: string; r: string } => !!x);
 }
+/** Preço "a partir de" no mesmo formato do app (R$ 329 mil, R$ 1,2 mi). */
+export function precoCurtoFoco(v?: number | null): string | null {
+  if (!v) return null;
+  if (v >= 1_000_000) return `R$ ${(v / 1_000_000).toLocaleString("pt-BR", { maximumFractionDigits: 2 })} mi`;
+  if (v % 1000 === 0) return `R$ ${(v / 1000).toLocaleString("pt-BR")} mil`;
+  return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+}
+/** Bloco de oferta da primeira tela: só mostra o que existe no banco. */
+export function ofertaFoco(preco: number | null | undefined, condicoes?: string[] | null, temCampanha = false) {
+  const p = precoCurtoFoco(preco);
+  const c = (condicoes ?? []).filter(Boolean);
+  return { preco: p ? `A partir de ${p}` : null, condicao: temCampanha && c.length ? `Natal: ${c.join(" · ")} · até 18/12` : null };
+}
+export const CONFIANCA_FOCO = "Uhome Imóveis · CRECI-RS 25682J · resposta pelo WhatsApp em minutos";

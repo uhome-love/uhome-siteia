@@ -15,7 +15,7 @@ function preencher() { fireEvent.change(screen.getByLabelText("Seu nome"), { tar
 afterEach(() => { cleanup(); vi.resetAllMocks(); });
 describe("pedidos locais com transporte simulado, sem CRM", () => {
   it("informações envia origem e planta escolhida", async () => {
-    mocks.lead.mockResolvedValue(true); montar("informacoes"); preencher(); fireEvent.click(screen.getByRole("button", { name: "Receber informações" }));
+    mocks.lead.mockResolvedValue(true); montar("informacoes"); preencher(); fireEvent.click(screen.getByRole("button", { name: "Quero receber" }));
     await waitFor(() => expect(mocks.lead).toHaveBeenCalledWith(expect.objectContaining({ tipo_interesse: "informacoes", contexto: expect.objectContaining({ origem: "informacoes", pedido: expect.objectContaining({ planta: "2 dormitórios", tipo: "informacoes_pedidas" }) }) })));
     expect(mocks.insert).not.toHaveBeenCalled();
   });
@@ -25,11 +25,11 @@ describe("pedidos locais com transporte simulado, sem CRM", () => {
     await waitFor(() => expect(mocks.lead).toHaveBeenCalledWith(expect.objectContaining({ tipo_interesse: "visita" })));
   });
   it("não confirma quando o salvamento falha", async () => {
-    mocks.lead.mockRejectedValue(new Error("não salvo")); montar("informacoes"); preencher(); fireEvent.click(screen.getByRole("button", { name: "Receber informações" }));
+    mocks.lead.mockRejectedValue(new Error("não salvo")); montar("informacoes"); preencher(); fireEvent.click(screen.getByRole("button", { name: "Quero receber" }));
     await waitFor(() => expect(screen.getByRole("alert")).toBeInTheDocument()); expect(screen.queryByRole("status")).toBeNull();
   });
   it("espera a resposta do salvamento para confirmar", async () => {
-    let concluir: (value: boolean) => void = () => {}; mocks.lead.mockImplementation(() => new Promise<boolean>(resolve => { concluir = resolve; })); montar("informacoes"); preencher(); fireEvent.click(screen.getByRole("button", { name: "Receber informações" }));
+    let concluir: (value: boolean) => void = () => {}; mocks.lead.mockImplementation(() => new Promise<boolean>(resolve => { concluir = resolve; })); montar("informacoes"); preencher(); fireEvent.click(screen.getByRole("button", { name: "Quero receber" }));
     await waitFor(() => expect(mocks.lead).toHaveBeenCalled()); expect(screen.queryByRole("status")).toBeNull(); concluir(true); await waitFor(() => expect(screen.getByRole("status")).toBeInTheDocument());
   });
 });

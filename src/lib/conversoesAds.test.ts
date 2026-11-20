@@ -7,5 +7,5 @@ describe('conversões do Google Ads', () => {
   it('abrir a comparação vira Comparar imóveis sem valor', () => { expect(conversaoDoEvento('comparar_imoveis')).toBe('comparar'); expect(valorConversao('comparar')).toBeUndefined(); });
   it('formulário comum segue Lead site de R$ 50 e visita R$ 100', () => { expect(conversaoDoEvento('generate_lead', { lead_source: 'lead_sidebar' })).toBe('lead'); expect(valorConversao('lead')).toBe(50); expect(valorConversao('visita')).toBe(100); });
   it('conta criada vira Conta criada, nunca Lead site, e sem valor', () => { expect(conversaoDoEvento('generate_lead', { lead_source: 'cadastro' })).toBe('conta_criada'); expect(valorConversao('conta_criada')).toBeUndefined(); });
-  it('formulário do em-foco (tabela e plantas) segue Lead site', () => { expect(conversaoDoEvento('generate_lead', { lead_source: 'foco_mais_informacoes' })).toBe('lead'); });
+  it('formulário do em-foco (mais informações) segue Lead site', () => { expect(conversaoDoEvento('generate_lead', { lead_source: 'foco_mais_informacoes' })).toBe('lead'); });
 });

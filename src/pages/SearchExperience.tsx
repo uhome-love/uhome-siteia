@@ -69,12 +69,15 @@ function SearchExperience() {
   // Visitante de anúncio: esconde "Mostrar mapa" e o avatar da LIA enquanto um cartão de seleção estiver na tela, para nunca cobrir o envio.
   useEffect(()=>{if(!anuncio||!mobile)return;let raf=0;
     // Checagem direta pela posição: não depende de qual nó do cartão o observador viu (hidratação/re-render trocam o elemento).
-    const checar=()=>{raf=0;const h=window.innerHeight;const na=[...document.querySelectorAll('[data-busca-selecao]')].some(el=>{const r=el.getBoundingClientRect();return r.bottom>0&&r.top<h&&r.height>0;});document.body.classList.toggle('selecao-na-tela',na);};
+    const checar=()=>{raf=0;const h=window.innerHeight;const na=[...document.querySelectorAll('[data-busca-selecao]')].some(el=>{const r=el.getBoundingClientRect();return r.bottom>0&&r.top<h&&r.height>0;});if(document.body.classList.contains('selecao-na-tela')!==na)document.body.classList.toggle('selecao-na-tela',na);};
     const agendar=()=>{if(!raf)raf=requestAnimationFrame(checar);};
-    checar();agendar();const t=setTimeout(checar,500);
+    checar();agendar();
+    // O CSS principal chega depois (carregamento assíncrono) e muda o layout sem mexer no DOM: rechecar nos primeiros segundos, no load e a cada mudança de tamanho.
+    const ts=[100,500,1000,2000,3000].map(ms=>setTimeout(checar,ms));window.addEventListener('load',agendar);
+    const ro=typeof ResizeObserver!=='undefined'?new ResizeObserver(agendar):null;ro?.observe(document.body);
     window.addEventListener('scroll',agendar,{passive:true});window.addEventListener('resize',agendar);
-    const mo=new MutationObserver(agendar);mo.observe(document.body,{childList:true,subtree:true});
-    return()=>{cancelAnimationFrame(raf);clearTimeout(t);window.removeEventListener('scroll',agendar);window.removeEventListener('resize',agendar);mo.disconnect();document.body.classList.remove('selecao-na-tela');};},[anuncio,mobile]);
+    const mo=new MutationObserver(agendar);mo.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});mo.observe(document.head,{childList:true});
+    return()=>{cancelAnimationFrame(raf);ts.forEach(clearTimeout);ro?.disconnect();window.removeEventListener('load',agendar);window.removeEventListener('scroll',agendar);window.removeEventListener('resize',agendar);mo.disconnect();document.body.classList.remove('selecao-na-tela');};},[anuncio,mobile]);
   const fkey=JSON.stringify(filtros); const key=JSON.stringify([filtros,area]);
   useEffect(()=>{setArea(null);},[fkey]);
   const rotuloBusca=Object.entries(filtrosUteis(filtros)??{}).map(([k,v])=>rotuloChip(k,v)).join(' · ');

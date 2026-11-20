@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Faixa de categorias: Home no container do header/cartões e busca nas suas margens; máscaras/setas e respiro mobile verificados em 1440/1920/375 px; 279 testes passaram, sem publicar. Molde ativo da Home não contém essa faixa e margens do molde mobile da busca permanecem iguais.
 - [x] Velocidade mobile — 2ª rodada (código): ajuda e interruptores sob demanda, gatilho de saída separado do formulário, catálogo público sem inicializar SDK, conta sem sessão após load/idle; 279 testes e ações mobile verificados, sem publicar.
 - [ ] Velocidade mobile — 2ª rodada (medição): tabela gzip antes → depois e 15 módulos maiores do entry. Bloqueio: compilação manual não permitida nesta sessão e relatório da compilação automática indisponível; analisador de chunks de produção incluído, sem números de desenvolvimento como substituto.
 - [x] Velocidade mobile: adiar dependências fora da primeira tela, medir localmente, validar contatos e publicar site-dobra.

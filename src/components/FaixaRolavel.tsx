@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 /** Faixa com rolagem lateral e setas redondas que só aparecem quando há mais itens (padrão Airbnb). */
 export function FaixaRolavel({ className, children, rotulo = 'itens' }: { className?: string; children: React.ReactNode; rotulo?: string }) {
@@ -16,8 +17,8 @@ export function FaixaRolavel({ className, children, rotulo = 'itens' }: { classN
   }, []);
   const ir = (d: number) => { const el = ref.current; if (el) el.scrollBy({ left: d * el.clientWidth * 0.85, behavior: 'smooth' }); };
   return <div className="faixa-rolavel" data-esq={lados.esq || undefined} data-dir={lados.dir || undefined}>
-    <button type="button" className="faixa-seta faixa-seta-esq" aria-label={`Ver ${rotulo} anteriores`} tabIndex={lados.esq ? 0 : -1} onClick={() => ir(-1)}><ChevronLeft aria-hidden="true" /></button>
+    <Button type="button" variant="ghost" size="icon" className="faixa-seta faixa-seta-esq min-h-0 min-w-0" aria-label={`Ver ${rotulo} anteriores`} tabIndex={lados.esq ? 0 : -1} onClick={() => ir(-1)}><ChevronLeft aria-hidden="true" /></Button>
     <div ref={ref} className={className}>{children}</div>
-    <button type="button" className="faixa-seta faixa-seta-dir" aria-label={`Ver mais ${rotulo}`} tabIndex={lados.dir ? 0 : -1} onClick={() => ir(1)}><ChevronRight aria-hidden="true" /></button>
+    <Button type="button" variant="ghost" size="icon" className="faixa-seta faixa-seta-dir min-h-0 min-w-0" aria-label={`Ver mais ${rotulo}`} tabIndex={lados.dir ? 0 : -1} onClick={() => ir(1)}><ChevronRight aria-hidden="true" /></Button>
   </div>;
 }

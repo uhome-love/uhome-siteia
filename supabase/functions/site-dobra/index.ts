@@ -270,7 +270,7 @@ async function produto(slug: string, corretor: boolean) {
   const f = galeria[0] || (p?.capa_url ? { url: p.capa_url } : null);
   if (!p || !f?.url) return { head: "", pre: "", script: "" };
   const mob = f.url_mobile as string | undefined;
-  const sizes = "(min-width: 1152px) 1152px, 100vw";
+  const sizes = "(min-width:1024px) 640px, 100vw";
   const set = mob ? `${mob} 800w, ${f.url} 1600w` : "";
   const head = mob
     ? `<link rel="preload" as="image" fetchpriority="high" href="${esc(mob)}" imagesrcset="${esc(set)}" imagesizes="${sizes}">`
@@ -310,7 +310,11 @@ async function produto(slug: string, corretor: boolean) {
     + (chips.length ? `<ul class="mt-4 flex flex-wrap gap-2">${chips.map((c) => `<li class="rounded-full border border-border px-3 py-1 font-body text-sm text-foreground">${esc(c)}</li>`).join("")}</ul>` : "")
     + `<div class="mt-5 flex flex-wrap items-end justify-between gap-4"><div>${preco ? `<p class="font-heading text-3xl font-bold text-foreground sm:text-4xl"><span class="block font-body text-xs font-normal uppercase tracking-wider text-muted-foreground">a partir de</span>${esc(preco)}</p>` : ""}${natal && condGerais[0] ? `<p class="mt-1 font-body text-sm font-semibold text-primary">${esc(condGerais[0])}</p>` : ""}</div>${botoes}</div></div>`;
   const pre = `<div id="uh-pre" data-uh-alvo="[data-uh-capa]"><div class="min-h-screen bg-background pb-24 lg:pb-0">${cab}<main><section class="mx-auto max-w-6xl sm:px-8 sm:pt-6">${capa}${info}</section></main></div></div>`;
-  const fotosV2 = galeria.slice(0, 5).map((g: any, i: number) => `<button type="button" aria-label="Abrir foto ${i + 1} de ${esc(p.nome)}" class="inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold foco-photo ${i === 0 ? "foco-photo-main" : ""}"><img src="${esc(g.url)}"${g.url_mobile ? ` srcset="${esc(g.url_mobile)} 800w, ${esc(g.url)} 1600w" sizes="${i === 0 ? "(min-width:1024px) 640px, 100vw" : "(min-width:1024px) 320px, 100vw"}"` : ""} alt="${esc(g.legenda ?? p.nome)}" width="1600" height="1200" loading="${i === 0 ? "eager" : "lazy"}" fetchpriority="${i === 0 ? "high" : "low"}" decoding="async"></button>`).join("");
+  const fotosV2 = galeria.slice(0, 5).map((g: any, i: number) => {
+    const setFoto = g.url_mobile ? `${esc(g.url_mobile)} 800w, ${esc(g.url)} 1600w` : esc(g.url);
+    const fonte = i === 0 ? `src="${esc(g.url)}"${g.url_mobile ? ` srcset="${setFoto}" sizes="${sizes}"` : ''}` : '';
+    return `<button type="button" aria-label="Abrir foto ${i + 1} de ${esc(p.nome)}" class="inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold foco-photo ${i === 0 ? "foco-photo-main" : ""}"><picture class="contents">${i > 0 ? `<source media="(min-width: 1024px)" srcset="${setFoto}" sizes="320px">` : ''}<img ${fonte} alt="${esc(g.legenda ?? p.nome)}" width="1600" height="1200" loading="${i === 0 ? "eager" : "lazy"}" fetchpriority="${i === 0 ? "high" : "low"}" decoding="async"></picture></button>`;
+  }).join("");
   let heroV2 = HERO_FOCO_V2.replace("{{FOTOS}}", fotosV2).replaceAll("{{NOME}}", esc(p.nome)).replaceAll("{{N}}", String(galeria.length));
   if (!natal) heroV2 = heroV2.replace(/<span[^>]*>Condição de Natal até 18\/12<\/span>/g, "");
   // Bloco de oferta e barra fixa: gerados do app renderizado (ProdutoFocoPage) em 390px.

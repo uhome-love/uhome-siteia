@@ -3,6 +3,7 @@ import { Navbar } from "@/components/Navbar";
 import { HomeVitrine } from "@/components/home/HomeVitrine";
 import { HomeCampanhaBanner } from "@/components/HomeCampanhaBanner";
 import { Reveal } from "@/components/ui/reveal";
+import { DeferredFoco } from "@/components/foco/DeferredFoco";
 
 
 const Footer = lazy(() => import("../components/Footer.tsx").then(m => ({ default: m.Footer })));
@@ -55,15 +56,15 @@ const Index = () => {
       <main>
         <HomeVitrine entreFileiras={<HomeCampanhaBanner />} />
         <Suspense fallback={null}>
-          <Reveal><EmpreendimentosDestaque /></Reveal>
-          <Reveal><FeaturedNeighborhoods /></Reveal>
-          <Reveal><HomeCorretorBusca /></Reveal>
-          <Reveal><HomeConfianca /></Reveal>
-          <SeoLinksSection />
-          <HomeFaqSection faqs={HOME_FAQS} />
+          <DeferredFoco minHeight={400}><Reveal><EmpreendimentosDestaque /></Reveal></DeferredFoco>
+          <DeferredFoco minHeight={400}><Reveal><FeaturedNeighborhoods /></Reveal></DeferredFoco>
+          <DeferredFoco minHeight={400}><Reveal><HomeCorretorBusca /></Reveal></DeferredFoco>
+          <DeferredFoco minHeight={400}><Reveal><HomeConfianca /></Reveal></DeferredFoco>
+          <DeferredFoco minHeight={200}><SeoLinksSection /></DeferredFoco>
+          <DeferredFoco minHeight={300}><HomeFaqSection faqs={HOME_FAQS} /></DeferredFoco>
         </Suspense>
       </main>
-      <Footer />
+      <DeferredFoco minHeight={300}><Suspense fallback={null}><Footer /></Suspense></DeferredFoco>
     </div>
   );
 };

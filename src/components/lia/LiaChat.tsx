@@ -41,17 +41,22 @@ function aberturaPorPagina(path: string): { texto: string; sugestoes: string[] }
   return null;
 }
 
-export function LiaChat() {
+export function LiaChat({ aberturaInicial }: { aberturaInicial?: { mensagem?: string; avatar: boolean } } = {}) {
   const location = useLocation();
   const { corretor } = useCorretor();
-  const [visible, setVisible] = useState(false);
-  const [aberto, setAberto] = useState(false);
+  const [visible, setVisible] = useState(!!aberturaInicial);
+  const [aberto, setAberto] = useState(!!aberturaInicial);
   const [msgs, setMsgs] = useState<Msg[]>(lerConversa);
   const [texto, setTexto] = useState("");
   const [enviando, setEnviando] = useState(false);
   const fimRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const pendenteRef = useRef<string | null>(null);
+  const pendenteRef = useRef<string | null>(aberturaInicial?.mensagem ?? null);
+  useEffect(() => {
+    if (!aberturaInicial) return;
+    if (aberturaInicial.avatar) track("lia_aberta", { pagina: location.pathname });
+    void trackEvent({ tipo: "lia_aberta" });
+  }, []);
 
   // Landing de campanha: a barra de contato própria aparece até 1080px; a LIA só entra acima disso.
   const isLanding = isLandingCampanha(location.pathname);

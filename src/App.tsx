@@ -10,15 +10,31 @@ import { BannerCorretor } from "@/components/BannerCorretor";
 import { PageFallback } from "@/components/PageFallback";
 import { AppRoutes } from "@/routes/AppRoutes";
 import { lazyRetry } from "@/lib/lazyRetry"; // hmr-trigger
+import { useWhatsAppLeadStore } from "@/stores/whatsappLeadStore";
+import { useAuth } from "@/hooks/useAuth";
+import { LiaLauncher } from "@/components/lia/LiaLauncher";
 
 const Sonner = lazyRetry(() => import("@/components/ui/sonner").then((m) => ({ default: m.Toaster })));
 const Toaster = lazyRetry(() => import("@/components/ui/toaster").then((m) => ({ default: m.Toaster })));
 const ExitIntentModal = lazyRetry(() => import("./components/ExitIntentModal.tsx").then((m) => ({ default: m.ExitIntentModal })));
-const LiaChat = lazyRetry(() => import("./components/lia/LiaChat.tsx"));
 
 /** Lia, avisos e janelas só baixam depois da primeira pintura e do carregamento da página, para não disputar com o conteúdo principal. */
 const SalvarNaPasta = lazyRetry(() => import('@/components/favoritos/SalvarNaPasta').then((m) => ({ default: m.SalvarNaPasta })));
 const ConviteWhatsApp = React.lazy(() => import("@/components/ConviteWhatsApp"));
+function ContatosSobDemanda() {
+  const aberto = useWhatsAppLeadStore(s => s.isOpen);
+  const { user } = useAuth();
+  return <Suspense fallback={null}>{aberto && <WhatsAppLeadModal />}{user && <ConviteWhatsApp />}</Suspense>;
+}
+function PastasSobDemanda() {
+  const [id, setId] = useState<string | null>(null);
+  useEffect(() => {
+    const abrir = (event: Event) => setId((event as CustomEvent<string>).detail);
+    window.addEventListener('uhome:salvo-favorito', abrir);
+    return () => window.removeEventListener('uhome:salvo-favorito', abrir);
+  }, []);
+  return id ? <Suspense fallback={null}><SalvarNaPasta initialId={id} /></Suspense> : null;
+}
 function DepoisDaPintura({ children }: { children: React.ReactNode }) {
   const [pronta, setPronta] = useState(false);
   useEffect(() => {
@@ -64,11 +80,10 @@ const App = () => (
               <DepoisDaPintura>
                 <Toaster />
                 <Sonner />
-                <WhatsAppLeadModal />
+                <ContatosSobDemanda />
                 <ExitIntentModal />
-                <LiaChat />
-                <SalvarNaPasta />
-                <Suspense fallback={null}><ConviteWhatsApp /></Suspense>
+                <LiaLauncher />
+                <PastasSobDemanda />
               </DepoisDaPintura>
             </TooltipProvider>
           </CorretorProvider>

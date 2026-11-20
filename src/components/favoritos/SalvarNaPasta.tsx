@@ -11,13 +11,19 @@ import { CriarPastaInline } from './CriarPastaInline';
 export const EVENTO_SALVO = 'uhome:salvo-favorito';
 
 /** Painel que aparece ao salvar um favorito: escolher ou criar pasta sem sair da página. */
-export function SalvarNaPasta() {
+export function SalvarNaPasta({ initialId }: { initialId?: string } = {}) {
   const [id, setId] = useState<string | null>(null), [estado, setEstado] = useState<EstadoPastas>(lerPastas);
   const [foto, setFoto] = useState<string>(''), [celular, setCelular] = useState(false);
   useEffect(() => {
     const on = (e: Event) => { const i = (e as CustomEvent<string>).detail; setEstado(lerPastas()); setFoto(''); setId(i); setCelular(window.matchMedia('(max-width: 767px)').matches); void fotosDoCard(i, false).then((f) => setFoto(f[0] ? cardFotoUrl(f[0]) : '')); };
     window.addEventListener(EVENTO_SALVO, on); return () => window.removeEventListener(EVENTO_SALVO, on);
   }, []);
+  useEffect(() => {
+    if (!initialId) return;
+    setEstado(lerPastas()); setFoto(''); setId(initialId);
+    setCelular(window.matchMedia('(max-width: 767px)').matches);
+    void fotosDoCard(initialId, false).then(f => setFoto(f[0] ? cardFotoUrl(f[0]) : ''));
+  }, [initialId]);
   const atualizar = (e: EstadoPastas) => { setEstado(e); salvarPastas(e); };
   const fechar = () => setId(null);
   const corpo = id && <div className="salvar-pasta">

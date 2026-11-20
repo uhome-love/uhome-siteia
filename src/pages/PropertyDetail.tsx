@@ -3,16 +3,19 @@ import { getImovelUrl } from "@/utils/shareUrl";
 import { useEffect, useState, useRef, useCallback, lazy, Suspense } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
+const Footer = lazy(() => import("@/components/Footer").then(m => ({ default: m.Footer })));
 import { LeadSidebar } from "@/components/LeadSidebar";
 import { DetalheNavFixa } from "@/components/imovel/DetalheNavFixa";
-import { AgendamentoVisita } from "@/components/AgendamentoVisita";
-import { SimilarProperties } from "@/components/SimilarProperties";
+const AgendamentoVisita = lazy(() => import("@/components/AgendamentoVisita").then(m => ({ default: m.AgendamentoVisita })));
+const SimilarProperties = lazy(() => import("@/components/SimilarProperties").then(m => ({ default: m.SimilarProperties })));
+import { DeferredFoco } from "@/components/foco/DeferredFoco";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { capaResponsiva } from "@/lib/imagemCapa";
 const PropertyMap = lazy(() => import("../components/PropertyMap.tsx").then(m => ({ default: m.PropertyMap })));
 import { FotoImovel } from "@/components/FotoImovel";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 const MaterialGallery = lazy(() => import("@/components/foco/MaterialGallery").then(m => ({ default: m.MaterialGallery })));
-import { AuthModal } from "@/components/AuthModal";
+const AuthModal = lazy(() => import("@/components/AuthModal").then(m => ({ default: m.AuthModal })));
 import { Bed, Car, Maximize, Bath, MapPin, Share2, Heart, ChevronLeft, ChevronRight, Loader2, Camera, ArrowLeft, MoreVertical, Map as MapIcon, Play, MessageCircle, Building2, Eye, TrendingUp, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { buildWhatsAppUrl, buildCorretorWhatsAppUrl } from "@/lib/whatsapp";
@@ -23,7 +26,7 @@ import { motion } from "framer-motion";
 import { trackEvent } from "@/lib/trackEvent";
 import { trackView, getViewCount } from "@/services/leads";
 import { fetchImovelBySlug, isCodigoSlug, type Imovel, formatPreco, fotoPrincipal } from "@/services/imoveis";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseLazy";
 import { setJsonLd, removeJsonLd, buildImovelJsonLd, buildImovelBreadcrumbJsonLd } from "@/lib/jsonld";
 import { useCanonical } from "@/hooks/useCanonical";
 import { useFavoritos } from "@/hooks/useFavoritos";
@@ -43,9 +46,11 @@ function extractPropertyCode(slug: string, id: string): string {
 
 const PropertyDetail = () => {
   const { slug } = useParams();
+  const mobileFotos = useIsMobile(640);
   const navigate = useNavigate();
   useCanonical(slug ? `/imovel/${slug}` : undefined);
   const [currentImage, setCurrentImage] = useState(0);
+  const [fotosInteracao, setFotosInteracao] = useState(false);
   const [viewCount, setViewCount] = useState(0);
   const { isFavorito, toggleFavorito } = useFavoritos();
   const { corretor, prefixLink } = useCorretor();
@@ -279,7 +284,7 @@ const PropertyDetail = () => {
           </div>
         </div>
       )}
-      <div className="mt-16 hidden sm:block">
+      {!mobileFotos && <div className="mt-16 hidden sm:block">
         <div className="mx-auto flex max-w-[1120px] items-end justify-between gap-6 px-6 pb-6 pt-8">
           <div className="min-w-0">
             <p aria-hidden="true" className="truncate font-body text-[26px] font-bold leading-tight text-foreground">{imovel.titulo}</p>
@@ -296,7 +301,7 @@ const PropertyDetail = () => {
             onClick={(e) => { galleryTrigger.current = e.currentTarget; setCurrentImage(0); setGalleryOpen(true); }}
             className="group relative col-span-2 row-span-2 overflow-hidden"
           >
-            <FotoImovel src={images[0]} alt={imovel.titulo} className="h-full w-full object-cover transition-transform duration-500 group-hover:brightness-90" />
+            <FotoImovel {...capaResponsiva(images[0])} fallbackSrc={images[0]} loading="eager" fetchPriority="high" alt={imovel.titulo} className="h-full w-full object-cover transition-transform duration-500 group-hover:brightness-90" />
           </button>
           {images.slice(1, 5).map((img, i) => (
             <button
@@ -315,18 +320,18 @@ const PropertyDetail = () => {
           {images.length > 1 && <button onClick={(e) => { galleryTrigger.current = e.currentTarget; setCurrentImage(0); setGalleryOpen(true); }} className="absolute bottom-4 right-4 flex items-center gap-2 rounded-lg border border-foreground bg-card px-4 py-2 font-body text-sm font-semibold text-foreground shadow-sm transition-transform active:scale-[0.97]"><Camera className="h-4 w-4" />Mostrar todas as {images.length} fotos</button>}
         </div>
         </div>
-      </div>
+      </div>}
       <DetalheNavFixa preco={priceFormatted} onAgendar={isIndisponivel ? undefined : abrirVisita} />
 
       {/* Mobile hero — QuintoAndar style */}
-      <div className="relative sm:hidden">
+      {mobileFotos && <div className="relative sm:hidden">
         <div className="relative aspect-[4/3] overflow-hidden">
           {/* Embla carousel */}
-          <div ref={emblaRef} className="h-full overflow-hidden">
+          <div ref={emblaRef} className="h-full overflow-hidden" onPointerDown={() => setFotosInteracao(true)} onTouchStart={() => setFotosInteracao(true)}>
             <div className="flex h-full">
               {images.map((img, i) => (
                 <div key={i} className="relative h-full min-w-0 flex-[0_0_100%]">
-                  <img src={img} alt={`Foto ${i + 1}`} className="h-full w-full object-cover" draggable={false} onClick={(e) => { galleryTrigger.current = e.currentTarget as any; setCurrentImage(i); setGalleryOpen(true); }} />
+                  <img {...(i === 0 || fotosInteracao && Math.abs(i - currentImage) <= 1 ? capaResponsiva(img) : {})} width={1600} height={1200} loading={i === 0 ? "eager" : "lazy"} fetchPriority={i === 0 ? "high" : "low"} decoding="async" onError={e => { if (e.currentTarget.getAttribute('src') !== img) { e.currentTarget.removeAttribute('srcset'); e.currentTarget.src = img; } }} alt={`Foto ${i + 1}`} className="h-full w-full object-cover" draggable={false} onClick={(e) => { galleryTrigger.current = e.currentTarget as any; setCurrentImage(i); setGalleryOpen(true); }} />
                 </div>
               ))}
             </div>
@@ -396,19 +401,19 @@ const PropertyDetail = () => {
             )}
           </div>
         </div>
-      </div>
+      </div>}
 
 
       {galleryOpen && <Suspense fallback={null}>
         <MaterialGallery fotos={images.map(url => ({ url }))} index={currentImage} restoreFocus={galleryTrigger.current} onClose={() => setGalleryOpen(false)} onAgendar={isIndisponivel ? undefined : abrirVisita} />
       </Suspense>}
-      <Dialog open={visitaOpen} onOpenChange={setVisitaOpen}>
+      {visitaOpen && <Dialog open={visitaOpen} onOpenChange={setVisitaOpen}>
         <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-lg">
           <DialogTitle>Agendar visita</DialogTitle>
           <DialogDescription>{imovel.titulo}</DialogDescription>
-          <AgendamentoVisita imovelId={imovel.id} imovelSlug={imovel.slug} imovelTitulo={imovel.titulo} imovelBairro={imovel.bairro} imovelPreco={imovel.preco} />
+          <Suspense fallback={<Loader2 className="animate-spin" />}><AgendamentoVisita imovelId={imovel.id} imovelSlug={imovel.slug} imovelTitulo={imovel.titulo} imovelBairro={imovel.bairro} imovelPreco={imovel.preco} /></Suspense>
         </DialogContent>
-      </Dialog>
+      </Dialog>}
 
       {/* Content */}
       <div className="mx-auto max-w-[1120px] px-4 py-6 sm:px-6 sm:py-8">
@@ -574,14 +579,14 @@ const PropertyDetail = () => {
                   {imovel.bairro}, {imovel.cidade} — endereço exato após contato
                 </p>
                 <div className="mt-4">
-                  <Suspense fallback={<div className="h-64 w-full rounded-xl bg-muted animate-pulse" />}>
+                  <DeferredFoco minHeight={256}><Suspense fallback={<div className="h-64 w-full rounded-xl bg-muted animate-pulse" />}>
                     <PropertyMap
                       neighborhood={imovel.bairro}
                       city={imovel.cidade}
                       lat={imovel.latitude}
                       lng={imovel.longitude}
                     />
-                  </Suspense>
+                  </Suspense></DeferredFoco>
                 </div>
               </div>
             )}
@@ -637,15 +642,15 @@ const PropertyDetail = () => {
 
       {/* Similar properties */}
       <div className="mx-auto max-w-[1120px] px-6 pb-12">
-        <SimilarProperties
+        <DeferredFoco minHeight={0}><SimilarProperties
           currentId={imovel.id}
           bairro={imovel.bairro}
           tipo={imovel.tipo}
           preco={imovel.preco}
-        />
+        /></DeferredFoco>
       </div>
 
-      <Footer />
+      <DeferredFoco minHeight={0}><Footer /></DeferredFoco>
 
       {/* Desktop sticky CTA */}
       <StickyPropertyCTA
@@ -693,7 +698,7 @@ const PropertyDetail = () => {
       </div>}
       {/* Spacer for fixed bottom bar */}
       <div className="h-32 sm:hidden" />
-      <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
+      {showAuth && <Suspense fallback={null}><AuthModal open={showAuth} onClose={() => setShowAuth(false)} /></Suspense>}
     </div>
   );
 };

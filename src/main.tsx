@@ -9,8 +9,21 @@ import App from "./App.tsx";
 import { iniciarBuscaCedo } from "./lib/buscaCedo";
 import { instalarJornada } from "./lib/journeyBrowser";
 import { initGA4, initMeta } from "./lib/gtag";
+import { fetchImovelBySlug } from "./services/imoveis";
+import { capaResponsiva } from "./lib/imagemCapa";
 performance.mark("uh-app-evaluation");
 iniciarBuscaCedo();
+// Começa a consulta antes do chunk da página; a página reutiliza a mesma promessa.
+const detalheSlug = location.pathname.match(/^(?:\/c\/[^/]+)?\/imovel\/([^/]+)\/?$/)?.[1];
+if (detalheSlug) void fetchImovelBySlug(detalheSlug).then(p => {
+  const foto = p?.fotos?.[0]?.url;
+  if (!foto) return;
+  const link = document.createElement('link');
+  const capa = capaResponsiva(foto);
+  link.rel = 'preload'; link.as = 'image'; link.href = capa.src;
+  if (capa.srcSet) { link.imageSrcset = capa.srcSet; link.imageSizes = capa.sizes; }
+  link.setAttribute('fetchpriority', 'high'); document.head.append(link);
+}).catch(() => {});
 initGA4();
 initMeta();
 

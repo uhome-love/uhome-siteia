@@ -86,8 +86,7 @@ function SearchExperience() {
   const { data, isLoading, isFetching, error } = useQuery({queryKey:['busca-site',key],queryFn:()=>buscarSite({...filtros,bounds:area??undefined,limit:40}), initialData: area?undefined:initial, initialDataUpdatedAt: 0, placeholderData: keepPreviousData, staleTime:180000});
   const rows=[...(data?.rows ?? []),...more]; const count=data?.count; const categories=categorias3dVisiveis(data?.categorias ?? {}, data?.tipos ?? {}, (data as any)?.comodidades ?? {});
   useEffect(() => { setMore([]); setVisible(loteInicial()); }, [key]);
-  // Mapa: baixa em segundo plano depois da página pronta, para abrir na hora ao tocar.
-  useEffect(() => { const ir=()=>{const w=window as any;(w.requestIdleCallback??((f:()=>void)=>setTimeout(f,300)))(()=>{void import('@/components/SearchMap');});}; if(document.readyState==='complete')ir();else{window.addEventListener('load',ir,{once:true});return()=>window.removeEventListener('load',ir);} },[]);
+  // No celular, só o toque em Mostrar mapa importa o mapa. No desktop, o mapa visível monta normalmente.
   // Expand the loaded page only as the reader approaches its last rendered card.
   useEffect(() => {
     const el = near.current;

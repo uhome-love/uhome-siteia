@@ -17,7 +17,7 @@ iniciarBuscaCedo();
 const detalheSlug = location.pathname.match(/^(?:\/c\/[^/]+)?\/imovel\/([^/]+)\/?$/)?.[1];
 if (detalheSlug) void fetchImovelBySlug(detalheSlug).then(p => {
   const foto = p?.fotos?.[0]?.url;
-  if (!foto) return;
+  if (!foto || document.querySelector('link[data-uh-detalhe-foto]')) return;
   const link = document.createElement('link');
   const capa = capaResponsiva(foto);
   link.rel = 'preload'; link.as = 'image'; link.href = capa.src;

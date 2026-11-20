@@ -4,3 +4,4 @@
 - Accounts become CRM leads only via registrarContaComoLead (AuthModal) when a WhatsApp is given; login alone never creates a lead. Why: owner wants only reachable sign-ups in the Fila do CEO.
 - Public campaign/product reads use catalogoPublico with anonymous permissions and unchanged filters; private operations retain the lazy SDK. Why: public content must not download the auth client before painting.
 - Optional startup work uses depoisDoLoadOcioso with cancellation; saved sessions initialize immediately. Why: avoid a load-event CPU burst without losing returning users.
+- The HTML module starts buscaCedo and detalheCedo before importing main; detail reuses the public response and responsive preload. Why: the LCP request must not wait for React or duplicate images/data.

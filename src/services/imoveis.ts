@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabaseLazy";
+import { DETAIL_COLUMNS, pedidosDetalheCedo } from '@/lib/detalheCedo';
 
 export interface Imovel {
   id: string;
@@ -147,7 +148,6 @@ export const CIDADES_PERMITIDAS = ["Porto Alegre", "Canoas", "Cachoeirinha", "Gr
 const LISTING_COLUMNS = "id,slug,tipo,finalidade,status,destaque,preco,preco_condominio,area_total,area_util,quartos,banheiros,vagas,bairro,cidade,uf,publicado_em,foto_principal,fase";
 
 // Focused detail payload — excludes large sync/debug fields that can slow or stall property pages
-const DETAIL_COLUMNS = "id,slug,tipo,finalidade,status,destaque,preco,preco_condominio,preco_iptu,iptu_periodicidade,area_total,area_util,quartos,banheiros,vagas,andar,latitude,longitude,titulo,descricao,diferenciais,comodidades,fotos,foto_principal,video_url,condominio_nome,publicado_em,bairro,cidade,uf";
 
 const PUBLIC_REST_URL = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/imoveis`;
 const PUBLIC_REST_HEADERS: HeadersInit = {
@@ -524,6 +524,12 @@ export async function fetchMapPins(filters: BuscaFilters = {}, signal?: AbortSig
 
 /** Single attempt to fetch an imóvel by slug */
 async function fetchImovelBySlugOnce(slug: string, signal?: AbortSignal): Promise<Imovel | null> {
+  const cedo = pedidosDetalheCedo.get(slug);
+  if (cedo) {
+    pedidosDetalheCedo.delete(slug);
+    const rows = await cedo.catch(() => []);
+    if (rows[0]) return mapRow(rows[0]);
+  }
   const fetchRows = async (operator: "eq" | "ilike") => {
     const url = new URL(PUBLIC_REST_URL);
     url.searchParams.set("select", DETAIL_COLUMNS);

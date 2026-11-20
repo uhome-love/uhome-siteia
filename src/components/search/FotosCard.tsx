@@ -26,11 +26,12 @@ export function fotosDoCard(id: string, produto: boolean): Promise<string[]> {
 /** Fotos do card num trilho que desliza com o dedo (1ª foto original intacta). */
 export function FotosCard({ id, produto, titulo, children }: { id: string; produto: boolean; titulo: string; children: React.ReactNode }) {
   const [fotos, setFotos] = useState<string[]>([]), [i, setI] = useState(0);
+  const [interagiu, setInteragiu] = useState(false);
   const caixa = useRef<HTMLDivElement>(null), trilho = useRef<HTMLDivElement>(null), raf = useRef(0);
   const carregar = () => { void fotosDoCard(id, produto).then((f) => setFotos(f)); };
   const extras = fotos.slice(1);
   const total = Math.max(fotos.length, 1);
-  useEffect(() => { if (fotos.length > 1) { preparar(fotos[(i + 1) % fotos.length]); if (i > 0) preparar(fotos[i - 1]); } }, [fotos, i]);
+  useEffect(() => { if (interagiu && fotos.length > 1) { preparar(fotos[(i + 1) % fotos.length]); if (i > 0) preparar(fotos[i - 1]); } }, [fotos, i, interagiu]);
   useEffect(() => { const el = caixa.current; if (!el || !('IntersectionObserver' in window)) return; let io: IntersectionObserver | null = null, vivo = true;
     // Fotos extras só depois da página pronta: não disputam com a 1ª foto.
     const iniciar = () => { if (!vivo) return; io = new IntersectionObserver((es) => { if (es.some((x) => x.isIntersecting)) { io?.disconnect(); carregar(); } }, { rootMargin: '200px' }); io.observe(el); };
@@ -38,7 +39,7 @@ export function FotosCard({ id, produto, titulo, children }: { id: string; produ
     if (document.readyState === 'complete') ocioso(); else window.addEventListener('load', ocioso, { once: true });
     return () => { vivo = false; io?.disconnect(); window.removeEventListener('load', ocioso); }; }, [id]);
   const aoRolar = () => { cancelAnimationFrame(raf.current); raf.current = requestAnimationFrame(() => { const t = trilho.current; if (t) setI(indiceDoScroll(t.scrollLeft, t.clientWidth, total)); }); };
-  const ir = (d: number) => { const t = trilho.current; if (!t) return; const n = (i + d + total) % total; t.scrollTo({ left: n * t.clientWidth, behavior: 'smooth' }); };
+  const ir = (d: number) => { setInteragiu(true); const t = trilho.current; if (!t) return; const n = (i + d + total) % total; t.scrollTo({ left: n * t.clientWidth, behavior: 'smooth' }); };
   const bloqueia = useRef(false), iRef = useRef(0); iRef.current = i;
   const totalRef = useRef(1); totalRef.current = total;
   // Deslize pelo próprio dedo: o iPhone nem sempre rola a fileira sozinho.
@@ -66,11 +67,11 @@ export function FotosCard({ id, produto, titulo, children }: { id: string; produ
   const abrir = () => { if (bloqueia.current) return; caixa.current?.querySelector<HTMLAnchorElement>('.fotos-card-trilho > a')?.click(); };
   return (
     <div ref={caixa} className="fotos-card" onPointerEnter={carregar} onClickCapture={(e) => { if (bloqueia.current) { bloqueia.current = false; e.preventDefault(); e.stopPropagation(); } }}>
-      <div ref={trilho} className="fotos-card-trilho" onScroll={aoRolar}>
+      <div ref={trilho} className="fotos-card-trilho" onScroll={aoRolar} onPointerDown={() => { setInteragiu(true); carregar(); }} onTouchStart={() => { setInteragiu(true); carregar(); }}>
         {children}
         {extras.map((u, k) => (
           <div key={u} className="fotos-card-slide" role="link" tabIndex={-1} onClick={abrir}>
-            <img src={Math.abs(k + 1 - i) <= 1 ? cardFotoUrl(u) : undefined} alt={`${titulo} - foto ${k + 2}`} loading="lazy" decoding="async" draggable={false} onError={(e) => { if (e.currentTarget.src !== u) e.currentTarget.src = u; }} />
+            <img src={interagiu && Math.abs(k + 1 - i) <= 1 ? cardFotoUrl(u) : undefined} alt={`${titulo} - foto ${k + 2}`} loading="lazy" decoding="async" draggable={false} onError={(e) => { if (e.currentTarget.src !== u) e.currentTarget.src = u; }} />
           </div>
         ))}
       </div>

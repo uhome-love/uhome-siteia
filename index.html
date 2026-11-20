@@ -207,6 +207,11 @@ gtag("consent", "default", {
       })();
     </script>
     <script type="module">
+      // Pedido/foto começam no script leve do HTML, sem esperar o pacote do app.
+      import { iniciarBuscaCedo } from '/src/lib/buscaCedo.ts';
+      import { iniciarDetalheCedo } from '/src/lib/detalheCedo.ts';
+      iniciarBuscaCedo();
+      iniciarDetalheCedo();
       // A tela da borda pinta antes de baixar/avaliar o app; sem pre, inicia normalmente.
       (async function () { const pre = document.getElementById("uh-pre");
       if (pre) {

@@ -66,6 +66,8 @@ function SearchExperience() {
   const opener = useRef<HTMLElement>(null), near=useRef<HTMLDivElement>(null); const mobile=useIsMobile(1024);
   const [anuncio]=useState(visitanteDeAnuncio); const resumo=resumoBusca(filtros as any);
   useEffect(()=>{if(!anuncio||!mobile)return;document.body.classList.add('sem-menu-app');return()=>document.body.classList.remove('sem-menu-app');},[anuncio,mobile]);
+  // Visitante de anúncio: esconde "Mostrar mapa" e o avatar da LIA enquanto um cartão de seleção estiver na tela, para nunca cobrir o envio.
+  useEffect(()=>{if(!anuncio||!mobile||typeof IntersectionObserver==='undefined')return;const vis=new Set<Element>();const io=new IntersectionObserver(es=>{for(const e of es)e.isIntersecting?vis.add(e.target):vis.delete(e.target);document.body.classList.toggle('selecao-na-tela',vis.size>0);});const ligar=()=>document.querySelectorAll('[data-busca-selecao]').forEach(el=>io.observe(el));ligar();const mo=new MutationObserver(ligar);mo.observe(document.body,{childList:true,subtree:true});return()=>{io.disconnect();mo.disconnect();document.body.classList.remove('selecao-na-tela');};},[anuncio,mobile]);
   const fkey=JSON.stringify(filtros); const key=JSON.stringify([filtros,area]);
   useEffect(()=>{setArea(null);},[fkey]);
   const rotuloBusca=Object.entries(filtrosUteis(filtros)??{}).map(([k,v])=>rotuloChip(k,v)).join(' · ');

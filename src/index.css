@@ -338,6 +338,7 @@ html { scroll-behavior: smooth; }
  .uhs-site-footer{padding-bottom:var(--uh-bottom-height)}
  body.sem-menu-app{--uh-bottom-height:0px}body.sem-menu-app .uhs-bottom-nav{display:none}
  body.sem-menu-app .uhs-contact-bar{bottom:0!important}body.sem-menu-app .search-page{padding-bottom:80px}body.sem-menu-app .search-show-map{bottom:calc(84px + var(--uh-cookie,0px))}body.sem-menu-app .uhs-lia-float{bottom:calc(84px + var(--uh-cookie,0px))}
+ body.selecao-na-tela .search-show-map,body.selecao-na-tela .uhs-lia-float{opacity:0;pointer-events:none;visibility:hidden}
 }
 
 /* Parte 2: páginas de empreendimento, escala fixa do design Site Uhome. */

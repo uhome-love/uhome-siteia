@@ -9,6 +9,8 @@ import { tituloFoco, numerosFoco, ofertaFoco, CONFIANCA_FOCO } from "../_shared/
 import { NAV_BUSCA_V3, TOOLBAR_V3, CARD_V3, ICONES_BUSCA_MOBILE } from './moldes-busca-v3.ts';
 import { BUSCA_URLS, categoriasVisiveis, tituloBusca } from '../_shared/buscaConfig.ts';
 import miniaturas from '../_shared/buscaMiniaturas.json' with { type: 'json' };
+import { renderHomeDobra, HOME_GUARD } from './homeDobra.ts';
+import { criarCacheDobra, pathDobra } from './cacheDobra.ts';
 import { NAV, NAV_BUSCA, HERO, BUSCA_TOPO, BUSCA_GRADE, CABECALHO_FOCO, BOTOES_FOCO } from "./moldes-legado.ts";
 
 const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
@@ -21,6 +23,7 @@ const json = (o: unknown) => JSON.stringify(o).replace(/</g, "\\u003c").replace(
 
 /** O Worker não precisa mudar: o HTML publicado decide, antes de pintar, qual molde usar. */
 function compativel(corpo: Corpo): Corpo {
+  if (corpo.homeLayout === 'lar-2') return { head: corpo.head, pre: corpo.pre ? corpo.pre + `<script>${HOME_GUARD}</script>` : '', script: corpo.script };
   let novo = corpo.pre;
   const pares = [[NAV_BUSCA, NOVO.NAV_BUSCA], [NAV, NOVO.NAV], [HERO, NOVO.HERO], [BUSCA_TOPO, NOVO.BUSCA_TOPO], [BUSCA_GRADE, NOVO.BUSCA_GRADE], [CABECALHO_FOCO, NOVO.CABECALHO_FOCO], [BOTOES_FOCO, NOVO.BOTOES_FOCO]];
   // Valores dinâmicos são conservados; apenas os fragmentos de estrutura mudam.
@@ -147,28 +150,15 @@ function linkDestaque(camps: Camp[]) {
     : `<a class="${base}" href="/em-foco">${STAR}Uhome em Foco</a>`;
 }
 
-// ---------- Home: capa pronta (HeroSection) ----------
+// ---------- Home: vitrine atual, sem paisagem/capa legada ----------
 async function calcularHome() {
-  const [camps, { count }] = await Promise.all([
+  const [camps, { data, error }] = await Promise.all([
     campanhasAtivas(),
-    supabase.from("imoveis").select("*", { count: "exact", head: true }).eq("status", "disponivel"),
+    supabase.rpc('busca_site', { p: { secao: 'imoveis', cidade: 'Porto Alegre', ordem: 'recentes', novidades: 30, limit: 5 } }),
   ]);
-  const c = destaqueDe(camps), black = blackDe(c);
-  const botao = c
-    ? `<div class="mt-7 flex flex-wrap gap-3"><a class="inline-flex h-12 items-center gap-2.5 rounded-full border border-natal-gold/60 px-6 font-body text-sm font-bold shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98] ${black ? "bg-noir text-noir-foreground" : "bg-natal text-natal-gold"}" href="/campanha/${esc(c.slug)}"><img src="${CHAVE}" alt="" class="h-3.5 w-auto">${esc(black ? "Black Natal Uhome" : c.nome)}<span class="hidden font-normal text-natal-foreground/80 sm:inline">· até ${black ? "29/11" : "18/12"}</span></a>`
-    : `<div class="mt-7 flex flex-wrap gap-3"><a class="inline-flex h-12 items-center gap-2 rounded-full bg-primary px-6 font-body text-sm font-bold text-primary-foreground shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98]" href="/em-foco">${SPARKLES} Uhome em Foco</a>`;
-  const total = count && count > 0 ? count : null;
-  const totalTxt = total ? `${(Math.floor(total / 100) * 100).toLocaleString("pt-BR")}+` : "milhares de";
-  const pre = `<div id="uh-pre" data-uh-alvo="[data-uh-capa]"><div class="min-h-screen bg-background">${NAV.replace("{{DESTAQUE}}", linkDestaque(camps))}<main>${HERO.replace("{{TOTAL}}", totalTxt).replace("{{BOTAO}}", botao)}</main></div></div>`;
-  // Título em Montserrat 800 já na primeira pintura (mesmo tamanho do título do app).
-  // Home nova: 1ª foto de "Novos no site" anunciada no HTML + dados prontos (mesmo pedido de HOME_NOVOS em src/lib/buscaCedo.ts).
-  let fotoHead = "", novos = "";
-  try {
-    const { data, error } = await supabase.rpc("busca_site", { p: { secao: "imoveis", cidade: "Porto Alegre", ordem: "recentes", novidades: 30, limit: 5 } });
-    const f = !error && data?.rows?.[0]?.foto_principal;
-    if (f) { fotoHead = `<link rel="preload" as="image" fetchpriority="high" href="${esc(fotoCardApp(f))}">`; novos = `window.__UH_HOME_NOVOS__=${json(data)};`; }
-  } catch (e) { console.error("home novos", e); }
-  return { head: `<link rel="preload" href="/fonts/mont-800.woff2" as="font" type="font/woff2" crossorigin>${fotoHead}`, pre, script: `window.__UH_DOBRA__=${json({ campanhas: camps, total })};${novos}` };
+  if (error) throw error;
+  const corpo = renderHomeDobra(data, fotoCardApp);
+  return { ...corpo, script: `window.__UH_DOBRA__=${json({ campanhas: camps })};window.__UH_HOME_NOVOS__=${json(data)};` };
 }
 
 // ---------- Busca: 4 primeiros cards (SearchPropertyCard, celular) ----------
@@ -202,13 +192,16 @@ function cardBusca(r: any, i: number) {
   return `<a class="relative block w-full min-w-0 cursor-pointer select-none outline-none [&amp;_*]:outline-none [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] no-underline text-inherit" href="/imovel/${esc(r.slug)}"><div class="sm:hidden"><div class="relative overflow-hidden rounded-xl"><div class="flex snap-x snap-mandatory overflow-x-auto scrollbar-hide" style="aspect-ratio: 4 / 3;"><div class="w-full shrink-0 snap-center"><div class="relative h-full w-full overflow-hidden" style="aspect-ratio: 4 / 3;"><img src="${esc(searchImageUrl(foto, 768))}" srcset="${esc(set)}" sizes="(max-width: 639px) calc(100vw - 24px), 400px" alt="${esc(alt)}" loading="eager" decoding="async" fetchpriority="${i === 0 ? "high" : "auto"}" class="h-full w-full object-cover transition-opacity duration-300 opacity-100" style="aspect-ratio: 4 / 3;" width="400" height="300"></div></div></div><div class="pointer-events-none absolute left-3 top-3 z-10 flex flex-wrap gap-1.5">${selos.slice(0, 2).map((b) => `<span class="inline-flex items-center gap-1 rounded-md px-2.5 py-1 font-body text-[11px] ${SELO_CLS[b.s]}">${b.s === "novo" ? CLOCK : ""}${b.l}</span>`).join("")}</div>${HEART}</div><div class="px-1 pt-2.5 pb-1"><p class="font-body text-[17px] font-extrabold leading-tight text-foreground">${preco}</p>${(r.preco_condominio ?? 0) > 0 ? `<p class="mt-0.5 font-body text-[12px] text-muted-foreground">Cond. R$ ${Number(r.preco_condominio).toLocaleString("pt-BR")}</p>` : ""}${stats.length ? `<p class="mt-1.5 font-body text-[13px] text-foreground">${esc(stats.join(" · "))}</p>` : ""}<p class="mt-0.5 font-body text-[12px] text-muted-foreground truncate">${esc(`${r.bairro}, ${r.cidade || "Porto Alegre"}`)}</p></div></div></a>`;
 }
 
-type Corpo = { head: string; pre: string; script: string; preV2?: string; preV3?: string };
+type Corpo = { head: string; pre: string; script: string; preV2?: string; preV3?: string; homeLayout?: string };
 const CALCULAR: Record<string, () => Promise<Corpo>> = { busca: calcularBusca, home: calcularHome };
+const memoriaDobra = criarCacheDobra<Corpo>();
 
 /** Primeira dobra pré-calculada: lê uma linha pronta (rápido); renova em segundo plano se passou de 4 min. */
 async function preCalculado(chave: "busca" | "home") {
-  const { data } = await supabase.from("site_dobra_cache").select("corpo, atualizado_em").eq("chave", chave).maybeSingle();
+  const chaveCache = chave === 'home' ? 'home-lar-2-1' : chave;
+  const { data } = await supabase.from("site_dobra_cache").select("corpo, atualizado_em").eq("chave", chaveCache).maybeSingle();
   const idade = data ? Date.now() - new Date(data.atualizado_em).getTime() : Infinity;
+  if (!data || idade > 15 * 60_000) return renovar(chave);
   if (idade > 4 * 60_000) {
     // @ts-ignore EdgeRuntime existe no ambiente das funções
     const tarefa = renovar(chave).catch((e) => console.error("renovar", chave, e));
@@ -226,7 +219,7 @@ async function renovar(chave: "busca" | "home") {
     Object.assign(corpo,{preV3:v3.preV3,script:corpo.script+v3.script,head:corpo.head+v3.head});
     for(const path of Object.keys(BUSCA_URLS)){const b=await calcularBuscaV3(path);await supabase.from('site_dobra_cache').upsert({chave:'busca-v3:'+path,corpo:b,atualizado_em:new Date().toISOString()});}
   }
-  if (corpo.script) await supabase.from("site_dobra_cache").upsert({ chave, corpo, atualizado_em: new Date().toISOString() });
+  if (corpo.script) await supabase.from("site_dobra_cache").upsert({ chave: chave === 'home' ? 'home-lar-2-1' : chave, corpo, atualizado_em: new Date().toISOString() });
   return corpo;
 }
 
@@ -357,15 +350,15 @@ Deno.serve(async (req) => {
   try {
     const q = new URL(req.url).searchParams;
     const corpoPost = req.method === "POST" ? await req.json().catch(() => ({})) : {};
-    const bruto = String(corpoPost.path ?? q.get("path") ?? "");
+    const bruto = pathDobra(String(corpoPost.path ?? q.get("path") ?? ""));
     const renovarJa = corpoPost.renovar === true || q.get("renovar") === "1";
     const corretor = /^\/c\/[^/]+/.test(bruto);
     const path = bruto.replace(/^\/c\/[^/]+/, "").replace(/\/$/, "") || "/";
     if (renovarJa) { const [b] = await Promise.all([renovar("busca"), renovar("home")]); corpo = b; }
-    else if (path === "/" && !corretor) corpo = await preCalculado("home");
-    else if (path === "/busca") corpo = await preCalculado("busca");
+    else if (path === "/" && !corretor) corpo = await memoriaDobra('home-lar-2-1', () => preCalculado("home"));
+    else if (path === "/busca") corpo = await memoriaDobra('busca', () => preCalculado("busca"));
     else if(path in BUSCA_URLS){const {data}=await supabase.from('site_dobra_cache').select('corpo').eq('chave','busca-v3:'+path).maybeSingle();corpo=data?.corpo??vazio;}
-    else if (path.startsWith("/em-foco/")) { corpo = await produto(decodeURIComponent(path.slice(9)), corretor); ttl = 600; }
+    else if (path.startsWith("/em-foco/")) { corpo = await memoriaDobra(bruto, () => produto(decodeURIComponent(path.slice(9)), corretor)); ttl = 600; }
     else if (path.startsWith("/campanha/") && !corretor) { corpo = await campanha(decodeURIComponent(path.slice(10))); ttl = 60; }
   } catch (e) {
     console.error("site-dobra", e);

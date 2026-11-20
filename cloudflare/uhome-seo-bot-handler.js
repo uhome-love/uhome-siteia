@@ -21,7 +21,7 @@ const BOT_UA = /googlebot|bingbot|whatsapp|facebookexternalhit|facebot|meta-exte
 const SSR_PATH = /^\/(?:$|imovel\/|em-foco\/[^/]+|campanha\/[^/]+|investir-studios|c\/)/;
 
 const HTML_TTL = 120; // s de cache do HTML na borda
-const ESPERA_DOBRA = 300; // ms máximos esperando o site-dobra
+const ESPERA_DOBRA = 3000; // cold start: cache quente responde imediatamente
 
 async function comTempo(url, ms, init) {
   const ctrl = new AbortController();
@@ -57,12 +57,13 @@ async function htmlOrigem(request, url, ctx) {
 
 /** site-dobra com cache de borda: serve o último resultado na hora e renova em segundo plano. */
 async function dobra(p, ctx) {
-  const chave = new Request("https://uh-dobra.internal" + p);
+  const chave = new Request("https://uh-dobra.internal" + p + "?versao=lar-2");
   const cache = caches.default;
   const buscar = async () => {
-    const r = await comTempo(FN + "site-dobra?path=" + encodeURIComponent(p), 3000);
+    const r = await comTempo(FN + "site-dobra?path=" + encodeURIComponent(p), 4500);
     if (!r.ok) return null;
     const j = await r.json();
+    if (!j || !(j.head || j.pre || j.script)) return null; // nunca guardar falha vazia
     await cache.put(chave, new Response(JSON.stringify(j), { headers: { "content-type": "application/json", "cache-control": "public, max-age=600", "x-uh-em": String(Date.now()) } }));
     return j;
   };
@@ -77,10 +78,10 @@ async function dobra(p, ctx) {
   return Promise.race([tarefa, new Promise((ok) => setTimeout(() => ok(null), ESPERA_DOBRA))]);
 }
 
-function caminhoDobra(url) {
+export function caminhoDobra(url) {
   const p = url.pathname;
   if (p === "/") return p; // capa da home (igual para qualquer parâmetro de anúncio)
-  if (p === "/busca") return url.search ? null : p; // só a busca padrão, sem filtros
+  if (p === "/busca") return url.search ? null : p; // busca filtrada/Ads permanece sem molde
   return /^(\/c\/[^/]+)?\/(em-foco|campanha)\/[^/]+\/?$/.test(p) ? p : null;
 }
 

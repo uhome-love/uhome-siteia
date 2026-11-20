@@ -8,16 +8,16 @@ import { PilulaBusca } from '@/components/PilulaBusca';
 import { CatalogCard } from '@/components/search/CatalogCard';
 import { useCorretor } from '@/contexts/CorretorContext';
 import { useFavoritos } from '@/hooks/useFavoritos';
-import { buscarSite, categorias3dVisiveis } from '@/services/buscaSite';
+import { buscarSite, categorias3dVisiveis, normalizarBusca } from '@/services/buscaSite';
 import { formatPreco, type Imovel } from '@/services/imoveis';
 import { supabase } from '@/lib/supabaseLazy';
 import { cardFotoUrl } from '@/lib/searchImages';
 import { HOME_NOVOS } from '@/lib/buscaCedo';
 import { urlCategoria, registrarVisitaHome, novoDesdeVisita } from '@/lib/homeVitrine';
 
-function Fileira({ titulo, verTodos, children }: { titulo: React.ReactNode; verTodos?: string; children: React.ReactNode }) {
+function Fileira({ titulo, verTodos, children, novos }: { titulo: React.ReactNode; verTodos?: string; children: React.ReactNode; novos?: boolean }) {
   return (
-    <section className="home-fileira">
+    <section className="home-fileira" data-uh-home-novos={novos || undefined}>
       <div className="home-fileira-topo"><h2>{titulo}</h2>{verTodos && <Link to={verTodos}>Ver todos</Link>}</div>
       <div className="home-trilho">{children}</div>
     </section>
@@ -27,18 +27,27 @@ function Fileira({ titulo, verTodos, children }: { titulo: React.ReactNode; verT
 function ContinueDeOndeParou() {
   const { prefixLink } = useCorretor();
   const ids = useMemo(() => { try { return (JSON.parse(localStorage.getItem('imoveis_vistos') || '[]') as unknown[]).filter((v): v is string => typeof v === 'string').slice(-3).reverse(); } catch { return []; } }, []);
-  const { data = [] } = useQuery({
+  const [descartarVazios, setDescartarVazios] = useState(false);
+  const { data = [], isFetched } = useQuery({
     queryKey: ['home-vistos', ids], enabled: ids.length > 0, staleTime: 300000,
     queryFn: async () => {
       const { data } = await supabase.from('imoveis').select('id, slug, titulo, tipo, bairro, quartos, preco, foto_principal').in('id', ids).eq('status', 'disponivel');
       return ids.map((id) => (data ?? []).find((r: any) => r.id === id)).filter(Boolean) as any[];
     },
   });
-  if (!data.length) return null;
+  useEffect(() => {
+    if (!isFetched || data.length) return;
+    const limpar = () => setDescartarVazios(true);
+    document.addEventListener('pointerdown', limpar, { once: true });
+    document.addEventListener('keydown', limpar, { once: true });
+    return () => { document.removeEventListener('pointerdown', limpar); document.removeEventListener('keydown', limpar); };
+  }, [isFetched, data.length]);
+  if (!ids.length || descartarVazios && !data.length) return null;
   return (
-    <section className="home-fileira">
+    <section className="home-fileira home-historico">
       <div className="home-fileira-topo"><h2>Continue de onde parou</h2></div>
       <div className="home-trilho home-trilho-vistos">
+        {!data.length && <div className="home-visto home-visto-esqueleto" aria-hidden="true" />}
         {data.map((r) => (
           <Link key={r.id} to={prefixLink(`/imovel/${r.slug}`)} className="home-visto">
             {r.foto_principal && <img src={cardFotoUrl(r.foto_principal)} alt="" width={80} height={72} loading="lazy" decoding="async" />}
@@ -54,7 +63,7 @@ function ContinueDeOndeParou() {
 export function HomeVitrine({ entreFileiras }: { entreFileiras?: React.ReactNode }) {
   const { prefixLink } = useCorretor(); const { isFavorito, toggleFavorito } = useFavoritos();
   const [ultimaVisita] = useState(() => (typeof window === 'undefined' ? null : registrarVisitaHome()));
-  const novos = useQuery({ queryKey: ['home-novos'], queryFn: () => buscarSite({ ...HOME_NOVOS }), staleTime: 180000, retry: 3, retryDelay: (n) => 800 * (n + 1) });
+  const novos = useQuery({ queryKey: ['home-novos'], queryFn: () => buscarSite({ ...HOME_NOVOS }), initialData: () => { const seed = (window as any).__UH_HOME_NOVOS__; return seed?.rows?.length ? normalizarBusca(seed) : undefined; }, staleTime: 180000, retry: 3, retryDelay: (n) => 800 * (n + 1) });
   const ate700 = useQuery({ queryKey: ['home-ate700'], queryFn: () => buscarSite({ secao: 'imoveis', cidade: 'Porto Alegre', ordem: 'recentes', precoMax: 700000, limit: 5 }), staleTime: 180000 });
   const categorias = categorias3dVisiveis(novos.data?.categorias ?? {}, novos.data?.tipos ?? {}, (novos.data as any)?.comodidades ?? {});
   useEffect(() => { document.documentElement.classList.add('uh-home-vitrine'); return () => document.documentElement.classList.remove('uh-home-vitrine'); }, []);
@@ -76,7 +85,7 @@ export function HomeVitrine({ entreFileiras }: { entreFileiras?: React.ReactNode
       </nav>
       <div className="home-conteudo">
         <ContinueDeOndeParou />
-        <Fileira titulo={<>Novos no site<span className="hidden sm:inline"> em Porto Alegre</span></>} verTodos={prefixLink('/busca?novidades=30&ordem=recentes')}>
+        <Fileira novos titulo={<>Novos no site<span className="hidden sm:inline"> em Porto Alegre</span></>} verTodos={prefixLink('/busca?novidades=30&ordem=recentes')}>
           {novos.data ? novos.data.rows.map((r, i) => card(r, i, 0)) : Array.from({ length: 5 }, (_, i) => <div key={i} className="catalog-card" aria-hidden="true"><div className="catalog-photo" /><div className="catalog-esqueleto-texto" /></div>)}
         </Fileira>
         {entreFileiras}

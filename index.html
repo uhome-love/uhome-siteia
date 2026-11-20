@@ -65,7 +65,7 @@ gtag("consent", "default", {
     <meta charset="UTF-8" />
     <meta name="uh-dobra-versao" content="site-v3" />
     <meta name="uh-busca-layout" content="compacta-1" />
-    <meta name="uh-home-layout" content="lar-1" />
+    <meta name="uh-home-layout" content="lar-2" />
     <meta name="uh-foco-layout" content="oferta-1" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="preconnect" href="https://huigglwvvzuwwyqvpmec.supabase.co" crossorigin />
@@ -174,7 +174,7 @@ gtag("consent", "default", {
           var im = real && (real.matches("img") ? real : real.querySelector("img[fetchpriority=high]"));
           if (original && im && original.currentSrc === im.currentSrc && original.naturalWidth) {
             var a = original.getBoundingClientRect(), b = im.getBoundingClientRect();
-            if (Math.abs(a.width-b.width)<2 && Math.abs(a.height-b.height)<2) {
+            if (Math.abs(a.x-b.x)<2 && Math.abs(a.y-b.y)<2 && Math.abs(a.width-b.width)<2 && Math.abs(a.height-b.height)<2) {
               p.removeAttribute("data-uh-alvo");
               p.classList.add("uh-foto-retida"); original.classList.add("uh-foto-original");
               r.classList.add("uh-app-com-foto"); im.classList.add("uh-foto-espelho");

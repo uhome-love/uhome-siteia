@@ -1,6 +1,6 @@
 # Roadmap
 - [x] Velocidade mobile: adiar dependências fora da primeira tela, medir localmente, validar contatos e publicar site-dobra.
-- [ ] Velocidade mobile: comparação de produção e confirmação de LCP <2,5 s — acesso aos arquivos compilados da prévia indisponível nesta sessão; repetir após publicação do front.
+- [ ] Velocidade mobile: comparar produção 8572719 → HEAD, cinco rodadas por página, 375×812, CPU 4×, rede 150 ms/1,6 Mbps e site-dobra; corrigir regressões >5% e CLS >0,05. Bloqueio: builds manuais não permitidos nesta sessão, artefatos compilados não disponíveis e prévia hospedada responde 401. Sem mudanças de código ou publicação por ausência de comparação válida; 267 testes passaram em 20/11.
 - [x] Anúncios ligados aos ícones 3D (Garden, Casas em condomínio, Terrenos, Studios)
 - [x] Studios R$ 8/dia + destino lista de studios
 - [ ] SEO: reforçar páginas de bairro/empreendimentos (próxima rodada)

@@ -1,0 +1,1 @@
+- Em-foco offer block: `ofertaFoco` (_shared) feeds app and site-dobra; mold gated by meta uh-foco-layout=oferta-1. Why: pre parity; old apps drop it.

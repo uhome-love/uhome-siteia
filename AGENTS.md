@@ -34,4 +34,3 @@
 - Retained-pre transition rules stay inline in index.html, not only in async CSS. Why: late CSS caused CLS 1.
 - Foco uses shared type/title/FAQ/numbers helpers, ficha.titulo_manual overrides, site-v2 molds and one deferred form. Preserve CRM/journey; mock test writes. Why: page/pre/social parity and safe verification.
 
-- Em-foco offer block: `ofertaFoco` (_shared) feeds app and site-dobra; mold gated by meta uh-foco-layout=oferta-1. Why: pre parity; old apps drop it.

@@ -40,39 +40,58 @@ Deno.serve(async (req) => {
     })
   }
 
-  // 2. Para cada corretor, upsert no site
+  // 2. Para cada corretor, atualiza o cadastro existente ou cria um novo
+  // Os ids do CRM nem sempre batem com uhomesales_id: reconhece por id, e-mail e slug.
   let sincronizados = 0
   const erros: string[] = []
+  const { data: existentes } = await supabaseSite
+    .from('profiles')
+    .select('id, uhomesales_id, email, slug_ref, foto_url')
+    .eq('role', 'corretor')
+  const porId = new Map<string, any>(), porEmail = new Map<string, any>(), porSlug = new Map<string, any>()
+  const slugsUsados = new Set<string>()
+  for (const p of existentes ?? []) {
+    if (p.uhomesales_id) porId.set(p.uhomesales_id, p)
+    if (p.email) porEmail.set(p.email.trim().toLowerCase(), p)
+    if (p.slug_ref) { porSlug.set(p.slug_ref, p); slugsUsados.add(p.slug_ref) }
+  }
+  const { data: todosSlugs } = await supabaseSite.from('profiles').select('slug_ref').not('slug_ref', 'is', null)
+  for (const r of todosSlugs ?? []) slugsUsados.add(r.slug_ref)
 
   for (const corretor of corretoresCRM) {
-    const slugRef = gerarSlug(corretor.nome)
+    const slugRef = gerarSlug(corretor.nome ?? '')
+    const email = (corretor.email ?? '').trim().toLowerCase()
+    const atual = porId.get(corretor.id) ?? (email ? porEmail.get(email) : undefined) ?? porSlug.get(slugRef)
+    const base = {
+      uhomesales_id: corretor.id,
+      nome: corretor.nome,
+      email: corretor.email,
+      telefone: corretor.telefone,
+      creci: corretor.creci,
+      role: 'corretor',
+      ativo: true,
+      sincronizado_em: new Date().toISOString(),
+    }
 
-    const { error } = await supabaseSite
-      .from('profiles')
-      .upsert({
-        uhomesales_id: corretor.id,
-        nome: corretor.nome,
-        email: corretor.email,
-        telefone: corretor.telefone,
-        foto_url: corretor.avatar_url ?? null,
-        creci: corretor.creci,
-        role: 'corretor',
-        ativo: true,
-        slug_ref: slugRef,
-        sincronizado_em: new Date().toISOString(),
-      }, {
-        onConflict: 'uhomesales_id',
-        ignoreDuplicates: false
-      })
+    let error: { message: string } | null = null
+    if (atual) {
+      // Mantém slug (links já enviados) e a foto oficial do site
+      const foto = atual.foto_url?.startsWith('/__l5e/') ? atual.foto_url : (corretor.avatar_url ?? atual.foto_url ?? null)
+      ;({ error } = await supabaseSite.from('profiles').update({ ...base, foto_url: foto }).eq('id', atual.id))
+    } else {
+      let slug = slugRef, n = 2
+      while (slugsUsados.has(slug)) slug = `${slugRef}-${n++}`
+      slugsUsados.add(slug)
+      ;({ error } = await supabaseSite.from('profiles').insert({ ...base, foto_url: corretor.avatar_url ?? null, slug_ref: slug }))
+    }
 
     if (!error) {
       sincronizados++
     } else {
       erros.push(`${corretor.nome}: ${error.message}`)
-      console.error(`[sync-corretores] Erro upsert ${corretor.nome}:`, error.message)
+      console.error(`[sync-corretores] Erro ${corretor.nome}:`, error.message)
     }
 
-    // Log
     await supabaseSite.from('sync_log').insert({
       direcao: 'crm->site',
       tipo: 'corretor',

@@ -8,7 +8,7 @@ import { ExternalLink, Loader2, Search } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 
 interface Lead {
   id: string;
@@ -87,6 +87,7 @@ export default function AdminLeads() {
   }
 
   return (
+    <TooltipProvider>
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Leads</h1>
 
@@ -222,5 +223,6 @@ export default function AdminLeads() {
         </Card>
       )}
     </div>
+    </TooltipProvider>
   );
 }

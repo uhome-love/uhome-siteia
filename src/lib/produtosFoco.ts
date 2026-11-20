@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { dadosDobra } from "@/lib/dobra";
-import { supabase } from "@/lib/supabaseLazy";
+import { catalogoPublico, itemPublico } from "@/lib/catalogoPublico";
 
 export interface MidiaFoco { url: string; url_mobile?: string | null; legenda?: string | null; w?: number; h?: number; categoria?: string | null }
 export interface PrecoFoco { tipologia: string; valor: number; texto: string }
@@ -104,16 +104,7 @@ export function useProdutosFoco() {
   return useQuery({
     queryKey: ["produtos-foco"],
     staleTime: 5 * 60_000,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("produtos_foco")
-        .select(SELECT)
-        .eq("ativo", true)
-        .eq("em_foco", true)
-        .order("ordem");
-      if (error) throw error;
-      return (data ?? []) as unknown as ProdutoFoco[];
-    },
+    queryFn: ({ signal }) => catalogoPublico<ProdutoFoco>('produtos_foco', { select: SELECT, ativo: 'eq.true', em_foco: 'eq.true', order: 'ordem.asc' }, signal),
   });
 }
 
@@ -126,16 +117,7 @@ export function useProdutoFoco(slug?: string) {
       const p = dadosDobra("produto") as ProdutoFoco | undefined;
       return p?.slug === slug ? p : undefined;
     },
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("produtos_foco")
-        .select(SELECT)
-        .eq("slug", slug ?? "")
-        .eq("ativo", true)
-        .maybeSingle();
-      if (error) throw error;
-      return data as unknown as ProdutoFoco | null;
-    },
+    queryFn: ({ signal }) => itemPublico<ProdutoFoco>('produtos_foco', { select: SELECT, slug: `eq.${slug ?? ''}`, ativo: 'eq.true' }, signal),
   });
 }
 
@@ -148,15 +130,7 @@ export function useCampanhasAtivas() {
       const c = dadosDobra("campanhas");
       return c ? (c as Campanha[]).filter((x) => campanhaVigente(x)) : undefined;
     },
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("campanhas")
-        .select("id, slug, nome, tema, titulo, subtitulo, descricao, banner_url, inicio, fim, destaque_home, config")
-        .eq("ativo", true)
-        .order("ordem");
-      if (error) throw error;
-      return ((data ?? []) as unknown as Campanha[]).filter((c) => campanhaVigente(c));
-    },
+    queryFn: async ({ signal }) => (await catalogoPublico<Campanha>('campanhas', { select: 'id, slug, nome, tema, titulo, subtitulo, descricao, banner_url, inicio, fim, destaque_home, config', ativo: 'eq.true', order: 'ordem.asc' }, signal)).filter(c => campanhaVigente(c)),
   });
 }
 
@@ -175,23 +149,11 @@ export function useCampanha(slug?: string) {
     queryKey: ["campanha", slug],
     enabled: !!slug,
     staleTime: 5 * 60_000,
-    queryFn: async () => {
-      const { data: c, error } = await supabase
-        .from("campanhas")
-        .select("id, slug, nome, tema, titulo, subtitulo, descricao, banner_url, inicio, fim, destaque_home, config")
-        .eq("slug", slug ?? "")
-        .eq("ativo", true)
-        .maybeSingle();
-      if (error) throw error;
+    queryFn: async ({ signal }) => {
+      const c = await itemPublico<Campanha>('campanhas', { select: 'id, slug, nome, tema, titulo, subtitulo, descricao, banner_url, inicio, fim, destaque_home, config', slug: `eq.${slug ?? ''}`, ativo: 'eq.true' }, signal);
       if (!c) return null;
-      const { data: links, error: linksError } = await supabase
-        .from("campanha_produtos")
-        .select(`ordem, produto:produtos_foco!inner(${SELECT})`)
-        .eq("campanha_id", c.id)
-        .eq("produto.ativo", true)
-        .order("ordem");
-      if (linksError) throw linksError;
-      const produtos = ((links ?? []) as unknown as { produto: ProdutoFoco }[]).map((link) => link.produto);
+      const links = await catalogoPublico<{ produto: ProdutoFoco }>('campanha_produtos', { select: `ordem, produto:produtos_foco!inner(${SELECT})`, campanha_id: `eq.${c.id}`, 'produto.ativo': 'eq.true', order: 'ordem.asc' }, signal);
+      const produtos = links.map(link => link.produto);
       return { campanha: c as unknown as Campanha, produtos, vigente: campanhaVigente(c as unknown as Campanha) };
     },
   });

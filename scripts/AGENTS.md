@@ -1,0 +1,1 @@
+- Bundle analysis reads emitted Rollup chunks and follows only static imports, deduplicating HTML preloads; never use manualChunks. Why: route gzip totals must measure production code, not dev transforms or optional panels.

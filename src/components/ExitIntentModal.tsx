@@ -1,70 +1,17 @@
-import { useState, useEffect, forwardRef } from "react";
+import { useState, forwardRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Loader2, Check } from "lucide-react";
 import { submitLead } from "@/services/leads";
 import { toast } from "sonner";
 import { formatPhone } from "@/lib/phoneMask";
-import { isLandingCampanha } from "@/lib/landingPages";
 
 export const ExitIntentModal = forwardRef<HTMLDivElement>(function ExitIntentModal(_props, ref) {
-  const [show, setShow] = useState(false);
+  const [show, setShow] = useState(true);
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
   const [touched, setTouched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-
-  useEffect(() => {
-    const shown = sessionStorage.getItem("uhome_exit_shown");
-    if (shown) return;
-
-    const pageLoadTime = Date.now();
-
-    let lastMouseX = 0;
-    const trackMouse = (e: MouseEvent) => { lastMouseX = e.clientX; };
-    document.addEventListener("mousemove", trackMouse);
-
-    const canShow = () => {
-      // Landings de anúncio têm formulário próprio
-      if (isLandingCampanha(window.location.pathname)) return false;
-      // Don't show if a dropdown/popover/select is open
-      const openEl = document.querySelector(
-        '[data-state="open"], [aria-expanded="true"]'
-      );
-      if (openEl) return false;
-      // Require at least 60s on page
-      if (Date.now() - pageLoadTime < 60000) return false;
-      if (sessionStorage.getItem("uhome_exit_shown")) return false;
-      // Don't show if mouse was over the map area (right side)
-      const mapEl = document.querySelector("[data-testid='search-map']");
-      if (mapEl) {
-        const rect = mapEl.getBoundingClientRect();
-        if (lastMouseX > rect.left) return false;
-      }
-      return true;
-    };
-
-    const handleMouseLeave = (e: MouseEvent) => {
-      if (e.clientY <= 0 && canShow()) {
-        sessionStorage.setItem("uhome_exit_shown", "1");
-        setShow(true);
-      }
-    };
-
-    const timer = setTimeout(() => {
-      if (canShow()) {
-        sessionStorage.setItem("uhome_exit_shown", "1");
-        setShow(true);
-      }
-    }, 90000);
-
-    document.addEventListener("mouseleave", handleMouseLeave);
-    return () => {
-      document.removeEventListener("mouseleave", handleMouseLeave);
-      document.removeEventListener("mousemove", trackMouse);
-      clearTimeout(timer);
-    };
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

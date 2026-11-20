@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
+import { bundleAnalysis } from "./scripts/bundleAnalysis";
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL ?? "https://huigglwvvzuwwyqvpmec.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY =
@@ -32,7 +33,7 @@ export default defineConfig(({ mode }) => ({
       overlay: false,
     },
   },
-  plugins: [react(), cssAssincrono, mode === "development" && componentTagger()].filter(Boolean),
+  plugins: [react(), cssAssincrono, bundleAnalysis(), mode === "development" && componentTagger()].filter(Boolean),
   define: {
     "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(SUPABASE_URL),
     "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(SUPABASE_PUBLISHABLE_KEY),

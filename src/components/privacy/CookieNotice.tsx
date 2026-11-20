@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
+const Switch = lazy(() => import('@/components/ui/switch').then(m => ({ default: m.Switch })));
 import { needsAnswer, onConsentChange, readChoice, saveChoices } from '@/lib/consent';
 
 /** Abre as preferências de cookies de qualquer lugar (ex.: link no rodapé). */
@@ -50,6 +50,7 @@ export function CookieNotice() {
     <div ref={panel} tabIndex={-1} role="region" aria-label="Preferências de privacidade" style={{ bottom: base ? base + 8 : undefined }}
       className="aviso-cookies fixed inset-x-2 bottom-2 z-[110] rounded-xl border border-border bg-background/95 px-3 py-1.5 shadow-lg backdrop-blur sm:inset-x-auto sm:bottom-4 sm:left-4 sm:max-w-[420px] sm:px-3 sm:py-2">
       {settings ? (
+        <Suspense fallback={null}>
         <div className="max-h-[60dvh] space-y-3 overflow-auto py-1 text-sm">
           <p className="font-semibold text-foreground">Preferências de cookies</p>
           <p className="text-muted-foreground">Necessários · sempre ativos</p>
@@ -61,6 +62,7 @@ export function CookieNotice() {
             <a href="/politica-de-privacidade" className="text-xs text-primary underline">Política de privacidade</a>
           </div>
         </div>
+        </Suspense>
       ) : (
         <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 sm:gap-y-1.5">
           <p className="min-w-0 flex-1 text-xs leading-tight text-foreground sm:basis-full sm:whitespace-nowrap sm:text-sm">Usamos cookies para melhorar sua busca.</p>

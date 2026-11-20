@@ -2,3 +2,5 @@
 - Search data starts in `src/lib/buscaCedo.ts` (called from main.tsx, raw PostgREST fetch + first photo preload); `buscarSite` reuses that promise by filter JSON. Why: the list must not wait for the route chunk or the backend client.
 - Google Ads conversion routing lives in `conversaoDoEvento` (src/lib/gtag.ts): saved searches and comparisons map to their own secondary, valueless actions and must never fall into the primary lead action. Why: soft actions would inflate primary leads and skew bidding.
 - Accounts become CRM leads only via registrarContaComoLead (AuthModal) when a WhatsApp is given; login alone never creates a lead. Why: owner wants only reachable sign-ups in the Fila do CEO.
+- Public campaign/product reads use catalogoPublico with anonymous permissions and unchanged filters; private operations retain the lazy SDK. Why: public content must not download the auth client before painting.
+- Optional startup work uses depoisDoLoadOcioso with cancellation; saved sessions initialize immediately. Why: avoid a load-event CPU burst without losing returning users.

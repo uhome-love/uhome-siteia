@@ -2,7 +2,6 @@ import { CookieNotice } from "@/components/privacy/CookieNotice";
 import React, { Suspense, useEffect, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
 import { CorretorProvider } from "@/contexts/CorretorContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -13,10 +12,11 @@ import { lazyRetry } from "@/lib/lazyRetry"; // hmr-trigger
 import { useWhatsAppLeadStore } from "@/stores/whatsappLeadStore";
 import { useAuth } from "@/hooks/useAuth";
 import { LiaLauncher } from "@/components/lia/LiaLauncher";
+import { depoisDoLoadOcioso } from "@/lib/depoisDoLoadOcioso";
 
 const Sonner = lazyRetry(() => import("@/components/ui/sonner").then((m) => ({ default: m.Toaster })));
 const Toaster = lazyRetry(() => import("@/components/ui/toaster").then((m) => ({ default: m.Toaster })));
-const ExitIntentModal = lazyRetry(() => import("./components/ExitIntentModal.tsx").then((m) => ({ default: m.ExitIntentModal })));
+const ExitIntentTrigger = lazyRetry(() => import("./components/ExitIntentTrigger.tsx").then((m) => ({ default: m.ExitIntentTrigger })));
 
 /** Lia, avisos e janelas só baixam depois da primeira pintura e do carregamento da página, para não disputar com o conteúdo principal. */
 const SalvarNaPasta = lazyRetry(() => import('@/components/favoritos/SalvarNaPasta').then((m) => ({ default: m.SalvarNaPasta })));
@@ -37,12 +37,7 @@ function PastasSobDemanda() {
 }
 function DepoisDaPintura({ children }: { children: React.ReactNode }) {
   const [pronta, setPronta] = useState(false);
-  useEffect(() => {
-    const ric = (window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
-    const go = () => (ric ? ric(() => setPronta(true), { timeout: 3000 }) : setTimeout(() => setPronta(true), 1500));
-    if (document.readyState === "complete") go(); else window.addEventListener("load", go, { once: true });
-    return () => window.removeEventListener("load", go);
-  }, []);
+  useEffect(() => depoisDoLoadOcioso(() => setPronta(true)), []);
   return pronta ? <Suspense fallback={null}>{children}</Suspense> : null;
 }
 const WhatsAppLeadModal = lazyRetry(() => import("./components/WhatsAppLeadModal.tsx").then((m) => ({ default: m.WhatsAppLeadModal })));
@@ -71,7 +66,7 @@ const App = () => (
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <CorretorProvider>
-            <TooltipProvider>
+            <>
               <CookieNotice />
               <BannerCorretor />
               <Suspense fallback={<PageFallback />}>
@@ -81,11 +76,11 @@ const App = () => (
                 <Toaster />
                 <Sonner />
                 <ContatosSobDemanda />
-                <ExitIntentModal />
+                <ExitIntentTrigger />
                 <LiaLauncher />
                 <PastasSobDemanda />
               </DepoisDaPintura>
-            </TooltipProvider>
+            </>
           </CorretorProvider>
         </AuthProvider>
       </QueryClientProvider>

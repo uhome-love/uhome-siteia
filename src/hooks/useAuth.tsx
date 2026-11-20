@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { carregarSupabase } from "@/lib/supabaseLazy";
+import { depoisDoLoadOcioso } from "@/lib/depoisDoLoadOcioso";
 import type { User, Session } from "@supabase/supabase-js";
 
 interface AuthContext {
@@ -66,10 +67,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
     sair = () => subscription.unsubscribe();
     };
-    if (temSessao || document.readyState === "complete") void iniciar();
-    else window.addEventListener("load", () => void iniciar(), { once: true });
+    const cancelar = temSessao ? (() => { void iniciar(); return () => {}; })() : depoisDoLoadOcioso(() => void iniciar());
 
-    return () => { ativo = false; sair?.(); };
+    return () => { ativo = false; cancelar(); sair?.(); };
   }, []);
 
   const signOut = async () => {

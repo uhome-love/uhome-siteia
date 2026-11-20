@@ -410,14 +410,14 @@ Sem snippets estruturados, imagens ou formulário de lead em nenhum nível.
 | Golden Lake | golden lake apartamentos | Frase | — | — | — | — | R$ 5,26 | 4 | 0 |
 | Golden Lake | golden lake apartamento | Frase | 8 | Acima | Média | Acima | R$ 4,13 | 4 | 0 |
 | Golden Lake | golden lake poa | Frase | 7 | Acima | Média | Média | R$ 0,00 | 0 | 0 |
-| Golden Lake | **av** | **Ampla** | — | — | — | — | R$ 0,00 | 0 | 0 |
-| Golden Lake | **multiplan** | **Ampla** | — | — | — | — | R$ 0,00 | 0 | 0 |
-| Golden Lake | **bairro** | **Ampla** | — | — | — | — | R$ 0,00 | 0 | 0 |
+| Golden Lake | av (NEGATIVA do grupo) | Ampla | — | — | — | — | R$ 0,00 | 0 | 0 |
+| Golden Lake | multiplan (NEGATIVA do grupo) | Ampla | — | — | — | — | R$ 0,00 | 0 | 0 |
+| Golden Lake | bairro (NEGATIVA do grupo) | Ampla | — | — | — | — | R$ 0,00 | 0 | 0 |
 | Skyglass | skyglass porto alegre | Frase | 6 | Média | Acima | Abaixo | R$ 7,74 | 6 | 0 |
 | Skyglass | skyglass moinhos | Frase | 7 | Média | Acima | Média | R$ 1,30 | 1 | 0 |
 | Skyglass | skyglass rio branco | Frase | — | — | — | — | R$ 0,00 | 0 | 0 |
 
-"—" = o Google ainda não calculou o índice. Atenção: o grupo Golden Lake tem três palavras positivas de correspondência ampla e genéricas ("av", "multiplan", "bairro"), sem custo até agora, mas com risco de buscas irrelevantes.
+"—" = o Google ainda não calculou o índice. Correção: "av", "multiplan" e "bairro" no Golden Lake são negativas do grupo, não palavras positivas.
 
 ## 5. Termos de pesquisa com custo, últimos 7 dias (40 de 94, por custo)
 

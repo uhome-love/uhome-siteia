@@ -12,6 +12,11 @@ import { getCorretorRef, getCorretorRefId } from "@/lib/session";
 import type { ProdutoFoco } from "@/lib/produtosFoco";
 import { journeyEnvelope } from "@/lib/journeyIdentity";
 
+/** Prova perto do formulário. A nota agregada do Google fica desligada (regra do projeto: sem nota agregada na vitrine); hoje mostra só o CRECI. */
+export function provaFoco(r: { nota: number; total: number } | null | undefined): string {
+  return r && r.nota > 0 && r.total > 0 ? `★ ${r.nota.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} · ${r.total.toLocaleString("pt-BR")} avaliações no Google · CRECI-RS 25682J` : "CRECI-RS 25682J";
+}
+
 const ASSUNTOS = ["Valores e condições", "Plantas e unidades", "Financiamento", "Localização e obra"];
 export type PedidoFoco = "visita" | "informacoes";
 export function FocoContactForm({ p, modo, dia, periodo, planta, onVisita, setDia, setPeriodo }: { p: ProdutoFoco; modo: PedidoFoco; dia: Date; periodo: string; planta?: string | null; onVisita: () => void; setDia: (d: Date) => void; setPeriodo: (s: string) => void }) {
@@ -38,8 +43,9 @@ export function FocoContactForm({ p, modo, dia, periodo, planta, onVisita, setDi
     } catch { setErro("Não foi possível salvar seu pedido. Tente novamente ou chame no WhatsApp."); }
     finally { setLoading(false); }
   }
-  if (ok) return <div role="status" className="space-y-4 py-6 text-center"><Check className="mx-auto h-8 w-8 text-primary" /><h3 className="text-xl font-bold">{modo === "visita" ? `Visita pedida, ${nome.trim().split(" ")[0]}… Um passo mais perto do seu novo lar.` : `Pedido recebido, ${nome.trim().split(" ")[0]}…`}</h3><p className="text-muted-foreground">Um especialista da Uhome confirma pelo WhatsApp.</p>{modo === "informacoes" && <Button className="w-full" onClick={onVisita}>Agendar visita também</Button>}</div>;
+  if (ok) return <div role="status" className="space-y-4 py-6 text-center"><Check className="mx-auto h-8 w-8 text-primary" /><h3 className="text-xl font-bold">{modo === "visita" ? `Visita pedida, ${nome.trim().split(" ")[0]}… Um passo mais perto do seu novo lar.` : `Pedido recebido, ${nome.trim().split(" ")[0]}…`}</h3><p className="text-muted-foreground">Um especialista da Uhome confirma pelo WhatsApp.</p>{modo === "informacoes" && <Button className="w-full" onClick={onVisita}>Agendar visita</Button>}</div>;
   return <form noValidate data-formulario={modo === "visita" ? "agendamento_visita_foco" : "foco_mais_informacoes"} data-contato onSubmit={enviar} className="space-y-4">
+    <p data-foco-prova className="text-xs font-semibold text-muted-foreground">{provaFoco(null)}</p>
     {modo === "informacoes" && <p className="text-sm text-muted-foreground">Enviamos pelo WhatsApp os valores, as condições de pagamento e as plantas.</p>}
     <div className="rounded-lg bg-secondary p-3 text-sm">{modo === "visita" ? <><strong>{p.nome}</strong><p>{dia.toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" })} · {periodo}</p></> : <><strong>{p.nome}</strong><p>Planta: {planta ?? "A escolher com o especialista"}</p></>}</div>
     {modo === "visita" && <><div className="grid grid-cols-5 gap-1">{proximosDiasFoco().map(d => <Button type="button" key={dataLocalFoco(d)} variant={dataLocalFoco(dia) === dataLocalFoco(d) ? "secondary" : "outline"} aria-pressed={dataLocalFoco(dia) === dataLocalFoco(d)} className="h-14 flex-col gap-0 px-1" onClick={() => { setDia(d); void trackEvent({ tipo: "dia_escolhido", imovel_slug: `em-foco/${p.slug}`, dados: { dia: dataLocalFoco(d) } }); }}><span className="text-xs">{d.toLocaleDateString("pt-BR", { weekday: "short" })}</span>{d.getDate()}</Button>)}</div><div className="grid grid-cols-2 gap-2">{["Manhã", "Tarde"].map(t => <Button type="button" key={t} variant={periodo === t ? "secondary" : "outline"} aria-pressed={periodo === t} onClick={() => setPeriodo(t)}>{t}</Button>)}</div></>}

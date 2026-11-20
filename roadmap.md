@@ -6,3 +6,4 @@
 
 - [ ] 04/12: rever anúncios (Imóveis do Site acima de R$80 por contato = recomendar pausar tudo; Natal termina 18/12)
 - [x] Página /em-foco/:slug com oferta na 1ª tela, barra fixa, sem menu do app, formulário "tabela e plantas" e molde site-dobra
+- [x] Conversão Ads: cartão de seleção na /busca (anúncio), barra em-foco ordem, prova Google, SEO em-foco, tirar GTM do ssr-render, velocidade segura

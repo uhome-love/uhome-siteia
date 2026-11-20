@@ -25,6 +25,8 @@ export const FORMULARIO_LABELS: Record<string, string> = {
   wizard_onboarding: "Cadastro guiado",
   lia_chat: "Conversa com a LIA",
   lp_studios_cyrela: "Formulário Studios Cyrela",
+  busca_selecao_anuncio: "Busca - seleção (anúncio)",
+  agendamento_visita_busca: "Busca - visita (anúncio)",
 };
 
 export function nomeFormulario(origem: string, informado?: string): string {

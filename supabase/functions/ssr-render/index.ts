@@ -1,5 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
-import { tituloFoco, tituloPreviaFoco, faqFoco } from "../_shared/focoPresentation.ts";
+import { tituloFoco, tituloPreviaFoco, descricaoSeoFoco, faqFoco } from "../_shared/focoPresentation.ts";
 import { BUSCA_URLS } from '../_shared/buscaConfig.ts';
 
 const corsHeaders = {
@@ -217,19 +217,8 @@ function html(title: string, description: string, rawOgImage: string, canonical:
   <meta name="twitter:image" content="${esc(ogImage)}" />
   <meta name="robots" content="index, follow" />
   ${jsonLdBlocks.map((j) => `<script type="application/ld+json">${j}</script>`).join("\n  ")}
-  <!-- Google Tag Manager -->
-  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-  })(window,document,'script','dataLayer','GTM-5838J9Z');</script>
-  <!-- End Google Tag Manager -->
 </head>
 <body>
-  <!-- Google Tag Manager (noscript) -->
-  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5838J9Z"
-  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-  <!-- End Google Tag Manager (noscript) -->
   ${bodyHtml}
   <script>
     // Redirect human visitors to canonical URL (bots don't execute JS)
@@ -871,14 +860,10 @@ async function renderProdutoFoco(slug: string, corretorSlug?: string) {
     .maybeSingle();
   if (!p) return null;
   const nomeCorretor = await corretorNome(corretorSlug);
-  const preco = precoCurto(p.preco_a_partir);
   const title = nomeCorretor
     ? `${p.nome} · ${tituloFoco(p)} · enviado por ${nomeCorretor} | Uhome`
     : tituloPreviaFoco(p);
-  const ficha = (p.ficha ?? {}) as Record<string, unknown>;
-  const tip = typeof ficha.tipologias === "string" ? ficha.tipologias : Array.isArray(ficha.tipologias) ? (() => { const ds = [...new Set((ficha.tipologias as { dorm?: number | string }[]).map((t) => Number(t?.dorm)).filter((n) => n > 0))].sort(); return ds.length ? `${ds.join(ds.length > 2 ? ", " : " e ")} dormitório${ds.length > 1 || ds[0] > 1 ? "s" : ""}` : ""; })() : (p.tipo ?? "");
-  const partes = [tip ? `${p.nome}: ${tip}` : p.nome, preco ? `a partir de ${preco}` : "", p.entrega ? `entrega ${p.entrega}` : ""].filter(Boolean);
-  const desc = `${partes.join(", ")}. ${p.bairro}, ${p.cidade}. ${semMcmv(p.resumo ?? "")}`.trim();
+  const desc = descricaoSeoFoco(p);
   const canonical = `${SITE}/em-foco/${slug}`;
   const imgs = ((p.galeria as { url: string }[]) ?? []).slice(0, 6).map((g) => absAsset(g.url));
   const ld = JSON.stringify({

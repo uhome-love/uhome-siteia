@@ -13,7 +13,7 @@ import { lazyRetry } from "@/lib/lazyRetry";
 import { useCanonical } from "@/hooks/useCanonical";
 import { useCorretor } from "@/contexts/CorretorContext";
 import { useProdutoFoco, useProdutosFoco, useCampanhasAtivas, formatPreco, SITE_URL, absUrl, type MidiaFoco } from "@/lib/produtosFoco";
-import { tituloFoco, tituloPreviaFoco, numerosFoco, destaquesFoco, faqFoco, ofertaFoco, CONFIANCA_FOCO } from "../../supabase/functions/_shared/focoPresentation";
+import { tituloFoco, tituloPreviaFoco, descricaoSeoFoco, numerosFoco, destaquesFoco, faqFoco, ofertaFoco, CONFIANCA_FOCO } from "../../supabase/functions/_shared/focoPresentation";
 import { proximosDiasFoco, diaInicialFoco } from "@/lib/focoVisit";
 import { setJsonLd, removeJsonLd } from "@/lib/jsonld";
 import { trackEvent } from "@/lib/trackEvent";
@@ -36,7 +36,8 @@ export default function ProdutoFocoPage() {
   useEffect(() => {
     if (!p) return;
     document.title = tituloPreviaFoco(p);
-    for (const [prop, value] of [["og:title", tituloPreviaFoco(p)], ["og:image", absUrl(p.capa_url) ?? ""]]) {
+    { let d = document.querySelector('meta[name="description"]'); if (!d) { d = document.createElement("meta"); d.setAttribute("name", "description"); document.head.append(d); } d.setAttribute("content", descricaoSeoFoco(p)); }
+    for (const [prop, value] of [["og:title", tituloPreviaFoco(p)], ["og:description", descricaoSeoFoco(p)], ["og:image", absUrl(p.capa_url) ?? ""]]) {
       let el = document.querySelector(`meta[property="${prop}"]`); if (!el) { el = document.createElement("meta"); el.setAttribute("property", prop); document.head.append(el); } el.setAttribute("content", value);
     }
     void trackEvent({ tipo: "imovel_visto", imovel_slug: `em-foco/${p.slug}`, imovel_titulo: p.nome, imovel_bairro: p.bairro, imovel_preco: p.preco_a_partir });
@@ -81,7 +82,7 @@ export default function ProdutoFocoPage() {
       </div>
     </main>
     <footer className="foco-footer border-t border-border px-5 py-10 text-center text-xs text-muted-foreground"><p className="text-base font-bold text-foreground">Você e seu novo lar.</p><p className="mt-3">Uhome Imóveis · CRECI-RS 25682J</p><Link className="inline-flex min-h-11 items-center" to="/politica-de-privacidade">Política de privacidade</Link></footer>
-    <div data-barra-baixo className="uhs-contact-bar fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-border bg-background/95 p-3 backdrop-blur lg:hidden">{!modoCorretor && <Button variant="outline" onClick={() => pedir("visita")} className="flex-1 px-2 text-sm">Agendar visita</Button>}<Button onClick={() => pedir("informacoes")} className="flex-1 px-2 text-sm">Mais informações</Button><a href={waUrl} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" onClick={() => trackProdutoWhatsApp(p)} className="flex items-center justify-center rounded-xl border border-border px-4 py-3.5 text-foreground"><MessageCircle className="h-5 w-5 text-whatsapp" /></a></div>
+    <div data-barra-baixo className="uhs-contact-bar fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-border bg-background/95 p-3 backdrop-blur lg:hidden"><Button onClick={() => pedir("informacoes")} className="flex-1 px-2 text-sm">Mais informações</Button>{!modoCorretor && <Button variant="outline" onClick={() => pedir("visita")} className="flex-1 px-2 text-sm">Agendar visita</Button>}<a href={waUrl} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" onClick={() => trackProdutoWhatsApp(p)} className="flex items-center justify-center rounded-xl border border-border px-4 py-3.5 text-foreground"><MessageCircle className="h-5 w-5 text-whatsapp" /></a></div>
     {box && <Suspense fallback={null}><MaterialGallery fotos={box.fotos} index={box.i} onClose={() => setBox(null)} onAgendar={() => { setBox(null); pedir("visita"); }} restoreFocus={opener.current} /></Suspense>}
     <Dialog.Root open={!!pedido} onOpenChange={v => { if (!v) setPedido(null); }}><Dialog.Portal><Dialog.Overlay className="fixed inset-0 z-[120] bg-noir/80" /><Dialog.Content aria-describedby={undefined} className="fixed inset-x-3 top-1/2 z-[121] max-h-[85dvh] -translate-y-1/2 overflow-auto rounded-lg border border-border bg-background p-5 sm:left-1/2 sm:right-auto sm:w-[480px] sm:-translate-x-1/2 sm:p-6"><div className="mb-5 flex items-center justify-between gap-3"><Dialog.Title className="text-xl font-bold">{pedido === "visita" ? "Agendar visita" : `Receba valores, condições e plantas do ${p.nome}`}</Dialog.Title><Dialog.Close asChild><Button variant="ghost" size="icon" aria-label="Fechar formulário"><X /></Button></Dialog.Close></div>{pedido && <Suspense fallback={<div className="h-80 animate-pulse bg-secondary" />}><FocoContactForm key={pedido} p={p} modo={pedido} dia={dia} periodo={periodo} planta={planta} setDia={setDia} setPeriodo={setPeriodo} onVisita={() => setPedido("visita")} /></Suspense>}</Dialog.Content></Dialog.Portal></Dialog.Root>
   </div>;

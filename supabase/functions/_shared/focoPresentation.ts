@@ -22,7 +22,13 @@ export function tituloFoco(p: Produto): string {
   return `${tipo} com ${diferencial}${p.bairro ? ` no ${p.bairro}` : ""}`;
 }
 export function tituloPreviaFoco(p: Produto): string {
-  return `${p.nome} · ${tituloFoco(p)} | Uhome`;
+  return p.bairro ? `${p.nome} em ${p.bairro}: valores, plantas e condições | Uhome` : `${p.nome}: valores, plantas e condições | Uhome`;
+}
+/** Descrição de busca: preço real "a partir de" quando existe; nada inventado. */
+export function descricaoSeoFoco(p: Produto & { cidade?: string | null; preco_a_partir?: number | null }): string {
+  const local = [p.bairro, p.cidade].filter(Boolean).join(", ");
+  const preco = precoCurtoFoco(p.preco_a_partir);
+  return `${p.nome}${local ? ` em ${local}` : ""}${preco ? `, a partir de ${preco}` : ""}. Receba pelo WhatsApp os valores, as condições de pagamento e as plantas com a Uhome.`;
 }
 export function numerosFoco(p: { entrega?: string | null; ficha?: { tipologias?: { area?: string; dorm?: number | null; suites?: number | null; vagas?: string }[] } | null }) {
   const tip = p.ficha?.tipologias ?? [];

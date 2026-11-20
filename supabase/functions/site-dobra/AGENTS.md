@@ -1,1 +1,2 @@
 - Em-foco offer block: `ofertaFoco` (_shared) feeds app and site-dobra; mold gated by meta uh-foco-layout=oferta-1. Why: pre parity; old apps drop it.
+- Ad-visitor search card (visitanteAnuncio) changes the results layout, so site-dobra drops the busca pre for ad visitors at parser time. Why: no swap jump.

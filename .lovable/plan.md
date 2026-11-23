@@ -1,15 +1,31 @@
-# Andamento Google Ads (conta 1041226095) — leitura de 23/11
+# Anúncios para público de médio/alto padrão (Imóveis do Site)
 
-| Campanha | Status | Verba/dia | 7 dias: cliques / custo / conversões | 30 dias: custo / conversões |
-|---|---|---|---|---|
-| Natal Chave de Ouro | Em aprendizado | R$ 15 | 171 / R$ 184,42 / 3 (≈R$ 61 cada) | R$ 337,29 / 3 (≈R$ 112) |
-| Imóveis do Site | Limitada | R$ 30 | 311 / R$ 224,94 / 0 | R$ 350,29 / 2 (≈R$ 175) |
+## Objetivo
+Parar de atrair buscas de R$ 200–300 mil e trazer quem procura imóveis a partir de R$ 500 mil: coberturas, casas em condomínio, studios e imóveis de R$ 1 milhão. A campanha Natal Chave de Ouro não muda. O Open Arvoredo pode continuar aparecendo.
 
-- Meta de custo por lead: R$ 30–40. As duas campanhas estão acima da meta.
-- Imóveis do Site: gasta mais e não registrou conversão nos últimos 7 dias.
-- Natal: melhorou na semana, mas ainda está em fase de aprendizado.
+## Passo 1 — Leitura (sem alterar nada)
+- Termos pesquisados dos últimos 30 dias da Imóveis do Site, com cliques, custo e contatos.
+- Grupos, palavras-chave, anúncios e páginas de destino atuais.
+- Faixa de preço dos leads recentes do site vindos de anúncio, para confirmar o problema.
+- Conferir quantos imóveis o site tem acima de R$ 500 mil em cada tipo (cobertura, casa em condomínio, studio), para não mandar gente para página vazia.
 
-## Próximos passos sugeridos (nenhum aplicado)
-1. Verificar se as conversões "Lead site" estão sendo registradas desde a publicação das mudanças no site, antes de qualquer ajuste.
-2. Ler os termos de pesquisa de Imóveis do Site dos últimos 7 dias para identificar cliques sem intenção de compra.
-3. Esperar a Natal sair do aprendizado antes de mexer nela.
+## Passo 2 — Novos grupos de anúncio na Imóveis do Site
+Um grupo por tipo, cada um com palavras-chave de frase/exata e destino na busca do site já filtrada (preço mínimo R$ 500 mil):
+- Coberturas em Porto Alegre
+- Casas em condomínio
+- Studios (bairros nobres)
+- Imóveis de alto padrão / R$ 1 milhão
+Textos com foco em localização, padrão e atendimento consultivo; sem MCMV, FGTS, subsídio, "barato" ou "a partir de R$ 240 mil".
+
+## Passo 3 — Cortar o tráfego barato
+- Pausar palavras-chave e grupos que só trouxeram buscas de baixo valor (pela leitura do passo 1).
+- Adicionar negativas de baixo padrão: "barato", "popular", "200 mil", "300 mil", "entrada zero", "sem entrada", "financiamento caixa" etc., conferindo que não bloqueiam o Open Arvoredo.
+- Revisar anúncios atuais que destacam preço baixo.
+
+## Passo 4 — Aprovação e conferência
+- Tudo passa pelo cartão de aprovação; orçamento e estratégia de lance ficam como estão (custo por lead continua acima da meta de R$ 30–40).
+- Depois de aplicar, confirmar pelos relatórios que grupos, palavras e negativas estão ativos.
+- Revisar em 7 dias a faixa de preço dos novos leads.
+
+## Fora do escopo
+Campanha Natal, orçamento, estratégia de lance e mudanças no site.

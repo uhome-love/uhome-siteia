@@ -1,3 +1,4 @@
+import { memo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -8,7 +9,10 @@ import { FotoCatalogo } from './FotoCatalogo';
 import { trackEvent } from '@/lib/trackEvent';
 import { FotosCard } from './FotosCard';
 import { selosDoCard } from '@/lib/novidade';
-export function CatalogCard({ imovel: r, index, saved, onSave, highlighted, onHover, selo }: {imovel:Imovel;index:number;saved:boolean;onSave:()=>void;highlighted:boolean;onHover:(id:string|null)=>void;selo?:string}) {
+type Props={imovel:Imovel;index:number;saved:boolean;onSave:()=>void;highlighted:boolean;onHover:(id:string|null)=>void;selo?:string};
+/** Memo: digitar na busca ou abrir filtros não redesenha todos os cartões; callbacks lidos do último render via ref. */
+export const CatalogCard=memo(function CatalogCard(props:Props){ const cb=useRef(props); cb.current=props; return <Cartao {...props} onSave={()=>cb.current.onSave()} onHover={(id)=>cb.current.onHover(id)}/>; },(a,b)=>a.imovel===b.imovel&&a.index===b.index&&a.saved===b.saved&&a.highlighted===b.highlighted&&a.selo===b.selo);
+function Cartao({ imovel: r, index, saved, onSave, highlighted, onHover, selo }: Props) {
   const {prefixLink}=useCorretor(); const product=(r as Imovel & {fonte?:string}).fonte==='produto';
   const href=prefixLink(`${product?'/em-foco/':'/imovel/'}${r.slug}`);
   const selos=selosDoCard((r as any).publicado_em,r.fase,selo);

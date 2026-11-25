@@ -1,2 +1,3 @@
 - Amenities: `imoveis.comodidades` (trigger from Jetimob raw) drives busca_site filter, counts and price histogram. Why: one source, no client parsing.
 - Catalog photos use explicit viewport proximity; results expand in small batches and closed panels load on demand. Why: native image lazy-loading otherwise downloads multiple screens at startup.
+- CatalogCard is memoized and reads callbacks from a ref; pass stable data props (imovel, saved, highlighted). Why: typing or opening panels must not re-render every card.

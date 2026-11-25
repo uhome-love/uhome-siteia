@@ -10,7 +10,7 @@ const corsHeaders = {
 
 const SITE = "https://uhome.com.br";
 const LOGO = `${SITE}/uhome-logo.svg`;
-const OG_DEFAULT = `${SITE}/og-default.jpg`;
+const OG_DEFAULT = `${SITE}/og-uhome-2026.jpg`;
 
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
